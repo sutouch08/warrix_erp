@@ -13,7 +13,19 @@ function _check_login()
 function get_permission($menu, $uid, $id_profile)
 {
   $CI =& get_instance();
-  return $CI->user_model->get_permission($menu, $uid, $id_profile);
+  $pm = $CI->user_model->get_permission($menu, $uid, $id_profile);
+  if(empty($pm))
+  {
+    $pm = new stdClass();
+    $pm->can_view = 0;
+    $pm->can_add = 0;
+    $pm->can_edit = 0;
+    $pm->can_delete = 0;
+    $pm->can_approve = 0;
+  }
+
+  return $pm;
+
 }
 
 

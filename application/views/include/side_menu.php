@@ -47,9 +47,14 @@
 			<b class="arrow fa fa-angle-down"></b>
 		</a>
 		<ul class="submenu">
+			<?php echo side_menu('SCCONF', 'setting/configs', 'การกำหนดค่า');  ?>
 			<?php echo side_menu('SCUSER', 'users/users', 'เพิ่ม/แก้ไข ชื่อผู้ใช้งาน');  ?>
 			<?php echo side_menu('SCPORF', 'users/profiles', 'เพิ่ม/แก้ไข โปรไฟล์'); ?>
 			<?php echo side_menu('SCPERM', 'users/permission', 'กำหนดสิทธิ์'); ?>
+			<?php echo side_menu('SCPOLI', 'discount/discount_policy', 'นโยบายส่วนลด'); ?>
+			<?php echo side_menu('SCRULE', 'discount/discount_rule', 'เงื่อนไขส่วนลด'); ?>
+			<?php echo side_menu('SCBGSP', 'budget/sponsor_budget', 'งบประมาณสปอนเซอร์'); ?>
+			<?php echo side_menu('SCBGSU', 'budget/support_budget', 'งบประมาณอภินันท์'); ?>
 		</ul>
 	</li>
 
@@ -60,10 +65,15 @@
 			<b class="arrow fa fa-angle-down"></b>
 		</a>
 		<ul class="submenu">
-			<?php echo side_menu('DBPROD', 'products/products','เพิ่ม/แก้ไข รายการสินค้า'); ?>
-			<?php echo side_menu('DBCUST', 'products/customers','เพิ่ม/แก้ไข รายชื่อลูกค้า'); ?>
-			<?php echo side_menu('DBCHAN', 'products/sale_channels','เพิ่ม/แก้ไข ช่องทางการขาย'); ?>
-			<?php echo side_menu('DBPAYM', 'products/payment_methods','เพิ่ม/แก้ไข ช่องทางการชำระเงิน'); ?>
+			<?php echo side_menu('DBPROD', 'masters/products','เพิ่ม/แก้ไข รายการสินค้า'); ?>
+			<?php echo side_menu('DBCUST', 'masters/customers','เพิ่ม/แก้ไข รายชื่อลูกค้า'); ?>
+			<?php echo side_menu('DBCARE', 'masters/customer_area','เพิ่ม/แก้ไข เขตการขาย'); ?>
+			<?php echo side_menu('DBCLAS', 'masters/customer_class','เพิ่ม/แก้ไข เกรดลูกค้า'); ?>
+			<?php echo side_menu('DBCGRP', 'masters/customer_group','เพิ่ม/แก้ไข กลุ่มลูกค้า'); ?>
+			<?php echo side_menu('DBCKIN', 'masters/customer_kind','เพิ่ม/แก้ไข ประเภทลูกค้า'); ?>
+			<?php echo side_menu('DBCTYP', 'masters/customer_type','เพิ่ม/แก้ไข ชนิดลูกค้า'); ?>
+			<?php echo side_menu('DBCHAN', 'masters/channels','เพิ่ม/แก้ไข ช่องทางการขาย'); ?>
+			<?php echo side_menu('DBPAYM', 'masters/payment_methods','เพิ่ม/แก้ไข ช่องทางการชำระเงิน'); ?>
 		</ul>
 	</li>
 </ul><!-- /.nav-list -->
