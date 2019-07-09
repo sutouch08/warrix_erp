@@ -67,6 +67,19 @@ class Customer_kind_model extends CI_Model
 
 
 
+  public function get_name($code)
+  {
+    if($code === NULL OR $code === '')
+    {
+      return $code;
+    }
+    
+    $rs = $this->db->select('name')->where('code', $code)->get('customer_kind');
+    return $rs->row()->name;
+  }
+
+
+
 
   public function get_data($code = '', $name = '', $perpage = '', $offset = '')
   {

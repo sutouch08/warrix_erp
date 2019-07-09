@@ -412,10 +412,10 @@ class CI_Pagination {
 		$num_pages = (int) ceil($this->total_rows / $this->per_page);
 
 		// Is there only one page? Hm... nothing more to do here then.
-		if ($num_pages === 1)
-		{
-			return '';
-		}
+		// if ($num_pages === 1)
+		// {
+		// 	return '';
+		// }
 
 		// Check the user defined number of links.
 		$this->num_links = (int) $this->num_links;

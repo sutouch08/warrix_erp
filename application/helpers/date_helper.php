@@ -2,9 +2,7 @@
 function thai_date($date, $sp = '-', $time = FALSE)
 {
   $sp = $sp === '' ? '-' : $sp;
-  $diff = getConfig('DATE_FORMAT') === 'BE' ? 543 : 0;
-  $Year = date('Y', strtotime($date)) + $diff;
-  $format = $time === TRUE ? 'd'.$sp.'m'.$sp.$Year.' H:i:s' : 'd'.$sp.'m'.$sp.$Year;
+  $format = $time === TRUE ? 'd'.$sp.'m'.$sp.'Y'.' H:i:s' : 'd'.$sp.'m'.$sp.'Y';
 
   return date($format, strtotime($date));
 }
@@ -12,10 +10,35 @@ function thai_date($date, $sp = '-', $time = FALSE)
 
 function db_date($date, $sp = '-', $time = FALSE)
 {
-  $sp = $sp === '' ? '-' : $sp;
-  $diff = getConfig('DATE_FORMAT') === 'BE' ? 543 : 0;
-  $Year = date('Y', strtotime($date)) - $diff;
-  return $time === TRUE ? date($Year.$sp.'m'.$sp.'d H:i:s', strtotime($date)) : date($Year.$sp.'m'.$sp.'d', strtotime($date));
+  return $time === TRUE ? date('Y-m-d H:i:s', strtotime($date)) : date('Y-m-d', strtotime($date));
+}
+
+
+
+function from_date($date = '')
+{
+  if($date === '')
+  {
+    return date('Y-m-d 00:00:00');
+  }
+  else
+  {
+    return date('Y-m-d 00:00:00', strtotime($date));
+  }
+}
+
+
+
+function to_date($date = '')
+{
+  if($date === '')
+  {
+    return date('Y-m-d 23:59:59');
+  }
+  else
+  {
+    return date('Y-m-d 23:59:59', strtotime($date));
+  }
 }
 
  ?>

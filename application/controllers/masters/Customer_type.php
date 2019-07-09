@@ -5,6 +5,7 @@ class Customer_type extends PS_Controller
 {
   public $menu_code = 'DBCTYP';
 	public $menu_group_code = 'DB';
+  public $menu_sub_group_code = 'CUSTOMER';
 	public $title = 'เพิ่ม/แก้ไข ชนิดลูกค้า';
 
   public function __construct()
@@ -77,15 +78,19 @@ class Customer_type extends PS_Controller
         set_error("'".$name."' มีในระบบแล้ว");
       }
 
-      if($sc === TRUE && $this->customer_type_model->add($ds))
+      if($sc === TRUE)
       {
-        set_message('เพิ่มข้อมูลเรียบร้อยแล้ว');
+        if($this->customer_type_model->add($ds))
+        {
+          set_message('เพิ่มข้อมูลเรียบร้อยแล้ว');
+        }
+        else
+        {
+          $sc = FALSE;
+          set_error('เพิ่มข้อมูลไม่สำเร็จ');
+        }
       }
-      else
-      {
-        $sc = FALSE;
-        set_error('เพิ่มข้อมูลไม่สำเร็จ');
-      }
+
 
       if($sc === FALSE)
       {
