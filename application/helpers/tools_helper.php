@@ -13,6 +13,11 @@ function is_checked($val1, $val2)
 
 
 
+function is_active($val)
+{
+  return $val == 1 ? '<i class="fa fa-check green"></i>' : '<i class="fa fa-times red"></i>';
+}
+
 function get_filter($postName, $sessionName, $defaultValue = "")
 {
   $CI =& get_instance();

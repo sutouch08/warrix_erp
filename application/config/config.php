@@ -23,8 +23,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/ERP/';
-
+$config['base_url'] = 'http://localhost/flex/';
+$config['image_path'] = 'images/products/';
+$config['image_file_path'] = $_SERVER['DOCUMENT_ROOT'] .'/flex/images/products/';
 /*
 |--------------------------------------------------------------------------
 | Index File

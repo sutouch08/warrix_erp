@@ -1,4 +1,4 @@
 RewriteEngine On
-RewriteBase /ERP/
+RewriteBase /flex/
 RewriteCond $1 !^(index\.php|asset|images|scripts)
 RewriteRule ^(.*)$ index.php

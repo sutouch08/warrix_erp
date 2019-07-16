@@ -14,6 +14,25 @@ function getEdit(code){
 }
 
 
+function changeURL(style, tab)
+{
+
+	var url = BASE_URL + 'masters/products/edit/' + style + '/' + tab;
+	var stObj = { stage: 'stage' };
+	window.history.pushState(stObj, 'products', url);
+}
+
+
+
+
+function newItems(){
+  var style = $('#style').val();
+  window.location.href = BASE_URL + 'masters/products/item_gen/' + style;
+}
+
+
+
+
 function clearFilter(){
   var url = BASE_URL + 'masters/products/clear_filter';
   var page = BASE_URL + 'masters/products';
@@ -23,10 +42,10 @@ function clearFilter(){
 }
 
 
-function getDelete(code, name){
+function getDelete(code){
   swal({
     title:'Are sure ?',
-    text:'ต้องการลบ ' + name + ' หรือไม่ ?',
+    text:'ต้องการลบ ' + code + ' หรือไม่ ?',
     type:'warning',
     showCancelButton: true,
 		confirmButtonColor: '#FA5858',
@@ -34,7 +53,30 @@ function getDelete(code, name){
 		cancelButtonText: 'ยกเลิก',
 		closeOnConfirm: false
   },function(){
-    window.location.href = BASE_URL + 'masters/products/delete/' + code;
+    $.ajax({
+      url: BASE_URL + 'masters/products/delete_style/' + code,
+      type:'GET',
+      cache:false,
+      success:function(rs){
+        if(rs === 'success'){
+          swal({
+            title:'Deleted',
+            text:'ลบรุ่นสินค้าเรียบร้อยแล้ว',
+            type:'success',
+            timer:1000
+          });
+
+          $('#row-'+code).remove();
+        }else{
+          swal({
+            title:'Error!',
+            text:rs,
+            type:'error'
+          });
+        }
+      }
+    })
+
   })
 }
 

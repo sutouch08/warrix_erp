@@ -1,4 +1,6 @@
-
+a {
+  text-decoration: none;
+}
 .input-label
 {
 background-color:White;
@@ -33,6 +35,10 @@ input[type=date]::-webkit-clear-button
 
 
 /* Framework start from here */
+
+.tree:before{
+  border: 0;
+}
 ul.tree,
 ul.tree ul {
   list-style:none;
@@ -59,7 +65,8 @@ ul.tree ul:before {
   top:0;
   bottom:0;
   left:0;
-  border-left:1px solid;
+  border-left:1px dotted;
+  z-index: 20
 }
 
 
@@ -81,10 +88,11 @@ ul.tree ul li:before {
   display:block;
   width:10px; /* same with indentation */
   height:0;
-  border-top:1px solid;
+  border-top:1px dotted;
   position:absolute;
   top:10px;
   left:0;
+  z-index: 20
 }
 
 
@@ -604,17 +612,18 @@ hr{
 
 
 
-/* .active > a {
-	border-left:solid 5px #F00;
+ .active > a {
+	border-left:solid 5px #2b7dbc;
 }
 
 
 
 .active > a:hover {
-	border-left:solid 5px #F00;
+  text-decoration: none;
+	border-left:solid 5px #2b7dbc;
 	background-color:White;
 	transition:linear 0.1s;
-} */
+}
 
 
 

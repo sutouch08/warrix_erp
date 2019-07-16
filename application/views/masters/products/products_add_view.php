@@ -9,42 +9,26 @@
 		</p>
 	</div>
 </div><!-- End Row -->
-<hr class="title-block"/>
-<form class="form-horizontal" id="addForm" method="post" action="<?php echo $this->home."/add"; ?>">
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">รหัส</label>
-    <div class="col-xs-12 col-sm-3">
-      <input type="text" name="code" id="code" class="width-100" value="<?php echo $code; ?>" autofocus required />
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
-  </div>
-
-
-
-  <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">ชื่อ</label>
-    <div class="col-xs-12 col-sm-3">
-			<input type="text" name="name" id="name" class="width-100" value="<?php echo $name; ?>" required />
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
-  </div>
-
-	<div class="divider-hidden">
-
+<hr style="margin-bottom:0px;"/>
+<script src="<?php echo base_url(); ?>assets/js/dropzone.js"></script>
+<link rel="stylesheet" href="<?php  echo base_url();?>assets/css/dropzone.css" />
+<div class="row">
+<div class="col-sm-1 col-1-harf padding-right-0 padding-top-15">
+	<ul id="myTab1" class="setting-tabs width-100" style="margin-left:0px;">
+	  <li class="li-block active in"><a href="#styleTab" data-toggle="tab">รุ่นสินค้า</a></li>
+		<li class="li-block not-show"><a href="#itemTab" data-toggle="tab" style="text-decoration:none;">รายการสินค้า</a></li>
+		<li class="li-block not-show"><a href="#imageTab" data-toggle="tab" style="text-decoration:none;" >รูปภาพ</a></li>
+	</ul>
+</div>
+<div class="col-sm-10" style="padding-top:15px; border-left:solid 1px #ccc; min-height:600px; ">
+<div class="tab-content" style="border:0">
+	<div class="tab-pane fade active in" id="styleTab">
+		<?php $this->load->view('masters/products/product_info'); ?>
 	</div>
-  <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right"></label>
-    <div class="col-xs-12 col-sm-3">
-      <p class="pull-right">
-        <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-save"></i> Save</button>
-      </p>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline">
-      &nbsp;
-    </div>
-  </div>
-</form>
+</div>
+</div><!--/ col-sm-9  -->
+</div><!--/ row  -->
 
-<script src="<?php echo base_url(); ?>scripts/masters/product_brand.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/products.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/product_info.js"></script>
 <?php $this->load->view('include/footer'); ?>

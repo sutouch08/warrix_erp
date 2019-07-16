@@ -9,44 +9,53 @@
 		</p>
 	</div>
 </div><!-- End Row -->
-<hr class="title-block"/>
-<form class="form-horizontal" id="addForm" method="post" action="<?php echo $this->home."/update"; ?>">
+<hr style="margin-bottom:0px;"/>
+<script src="<?php echo base_url(); ?>assets/js/dropzone.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.colorbox.js"></script>
+<link rel="stylesheet" href="<?php echo base_url();?>assets/css/dropzone.css" />
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/colorbox.css" />
+<?php
+$tab1 = $tab == 'styleTab' ? 'active in' : '';
+$tab2 = $tab == 'itemTab' ? 'active in' : '';
+$tab3 = $tab == 'imageTab' ? 'active in' : '';
 
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">Code</label>
-    <div class="col-xs-12 col-sm-3">
-      <input type="text" name="code" id="code" class="width-100" value="<?php echo $code; ?>" autofocus required />
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
-  </div>
+?>
 
 
 
-  <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">Name</label>
-    <div class="col-xs-12 col-sm-3">
-			<input type="text" name="name" id="name" class="width-100" value="<?php echo $name; ?>" required />
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
-  </div>
 
-	<div class="divider-hidden">
+<div class="row">
+<div class="col-sm-1 col-1-harf padding-right-0 padding-top-15">
+	<ul id="myTab1" class="setting-tabs width-100" style="margin-left:0px;">
+	  <li class="li-block <?php echo $tab1; ?>" onclick="changeURL('<?php echo $style->code; ?>','styleTab')" >
+			<a href="#styleTab" data-toggle="tab" style="text-decoration:none;">รุ่นสินค้า</a>
+		</li>
+		<li class="li-block <?php echo $tab2; ?>" onclick="changeURL('<?php echo $style->code; ?>','itemTab')" >
+			<a href="#itemTab" data-toggle="tab" style="text-decoration:none;">รายการสินค้า</a>
+		</li>
+		<li class="li-block <?php echo $tab3; ?>" onclick="changeURL('<?php echo $style->code; ?>','imageTab')" >
+			<a href="#imageTab" data-toggle="tab" style="text-decoration:none;" >รูปภาพ</a>
+		</li>
+	</ul>
+</div>
 
+<div class="col-sm-10" style="padding-top:15px; border-left:solid 1px #ccc; min-height:600px; ">
+<div class="tab-content" style="border:0">
+	<div class="tab-pane fade <?php echo $tab1; ?>" id="styleTab">
+		<?php $this->load->view('masters/products/product_edit_info'); ?>
 	</div>
-  <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right"></label>
-    <div class="col-xs-12 col-sm-3">
-      <p class="pull-right">
-        <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-save"></i> Save</button>
-      </p>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline">
-      &nbsp;
-    </div>
-  </div>
-	<input type="hidden" name="products_code" value="<?php echo $code; ?>" />
-	<input type="hidden" name="products_name" value="<?php echo $name; ?>" />
-</form>
+	<div class="tab-pane fade <?php echo $tab2; ?>" id="itemTab">
+		<?php $this->load->view('masters/products/product_items'); ?>
+	</div>
+	<div class="tab-pane fade <?php echo $tab3; ?>" id="imageTab">
+		<?php $this->load->view('masters/products/product_image'); ?>
+	</div>
+</div>
+</div><!--/ col-sm-9  -->
+</div><!--/ row  -->
 
 <script src="<?php echo base_url(); ?>scripts/masters/products.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/product_info.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/product_image.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/product_items.js"></script>
 <?php $this->load->view('include/footer'); ?>

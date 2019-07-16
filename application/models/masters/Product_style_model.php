@@ -33,22 +33,66 @@ class Product_style_model extends CI_Model
 
   public function delete($code)
   {
-    return $this->db->where('code', $code)->delete('product_style');
+    $rs =  $this->db->where('code', $code)->delete('product_style');
+    if($rs)
+    {
+      return TRUE;
+    }
+
+    return $this->db->_error_message();
   }
 
 
-  public function count_rows($code = '', $name = '')
+  public function count_rows(array $ds = array())
   {
-    $this->db->select('code');
+    $this->db->select('active');
 
-    if($code != '')
+    if(!empty($ds))
     {
-      $this->db->like('code', $code);
-    }
+      if($ds['code'] != '')
+      {
+        $this->db->like('code', $ds['code']);
+      }
 
-    if($name != '')
-    {
-      $this->db->like('name', $name);
+      if($ds['name'] != '')
+      {
+        $this->db->like('name', $ds['name']);
+      }
+
+      if($ds['group'] != '')
+      {
+        $this->db->where('group_code', $ds['group']);
+      }
+
+      if($ds['sub_group'] != '')
+      {
+        $this->db->where('sub_group_code', $ds['sub_group']);
+      }
+
+      if($ds['category'] != '')
+      {
+        $this->db->where('category_code', $ds['category']);
+      }
+
+      if($ds['kind'] != '')
+      {
+        $this->db->where('kind_code', $ds['kind']);
+      }
+
+      if($ds['type'] != '')
+      {
+        $this->db->where('type_code', $ds['type']);
+      }
+
+      if($ds['brand'] !='')
+      {
+        $this->db->where('brand_code', $ds['brand']);
+      }
+
+      if($ds['year'] != '')
+      {
+        $this->db->where('year', $ds['year']);
+      }
     }
 
     $rs = $this->db->get('product_style');
@@ -81,17 +125,56 @@ class Product_style_model extends CI_Model
 
 
 
-  public function get_data($code = '', $name = '', $perpage = '', $offset = '')
+  public function get_data(array $ds = array(), $perpage = '', $offset = '')
   {
-    if($code != '')
+    if(!empty($ds))
     {
-      $this->db->like('code', $code);
+      if($ds['code'] != '')
+      {
+        $this->db->like('code', $ds['code']);
+      }
+
+      if($ds['name'] != '')
+      {
+        $this->db->like('name', $ds['name']);
+      }
+
+      if($ds['group'] != '')
+      {
+        $this->db->where('group_code', $ds['group']);
+      }
+
+      if($ds['sub_group'] != '')
+      {
+        $this->db->where('sub_group_code', $ds['sub_group']);
+      }
+
+      if($ds['category'] != '')
+      {
+        $this->db->where('category_code', $ds['category']);
+      }
+
+      if($ds['kind'] != '')
+      {
+        $this->db->where('kind_code', $ds['kind']);
+      }
+
+      if($ds['type'] != '')
+      {
+        $this->db->where('type_code', $ds['type']);
+      }
+
+      if($ds['brand'] !='')
+      {
+        $this->db->where('brand_code', $ds['brand']);
+      }
+
+      if($ds['year'] != '')
+      {
+        $this->db->where('year', $ds['year']);
+      }
     }
 
-    if($name != '')
-    {
-      $this->db->like('name', $name);
-    }
 
     if($perpage != '')
     {

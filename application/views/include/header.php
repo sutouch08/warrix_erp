@@ -42,6 +42,7 @@
   	<script src="<?php echo base_url(); ?>assets/js/jquery-ui-1.10.4.custom.min.js"></script>
 	  <script src="<?php echo base_url(); ?>assets/js/bootstrap.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/ace/ace.js"></script>
+			<script src="<?php echo base_url(); ?>assets/js/ace-elements.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/ace/elements.fileinput.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/sweet-alert.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/handlebars-v3.js"></script>
