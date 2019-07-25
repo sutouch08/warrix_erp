@@ -161,8 +161,8 @@ class Permission extends PS_Controller{
 
   public function clear_filter()
   {
-    $this->session->unset_userdata('profileName');
-    echo done;
+    clear_filter('profileName');
+    echo 'done';
   }
 
 } //-- end class

@@ -276,12 +276,29 @@ class Product_tab_model extends CI_Model
 	public function getStyleInTab($id)
 	{
 		$qr = "SELECT t.style_code FROM product_tab_style AS t ";
-		$qr .= "JOIN product_style AS p ON t.style_code = p.id ";
+		$qr .= "JOIN product_style AS p ON t.style_code = p.code ";
 		$qr .= "WHERE p.active = 1 AND p.can_sell = 1 AND is_deleted = 0 ";
 		$qr .= "AND id_tab = ".$id;
 
 		return $this->db->query($qr);
 	}
+
+
+  public function get_style_in_tab($id)
+  {
+    $qr = "SELECT t.style_code FROM product_tab_style AS t ";
+		$qr .= "JOIN product_style AS p ON t.style_code = p.id ";
+		$qr .= "WHERE p.active = 1 AND p.can_sell = 1 AND is_deleted = 0 ";
+		$qr .= "AND id_tab = ".$id;
+
+    $rs = $this->db->query($qr);
+    if($rs->num_rows() > p)
+    {
+      return $rs->result();
+    }
+
+    return array();
+  }
 
 
 

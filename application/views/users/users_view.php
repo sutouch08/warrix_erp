@@ -18,17 +18,17 @@
 <div class="row">
   <div class="col-sm-2">
     <label>User name</label>
-    <input type="text" class="width-100" name="uname" id="uname" value="<?php echo $uname; ?>" />
+    <input type="text" class="width-100" name="user" value="<?php echo $user; ?>" />
   </div>
 
   <div class="col-sm-2">
     <label>Display name</label>
-    <input type="text" class="width-100" name="dname" id="dname" value="<?php echo $dname; ?>" />
+    <input type="text" class="width-100" name="dname" value="<?php echo $dname; ?>" />
   </div>
 
   <div class="col-sm-2">
     <label>Profile</label>
-    <input type="text" class="width-100" name="profile" id="profile" value="<?php echo $profile; ?>" />
+    <input type="text" class="width-100" name="profile" value="<?php echo $profile; ?>" />
   </div>
   <div class="col-sm-2">
     <label class="display-block not-show">buton</label>

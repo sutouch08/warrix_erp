@@ -49,6 +49,18 @@ class User_model extends CI_Model
 
 
 
+  public function get_name($uname)
+  {
+    $rs = $this->db->where('uname', $uname)->get('user');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row()->name;
+    }
+
+    return "";
+  }
+
+
   public function get_users($uname = '', $dname = '', $profile = '', $perpage = 50, $offset = 0)
   {
     $offset = $offset === NULL ? 0 : $offset;
@@ -244,6 +256,23 @@ class User_model extends CI_Model
     $rs = $this->db->get('user');
 
     return $rs->num_rows() === 1 ? TRUE : FALSE;
+  }
+
+
+
+  public function search($txt)
+  {
+    $qr = "SELECT uname FROM user WHERE uname LIKE '%".$txt."%' OR name LIKE '%".$txt."%'";
+    $rs = $this->db->query($qr);
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+    else
+    {
+      return array();
+    }
+
   }
 
 

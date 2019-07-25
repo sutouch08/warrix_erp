@@ -48,6 +48,7 @@
 					<th class="width-15 middle">รหัส</th>
 					<th class="width-40 middle">ชื่อ</th>
 					<th class="width-15 middle text-center">สินค้า</th>
+					<th class="width-5 middle text-center">สถานะ</th>
 					<th class=""></th>
 				</tr>
 			</thead>
@@ -60,6 +61,7 @@
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle text-center"><?php echo number($rs->menber); ?></td>
+						<td class="middle text-center"><?php echo is_active($rs->active); ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">

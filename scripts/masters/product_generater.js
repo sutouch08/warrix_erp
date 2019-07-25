@@ -52,6 +52,7 @@ $('.sizeBox').change(function(){
     addCostPrice(size);
   }else{
     $('#size-'+ size).remove();
+    removeCostPrice(size);
   }
 
   preGen();

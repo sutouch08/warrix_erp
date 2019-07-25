@@ -31,12 +31,12 @@ $menu_group = $this->menu_group_code;
 
 	<li class="<?php echo isActiveOpenMenu($menu_group, 'SO'); ?>">
 		<a href="#" class="dropdown-toggle">
-			<i class="menu-icon fa fa-cogs"></i>
+			<i class="menu-icon fa fa-shopping-basket"></i>
 			<span class="menu-text">ระบบขาย</span>
 			<b class="arrow fa fa-angle-down"></b>
 		</a>
 		<ul class="submenu">
-			<?php echo side_menu($menu, 'SOODSO',  'orders/order', 'ออเดอร์'); ?>
+			<?php echo side_menu($menu, 'SOODSO',  'orders/orders', 'ออเดอร์'); ?>
 			<?php echo side_menu($menu, 'SOODSP',  'orders/sponsor', 'สปอนเซอร์'); ?>
 			<?php echo side_menu($menu, 'SOCCSO',  'orders/consign_so', 'ฝากขาย(ใบกำกับ)'); ?>
 			<?php echo side_menu($menu, 'SOCCTR',  'orders/consign_tr', 'ฝากขาย(โอนคลัง)'); ?>
@@ -80,6 +80,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'DBPDCR', 'masters/product_category','เพิ่ม/แก้ไข หมวดหมู่สินค้า'); ?>
 					<?php echo side_menu($menu, 'DBPDKN', 'masters/product_kind','เพิ่ม/แก้ไข ประเภทสินค้า'); ?>
 					<?php echo side_menu($menu, 'DBPDTY', 'masters/product_type','เพิ่ม/แก้ไข ชนิดสินค้า'); ?>
+					<?php echo side_menu($menu, 'DBPTAB', 'masters/product_tab','เพิ่ม/แก้ไข แถบแสดงสินค้า'); ?>
 					<?php echo side_menu($menu, 'DBPDCL', 'masters/product_color','เพิ่ม/แก้ไข สี'); ?>
 					<?php echo side_menu($menu, 'DBPDSI', 'masters/product_size','เพิ่ม/แก้ไข ไซส์'); ?>
 					<?php echo side_menu($menu, 'DBPDBR', 'masters/product_brand','เพิ่ม/แก้ไข ยี่ห้อสินค้า'); ?>

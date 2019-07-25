@@ -16,7 +16,7 @@ class Users extends PS_Controller{
 
   public function index()
   {
-		$uname = get_filter('uname', 'uname', '');
+		$uname = get_filter('user', 'user', '');
 		$dname = get_filter('dname', 'dname', '');
 		$profile = get_filter('profile', 'profile', '');
 
@@ -36,7 +36,7 @@ class Users extends PS_Controller{
 
 		$rs = $this->user_model->get_users($uname, $dname, $profile, $perpage, $this->uri->segment($segment));
     $ds = array(
-      'uname' => $uname,
+      'user' => $uname,
       'dname' => $dname,
       'profile' => $profile,
 			'data' => $rs
@@ -248,8 +248,8 @@ class Users extends PS_Controller{
 
 	public function clear_filter()
 	{
-		$filter = array('uname', 'dname', 'profile');
-		$this->session->unset_userdata($filter);
+		$filter = array('user', 'dname', 'profile');
+		clear_filter($filter);
 		echo 'done';
 	}
 

@@ -205,5 +205,22 @@ class Customers_model extends CI_Model
   }
 
 
+
+
+  public function search($txt)
+  {
+    $qr = "SELECT code FROM customers WHERE code LIKE '%".$txt."%' OR name LIKE '%".$txt."%'";
+    $rs = $this->db->query($qr);
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+    else
+    {
+      return array();
+    }
+
+  }
+
 }
 ?>

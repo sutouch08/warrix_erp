@@ -472,6 +472,7 @@ hr{
 
 .top-p{
 	margin-bottom:0px;
+  margin-right:0px !important;
 }
 
 
@@ -598,6 +599,7 @@ hr{
 	border-left:solid 5px #CCC;
 	background-color: #EEE;
 	transition: border 0.1s ease;
+  text-decoration: none;
 }
 
 
@@ -918,7 +920,9 @@ hr{
 	line-height:1;
 	border-radius:2px;
 } */
-
+.btn-block + .btn-block {
+  margin-top:0px !important;
+}
 
 
 .callout{
@@ -1154,4 +1158,9 @@ input[type=number]::-webkit-outer-spin-button {
   width:100%;
   padding:0px;
   border:0px;
+}
+
+
+.from-date {
+  border-right:0px !important;
 }

@@ -18,18 +18,19 @@ function is_active($val)
   return $val == 1 ? '<i class="fa fa-check green"></i>' : '<i class="fa fa-times red"></i>';
 }
 
-function get_filter($postName, $sessionName, $defaultValue = "")
+function get_filter($postName, $cookieName, $defaultValue = "")
 {
   $CI =& get_instance();
   $sc = '';
+
   if($CI->input->post($postName) !== NULL)
   {
     $sc = $CI->input->post($postName);
-    $CI->session->set_userdata($sessionName, $sc);
+    $CI->input->set_cookie(array('name' => $cookieName, 'value' => $sc, 'expire' => 3600 , 'path' => '/'));
   }
-  else if($CI->session->userdata($sessionName))
+  else if($CI->input->cookie($cookieName))
   {
-    $sc = $CI->session->userdata($sessionName);
+    $sc = $CI->input->cookie($cookieName);
   }
   else
   {
@@ -41,10 +42,19 @@ function get_filter($postName, $sessionName, $defaultValue = "")
 
 
 
-function clear_filter($sessionName)
+function clear_filter($cookies)
 {
-  $CI =& get_instance();
-  $CI->session->unset_userdata($sessionName);
+  if(is_array($cookies))
+  {
+    foreach($cookies as $cookie)
+    {
+      delete_cookie($cookie);
+    }
+  }
+  else
+  {
+    delete_cookie($cookies);
+  }
 }
 
 
@@ -58,10 +68,10 @@ function set_rows($value = 20)
     'name' => 'rows',
     'value' => $value,
     'expire' => 259200,
-    'parth' => '/'
+    'path' => '/'
   );
   $CI =& get_instance();
-  return $CI->input->cookie($arr);
+  return $CI->input->set_cookie($arr);
 }
 
 
@@ -85,7 +95,11 @@ function getConfig($name)
 {
   $CI =& get_instance();
   $rs = $CI->db->select('value')->where('name', $name)->get('config');
-  return $rs->row()->value;
+  if($rs->num_rows() == 1)
+  {
+    return $rs->row()->value;
+  }
+
 }
 
 

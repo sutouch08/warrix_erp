@@ -51,4 +51,25 @@ function profile_name_in($text)
 
 
 
+
+function user_in($txt)
+{
+  $sc = "'0'";
+  $CI =& get_instance();
+  $CI->load->model('users/user_model');
+  $users = $CI->user_model->search($txt);
+
+  if(!empty($users))
+  {
+    foreach($users as $rs)
+    {
+      $sc .= ", '".$rs->uname."'";
+    }
+  }
+
+  return $sc;
+}
+
+
+
  ?>

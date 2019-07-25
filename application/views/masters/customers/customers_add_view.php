@@ -34,8 +34,8 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">กลุ่มลูกค้า</label>
     <div class="col-xs-12 col-sm-3">
-			<select name="group" id="group" class="form-control">
-				<option value=""></option>
+			<select name="group" id="group" class="form-control" required>
+				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_group($group); ?>
 			</select>
     </div>
@@ -46,8 +46,8 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">ประเภทลูกค้า</label>
     <div class="col-xs-12 col-sm-3">
-			<select name="kind" id="kind" class="form-control">
-				<option value=""></option>
+			<select name="kind" id="kind" class="form-control" required>
+				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_kind($kind); ?>
 			</select>
     </div>
@@ -58,8 +58,8 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">ชนิดลูกค้า</label>
     <div class="col-xs-12 col-sm-3">
-			<select name="type" id="type" class="form-control">
-				<option value=""></option>
+			<select name="type" id="type" class="form-control" required>
+				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_type($type); ?>
 			</select>
     </div>
@@ -71,8 +71,8 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">เกรดลูกค้า</label>
     <div class="col-xs-12 col-sm-3">
-			<select name="class" id="class" class="form-control">
-				<option value=""></option>
+			<select name="class" id="class" class="form-control" required>
+				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_class($class); ?>
 			</select>
     </div>
@@ -83,8 +83,8 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">พื้นที่ขาย</label>
     <div class="col-xs-12 col-sm-3">
-			<select name="area" id="area" class="form-control">
-				<option value=""></option>
+			<select name="area" id="area" class="form-control" required>
+				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_area($area); ?>
 			</select>
     </div>

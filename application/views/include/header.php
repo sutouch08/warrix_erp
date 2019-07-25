@@ -66,11 +66,11 @@
 		<!-- #section:basics/navbar.layout -->
 		<div id="navbar" class="navbar navbar-default">
 			<script type="text/javascript">
-				try{
-					ace.settings.check('navbar' , 'fixed')
-				}catch(e){
-
-				}
+				// try{
+				// 	ace.settings.check('navbar' , 'fixed')
+				// }catch(e){
+				//
+				// }
 
 				var BASE_URL = '<?php echo base_url(); ?>';
 			</script>
@@ -156,11 +156,11 @@
 		<!-- /section:basics/navbar.layout -->
 		<div class="main-container" id="main-container">
 			<script type="text/javascript">
-				try{
-					ace.settings.check('main-container' , 'fixed')
-				}catch(e){
-
-				}
+				// try{
+				// 	ace.settings.check('main-container' , 'fixed')
+				// }catch(e){
+				//
+				// }
 			</script>
 
 			<!-- #section:basics/sidebar -->

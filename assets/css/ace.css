@@ -53,7 +53,7 @@ body {
   clear: both;
 }
 .sidebar + .main-content {
-  margin-left: 250px;
+  margin-left: 200px;
 }
 .page-content {
   background-color: #ffffff;
@@ -1967,7 +1967,7 @@ pre.prettyprint {
   margin-left: 7px;
 }
 .sidebar {
-  width: 250px;
+  width: 200px;
   float: left;
   position: static;
   padding-left: 0;
@@ -6770,7 +6770,8 @@ fieldset[disabled] .btn-white.btn-grey.active {
 }
 .btn-group > .btn,
 .btn-group > .btn + .btn {
-  margin: 0 1px 0 0;
+  /*margin: 0 1px 0 0;*/
+  margin: p;
 }
 .btn-group > .btn:first-child {
   margin: 0 1px 0 0;
@@ -6811,7 +6812,8 @@ fieldset[disabled] .btn-white.btn-grey.active {
 }
 .btn-group > .btn,
 .btn-group + .btn {
-  margin: 0 1px 0 0;
+  /*margin: 0 1px 0 0; */
+  margin: 0;
   border-width: 3px;
   /* the border under an active button in button groups */
 }

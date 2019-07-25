@@ -138,3 +138,56 @@ $('#set_rows').keyup(function(e){
 		set_rows();
 	}
 });
+
+
+
+
+function reIndex(){
+  $('.no').each(function(index, el) {
+    no = index +1;
+    $(this).text(addCommas(no));
+  });
+}
+
+
+
+var downloadTimer;
+function get_download(token)
+{
+	load_in();
+	downloadTimer = window.setInterval(function(){
+		var cookie = $.cookie("file_download_token");
+		if(cookie == token)
+		{
+			finished_download();
+		}
+	}, 1000);
+}
+
+
+
+function finished_download()
+{
+	window.clearInterval(downloadTimer);
+	$.removeCookie("file_down_load_token");
+	load_out();
+}
+
+
+
+function isJson(str){
+	try{
+		JSON.parse(str);
+	}catch(e){
+		return false;
+	}
+	return true;
+}
+
+
+
+function printOut(url)
+{
+	var center = ($(document).width() - 800) /2;
+	window.open(url, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
+}

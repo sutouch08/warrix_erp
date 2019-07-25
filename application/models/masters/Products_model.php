@@ -166,6 +166,34 @@ class Products_model extends CI_Model
 
 
 
+  public function get_item_by_color_and_size($style, $color, $size)
+  {
+    $rs = $this->db
+    ->where('style_code', $style)
+    ->where('color_code', $color)
+    ->where('size_code', $size)
+    ->limit(1)
+    ->get('products');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return array();
+  }
+
+
+
+
+  public function countAttribute($style_code)
+	{
+		$color = $this->db->where('style_code', $style_code)->where('color_code is NOT NULL')->where('color_code !=', '')->group_by('style_code')->get('products');
+		$size  = $this->db->where('style_code', $style_code)->where('size_code is NOT NULL')->where('size_code !=', '')->group_by('style_code')->get('products');
+		return $color->num_rows() + $size->num_rows();
+	}
+
+
   public function get_unbarcode_items($style)
   {
     $this->db->select('code');
@@ -244,12 +272,90 @@ class Products_model extends CI_Model
 
 
 
+  public function is_disactive_all($style_code)
+  {
+    $this->db->select('code')->where('style_code', $style_code)->where('active', 1);
+    $rs = $this->db->get('products');
+    if($rs->num_rows() > 0)
+    {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+
   public function get_updte_data()
   {
     $this->ms->select("CardCode, CardName");
     $this->ms->where("UpdateDate >=", from_date());
     $rs = $this->ms->get('OCRD');
     return $rs->result();
+  }
+
+
+
+
+  public function count_color($style_code)
+  {
+    $this->db->select('color_code')
+    ->where('style_code', $style_code)
+    ->where('color_code is NOT NULL')
+    ->where('color_code != ', '')
+    ->group_by('color_code');
+    $rs = $this->db->get('products');
+
+    return $rs->num_rows();
+  }
+
+
+
+  public function count_size($style_code)
+  {
+    $this->db->select('size_code')
+    ->where('style_code', $style_code)
+    ->where('size_code is NOT NULL')
+    ->where('size_code != ', '')
+    ->group_by('size_code');
+    $rs = $this->db->get('products');
+
+    return $rs->num_rows();
+  }
+
+
+
+  public function get_all_colors($style_code)
+  {
+    $qr = "SELECT c.code, c.name FROM products AS p
+          LEFT JOIN product_color AS c ON p.color_code = c.code
+          WHERE p.style_code = '".$style_code."'
+          GROUP BY p.color_code
+          ORDER BY p.color_code ASC";
+    $rs = $this->db->query($qr);
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_all_sizes($style_code)
+  {
+    $qr = "SELECT s.code, s.name FROM products AS p
+           LEFT JOIN product_size AS s ON p.size_code = s.code
+           WHERE p.style_code = '".$style_code."'
+           GROUP BY p.size_code
+           ORDER BY s.position ASC";
+    $rs = $this->db->query($qr);
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 

@@ -44,6 +44,7 @@ class Product_color extends PS_Controller
         $arr = new stdClass();
         $arr->code = $rs->code;
         $arr->name = $rs->name;
+        $arr->active = $rs->active;
         $arr->menber = $this->product_color_model->count_members($rs->code);
 
         $data[] = $arr;

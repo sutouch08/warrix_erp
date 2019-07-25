@@ -61,10 +61,26 @@ class Channels_model extends CI_Model
   public function get_channels($code)
   {
     $rs = $this->db->where('code', $code)->get('channels');
-    return $rs->row();
+    if($rs->num_rows() == 1 )
+    {
+      return $rs->row();
+    }
+
+    return array();
   }
 
 
+
+  public function get_name($code)
+  {
+    $rs = $this->db->select('name')->where('code', $code)->get('channels');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row()->name;
+    }
+
+    return FALSE;
+  }
 
 
   public function get_data($c_code = '', $c_name = '', $perpage = '', $offset = '')
