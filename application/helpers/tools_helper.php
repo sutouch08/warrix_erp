@@ -155,4 +155,6 @@ function pagination_config( $base_url, $total_rows = 0, $perpage = 20, $segment 
 		return $config;
 }
 
+
+
  ?>

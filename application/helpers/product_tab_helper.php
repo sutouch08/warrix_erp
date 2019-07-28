@@ -34,7 +34,7 @@ function getSubTab($parent, $ajax)
 {
 	$ci =& get_instance();
 	$sc = '';
-	$qs = $ci->db->query("SELECT * FROM product_tab WHERE id_parent = ".$parent);
+	$qs = $ci->db->query("SELECT * FROM product_tab WHERE id_parent = ".$parent." ORDER BY name ASC");
 
 	if( $qs->num_rows() > 0 )
 	{

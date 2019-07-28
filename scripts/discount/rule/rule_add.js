@@ -50,13 +50,12 @@ function updateRule(){
   load_in();
 
   $.ajax({
-    url:'controller/discountRuleController.php?updateRule',
+    url: BASE_URL + 'discount/discount_rule/update_rule/'+id,
     type:'POST',
     cache:'false',
     data:{
-      'id' : id,
       'name' : name,
-      'isActive' : isActive
+      'active' : isActive
     },
     success:function(rs){
       load_out();

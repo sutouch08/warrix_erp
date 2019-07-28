@@ -1,23 +1,24 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
-class Discount_model extends CI_Model
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+class Discount
 {
+  protected $ci;
 
-  public function __construct()
-  {
-    parent::__construct();
-  }
-
-
-  public function get_item_discount($item_code, $customer_code, $qty, $payment_code, $channels_code, $date = '')
+	public function __construct()
 	{
-    $this->load->model('masters/products_model');
-    $this->load->model('masters/customers_model');
-    $this->load->model('orders/orders_model');
+    // Assign the CodeIgniter super-object
+    $this->ci =& get_instance();
+	}
 
+
+	public function getItemDiscount($code, $customer_code, $qty, $payment_code, $channels_code, $date = "")
+	{
+    $ci->load->model('masters/products');
+    $ci->load->model('masters/customers');
 		$date = $date == "" ? date('Y-m-d') : $date;
-		$pd   = $this->products_model->get($item_code);
-		$cs   = $this->customers_model->get($customer_code);
+		$pd = new product($code);
+		$cs = new customer($customer_code);
+		$order = new order();
 		$price = $pd->price;
 
 		//--- default value if dont have any discount
@@ -35,7 +36,7 @@ class Discount_model extends CI_Model
 			'id_rule' => NULL
 		); //-- end array
 
-		if( $pd->code != "" && $cs->code != "" )
+		if( $pd->id != "" && $cs->id != "" )
 		{
 			$qr  = "SELECT DISTINCT
 							r.id, r.item_price,
@@ -44,104 +45,108 @@ class Discount_model extends CI_Model
 							r.item_disc_3, r.item_disc_3_unit,
 							r.qty, r.amount, r.canGroup ";
 
-			$qr .= "FROM discount_policy AS p ";
+			$qr .= "FROM tbl_discount_policy AS p ";
 
 			//----- รายการกฏต่างๆ
-			$qr .= "LEFT JOIN discount_rule AS r ON p.id = r.id_policy ";
+			$qr .= "LEFT JOIN tbl_discount_rule AS r ON p.id = r.id_discount_policy ";
+
+			//---- get list of product if specific SKU
+			$qr .= "LEFT JOIN tbl_discount_rule_items AS i ON r.id = i.id_rule ";
 
 			//--- เลือกรายการตาม รุ่นสินค้า
-			$qr .= "LEFT JOIN discount_rule_product_style AS ps ON r.id = ps.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_style AS ps ON r.id = ps.id_rule ";
 
 			//--- รายการตามกลุ่มสินค้า
-			$qr .= "LEFT JOIN discount_rule_product_group AS pg ON r.id = pg.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_group AS pg ON r.id = pg.id_rule ";
 
 			//--- รายการตามกลุ่มย่อยสินค้า
-			$qr .= "LEFT JOIN discount_rule_product_sub_group AS psg ON r.id = psg.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_sub_group AS psg ON r.id = psg.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_type AS pt ON r.id = pt.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_type AS pt ON r.id = pt.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_kind AS pk ON r.id = pk.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_kind AS pk ON r.id = pk.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_category AS pc ON r.id = pc.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_category AS pc ON r.id = pc.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_brand AS pb ON r.id = pb.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_brand AS pb ON r.id = pb.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_year AS py ON r.id = py.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_year AS py ON r.id = py.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer AS c ON r.id = c.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customers AS c ON r.id = c.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_group AS cg ON r.id = cg.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_group AS cg ON r.id = cg.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_area AS ca ON r.id = ca.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_area AS ca ON r.id = ca.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_kind AS ck ON r.id = ck.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_kind AS ck ON r.id = ck.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_type AS ct ON r.id = ct.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_type AS ct ON r.id = ct.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_class AS cc ON r.id = cc.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_class AS cc ON r.id = cc.id_rule ";
 
 			//--- get list of sales channels if specific channels
-			$qr .= "LEFT JOIN discount_rule_channels AS n ON r.id = n.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_channels AS n ON r.id = n.id_rule ";
 
 			//---- get list of payment thod if specific payment method
-			$qr .= "LEFT JOIN discount_rule_payment AS m ON r.id = m.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_payment AS m ON r.id = m.id_rule ";
 
 			//----- Check preriod and approval first
-			$qr .= "WHERE p.start_date <= '".$date."' AND p.end_date >= '".$date."' AND p.active = 1 ";
+			$qr .= "WHERE p.date_start <= '".$date."' AND p.date_end >= '".$date."' AND p.isApproved = 1 AND p.active = 1 AND p.isDeleted = 0 ";
 
 			//----- now check product
-			$qr .= "AND (r.all_product = 1 OR r.all_product = 0) ";
-			$qr .= "AND (ps.style_code IS NULL OR ps.style_code = '".$pd->style_code."') ";
-			$qr .= "AND (pg.group_code IS NULL OR pg.group_code = '".$pd->group_code."') ";
-			$qr .= "AND (psg.sub_group_code IS NULL OR psg.sub_group_code = '".$pd->sub_group_code."') ";
-			$qr .= "AND (pt.type_code IS NULL OR pt.type_code = '".$pd->type_code."') ";
-			$qr .= "AND (pk.kind_code IS NULL OR pk.kind_code = '".$pd->kind_code."') ";
-			$qr .= "AND (pc.category_code IS NULL OR pc.category_code = '".$pd->category_code."') ";
-			$qr .= "AND (pb.brand_code IS NULL OR pb.brand_code = '".$pd->brand_code."') ";
-			$qr .= "AND (py.year IS NULL OR py.year = '".$pd->year."') ";
+			$qr .= "AND (all_product = 1 OR all_product = 0) ";
+			$qr .= "AND (id_product IS NULL OR id_product = '".$pd->id."') ";
+			$qr .= "AND (id_product_style IS NULL OR id_product_style = '".$pd->id_style."') ";
+			$qr .= "AND (id_product_group IS NULL OR id_product_group = '".$pd->id_group."') ";
+			$qr .= "AND (id_product_sub_group IS NULL OR id_product_sub_group = '".$pd->id_sub_group."') ";
+			$qr .= "AND (id_product_type IS NULL OR id_product_type = '".$pd->id_type."') ";
+			$qr .= "AND (id_product_kind IS NULL OR id_product_kind = '".$pd->id_kind."') ";
+			$qr .= "AND (id_product_category IS NULL OR id_product_category = '".$pd->id_category."') ";
+			$qr .= "AND (id_product_brand IS NULL OR id_product_brand = '".$pd->id_brand."') ";
+			$qr .= "AND (year IS NULL OR year = '".$pd->year."') ";
 
 			//---- now check customer
-			$qr .= "AND (r.all_customer = 1 OR r.all_customer = 0) ";
-			$qr .= "AND (c.customer_code IS NULL OR c.customer_code = '".$cs->code."') ";
-			$qr .= "AND (cg.group_code IS NULL OR cg.group_code = '".$cs->group_code."') ";
-			$qr .= "AND (ca.area_code IS NULL OR ca.area_code = '".$cs->area_code."') ";
-			$qr .= "AND (ck.kind_code IS NULL OR ck.kind_code = '".$cs->kind_code."') ";
-			$qr .= "AND (ct.type_code IS NULL OR ct.type_code = '".$cs->type_code."') ";
-			$qr .= "AND (cc.class_code IS NULL OR cc.class_code = '".$cs->class_code."') ";
+			$qr .= "AND (all_customer = 1 OR all_customer = 0) ";
+			$qr .= "AND (id_customer IS NULL OR id_customer = '".$cs->id."') ";
+			$qr .= "AND (id_customer_group IS NULL OR id_customer_group = '".$cs->id_group."') ";
+			$qr .= "AND (id_customer_area IS NULL OR id_customer_area = '".$cs->id_area."') ";
+			$qr .= "AND (id_customer_kind IS NULL OR id_customer_kind = '".$cs->id_kind."') ";
+			$qr .= "AND (id_customer_type IS NULL OR id_customer_type = '".$cs->id_type."') ";
+			$qr .= "AND (id_customer_class IS NULL OR id_customer_class = '".$cs->id_class."') ";
 
 			//---- now check  payment method
-			$qr .= "AND (r.all_payment = 1 OR r.all_payment = 0) ";
-			$qr .= "AND (m.payment_code IS NULL OR m.payment_code = '".$payment_code."') ";
+			$qr .= "AND ( all_payment = 1 OR all_payment = 0) ";
+			$qr .= "AND ( id_payment IS NULL OR id_payment = '".$payment_code."') ";
 
 			//---- now check sales channels
-			$qr .= "AND (r.all_channels = 1 OR r.all_channels = 0) ";
-			$qr .= "AND (n.channels_code IS NULL OR n.channels_code = '".$channels_code."') ";
+			$qr .= "AND ( all_channels = 1 OR all_channels = 0) ";
+			$qr .= "AND (id_channels IS NULL OR id_channels = '".$channels_code."') ";
 
 			//--- now check qty options
-			$qr .= "AND (r.qty = 0 OR  r.qty <= {$qty}) ";
+			$qr .= "AND (qty = 0 OR  qty <= ".$qty.") ";
 
 			//--- now check amount options
-			$qr .= "AND (r.amount = 0 OR r.amount <= ".($qty * $price).") ";
+			$qr .= "AND ( amount = 0 OR amount <= ".( $qty * $price ).") ";
 
 			$qr .= "AND r.active = 1 AND r.isDeleted = 0 ";
 
 			//echo $qr;
 
 
-			$qs = $this->db->query($qr);
+			$qs = dbQuery($qr);
 
-			if( $qs->num_rows() > 0 )
+			if( dbNumRows($qs) > 0 )
 			{
 				$discAmount = 0;
 				$discLabel = 0;
@@ -162,20 +167,20 @@ class Discount_model extends CI_Model
 
 				//---- วนรอบจนหมดเงื่อนไข
 				//--- หากเงื่อนไขถัดไปได้ส่วนลดรวมมากกว่าเงื่อนไขก่อนหน้า ตัวแปรด้านบนจะถูกแทนค่าใหม่ ถ้าไม่ดีกว่าจะได้ค่าเดิม
-				foreach($qs->result() as $rs)
+				while( $rs = dbFetchObject($qs) )
 				{
 					$discount = 0;
 					$discount2 = 0;
 					$discount3 = 0;
 					$amount = $qty * $price;
-					$isSetMin = ($rs->qty > 0 OR $rs->amount > 0) ? TRUE : FALSE; //--- มีการกำหนดขั้นต่ำหรือไม่
+					$isSetMin = ( $rs->qty > 0 OR $rs->amount > 0 ) ? TRUE : FALSE; //--- มีการกำหนดขั้นต่ำหรือไม่
 					$canGroup = $rs->canGroup == 1 ? TRUE : FALSE; //--- รวมยอดได้หรือไม่
 
 					//----- หากมีการกำหนดยอดขั้นต่ำ และ สามารถรวมยอดได้
 					if($isSetMin && $canGroup)
 					{
 						//---- คำนวณยอดสั่งใหม่
-						$qty = $this->orders_model->get_sum_style_qty($order_code, $pd->code_style);
+						$qty = $order->getSumOrderStyleQty($order_code, $pd->id_style);
 						$amount = $qty * $price;
 					}
 
@@ -255,15 +260,12 @@ class Discount_model extends CI_Model
 
 
 	//----- คำนวณส่วนลดใหม่ โดยจำนวนซื้อกับมูลค่าซื้อจะมีผลกับส่วนลด
-	public function get_item_recal_discount($order_code, $item_code, $price, $customer_code, $qty, $payment_code, $channels_code, $date = '')
+	public function getItemRecalDiscount($order_code, $code, $price, $customer_code, $qty, $payment_code, $channels_code, $date = "")
 	{
-    $this->load->model('masters/products_model');
-    $this->load->model('masters/customers_model');
-    $this->load->model('orders/orders_model');
-
-		$date = $date == '' ? date('Y-m-d') : $date;
-		$pd   = $this->products_model->get($item_code);
-		$cs   = $this->customers_model->get($customer_code);
+		$date = $date == "" ? date('Y-m-d') : $date;
+		$pd = new product($code);
+		$cs = new customer($customer_code);
+		$order = new order();
 
 		//--- default value if dont have any discount
 		$sc = array(
@@ -280,8 +282,9 @@ class Discount_model extends CI_Model
 			'id_rule' => NULL
 		); //-- end array
 
-    if( $pd->code != "" && $cs->code != "" )
+		if( $pd->id != "" && $cs->id != "" )
 		{
+			//$qr  = "SELECT DISTINCT r.id, r.item_price, r.item_disc, r.item_disc_unit, r.qty, r.amount, r.canGroup ";
 			$qr  = "SELECT DISTINCT
 							r.id, r.item_price,
 							r.item_disc, r.item_disc_unit,
@@ -289,102 +292,106 @@ class Discount_model extends CI_Model
 							r.item_disc_3, r.item_disc_3_unit,
 							r.qty, r.amount, r.canGroup ";
 
-			$qr .= "FROM discount_policy AS p ";
+			$qr .= "FROM tbl_discount_policy AS p ";
 
 			//----- รายการกฏต่างๆ
-			$qr .= "LEFT JOIN discount_rule AS r ON p.id = r.id_policy ";
+			$qr .= "LEFT JOIN tbl_discount_rule AS r ON p.id = r.id_discount_policy ";
+
+			//---- get list of product if specific SKU
+			$qr .= "LEFT JOIN tbl_discount_rule_items AS i ON r.id = i.id_rule ";
 
 			//--- เลือกรายการตาม รุ่นสินค้า
-			$qr .= "LEFT JOIN discount_rule_product_style AS ps ON r.id = ps.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_style AS ps ON r.id = ps.id_rule ";
 
 			//--- รายการตามกลุ่มสินค้า
-			$qr .= "LEFT JOIN discount_rule_product_group AS pg ON r.id = pg.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_group AS pg ON r.id = pg.id_rule ";
 
 			//--- รายการตามกลุ่มย่อยสินค้า
-			$qr .= "LEFT JOIN discount_rule_product_sub_group AS psg ON r.id = psg.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_sub_group AS psg ON r.id = psg.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_type AS pt ON r.id = pt.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_type AS pt ON r.id = pt.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_kind AS pk ON r.id = pk.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_kind AS pk ON r.id = pk.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_category AS pc ON r.id = pc.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_category AS pc ON r.id = pc.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_brand AS pb ON r.id = pb.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_brand AS pb ON r.id = pb.id_rule ";
 
 			//---
-			$qr .= "LEFT JOIN discount_rule_product_year AS py ON r.id = py.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_product_year AS py ON r.id = py.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer AS c ON r.id = c.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customers AS c ON r.id = c.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_group AS cg ON r.id = cg.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_group AS cg ON r.id = cg.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_area AS ca ON r.id = ca.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_area AS ca ON r.id = ca.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_kind AS ck ON r.id = ck.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_kind AS ck ON r.id = ck.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_type AS ct ON r.id = ct.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_type AS ct ON r.id = ct.id_rule ";
 
 			//---- get list of customer if specific personaly customer
-			$qr .= "LEFT JOIN discount_rule_customer_class AS cc ON r.id = cc.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_customer_class AS cc ON r.id = cc.id_rule ";
 
 			//--- get list of sales channels if specific channels
-			$qr .= "LEFT JOIN discount_rule_channels AS n ON r.id = n.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_channels AS n ON r.id = n.id_rule ";
 
 			//---- get list of payment thod if specific payment method
-			$qr .= "LEFT JOIN discount_rule_payment AS m ON r.id = m.id_rule ";
+			$qr .= "LEFT JOIN tbl_discount_rule_payment AS m ON r.id = m.id_rule ";
 
 			//----- Check preriod and approval first
-			$qr .= "WHERE p.start_date <= '".$date."' AND p.end_date >= '".$date."' AND p.active = 1 ";
+			$qr .= "WHERE p.date_start <= '".$date."' AND p.date_end >= '".$date."' AND p.isApproved = 1 AND p.active = 1 AND p.isDeleted = 0 ";
 
 			//----- now check product
-			$qr .= "AND (r.all_product = 1 OR r.all_product = 0) ";
-			$qr .= "AND (ps.style_code IS NULL OR ps.style_code = '".$pd->style_code."') ";
-			$qr .= "AND (pg.group_code IS NULL OR pg.group_code = '".$pd->group_code."') ";
-			$qr .= "AND (psg.sub_group_code IS NULL OR psg.sub_group_code = '".$pd->sub_group_code."') ";
-			$qr .= "AND (pt.type_code IS NULL OR pt.type_code = '".$pd->type_code."') ";
-			$qr .= "AND (pk.kind_code IS NULL OR pk.kind_code = '".$pd->kind_code."') ";
-			$qr .= "AND (pc.category_code IS NULL OR pc.category_code = '".$pd->category_code."') ";
-			$qr .= "AND (pb.brand_code IS NULL OR pb.brand_code = '".$pd->brand_code."') ";
-			$qr .= "AND (py.year IS NULL OR py.year = '".$pd->year."') ";
+			$qr .= "AND (all_product = 1 OR all_product = 0) ";
+			$qr .= "AND (id_product IS NULL OR id_product = '".$pd->id."') ";
+			$qr .= "AND (id_product_style IS NULL OR id_product_style = '".$pd->id_style."') ";
+			$qr .= "AND (id_product_group IS NULL OR id_product_group = '".$pd->id_group."') ";
+			$qr .= "AND (id_product_sub_group IS NULL OR id_product_sub_group = '".$pd->id_sub_group."') ";
+			$qr .= "AND (id_product_type IS NULL OR id_product_type = '".$pd->id_type."') ";
+			$qr .= "AND (id_product_kind IS NULL OR id_product_kind = '".$pd->id_kind."') ";
+			$qr .= "AND (id_product_category IS NULL OR id_product_category = '".$pd->id_category."') ";
+			$qr .= "AND (id_product_brand IS NULL OR id_product_brand = '".$pd->id_brand."') ";
+			$qr .= "AND (year IS NULL OR year = '".$pd->year."') ";
 
 			//---- now check customer
-			$qr .= "AND (r.all_customer = 1 OR r.all_customer = 0) ";
-			$qr .= "AND (c.customer_code IS NULL OR c.customer_code = '".$cs->code."') ";
-			$qr .= "AND (cg.group_code IS NULL OR cg.group_code = '".$cs->group_code."') ";
-			$qr .= "AND (ca.area_code IS NULL OR ca.area_code = '".$cs->area_code."') ";
-			$qr .= "AND (ck.kind_code IS NULL OR ck.kind_code = '".$cs->kind_code."') ";
-			$qr .= "AND (ct.type_code IS NULL OR ct.type_code = '".$cs->type_code."') ";
-			$qr .= "AND (cc.class_code IS NULL OR cc.class_code = '".$cs->class_code."') ";
+			$qr .= "AND (all_customer = 1 OR all_customer = 0) ";
+			$qr .= "AND (id_customer IS NULL OR id_customer = '".$cs->id."') ";
+			$qr .= "AND (id_customer_group IS NULL OR id_customer_group = '".$cs->id_group."') ";
+			$qr .= "AND (id_customer_area IS NULL OR id_customer_area = '".$cs->id_area."') ";
+			$qr .= "AND (id_customer_kind IS NULL OR id_customer_kind = '".$cs->id_kind."') ";
+			$qr .= "AND (id_customer_type IS NULL OR id_customer_type = '".$cs->id_type."') ";
+			$qr .= "AND (id_customer_class IS NULL OR id_customer_class = '".$cs->id_class."') ";
 
 			//---- now check  payment method
-			$qr .= "AND (r.all_payment = 1 OR r.all_payment = 0) ";
-			$qr .= "AND (m.payment_code IS NULL OR m.payment_code = '".$payment_code."') ";
+			$qr .= "AND ( all_payment = 1 OR all_payment = 0) ";
+			$qr .= "AND ( id_payment IS NULL OR id_payment = '".$payment_code."') ";
 
 			//---- now check sales channels
-			$qr .= "AND (r.all_channels = 1 OR r.all_channels = 0) ";
-			$qr .= "AND (n.channels_code IS NULL OR n.channels_code = '".$channels_code."') ";
+			$qr .= "AND ( all_channels = 1 OR all_channels = 0) ";
+			$qr .= "AND (id_channels IS NULL OR id_channels = '".$channels_code."') ";
 
 			//--- now check qty options
-			$qr .= "AND (r.qty = 0 OR  r.qty <= {$qty}) ";
+			$qr .= "AND (qty = 0 OR  qty <= ".$qty.") ";
 
 			//--- now check amount options
-			$qr .= "AND (r.amount = 0 OR r.amount <= ".($qty * $price).") ";
+			$qr .= "AND ( amount = 0 OR amount <= ".( $qty * $price ).") ";
 
-			$qr .= "AND r.active = 1 AND r.isDeleted = 0 ";
+			$qr .= "AND r.active = 1 AND r.isDeleted = 0";
 
 			//echo $qr;
-			$qs = $this->db->query($qr);
+			$qs = dbQuery($qr);
 
-			if($qs->num_rows() > 0)
+			if( dbNumRows($qs) > 0 )
 			{
 				$discAmount = 0;
 				$discLabel = 0;
@@ -402,7 +409,7 @@ class Discount_model extends CI_Model
 
 				$dis_rule = 0;
 
-				foreach($qs->result() as $rs)
+				while( $rs = dbFetchObject($qs) )
 				{
 					$discount = 0;
 					$discount2 = 0;
@@ -415,12 +422,12 @@ class Discount_model extends CI_Model
 					if($isSetMin && $canGroup)
 					{
 						//---- คำนวณยอดสั่งใหม่
-						$qty = $order->get_sum_style_qty($order_code, $pd->style_code);
+						$qty = $order->getSumOrderStyleQty($order_code, $pd->id_style);
 						$amount = $qty * $price;
 					}
 
 					//---- ถ้ามีการกำหนดราคาขาย
-					if($rs->item_price > 0)
+					if( $rs->item_price > 0 )
 					{
 						//--- step 1
 						//--- ถ้ามีการกำหนดราคาขาย จะไม่สนใจส่วนลด ส่วนต่างราคาขาย จะถูกแปลงเป็นส่วนลดแทน
@@ -492,7 +499,6 @@ class Discount_model extends CI_Model
 		return $sc;
 	}
 
+}//-- end class
 
-
-} //--- end class
 ?>

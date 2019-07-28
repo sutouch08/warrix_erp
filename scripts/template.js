@@ -90,7 +90,7 @@ function isDate(txtDate){
 
 	function addCommas(number){
 		 return (
-		 	input.toString()).replace(/^([-+]?)(0?)(\d+)(.?)(\d+)$/g, function(match, sign, zeros, before, decimal, after) {
+		 	number.toString()).replace(/^([-+]?)(0?)(\d+)(.?)(\d+)$/g, function(match, sign, zeros, before, decimal, after) {
 		 		var reverseString = function(string) { return string.split('').reverse().join(''); };
 		 		var insertCommas  = function(string) {
 						var reversed   = reverseString(string);

@@ -125,6 +125,20 @@ class Discount_rule extends PS_Controller
 
 
 
+  public function update_rule($id)
+  {
+    $arr = array(
+      'name' => $this->input->post('name'),
+      'active' => $this->input->post('active')
+    );
+
+    $rs = $this->discount_rule_model->update($id, $arr);
+
+    echo $rs === TRUE ? 'success' : 'แก้ไขรายการไม่สำเร็จ';
+  }
+
+
+
 
   //---- set discount on discount tab
   public function set_discount()
@@ -436,7 +450,7 @@ class Discount_rule extends PS_Controller
   {
     $sc = TRUE;
     $id_rule = $this->input->post('id_rule');
-    if($this->discount_rule_model->update_policy($id_rule, 0) === FALSE)
+    if($this->discount_rule_model->update_policy($id_rule, NULL) === FALSE)
     {
       $sc = FALSE;
       $message = 'ลบกฏไม่สำเร็จ';

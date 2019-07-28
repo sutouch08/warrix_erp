@@ -11,9 +11,10 @@ $delete = $this->pm->can_delete;
     </div>
     <div class="col-sm-6">
     	<p class="pull-right top-p">
-
         	<button type="button" class="btn btn-sm btn-warning" onClick="editOrder('<?php echo $order->code; ?>')"><i class="fa fa-arrow-left"></i> กลับ</button>
+      <?php if($order->status == 0) : ?>
           <button type="button" class="btn btn-sm btn-success" id="btn-save-order" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
+      <?php endif; ?>
         </p>
     </div>
 </div>

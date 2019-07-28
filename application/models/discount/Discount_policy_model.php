@@ -26,6 +26,34 @@ class Discount_policy_model extends CI_Model
 
 
 
+  public function delete($id)
+  {
+    $result = new stdClass();
+    $result->status = TRUE;
+
+    $this->db->trans_start();
+
+    //---- remove rule from policy before delete
+    $this->db->set('id_policy', NULL)->where('id_policy', $id)->update('discount_rule');
+
+    //--- delete policy
+    $this->db->where('id', $id)->delete('discount_policy');
+
+    $this->db->trans_complete();
+
+    if($this->db->trans_status() === FALSE)
+    {
+       $result->status = FALSE;
+       $result->message = $this->db->error();
+    }
+
+    return $result;
+  }
+
+
+
+
+
   public function get($id)
   {
     $rs = $this->db->where('id', $id)->get('discount_policy');
@@ -90,8 +118,8 @@ class Discount_policy_model extends CI_Model
 
     if($start != "" && $end != "")
     {
-      $qr .= "AND ((start_date >= '".db_date($start)."' AND start_date <= '".db_date($start)."') ";
-      $qr .= "OR (end_date >= '".db_date($end)."' AND end_date <= '".db_date($end)."'))";
+      $qr .= "AND (start_date >= '".db_date($start)."' OR end_date <= '".db_date($end)."') ";
+
     }
 
     $rs = $this->db->query($qr);
@@ -127,8 +155,8 @@ class Discount_policy_model extends CI_Model
 
     if($start != "" && $end != "")
     {
-      $qr .= "AND ((start_date >= '".db_date($start)."' AND start_date <= '".db_date($start)."') ";
-      $qr .= "OR (end_date >= '".db_date($end)."' AND end_date <= '".db_date($end)."'))";
+      $qr .= "AND (start_date >= '".db_date($start)."' OR end_date <= '".db_date($end)."') ";
+
     }
 
     $qr .= "ORDER BY code DESC";

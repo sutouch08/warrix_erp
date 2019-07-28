@@ -5,14 +5,14 @@ $canChange	= ($pm->can_add + $pm->can_edit + $pm->can_delete) > 0 ? TRUE : FALSE
 $canUnbill	= ($px->can_add + $px->can_edit + $px->can_delete) > 0 ? TRUE : FALSE;
 ?>
 
-<div class="row" style="margin-left:0px; margin-right:0px; margin-bottom:5px;">
-	<div class="col-sm-4 padding-left-0">
-    	<table class="table border-1" style="margin-bottom:0px;">
+<div class="row" style="padding:10px;">
+	<div class="col-sm-4">
+    	<table class="table" style="margin-bottom:0px;">
         <?php if( $this->pm->can_add OR $this->pm->can_edit OR $this->pm->can_delete ) : ?>
         	<tr>
-            	<td class="width-30 middle text-right">สถานะ : </td>
-                <td class="width-40">
-                	<select class="form-control input-xs" style="padding-top:0px; padding-bottom:0px;" id="stateList">
+            	<td class="width-30 middle text-right" style="border:0px;">สถานะ : </td>
+                <td class="width-40" style="border:0px;">
+                	<select class="form-control input-sm" style="padding-top:0px; padding-bottom:0px;" id="stateList">
                     	<option value="0">เลือกสถานะ</option>
 							<?php if( $order->state != 9 && $order->is_expired == 0 ) : ?>
                  <?php if( $order->state <=3 && $this->pm->can_edit) : ?>
@@ -40,7 +40,7 @@ $canUnbill	= ($px->can_add + $px->can_edit + $px->can_delete) > 0 ? TRUE : FALSE
 							<?php endif; ?>
                     </select>
                 </td>
-                <td class="width-30">
+                <td class="width-30" style="border:0px;">
                 <?php if( $order->status == 1 && $order->is_expired == 0 ) : ?>
                 	<button class="btn btn-xs btn-primary btn-block" onclick="changeState()">เปลี่ยนสถานะ</button>
 								<?php elseif($order->is_expired == 1 && $delete) : ?>
@@ -50,9 +50,9 @@ $canUnbill	= ($px->can_add + $px->can_edit + $px->can_delete) > 0 ? TRUE : FALSE
             </tr>
        <?php else : ?>
        <tr>
-            	<td class="width-30 text-center">สถานะ</td>
-                <td class="width-40 text-center">พนักงาน</td>
-                <td class="width-30 text-center">เวลา</td>
+            	<td class="width-30 text-center" style="border:0px;">สถานะ</td>
+                <td class="width-40 text-center" style="border:0px;">พนักงาน</td>
+                <td class="width-30 text-center" style="border:0px;">เวลา</td>
             </tr>
        <?php endif; ?>
       </table>
@@ -63,7 +63,7 @@ $canUnbill	= ($px->can_add + $px->can_edit + $px->can_delete) > 0 ? TRUE : FALSE
 	<div class="col-sm-1 col-1-harf padding-0 font-size-8" style="<?php echo state_color($rs->state); ?>">
     <center><?php echo get_state_name($rs->state); ?></center>
     <center><?php echo $this->user_model->get_name($rs->update_user); ?></center>
-    <center><?php echo thai_date($rs->date_upd,'/', TRUE); ?></center>
+    <center><?php echo thai_date($rs->date_upd,TRUE, '/'); ?></center>
   </div>
 <?php	endforeach; ?>
 <?php endif; ?>

@@ -1159,7 +1159,7 @@ class Discount_rule_model extends CI_Model
 
   public function get_active_rule()
   {
-    $rs = $this->db->where('active', 1)->where('id_policy', 0)->get('discount_rule');
+    $rs = $this->db->where('active', 1)->where('id_policy IS NULL')->get('discount_rule');
     if($rs->num_rows() > 0)
     {
       return $rs->result();

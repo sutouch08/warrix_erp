@@ -45,10 +45,47 @@ public function get_style_code()
     foreach($qs->result() as $rs)
     $sc[] = $rs->code;
   }
-  
+
 	echo json_encode($sc);
 }
 
+
+
+
+  public function sub_district()
+  {
+    $sc = array();
+    $adr = $this->db->like('tumbon', $_REQUEST['term'])->limit(20)->get('address_info');
+    if($adr->num_rows() > 0)
+    {
+      foreach($adr->result() as $rs)
+      {
+        $sc[] = $rs->tumbon.'>>'.$rs->amphur.'>>'.$rs->province.'>>'.$rs->zipcode;
+      }
+    }
+
+    echo json_encode($sc);
+  }
+
+
+  public function district()
+  {
+    $sc = array();
+    $adr = $this->db->select("amphur, province, zipcode")
+    ->like('amphur', $_REQUEST['term'])
+    ->group_by('amphur')
+    ->group_by('province')
+    ->limit(20)->get('address_info');
+    if($adr->num_rows() > 0)
+    {
+      foreach($adr->result() as $rs)
+      {
+        $sc[] = $rs->amphur.'>>'.$rs->province.'>>'.$rs->zipcode;
+      }
+    }
+
+    echo json_encode($sc);
+  }
 
 } //-- end class
 ?>

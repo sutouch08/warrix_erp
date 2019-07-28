@@ -47,7 +47,7 @@ function getDelete(id, name){
 		closeOnConfirm: false
 		}, function(){
 			$.ajax({
-				url: HOME + '/delete_policy/id',
+				url: HOME + '/delete_policy/' + id,
 				type:"POST",
         cache:"false",
 				success: function(rs){

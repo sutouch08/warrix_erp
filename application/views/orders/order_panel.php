@@ -13,5 +13,4 @@ else
   $this->load->view('orders/order_state');
 }
 
-
 ?>

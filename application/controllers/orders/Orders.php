@@ -23,6 +23,7 @@ class Orders extends PS_Controller
     $this->load->model('masters/products_model');
     $this->load->model('orders/discount_model');
 
+    $this->load->helper('order');
     $this->load->helper('channels');
     $this->load->helper('payment_method');
     $this->load->helper('customer');
@@ -150,7 +151,7 @@ class Orders extends PS_Controller
     $err = "";
     $err_qty = 0;
     $data = $this->input->post('data');
-    $order = $this->orders_model->get_order($order_code);
+    $order = $this->orders_model->get($order_code);
     if(!empty($data))
     {
       foreach($data as $rs)
@@ -256,8 +257,11 @@ class Orders extends PS_Controller
 
   public function edit_order($code)
   {
+    $this->load->model('address/address_model');
+    $this->load->model('masters/bank_model');
+    $this->load->helper('bank');
     $ds = array();
-    $rs = $this->orders_model->get_order($code);
+    $rs = $this->orders_model->get($code);
     if(!empty($rs))
     {
       $rs->channels_name = $this->channels_model->get_name($rs->channels_code);
@@ -269,9 +273,7 @@ class Orders extends PS_Controller
     }
 
     $state = $this->order_state_model->get_order_state($code);
-
     $ost = array();
-
     if(!empty($state))
     {
       foreach($state as $st)
@@ -279,11 +281,90 @@ class Orders extends PS_Controller
         $ost[] = $st;
       }
     }
+
+    $details = $this->orders_model->get_order_details($code);
+    $ship_to = $this->address_model->get_shipping_address($rs->customer_ref);
+    $banks = $this->bank_model->get_active_bank();
     $ds['state'] = $ost;
     $ds['order'] = $rs;
+    $ds['details'] = $details;
+    $ds['addr']  = $ship_to;
+    $ds['banks'] = $banks;
     $this->load->view('orders/order_edit', $ds);
   }
 
+
+
+  public function update_order()
+  {
+    $sc = TRUE;
+
+    if($this->input->post('order_code'))
+    {
+      $code = $this->input->post('order_code');
+      $recal = $this->input->post('recal');
+      $has_term = $this->payment_methods_model->has_term($this->input->post('payment_code'));
+      $ds = array(
+        'reference' => $this->input->post('reference'),
+        'customer_code' => $this->input->post('customer_code'),
+        'customer_ref' => $this->input->post('customer_ref'),
+        'channels_code' => $this->input->post('channels_code'),
+        'payment_code' => $this->input->post('payment_code'),
+        'is_term' => $has_term,
+        'date_add' => db_date($this->input->post('date_add')),
+        'remark' => $this->input->post('remark')
+      );
+
+      $rs = $this->orders_model->update($code, $ds);
+
+      if($rs === TRUE)
+      {
+        if($recal == 1)
+        {
+          $order = $this->orders_model->get($code);
+
+          //---- Recal discount
+          $details = $this->orders_model->get_order_details($code);
+          if(!empty($details))
+          {
+            foreach($details as $detail)
+            {
+              $qty	= $detail->qty;
+
+              //---- คำนวณ ส่วนลดจากนโยบายส่วนลด
+              $discount 	= $this->discount_model->get_item_recal_discount($detail->order_code, $detail->product_code, $detail->price, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
+
+              $arr = array(
+                "qty"		=> $qty,
+                "discount1"	=> $discount['discLabel1'],
+                "discount2" => $discount['discLabel2'],
+                "discount3" => $discount['discLabel3'],
+                "discount_amount" => $discount['amount'],
+                "total_amount"	=> ($detail->price * $qty) - $discount['amount'],
+                "id_rule"	=> $discount['id_rule'],
+                "valid" => 0,
+                "is_saved" => 0
+              );
+
+              $this->orders_model->update_detail($detail->id, $arr);
+            }
+          }
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $message = 'ปรับปรุงรายการไม่สำเร็จ';
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $message = 'ไม่พบเลขที่เอกสาร';
+    }
+
+    echo $sc === TRUE ? 'success' : $message;
+  }
 
 
 
@@ -291,7 +372,7 @@ class Orders extends PS_Controller
   {
     $this->load->helper('product_tab');
     $ds = array();
-    $rs = $this->orders_model->get_order($code);
+    $rs = $this->orders_model->get($code);
     if($rs->state <= 3)
     {
       $rs->customer_name = $this->customers_model->get_name($rs->customer_code);
@@ -301,7 +382,14 @@ class Orders extends PS_Controller
       $ds['details'] = $details;
       $this->load->view('orders/order_edit_detail', $ds);
     }
+  }
 
+
+
+  public function save($code)
+  {
+    $rs = $this->orders_model->set_status($code, 1);
+    echo $rs === TRUE ? 'success' : 'บันทึกออเดอร์ไม่สำเร็จ';
   }
 
 
@@ -647,7 +735,7 @@ class Orders extends PS_Controller
   public function get_detail_table($order_code)
   {
     $sc = "no data found";
-    $order = $this->orders_model->get_order($order_code);
+    $order = $this->orders_model->get($order_code);
     $details = $this->orders_model->get_order_details($order_code);
     if($details != FALSE )
     {
@@ -696,6 +784,343 @@ class Orders extends PS_Controller
     echo $sc;
 
   }
+
+
+  public function get_pay_amount()
+  {
+    $pay_amount = 0;
+
+    if($this->input->get('order_code'))
+    {
+      $code = $this->input->get('order_code');
+
+      //--- ยอดรวมหลังหักส่วนลด ตาม item
+      $amount = $this->orders_model->get_order_total_amount($code);
+      //--- ส่วนลดท้ายบิล
+      $bDisc = $this->orders_model->get_bill_discount($code);
+
+      $pay_amount = $amount - $bDisc;
+    }
+
+    echo $pay_amount;
+  }
+
+
+
+  public function get_account_detail($id)
+  {
+    $sc = 'fail';
+    $this->load->model('masters/bank_model');
+    $this->load->helper('bank');
+    $rs = $this->bank_model->get_account_detail($id);
+    if($rs !== FALSE)
+    {
+      $ds = bankLogoUrl($rs->bank_code).' | '.$rs->bank_name.' สาขา '.$rs->branch.'<br/>เลขที่บัญชี '.$rs->acc_no.'<br/> ชื่อบัญชี '.$rs->acc_name;
+      $sc = $ds;
+    }
+
+    echo $sc;
+  }
+
+
+
+  public function confirm_payment()
+  {
+    $sc = TRUE;
+
+    if($this->input->post('order_code'))
+    {
+      $this->load->helper('bank');
+      $this->load->model('orders/order_payment_model');
+
+      $file = isset( $_FILES['image'] ) ? $_FILES['image'] : FALSE;
+      $order_code = $this->input->post('order_code');
+      $date = $this->input->post('payDate');
+      $h = $this->input->post('payHour');
+      $m = $this->input->post('payMin');
+      $dhm = $date.' '.$h.':'.$m.':00';
+      $pay_date = db_date($dhm, TRUE);
+      $arr = array(
+        'order_code' => $order_code,
+        'order_amount' => $this->input->post('orderAmount'),
+        'pay_amount' => $this->input->post('payAmount'),
+        'pay_date' => $pay_date,
+        'id_account' => $this->input->post('id_account'),
+        'acc_no' => $this->input->post('acc_no'),
+        'user' => get_cookie('uname')
+      );
+
+      //--- บันทึกรายการ
+      if($this->order_payment_model->add($arr))
+      {
+        $rs = $this->orders_model->change_state($order_code, 2);  //--- แจ้งชำระเงิน
+
+        if($rs)
+        {
+          $arr = array(
+            'order_code' => $order_code,
+            'state' => 2,
+            'update_user' => get_cookie('uname')
+          );
+          $this->order_state_model->add_state($arr);
+        }
+
+        if($rs === FALSE)
+        {
+          $sc = FALSE;
+          $message = 'เปลี่ยนสถานะออเดอร์ไม่สำเร็จ';
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $message = 'บันทึกรายการไม่สำเร็จ';
+      }
+
+      if($file !== FALSE)
+      {
+        $rs = $this->do_upload($file, $order_code);
+        if($rs !== TRUE)
+        {
+          $sc = FALSE;
+          $message = $sc;
+        }
+      }
+    }
+
+    echo $sc === TRUE ? 'success' : $message;
+  }
+
+
+
+  public function do_upload($file, $code)
+	{
+    $this->load->library('upload');
+    $sc = TRUE;
+
+		$image_path = $this->config->item('image_path').'payments/';
+    $image 	= new upload($file);
+    if( $image->uploaded )
+    {
+      $image->file_new_name_body = $code; 		//--- เปลี่ยนชือ่ไฟล์ตาม order_code
+      $image->image_resize			 = TRUE;		//--- อนุญาติให้ปรับขนาด
+      $image->image_retio_fill	 = TRUE;		//--- เติกสีให้เต็มขนาดหากรูปภาพไม่ได้สัดส่วน
+      $image->file_overwrite		 = TRUE;		//--- เขียนทับไฟล์เดิมได้เลย
+      $image->auto_create_dir		 = TRUE;		//--- สร้างโฟลเดอร์อัตโนมัติ กรณีที่ไม่มีโฟลเดอร์
+      $image->image_x					   = 500;		//--- ปรับขนาดแนวนอน
+      //$image->image_y					   = 800;		//--- ปรับขนาดแนวตั้ง
+      $image->image_ratio_y      = TRUE;  //--- ให้คงสัดส่วนเดิมไว้
+      $image->image_background_color	= "#FFFFFF";		//---  เติมสีให้ตามี่กำหนดหากรูปภาพไม่ได้สัดส่วน
+      $image->image_convert			= 'jpg';		//--- แปลงไฟล์
+
+      $image->process($image_path);						//--- ดำเนินการตามที่ได้ตั้งค่าไว้ข้างบน
+
+      if( ! $image->processed )	//--- ถ้าไม่สำเร็จ
+      {
+        $sc 	= $image->error;
+      }
+    } //--- end if
+
+    $image->clean();	//--- เคลียร์รูปภาพออกจากหน่วยความจำ
+
+		return $sc;
+	}
+
+
+
+
+  public function view_payment_detail()
+  {
+    $this->load->model('orders/order_payment_model');
+    $this->load->model('masters/bank_model');
+    $sc = TRUE;
+    $code = $this->input->post('order_code');
+    $rs = $this->order_payment_model->get($code);
+
+    if(!empty($rs))
+    {
+      $bank = $this->bank_model->get_account_detail($rs->id_account);
+      $img  = payment_image_url($code); //--- order_helper
+      $ds   = array(
+        'order_code' => $code,
+        'orderAmount' => number($rs->order_amount, 2),
+        'payAmount' => number($rs->pay_amount, 2),
+        'payDate' => thai_date($rs->pay_date, TRUE, '/'),
+        'bankName' => $bank->bank_name,
+        'branch' => $bank->branch,
+        'accNo' => $bank->acc_no,
+        'accName' => $bank->acc_name,
+        'date_add' => thai_date($rs->date_upd, TRUE, '/'),
+        'imageUrl' => $img === FALSE ? '' : $img,
+        'valid' => "no"
+      );
+    }
+    else
+    {
+      $sc = FALSE;
+    }
+
+    echo $sc === TRUE ? json_encode($ds) : 'fail';
+  }
+
+
+  public function update_shipping_code()
+  {
+    $order_code = $this->input->post('order_code');
+    $ship_code  = $this->input->post('shipping_code');
+    if($order_code && $ship_code)
+    {
+      $rs = $this->orders_model->update_shipping_code($order_code, $ship_code);
+      echo $rs === TRUE ? 'success' : 'fail';
+    }
+  }
+
+
+
+  public function save_address()
+  {
+    $sc = TRUE;
+    if($this->input->post('customer_ref'))
+    {
+      $this->load->model('address/address_model');
+      $id = $this->input->post('id_address');
+      $arr = array(
+        'code' => trim($this->input->post('customer_ref')),
+        'name' => trim($this->input->post('name')),
+        'address' => trim($this->input->post('address')),
+        'sub_district' => trim($this->input->post('sub_district')),
+        'district' => trim($this->input->post('district')),
+        'province' => trim($this->input->post('province')),
+        'postcode' => trim($this->input->post('postcode')),
+        'phone' => trim($this->input->post('phone')),
+        'email' => trim($this->input->post('email')),
+        'alias' => trim($this->input->post('alias'))
+      );
+
+      if(!empty($id))
+      {
+        $rs = $this->address_model->update_shipping_address($id, $arr);
+      }
+      else
+      {
+        $rs = $this->address_model->add_shipping_address($arr);
+      }
+
+      if($rs === FALSE)
+      {
+        $sc = FALSE;
+        $message = 'เพิ่มที่อยู่ไม่สำเร็จ';
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $message = 'ไมพบชื่อลูกค้าออนไลน์';
+    }
+
+    echo $sc === TRUE ? 'success' : $message;
+  }
+
+
+
+  public function get_address_table()
+  {
+    $sc = TRUE;
+    if($this->input->post('customer_ref'))
+    {
+      $code = $this->input->post('customer_ref');
+      if(!empty($code))
+      {
+        $ds = array();
+        $this->load->model('address/address_model');
+        $adrs = $this->address_model->get_shipping_address($code);
+        if(!empty($adrs))
+        {
+          foreach($adrs as $rs)
+          {
+            $arr = array(
+              'id' => $rs->id,
+              'name' => $rs->name,
+              'address' => $rs->address.' '.$rs->sub_district.' '.$rs->district.' '.$rs->province.' '.$rs->postcode,
+              'phone' => $rs->phone,
+              'email' => $rs->email,
+              'alias' => $rs->alias,
+              'default' => $rs->is_default == 1 ? 1 : ''
+            );
+            array_push($ds, $arr);
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+      }
+    }
+
+    echo $sc === TRUE ? json_encode($ds) : 'noaddress';
+  }
+
+
+
+  public function set_default_address()
+  {
+    $this->load->model('address/address_model');
+    $id = $this->input->post('id_address');
+    $code = $this->input->post('customer_ref');
+    //--- drop current
+    $this->address_model->unset_default_shipping_address($code);
+
+    //--- set new default
+    $rs = $this->address_model->set_default_shipping_address($id);
+    echo $rs === TRUE ? 'success' :'fail';
+  }
+
+
+
+  public function get_shipping_address()
+  {
+    $this->load->model('address/address_model');
+    $id = $this->input->post('id_address');
+    $rs = $this->address_model->get_shipping_detail($id);
+    if(!empty($rs))
+    {
+      $arr = array(
+        'id' => $rs->id,
+        'code' => $rs->code,
+        'name' => $rs->name,
+        'address' => $rs->address,
+        'sub_district' => $rs->sub_district,
+        'district' => $rs->district,
+        'province' => $rs->province,
+        'postcode' => $rs->postcode,
+        'phone' => $rs->phone,
+        'email' => $rs->email,
+        'alias' => $rs->alias,
+        'is_default' => $rs->is_default
+      );
+
+      echo json_encode($rs);
+    }
+    else
+    {
+      echo 'nodata';
+    }
+  }
+
+
+
+  public function delete_shipping_address()
+  {
+    $this->load->model('address/address_model');
+    $id = $this->input->post('id_address');
+    $rs = $this->address_model->delete_shipping_address($id);
+    echo $rs === TRUE ? 'success' : 'fail';
+  }
+
 
   public function clear_filter()
   {

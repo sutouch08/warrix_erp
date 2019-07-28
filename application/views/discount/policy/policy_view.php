@@ -25,7 +25,7 @@
   </div>
   <div class="col-sm-2 padding-5">
     <label>สถานะ</label>
-    <select class="form-control input-sm" name="active" id="active">
+    <select class="form-control input-sm" name="active" id="active" onchange="getSearch()">
       <option value="2" <?php echo is_selected(2, $active); ?>>ทั้งหมด</option>
       <option value="1" <?php echo is_selected(1, $active); ?>>ใช้งาน</option>
       <option value="0" <?php echo is_selected(0, $active); ?>>ไม่ใช้งาน</option>
@@ -47,7 +47,7 @@
   </div>
 	<div class="col-sm-2 padding-5 last">
     <label class="display-block not-show">buton</label>
-    <button type="button" class="btn btn-sm btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
+    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
 </div>
 <hr class="margin-top-15">
@@ -72,7 +72,7 @@
 			<?php if(!empty($data)) : ?>
 				<?php $no = $this->uri->segment(4) + 1; ?>
 				<?php foreach($data as $rs) : ?>
-					<tr>
+					<tr id="row-<?php echo $rs->id; ?>">
 						<td class="middle text-center"><?php echo $no; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
@@ -89,7 +89,7 @@
 								</button>
 							<?php endif; ?>
 							<?php if($this->pm->can_delete) : ?>
-								<button type="button" class="btn btn-mini btn-danger" onclick="getDelete('<?php echo $rs->code; ?>', '<?php echo $rs->name; ?>')">
+								<button type="button" class="btn btn-mini btn-danger" onclick="getDelete('<?php echo $rs->id; ?>', '<?php echo addslashes($rs->code); ?>')">
 									<i class="fa fa-trash"></i>
 								</button>
 							<?php endif; ?>
@@ -99,7 +99,7 @@
 				<?php endforeach; ?>
 			<?php else : ?>
 				<tr>
-					<td colspan="6" class="text-center">--- No content ---</td>
+					<td colspan="7" class="text-center">--- No content ---</td>
 				</tr>
 			<?php endif; ?>
 			</tbody>

@@ -3,6 +3,34 @@ $('#date').datepicker({
 });
 
 
+
+
+//---- เปลี่ยนสถานะออเดอร์  เป็นบันทึกแล้ว
+function saveOrder(){
+  var order_code = $('#order_code').val();
+	$.ajax({
+		url: BASE_URL + 'orders/orders/save/'+ order_code,
+		type:"POST",
+    cache:false,
+		success:function(rs){
+			var rs = $.trim(rs);
+			if( rs == 'success' ){
+				swal({
+          title: 'Saved',
+          type: 'success',
+          timer: 1000
+        });
+				setTimeout(function(){ editOrder(order_code) }, 1200);
+			}else{
+				swal("Error ! ", rs , "error");
+			}
+		}
+	});
+}
+
+
+
+
 $("#customer").autocomplete({
 	source: BASE_URL + 'auto_complete/get_customer_code_and_name',
 	autoFocus: true,
@@ -45,12 +73,21 @@ function add(){
 }
 
 
+var customer;
+var channels;
+var payment;
+var date;
+
+
 function getEdit(){
   $('.edit').removeAttr('disabled');
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
+  customer = $("#customerCode").val();
+	channels = $("#channels").val();
+	payment  = $("#payment").val();
+	date = $("#date").val();
 }
-
 
 
 //---- เพิ่มรายการสินค้าเช้าออเดอร์
@@ -188,4 +225,140 @@ function countInput(){
 		}
     });
 	return qty;
+}
+
+
+
+function validUpdate(){
+	var date_add = $("#date").val();
+	var customer_code = $("#customerCode").val();
+  var customer_name = $('#customer').val();
+	var channels_code = $("#channels").val();
+	var payment_code = $("#payment").val();
+  var recal = 0;
+	//---- ตรวจสอบวันที่
+	if( ! isDate(date_add) ){
+		swal("วันที่ไม่ถูกต้อง");
+		return false;
+	}
+
+	//--- ตรวจสอบลูกค้า
+	if( customer_code.length == 0 || customer_name == "" ){
+		swal("ชื่อลูกค้าไม่ถูกต้อง");
+		return false;
+	}
+
+  if(channels_code == ""){
+    swal('กรุณาเลือกช่องทางขาย');
+    return false;
+  }
+
+
+  if(payment_code == ""){
+    swal('กรุณาเลือกช่องทางการชำระเงิน');
+    return false;
+  }
+
+	//--- ตรวจสอบความเปลี่ยนแปลงที่สำคัญ
+	if( (date_add != date) || ( customer_code != customer ) || ( channels_code != channels ) || ( payment_code != payment ) )
+  {
+		recal = 1; //--- ระบุว่าต้องคำนวณส่วนลดใหม่
+	}
+
+  updateOrder(recal);
+}
+
+
+
+
+
+function updateOrder(recal){
+	var order_code = $("#order_code").val();
+	var date_add = $("#date").val();
+	var customer_code = $("#customerCode").val();
+  var customer_name = $("#customer").val();
+  var customer_ref = $('#customer_ref').val();
+	var channels_code = $("#channels").val();
+	var payment_code = $("#payment").val();
+	var reference = $('#reference').val();
+	var remark = $("#remark").val();
+
+	load_in();
+
+	$.ajax({
+		url:BASE_URL + 'orders/orders/update_order',
+		type:"POST",
+		cache:"false",
+		data:{
+      "order_code" : order_code,
+  		"date_add"	: date_add,
+  		"customer_code" : customer_code,
+      "customer_ref" : customer_ref,
+  		"channels_code" : channels_code,
+  		"payment_code" : payment_code,
+  		"reference" : reference,
+  		"remark" : remark,
+      "recal" : recal
+    },
+		success: function(rs){
+			load_out();
+			var rs = $.trim(rs);
+			if( rs == 'success' ){
+				swal({
+          title: 'Done !',
+          type: 'success',
+          timer: 1000
+        });
+
+				setTimeout(function(){
+          window.location.reload();
+        }, 1200);
+
+			}else{
+				swal({
+          title: "Error!",
+          text: rs,
+          type: 'error'
+        });
+			}
+		}
+	});
+}
+
+
+
+function recalDiscount(){
+	updateOrder(1);
+}
+
+
+
+// JavaScript Document
+function changeState(){
+    var id_order = $("#id_order").val();
+    var state = $("#stateList").val();
+    if( state != 0){
+        $.ajax({
+            url:"controller/orderController.php?stateChange",
+            type:"POST", cache:"false", data:{"id_order":id_order, "state":state},
+            success:function(rs){
+                var rs = $.trim(rs);
+                if(rs == 'success'){
+                    swal({
+                      title:'success',
+                      text:'status updated',
+                      type:'success',
+                      timer: 1000
+                    });
+
+                    setTimeout(function(){
+                      window.location.reload();
+                    }, 1500);
+
+                }else{
+                    swal("Error !", rs, "error");
+                }
+            }
+        });
+    }
 }

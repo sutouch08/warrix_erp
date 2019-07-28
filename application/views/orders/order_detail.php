@@ -1,5 +1,3 @@
-
-<?php		$rowspan = $order->is_term == 0 ? 6 : 4;	?>
 <?php
 	$add = $this->pm->can_add;
 	$edit = $this->pm->can_edit;
@@ -56,11 +54,11 @@
       				</td>
 
               <td class="middle text-center">
-                <span class="price-label" id="price-label-<?php echo $rs->id; ?>">	<?php echo number_format($rs->price, 2); ?></span>
+                <span class="price-label" id="price-label-<?php echo $rs->id; ?>">	<?php echo number($rs->price, 2); ?></span>
               </td>
 
               <td class="middle text-center">
-      						<?php echo number_format($rs->qty); ?>
+      						<?php echo number($rs->qty); ?>
       				</td>
 
               <td class="middle text-center">
@@ -71,7 +69,7 @@
               </td>
 
               <td class="middle text-right">
-      					<?php echo number_format($rs->total_amount, 2); ?>
+      					<?php echo number($rs->total_amount, 2); ?>
       				</td>
 
               <td class="middle text-right">
@@ -100,36 +98,24 @@
 
 <?php 	$netAmount = ( $total_amount - $order->bDiscAmount ) + $order->shipping_fee + $order->service_fee;	?>
 			<tr class="font-size-12">
-            	<td colspan="6" rowspan="<?php echo $rowspan; ?>"></td>
+            	<td colspan="6" rowspan="4"></td>
                 <td style="border-left:solid 1px #CCC;"><b>จำนวนรวม</b></td>
-                <td class="text-right"><b><?php echo number_format($total_qty); ?></b></td>
+                <td class="text-right"><b><?php echo number($total_qty); ?></b></td>
                 <td class="text-center"><b>Pcs.</b></td>
             </tr>
            <tr class="font-size-12">
                 <td style="border-left:solid 1px #CCC;"><b>มูลค่ารวม</b></td>
-                <td class="text-right" id="total-td" style="font-weight:bold;"><?php echo number_format($order_amount, 2); ?></td>
+                <td class="text-right" id="total-td" style="font-weight:bold;"><?php echo number($order_amount, 2); ?></td>
                 <td class="text-center"><b>THB.</b></td>
             </tr>
             <tr class="font-size-12">
                 <td style="border-left:solid 1px #CCC;"><b>ส่วนลดรวม</b></td>
-                <td class="text-right" id="discount-td" style="font-weight:bold;"><?php echo number_format($total_discount, 2); ?></td>
+                <td class="text-right" id="discount-td" style="font-weight:bold;"><?php echo number($total_discount, 2); ?></td>
                 <td class="text-center"><b>THB.</b></td>
             </tr>
-            <?php if( $order->is_term == 0 ) : ?>
-            <tr class="font-size-12">
-                <td style="border-left:solid 1px #CCC;"><b>ค่าจัดส่ง</b></td>
-                <td class="text-right" id="shipping-td" style="font-weight:bold;"><?php echo number_format($order->shipping_fee, 2); ?></td>
-                <td class="text-center"><b>THB.</b></td>
-            </tr>
-            <tr class="font-size-12">
-                <td style="border-left:solid 1px #CCC;"><b>อื่นๆ</b></td>
-                <td class="text-right" id="service-td" style="font-weight:bold;"><?php echo number_format($order->service_fee, 2); ?></td>
-                <td class="text-center"><b>THB.</b></td>
-            </tr>
-            <?php endif; ?>
             <tr class="font-size-12">
                 <td style="border-left:solid 1px #CCC;"><b>สุทธิ</b></td>
-                <td class="text-right" style="font-weight:bold;" id="netAmount-td"><?php echo number_format( $netAmount, 2); ?></td>
+                <td class="text-right" style="font-weight:bold;" id="netAmount-td"><?php echo number( $netAmount, 2); ?></td>
                 <td class="text-center"><b>THB.</b></td>
             </tr>
 
@@ -137,14 +123,14 @@
         </table>
     </div>
 </div>
-<!--------------------------------  End Order Detail ----------------->
+<!--  End Order Detail ----------------->
 </form>
-<!------ order detail template ------>
+<!-- order detail template ------>
 <script id="detail-table-template" type="text/x-handlebars-template">
 {{#each this}}
 	{{#if @last}}
     <tr class="font-size-12">
-    	<td colspan="6" rowspan="<?php echo $rowspan; ?>"></td>
+    	<td colspan="6" rowspan="4"></td>
       <td style="border-left:solid 1px #CCC;"><b>จำนวนรวม</b></td>
       <td class="text-right"><b>{{ total_qty }}</b></td>
       <td class="text-center"><b>Pcs.</b></td>
@@ -161,20 +147,6 @@
       <td class="text-right"><b>{{ total_discount }}</b></td>
       <td class="text-center"><b>THB.</b></td>
     </tr>
-
-		<?php if( $order->is_term == 0 ) : ?>
-		<tr class="font-size-12">
-				<td style="border-left:solid 1px #CCC;"><b>ค่าจัดส่ง</b></td>
-				<td class="text-right" id="shipping-td" style="font-weight:bold;">{{ shipping_fee }}</td>
-				<td class="text-center"><b>THB.</b></td>
-		</tr>
-
-		<tr class="font-size-12">
-				<td style="border-left:solid 1px #CCC;"><b>อื่นๆ</b></td>
-				<td class="text-right" id="service-td" style="font-weight:bold;">{{ service_fee }}</td>
-				<td class="text-center"><b>THB.</b></td>
-		</tr>
-		<?php endif; ?>
 
     <tr class="font-size-12">
       <td style="border-left:solid 1px #CCC;"><b>สุทธิ</b></td>

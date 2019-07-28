@@ -1,5 +1,5 @@
 <?php
-class printer
+class Printer
 {
 public $page;
 public $total_page		= 1;

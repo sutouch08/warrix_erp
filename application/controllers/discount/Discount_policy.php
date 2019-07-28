@@ -168,6 +168,18 @@ class Discount_policy extends PS_Controller
     echo json_encode($ds);
   }
 
+
+
+
+  public function delete_policy($id)
+  {
+    $rs = $this->discount_policy_model->delete($id);
+
+    echo $rs->status === TRUE ? 'success' : $rs->message;
+  }
+
+
+
   public function get_new_code()
   {
     $date = date('Y-m-d');

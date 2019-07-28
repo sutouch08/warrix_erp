@@ -22,6 +22,30 @@ class Orders_model extends CI_Model
 
 
 
+  public function update($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->db->where('code', $code)->update('orders', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function get($code)
+  {
+    $rs = $this->db->where('code', $code)->get('orders');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
   public function add_detail(array $ds = array())
   {
     if(!empty($ds))
@@ -91,6 +115,26 @@ class Orders_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+
+  public function change_state($code, $state)
+  {
+    $arr = array(
+      'state' => $state,
+      'update_user' => get_cookie('uname')
+    );
+
+    return $this->db->where('code', $code)->update('orders', $arr);
+  }
+
+
+
+
+  public function update_shipping_code($code, $ship_code)
+  {
+    return $this->db->set('shipping_code', $ship_code)->where('code', $code)->update('orders');
   }
 
 
@@ -225,21 +269,6 @@ class Orders_model extends CI_Model
 
 
 
-  public function get_order($code)
-  {
-    $rs = $this->db->where('code', $code)->get('orders');
-    if($rs->num_rows() == 1)
-    {
-      return $rs->row();
-    }
-
-    return FALSE;
-  }
-
-
-
-
-
   public function get_max_code($code)
   {
     $qr = "SELECT MAX(code) AS code FROM orders WHERE code LIKE '".$code."%' ORDER BY code DESC";
@@ -258,6 +287,31 @@ class Orders_model extends CI_Model
     return $rs->row()->amount;
   }
 
+
+
+  public function get_bill_discount($code)
+  {
+    $rs = $this->db->select('bDiscAmount')
+    ->where('code', $code)
+    ->get('orders');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->bDiscAmount;
+    }
+
+    return 0;
+  }
+
+
+  public function get_sum_style_qty($order_code, $style_code)
+  {
+    $rs = $this->db->select_sum('qty')
+    ->where('order_code', $order_code)
+    ->where('style_code', $style_code)
+    ->get('order_detils');
+
+    return $rs->row()->qty;
+  }
 
 
 
@@ -295,6 +349,12 @@ class Orders_model extends CI_Model
     }
 
     return 0;
+  }
+
+
+  public function set_status($code, $status)
+  {
+    return $this->db->set('status', $status)->where('code', $code)->update('orders');
   }
 
 

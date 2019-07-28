@@ -7,7 +7,7 @@
     	<p class="pull-right top-p">
         <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
       <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
-        <button type="button" class="btn btn-sm btn-primary" onclick="getActiveRuleList()">เพิ่มกฏ</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="getActiveRuleList()">เพิ่มเงื่อนไข</button>
       <?php endif; ?>
       </p>
     </div>

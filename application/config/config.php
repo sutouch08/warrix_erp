@@ -24,8 +24,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 $config['base_url'] = 'http://localhost/flex/';
-$config['image_path'] = 'images/products/';
-$config['image_file_path'] = $_SERVER['DOCUMENT_ROOT'] .'/flex/images/products/';
+$config['image_path'] = 'images/';
+$config['image_file_path'] = $_SERVER['DOCUMENT_ROOT'] .'/flex/images/';
 /*
 |--------------------------------------------------------------------------
 | Index File
