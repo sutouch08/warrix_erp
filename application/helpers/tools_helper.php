@@ -127,7 +127,7 @@ function pagination_config( $base_url, $total_rows = 0, $perpage = 20, $segment 
     $input_rows .= 'ทั้งหมด '.$total_rows.' รายการ | แสดง';
     $input_rows .= '<input type="number" name="set_rows" id="set_rows" class="input-mini text-center margin-left-15 margin-right-15" value="'.$rows.'" />';
     $input_rows .= 'ต่อหน้า ';
-    $input_rows .= '<buton class="btn btn-success btn-sm" type="submit">แสดง</button>';
+    $input_rows .= '<buton class="btn btn-success btn-sm" type="button" onClick="set_rows()">แสดง</button>';
     $input_rows .= '</p>';
 
 		$config['full_tag_open'] 		= '<nav><ul class="pagination">';

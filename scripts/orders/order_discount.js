@@ -69,9 +69,8 @@ function updateDiscount(){
 	var error = 0;
 	var message = '';
 	var disc = [];
-	disc.push( {"name" : "id_order", "value" : $("#id_order").val() } ); //---- id_order
+	disc.push( {"name" : "order_code", "value" : $("#order_code").val() } ); //---- id_order
 	disc.push( { "name" : "approver", "value" : $("#approverName").val() } ); //--- ชื่อผู้อนุมัติ
-	disc.push( { "name" : "token", "value" : $("#approveToken").val() } ); //--- Token
 	$(".discount-box").each(function(index, element) {
     var attr = $(this).attr('id').split('_');
 		var id = attr[1];
@@ -153,7 +152,7 @@ function updateDiscount(){
 		}
 
 	$.ajax({
-		url:"controller/orderController.php?updateEditDiscount",
+		url:BASE_URL + 'orders/orders/update_discount',
 		type:"POST",
 		cache:"false",
 		data: disc,
@@ -173,7 +172,7 @@ function updateDiscount(){
 
 
 function updateNonCountPrice(id){
-	var id_order = $('#id_order').val()
+	var order_code = $('#order_code').val()
 	var price = parseFloat($('#price_'+id).val());
 	if(isNaN(price) || price < 0){
 		swal('ราคาไม่ถูกต้อง');
@@ -182,11 +181,11 @@ function updateNonCountPrice(id){
 
 	load_in();
 	$.ajax({
-		url:"controller/orderController.php?updateNonCountPrice",
+		url:BASE_URL + 'orders/orders/update_non_count_price',
 		type:"POST",
 		cache:"false",
 		data:{
-			"id_order" : id_order,
+			"order_code" : order_code,
 			"id_order_detail" : id,
 			"price" : price
 		},
@@ -213,9 +212,8 @@ function updateNonCountPrice(id){
 function updatePrice(){
 	var price = [];
 
-	price.push( { "name" : "id_order", "value" : $("#id_order").val() } );
+	price.push( { "name" : "order_code", "value" : $("#order_code").val() } );
 	price.push( { "name" : "approver", "value" : $("#approverName").val() } ); //--- ชื่อผู้อนุมัติ
-	price.push( { "name" : "token", "value" : $("#approveToken").val() } ); //--- Token
 	$(".price-box").each(function(index, element) {
         var attr = $(this).attr('id').split('_');
 				var id = attr[1];
@@ -224,12 +222,18 @@ function updatePrice(){
 				price.push( {"name" : name, "value" : value });
     });
 	$.ajax({
-		url:"controller/orderController.php?updateEditPrice",
-		type:"POST", cache:"false", data: price,
+		url:BASE_URL + 'orders/orders/update_price',
+		type:"POST",
+		cache:"false",
+		data: price,
 		success: function(rs){
 			var rs = $.trim(rs);
 			if( rs == 'success' ){
-				swal({title: "Done", type: "success", timer: 1000});
+				swal({
+					title: "Done",
+					type: "success",
+					timer: 1000
+				});
 				setTimeout(function(){ window.location.reload(); }, 1200 );
 			}else{
 				swal("Error!", rs, "error");
@@ -278,7 +282,7 @@ function getApprove(tab){
 	if( tab == 'discount' ){
 		var initialData = {
 			"title" : 'อนุมัติแก้ไขส่วนลด',
-			"id_tab" : 35,  //--- แก้ไขวันที่เอกสาร
+			"menu" : 'SODISC',
 			"field" : "", //--- add/edit/delete ถ้าอันไหนเป็น 1 ถือว่ามีสิทธิ์ /// ถ้าต้องการเฉพาะให้ระบุเป็น  add, edit หรือ delete
 			"callback" : function(){ updateDiscount();  }
 		}
@@ -287,7 +291,7 @@ function getApprove(tab){
 	if( tab == 'price' ){
 		var initialData = {
 			"title" : 'อนุมัติแก้ไขราคาขาย',
-			"id_tab" : 35,  //--- แก้ไขวันที่เอกสาร
+			"menu" : 'SOPRIC',
 			"field" : "", //--- add/edit/delete ถ้าอันไหนเป็น 1 ถือว่ามีสิทธิ์ /// ถ้าต้องการเฉพาะให้ระบุเป็น  add, edit หรือ delete
 			"callback" : function(){ updatePrice();  }
 		}
@@ -296,7 +300,7 @@ function getApprove(tab){
 	if( tab == 'cost' ){
 		var initialData = {
 			"title" : 'อนุมัติแก้ไขราคาทุน',
-			"id_tab" : 85,  //--- แก้ไขวันที่เอกสาร
+			"menu" : 'SOCOST',
 			"field" : "", //--- add/edit/delete ถ้าอันไหนเป็น 1 ถือว่ามีสิทธิ์ /// ถ้าต้องการเฉพาะให้ระบุเป็น  add, edit หรือ delete
 			"callback" : function(){ updateCost();  }
 		}

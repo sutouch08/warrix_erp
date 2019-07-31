@@ -138,11 +138,11 @@ class Permission extends PS_Controller{
 						'menu' => $code,
 						'uid' => NULL,
 						'id_profile' => $id_profile,
-						'can_view' => $view[$code],
-						'can_add' => $add[$code],
-						'can_edit' => $edit[$code],
-						'can_delete' => $delete[$code],
-						'can_approve' => $approve[$code]
+						'can_view' => isset($view[$code]) ? 1 : 0,
+						'can_add' => isset($add[$code]) ? 1 : 0,
+						'can_edit' => isset($edit[$code]) ? 1 : 0,
+						'can_delete' => isset($delete[$code]) ? 1 : 0,
+						'can_approve' => isset($approve[$code]) ? 1 : 0
 					);
 
 					$this->permission_model->add($pm);

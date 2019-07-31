@@ -106,6 +106,22 @@ class Orders_model extends CI_Model
     return FALSE;
   }
 
+
+
+  public function get_detail($id)
+  {
+    $rs = $this->db->where('id', $id)->get('order_details');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
+
   public function get_order_details($code)
   {
     $rs = $this->db->where('order_code', $code)->get('order_details');
@@ -116,6 +132,70 @@ class Orders_model extends CI_Model
 
     return FALSE;
   }
+
+
+
+  public function get_unvalid_details($code)
+  {
+    $rs = $this->db
+    ->where('order_code', $code)
+    ->where('valid', 0)
+    ->where('is_count', 1)
+    ->get('order_details');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function get_valid_details($code)
+  {
+    $rs = $this->db
+    ->where('order_code', $code)
+    ->where('valid', 1)
+    ->or_where('is_count', 0)
+    ->get('order_details');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_state($code)
+  {
+    $rs = $this->db->select('state')->where('code', $code)->get('orders');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->state;
+    }
+
+    return FALSE;
+  }
+
+
+
+
+  public function valid_detail($id)
+  {
+    return $this->db->set('valid', 1)->where('id', $id)->update('order_details');
+  }
+
+
+
+  public function valid_all_details($code)
+  {
+    return $this->db->set('valid', 1)->where('order_code', $code)->update('order_details');
+  }
+
 
 
 
@@ -135,6 +215,44 @@ class Orders_model extends CI_Model
   public function update_shipping_code($code, $ship_code)
   {
     return $this->db->set('shipping_code', $ship_code)->where('code', $code)->update('orders');
+  }
+
+
+
+
+  public function set_never_expire($code, $option)
+  {
+    return $this->db->set('never_expire', $option)->where('code', $code)->update('orders');
+  }
+
+
+  public function un_expired($code)
+  {
+    $this->db->trans_start();
+    $this->db->set('is_expired', 0)->where('order_code', $code)->update('order_details');
+    $this->db->set('is_expired', 0)->where('code', $code)->update('orders');
+    $this->db->trans_complete();
+
+    if($this->db->trans_status() === FALSE)
+    {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+
+
+  public function un_complete($code)
+  {
+    return $this->db->set('is_complete', 0)->where('order_code', $code)->update('order_details');
+  }
+
+
+  public function paid($code, $paid)
+  {
+    $paid = $paid === TRUE ? 1 : 0;
+    return $this->db->set('is_paid', $paid)->where('code', $code)->update('orders');
   }
 
 
@@ -188,8 +306,8 @@ class Orders_model extends CI_Model
 
     if($ds['from_date'] != '' && $ds['to_date'] != '')
     {
-      $this->db->where('date_add >=', $ds['from_date']);
-      $this->db->where('date_add <=', $ds['to_date']);
+      $this->db->where('date_add >=', from_date($ds['from_date']));
+      $this->db->where('date_add <=', to_date($ds['to_date']));
     }
 
     $rs = $this->db->get('orders');
@@ -285,6 +403,25 @@ class Orders_model extends CI_Model
     $this->db->where('order_code', $code);
     $rs = $this->db->get('order_details');
     return $rs->row()->amount;
+  }
+
+
+  //--- ใช้คำนวนยอดเครดิตคงเหลือ
+  public function get_sum_not_complete_amount($customer_code)
+  {
+    $qr = "SELECT SUM(od.total_amount) AS amount
+            FROM order_details AS od
+            JOIN orders AS o ON od.order_code = o.code
+            WHERE o.customer_code = '{$customer_code}'
+              AND od.is_complete = 0
+              AND od.is_expired = 0";
+    $rs = $this->db->query($qr);
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->amount;
+    }
+
+    return 0.00;
   }
 
 

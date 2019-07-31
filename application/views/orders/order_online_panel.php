@@ -53,17 +53,17 @@
                     <td><?php echo $rs->phone; ?></td>
                     <td align="right">
               <?php if( $rs->is_default == 1 ) : ?>
-                      <button type="button" class="btn btn-xs btn-success btn-address" id="btn-<?php echo $rs->id; ?>" onClick="setDefault(<?php echo $rs->id; ?>)">
+                      <button type="button" class="btn btn-mini btn-success btn-address" id="btn-<?php echo $rs->id; ?>" onClick="setDefault(<?php echo $rs->id; ?>)">
                         <i class="fa fa-check"></i>
                       </button>
               <?php else : ?>
-                      <button type="button" class="btn btn-xs btn-address" id="btn-<?php echo $rs->id; ?>" onClick="setDefault(<?php echo $rs->id; ?>)">
+                      <button type="button" class="btn btn-mini btn-address" id="btn-<?php echo $rs->id; ?>" onClick="setDefault(<?php echo $rs->id; ?>)">
                         <i class="fa fa-check"></i>
                       </button>
               <?php endif; ?>
-											<button type="button" class="btn btn-xs btn-primary" onclick="printOnlineAddress(<?php echo $rs->id; ?>)"><i class="fa fa-print"></i></button>
-                      <button type="button" class="btn btn-xs btn-warning" onClick="editAddress(<?php echo $rs->id; ?>)"><i class="fa fa-pencil"></i></button>
-                      <button type="button" class="btn btn-xs btn-danger" onClick="removeAddress(<?php echo $rs->id; ?>)"><i class="fa fa-trash"></i></button>
+											<button type="button" class="btn btn-mini btn-primary" onclick="printOnlineAddress(<?php echo $rs->id; ?>)"><i class="fa fa-print"></i></button>
+                      <button type="button" class="btn btn-mini btn-warning" onClick="editAddress(<?php echo $rs->id; ?>)"><i class="fa fa-pencil"></i></button>
+                      <button type="button" class="btn btn-mini btn-danger" onClick="removeAddress(<?php echo $rs->id; ?>)"><i class="fa fa-trash"></i></button>
                     </td>
                   </tr>
           <?php 	endforeach; ?>

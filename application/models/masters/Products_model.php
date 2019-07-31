@@ -48,6 +48,34 @@ class Products_model extends CI_Model
   }
 
 
+
+  public function get_barcode($code)
+  {
+    $rs = $this->db->select('barcode')->where('code', $code)->get('products');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->barcode;
+    }
+
+    return NULL;
+  }
+
+
+
+  public function get_product_by_barcode($barcode)
+  {
+    $rs = $this->db->where('barcode', $barcode)->get('products');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
+
   public function set_status($field, $item, $val)
   {
     return $this->db->set($field, $val)->where('code', $item)->update('products');

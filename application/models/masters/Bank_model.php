@@ -19,6 +19,18 @@ class Bank_model extends CI_Model
 
 
 
+  public function get_data()
+  {
+    $rs = $this->db->get('bank_account');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return array();
+  }
+
+
   public function get_account_detail($id)
   {
     $rs = $this->db->where('id', $id)->get('bank_account');

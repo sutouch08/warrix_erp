@@ -335,12 +335,17 @@ function recalDiscount(){
 
 // JavaScript Document
 function changeState(){
-    var id_order = $("#id_order").val();
+    var order_code = $("#order_code").val();
     var state = $("#stateList").val();
     if( state != 0){
         $.ajax({
-            url:"controller/orderController.php?stateChange",
-            type:"POST", cache:"false", data:{"id_order":id_order, "state":state},
+            url:BASE_URL + 'orders/orders/order_state_change',
+            type:"POST",
+            cache:"false",
+            data:{
+              "order_code" : order_code,
+              "state" : state
+            },
             success:function(rs){
                 var rs = $.trim(rs);
                 if(rs == 'success'){
@@ -361,4 +366,67 @@ function changeState(){
             }
         });
     }
+}
+
+
+
+function setNotExpire(option){
+  var order_code = $('#order_code').val();
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/set_never_expire',
+    type:'POST',
+    cache:'false',
+    data:{
+      'order_code' : order_code,
+      'option' : option
+    },
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(rs == 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer: 1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        },1500);
+      }else{
+        swal('Error', rs, 'error');
+      }
+    }
+  });
+}
+
+function unExpired(){
+  var order_code = $('#order_code').val();
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/un_expired',
+    type:'GET',
+    cache:'false',
+    data:{
+      'order_code' : order_code
+    },
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(rs == 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer: 1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        },1500);
+      }else{
+        swal('Error', rs, 'error');
+      }
+    }
+  });
 }

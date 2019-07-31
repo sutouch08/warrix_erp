@@ -40,6 +40,7 @@ $menu_group = $this->menu_group_code;
 			<?php echo side_menu($menu, 'SOODSP',  'orders/sponsor', 'สปอนเซอร์'); ?>
 			<?php echo side_menu($menu, 'SOCCSO',  'orders/consign_so', 'ฝากขาย(ใบกำกับ)'); ?>
 			<?php echo side_menu($menu, 'SOCCTR',  'orders/consign_tr', 'ฝากขาย(โอนคลัง)'); ?>
+			<?php echo side_menu($menu, 'SOPMCF',  'orders/order_payment', 'ตรวจสอบยอดชำระเงิน'); ?>
 
 		</ul>
 	</li>

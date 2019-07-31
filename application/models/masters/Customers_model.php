@@ -8,6 +8,20 @@ class Customers_model extends CI_Model
     $this->ms = $this->load->database('ms', TRUE);
   }
 
+  public function get_credit($code)
+  {
+    // $rs = $this->ms->select('CreditLine')->where('CardCode', $code)->get('OCRD');
+    // if($rs->num_rows() === 1)
+    // {
+    //   return $rs->row()->CreditLine;
+    // }
+    //
+    // return 0.00;
+
+    return 30000;
+  }
+
+
 
   public function add(array $ds = array())
   {

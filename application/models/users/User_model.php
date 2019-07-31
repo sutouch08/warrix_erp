@@ -260,6 +260,22 @@ class User_model extends CI_Model
 
 
 
+
+  public function get_user_credentials_by_skey($skey)
+  {
+    if(!empty($skey))
+    {
+      $rs = $this->db->where('skey', $skey)->get('user');
+      if($rs->num_rows() === 1)
+      {
+        return $rs->row();
+      }
+    }
+
+    return FALSE;    
+  }
+
+
   public function search($txt)
   {
     $qr = "SELECT uname FROM user WHERE uname LIKE '%".$txt."%' OR name LIKE '%".$txt."%'";

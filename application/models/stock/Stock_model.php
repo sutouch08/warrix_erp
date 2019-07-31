@@ -45,4 +45,33 @@ class stock_model extends CI_Model
     return 100;
   }
 
+
+  //---- ยอดสินค้าคงเหลือในแต่ละโซน
+  public function get_stock_in_zone($item)
+  {
+    // $rs = $this->ms
+    // ->select('zoneCode, zoneName, qty')
+    // ->where('ItemCode', $item_code)
+    // ->where('warehouse', xxx) //--- warehouse ต้องไม่ใช่คลังฝากขาย
+
+    //--- จำลองผลลัพธ์
+    $result = array();
+    $arr = array(
+      array('code' => 'C001', 'name' => 'C-001', 'qty' => 20),
+      array('code' => 'C002', 'name' => 'C-002', 'qty' => 13),
+      array('code' => 'C003', 'name' => 'C-003', 'qty' => 51)
+    );
+
+    foreach($arr as $stock)
+    {
+      $ds = new stdClass();
+      $ds->code = $stock['code'];
+      $ds->name = $stock['name'];
+      $ds->qty = $stock['qty'];
+      $result[] = $ds;
+    }
+
+    return $result;
+  }
+
 }//--- end class

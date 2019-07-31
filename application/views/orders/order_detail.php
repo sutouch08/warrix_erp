@@ -54,6 +54,13 @@
       				</td>
 
               <td class="middle text-center">
+								<?php if( ($allowEditPrice && $order->state < 4) OR ($rs->is_count == 0 && $order->state < 8)  ) : ?>
+				          	<input type="number"
+														class="form-control input-sm text-center price-box hide"
+														id="price_<?php echo $rs->id; ?>"
+														name="price[<?php echo $rs->id; ?>]"
+														value="<?php echo $rs->price; ?>" />
+				        <?php endif; ?>
                 <span class="price-label" id="price-label-<?php echo $rs->id; ?>">	<?php echo number($rs->price, 2); ?></span>
               </td>
 
@@ -73,12 +80,12 @@
       				</td>
 
               <td class="middle text-right">
-      				<?php if( $rs->is_count == 0 && ($edit OR $add) && $order->state < 8) : ?>
-      					<button type="button" class="btn btn-xs btn-warning" id="btn-show-price-<?php echo $rs->id; ?>" onclick="showNonCountPriceBox(<?php echo $rs->id; ?>)"><i class="fa fa-pencil"></i></button>
-      					<button type="button" class="btn btn-xs btn-info hide" id="btn-update-price-<?php echo $rs->id; ?>" onclick="updateNonCountPrice(<?php echo $rs->id; ?>)"><i class="fa fa-save"></i></button>
+      				<?php if( $rs->is_count == 0 && ($edit OR $add) && $order->state < 8 && $edit_order) : ?>
+      					<button type="button" class="btn btn-mini btn-warning" id="btn-show-price-<?php echo $rs->id; ?>" onclick="showNonCountPriceBox(<?php echo $rs->id; ?>)"><i class="fa fa-pencil"></i></button>
+      					<button type="button" class="btn btn-mini btn-info hide" id="btn-update-price-<?php echo $rs->id; ?>" onclick="updateNonCountPrice(<?php echo $rs->id; ?>)"><i class="fa fa-save"></i></button>
       				<?php endif; ?>
               <?php if( ( $order->is_paid == 0 && $order->state != 2 && $order->is_expired == 0 ) && ($edit OR $add) && $order->state < 4 ) : ?>
-              	<button type="button" class="btn btn-xs btn-danger" onclick="removeDetail(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"><i class="fa fa-trash"></i></button>
+              	<button type="button" class="btn btn-mini btn-danger" onclick="removeDetail(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"><i class="fa fa-trash"></i></button>
               <?php endif; ?>
               </td>
 

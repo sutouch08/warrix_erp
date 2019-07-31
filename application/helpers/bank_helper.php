@@ -15,4 +15,22 @@ function bankLogoUrl($code)
  	return $image_path;
 }
 
+
+function select_bank_account($id = '')
+{
+  $sc = '';
+  $CI =& get_instance();
+  $CI->load->model('masters/bank_model');
+  $banks = $CI->bank_model->get_data();
+  if(!empty($banks))
+  {
+    foreach($banks as $rs)
+    {
+      $sc .= '<option value="'.$rs->id.'" '.is_selected($rs->id, $id).'>'.$rs->bank_name.' : '.$rs->acc_no.'</option>';
+    }
+  }
+
+  return $sc;
+}
+
  ?>

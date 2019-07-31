@@ -259,6 +259,7 @@ class Orders extends PS_Controller
   {
     $this->load->model('address/address_model');
     $this->load->model('masters/bank_model');
+    $this->load->model('orders/order_payment_model');
     $this->load->helper('bank');
     $ds = array();
     $rs = $this->orders_model->get($code);
@@ -270,6 +271,7 @@ class Orders extends PS_Controller
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
+      $rs->has_payment   = $this->order_payment_model->is_exists($code);
     }
 
     $state = $this->order_state_model->get_order_state($code);
@@ -290,6 +292,9 @@ class Orders extends PS_Controller
     $ds['details'] = $details;
     $ds['addr']  = $ship_to;
     $ds['banks'] = $banks;
+    $ds['allowEditDisc'] = getConfig('ALLOW_EDIT_DISCOUNT') == 1 ? TRUE : FALSE;
+    $ds['allowEditPrice'] = getConfig('ALLOW_EDIT_PRICE') == 1 ? TRUE : FALSE;
+    $ds['edit_order'] = TRUE; //--- ใช้เปิดปิดปุ่มแก้ไขราคาสินค้าไม่นับสต็อก
     $this->load->view('orders/order_edit', $ds);
   }
 
@@ -341,9 +346,7 @@ class Orders extends PS_Controller
                 "discount3" => $discount['discLabel3'],
                 "discount_amount" => $discount['amount'],
                 "total_amount"	=> ($detail->price * $qty) - $discount['amount'],
-                "id_rule"	=> $discount['id_rule'],
-                "valid" => 0,
-                "is_saved" => 0
+                "id_rule"	=> $discount['id_rule']
               );
 
               $this->orders_model->update_detail($detail->id, $arr);
@@ -380,6 +383,9 @@ class Orders extends PS_Controller
 
       $details = $this->orders_model->get_order_details($code);
       $ds['details'] = $details;
+      $ds['allowEditDisc'] = getConfig('ALLOW_EDIT_DISCOUNT') == 1 ? TRUE : FALSE;
+      $ds['allowEditPrice'] = getConfig('ALLOW_EDIT_PRICE') == 1 ? TRUE : FALSE;
+      $ds['edit_order'] = FALSE; //--- ใช้เปิดปิดปุ่มแก้ไขราคาสินค้าไม่นับสต็อก
       $this->load->view('orders/order_edit_detail', $ds);
     }
   }
@@ -388,8 +394,38 @@ class Orders extends PS_Controller
 
   public function save($code)
   {
-    $rs = $this->orders_model->set_status($code, 1);
-    echo $rs === TRUE ? 'success' : 'บันทึกออเดอร์ไม่สำเร็จ';
+    $sc = TRUE;
+    $order = $this->orders_model->get($code);
+    //--- ถ้าออเดอร์เป็นแบบเครดิต
+    if($order->is_term == 1)
+    {
+      //---- check credit balance
+      $amount = $this->orders_model->get_order_total_amount($code);
+      //--- creadit used
+      $credit_used = $this->orders_model->get_sum_not_complete_amount($order->customer_code);
+      //--- credit balance from sap
+      $credit_balance = $this->customers_model->get_credit($order->customer_code);
+
+      if($credit_used > $credit_balance)
+      {
+        $diff = $credit_used - $credit_balance;
+        $sc = FALSE;
+        $message = 'เครดิตคงเหลือไม่พอ (ขาด : '.number($diff, 2).')';
+      }
+    }
+
+
+    if($sc === TRUE)
+    {
+      $rs = $this->orders_model->set_status($code, 1);
+      if($rs === FALSE)
+      {
+        $sc = FALSE;
+        $message = 'บันทึกออเดอร์ไม่สำเร็จ';
+      }
+    }
+
+    echo $sc === TRUE ? 'success' : $message;
   }
 
 
@@ -1120,6 +1156,277 @@ class Orders extends PS_Controller
     $rs = $this->address_model->delete_shipping_address($id);
     echo $rs === TRUE ? 'success' : 'fail';
   }
+
+
+
+  public function set_never_expire()
+  {
+    $code = $this->input->post('order_code');
+    $option = $this->input->post('option');
+    $rs = $this->orders_model->set_never_expire($code, $option);
+    echo $rs === TRUE ? 'success' : 'ทำรายการไม่สำเร็จ';
+  }
+
+
+  public function un_expired()
+  {
+    $code = $this->input->post('order_code');
+    $rs = $this->orders_model->un_expired($code);
+    echo $rs === TRUE ? 'success' : 'ทำรายการไม่สำเร็จ';
+  }
+
+
+
+  public function order_state_change()
+  {
+    if($this->input->post('order_code'))
+    {
+      $code = $this->input->post('order_code');
+      $state = $this->input->post('state');
+      $order = $this->orders_model->get($code);
+      if(!empty($order))
+      {
+        //--- ถ้าเปิดบิลแล้ว
+        if($order->state == 8 && $state < 8 && $state != 9)
+        {
+          //---- set is_complete = 0
+          $this->orders_model->un_complete($code);
+        }
+
+        $rs = $this->orders_model->change_state($code, $state);
+        if($rs)
+        {
+          $arr = array(
+            'order_code' => $code,
+            'state' => $state,
+            'update_user' => get_cookie('uname')
+          );
+          $this->order_state_model->add_state($arr);
+        }
+
+        echo $rs === TRUE ? 'success' : 'เปลี่ยนสถานะไม่สำเร็จ';
+      }
+    }
+    else
+    {
+      echo 'ไม่พบข้อมูลออเดอร์';
+    }
+  }
+
+
+
+
+  public function update_discount()
+  {
+    $code = $this->input->post('order_code');
+    $discount = $this->input->post('discount');
+    $approver = $this->input->post('approver');
+    $order = $this->orders_model->get($code);
+    $user = get_cookie('uname');
+    $this->load->model('orders/discount_logs_model');
+  	if(!empty($discount))
+  	{
+  		foreach( $discount as $id => $value )
+  		{
+  			//----- ข้ามรายการที่ไม่ได้กำหนดค่ามา
+  			if( $value != "")
+  			{
+  				//--- ได้ Obj มา
+  				$detail = $this->orders_model->get_detail($id);
+
+  				//--- ถ้ารายการนี้มีอยู่
+  				if( $detail !== FALSE )
+  				{
+  					//------ คำนวณส่วนลดใหม่
+  					$step = explode('+', $value);
+  					$discAmount = 0;
+  					$discLabel = array(0, 0, 0);
+  					$price = $detail->price;
+  					$i = 0;
+  					foreach($step as $discText)
+  					{
+  						if($i < 3) //--- limit ไว้แค่ 3 เสต็ป
+  						{
+  							$disc = explode('%', $discText);
+  							$disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
+  							$discount = count($disc) == 1 ? $disc[0] : $price * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
+  							$discLabel[$i] = count($disc) == 1 ? $disc[0] : $disc[0].'%';
+  							$discAmount += $discount;
+  							$price -= $discount;
+  						}
+  						$i++;
+  					}
+
+  					$total_discount = $detail->qty * $discAmount; //---- ส่วนลดรวม
+  					$total_amount = ( $detail->qty * $detail->price ) - $total_discount; //--- ยอดรวมสุดท้าย
+
+  					$arr = array(
+  								"discount1" => $discLabel[0],
+  								"discount2" => $discLabel[1],
+  								"discount3" => $discLabel[2],
+  								"discount_amount"	=> $total_discount,
+  								"total_amount" => $total_amount ,
+  								"id_rule"	=> NULL,
+                  "update_user" => $user
+  							);
+
+  					$cs = $this->orders_model->update_detail($id, $arr);
+            if($cs)
+            {
+              $log_data = array(
+    												"order_code"		=> $code,
+    												"product_code"	=> $detail->product_code,
+    												"old_discount"	=> discountLabel($detail->discount1, $detail->discount2, $detail->discount3),
+    												"new_discount"	=> discountLabel($discLabel[0], $discLabel[1], $discLabel[2]),
+    												"user"	=> $user,
+    												"approver"		=> $approver
+    												);
+    					$this->discount_logs_model->logs_discount($log_data);
+            }
+
+  				}	//--- end if detail
+  			} //--- End if value
+  		}	//--- end foreach
+  	}
+    echo 'success';
+  }
+
+
+  public function update_non_count_price()
+  {
+    $code = $this->input->post('order_code');
+    $id = $this->input->post('id_order_detail');
+    $price = $this->input->post('price');
+    $user = get_cookie('uname');
+
+    $order = $this->orders_model->get($code);
+    if($order->state == 8) //--- ถ้าเปิดบิลแล้ว
+    {
+      echo 'ไม่สามารถแก้ไขราคาได้ เนื่องจากออเดอร์ถูกเปิดบิลไปแล้ว';
+    }
+    else
+    {
+        //----- ข้ามรายการที่ไม่ได้กำหนดค่ามา
+        if( $price != "" )
+        {
+          //--- ได้ Obj มา
+          $detail = $this->orders_model->get_detail($id);
+
+          //--- ถ้ารายการนี้มีอยู่
+          if( $detail !== FALSE )
+          {
+            //------ คำนวณส่วนลดใหม่
+            $price_c = $price;
+  					$discAmount = 0;
+            $step = array($detail->discount1, $detail->discount2, $detail->discount3);
+            foreach($step as $discount)
+            {
+              $disc 	= explode('%', $discount);
+              $disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
+              $discount = count($disc) == 1 ? $disc[0] : $price_c * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
+              $discAmount += $discount;
+              $price_c -= $discount;
+            }
+
+            $total_discount = $detail->qty * $discAmount; //---- ส่วนลดรวม
+  					$total_amount = ( $detail->qty * $price ) - $total_discount; //--- ยอดรวมสุดท้าย
+
+            $arr = array(
+                  "price"	=> $price,
+                  "discount_amount"	=> $total_discount,
+                  "total_amount" => $total_amount,
+                  "update_user" => $user
+                );
+            $cs = $this->orders_model->update_detail($id, $arr);
+          }	//--- end if detail
+        } //--- End if value
+
+      echo 'success';
+    }
+  }
+
+
+
+  public function update_price()
+  {
+    $code = $this->input->post('order_code');
+    $ds = $this->input->post('price');
+  	$approver	= $this->input->post('approver');
+  	$user = get_cookie('uname');
+    $this->load->model('orders/discount_logs_model');
+  	foreach( $ds as $id => $value )
+  	{
+  		//----- ข้ามรายการที่ไม่ได้กำหนดค่ามา
+  		if( $value != "" )
+  		{
+  			//--- ได้ Obj มา
+  			$detail = $this->orders_model->get_detail($id);
+
+  			//--- ถ้ารายการนี้มีอยู่
+  			if( $detail !== FALSE )
+  			{
+          if($detail->price != $value)
+          {
+            //------ คำนวณส่วนลดใหม่
+    				$price 	= $value;
+            $discAmount = 0;
+            $step = array($detail->discount1, $detail->discount2, $detail->discount3);
+            foreach($step as $discount_text)
+            {
+              $disc 	= explode('%', $discount_text);
+              $disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
+              $discount = count($disc) == 1 ? $disc[0] : $price * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
+              $discAmount += $discount;
+              $price -= $discount;
+            }
+
+            $total_discount = $detail->qty * $discAmount; //---- ส่วนลดรวม
+  					$total_amount = ( $detail->qty * $value ) - $total_discount; //--- ยอดรวมสุดท้าย
+
+            $arr = array(
+              'price' => $value,
+              'discount_amount' => $total_discount,
+              'total_amount' => $total_amount,
+              'update_user' => $user
+            );
+
+            $cs = $this->orders_model->update_detail($id, $arr);
+            if($cs)
+            {
+              $log_data = array(
+                "order_code"		=> $code,
+                "product_code"	=> $detail->product_code,
+                "old_price"	=> $detail->price,
+                "new_price"	=> $value,
+                "user"	=> $user,
+                "approver"		=> $approver
+              );
+              $this->discount_logs_model->logs_price($log_data);
+            }
+          }
+
+  			}	//--- end if detail
+  		} //--- End if value
+  	}	//--- end foreach
+
+  	echo 'success';
+  }
+
+
+
+  public function get_summary()
+  {
+    $this->load->model('masters/bank_model');
+    $code = $this->input->post('order_code');
+    $order = $this->orders_model->get($code);
+    $details = $this->orders_model->get_order_details($code);
+    $bank = $this->bank_model->get_active_bank();
+    if(!empty($details))
+    {
+      echo get_summary($order, $details, $bank); //--- order_helper;
+    }
+  }
+
 
 
   public function clear_filter()

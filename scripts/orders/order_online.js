@@ -188,8 +188,6 @@ function submitPayment()
 
 
 
-
-
 function readURL(input)
 {
    if (input.files && input.files[0]) {
@@ -643,9 +641,9 @@ function clearAddressField()
 {
 	$("#id_address").val('');
 	$("#Fname").val('');
-	$("#Lname").val('');
 	$("#address1").val('');
-	$("#address2").val('');
+	$('#sub_district').val('');
+	$('#district').val('');
 	$("#province").val('');
 	$("#postcode").val('');
 	$("#phone").val('');
@@ -659,127 +657,11 @@ function clearAddressField()
 var clipboard = new Clipboard('.btn');
 
 
-//------- Shipping Fee
-function activeShippingFee()
-{
-	$("#shippingFee").removeAttr("disabled");
-	$("#btn-edit-shipping-fee").addClass('hide');
-	$("#btn-update-shipping-fee").removeClass('hide');
-	$("#shippingFee").numberOnly();
-	$("#shippingFee").focus();
-	$("#shippingFee").select();
-}
-
-
-function disActiveShippingFee()
-{
-	$("#shippingFee").attr("disabled", "disabled");
-	$("#btn-edit-shipping-fee").removeClass('hide');
-	$("#btn-update-shipping-fee").addClass('hide');
-}
-
-
-function updateShippingFee()
-{
-	var order_code = $("#order_code").val();
-	var fee = parseFloat($("#shippingFee").val());
-	if( isNaN( fee) ){ swal("ค่าจัดส่งไม่ถูกต้อง"); return false; }
-	$.ajax({
-		url:"controller/orderController.php?updateShippingFee",
-		type:"POST",cache: "false", data: { "order_code" : order_code, "fee" : fee },
-		success: function(rs){
-			var rs = $.trim(rs);
-			if( rs == 'success' ){
-				swal({ title : "สำเร็จ", text: "", timer: 1000, type: "success"});
-				disActiveShippingFee();
-				changeShippingFee();
-				Summary();
-			}else{
-				swal("ข้อผิดพลาด!!", "แก้ไขค่าจัดส่งไม่สำเร็จ", "error");
-			}
-		}
-	});
-}
-
-
-
-function changeShippingFee(){
-	var fee = $("#shippingFee").val();
-	$("#shipping-td").text( addCommas( parseFloat(fee).toFixed(2) ) );
-}
-
-
-$("#shippingFee").keyup(function(e) {
-    if( e.keyCode == 13 ){
-		updateShippingFee();
-	}
-});
-
-
-//------------ Service Fee
-function activeServiceFee(){
-	$("#serviceFee").removeAttr('disabled');
-	$("#btn-edit-service-fee").addClass('hide');
-	$("#btn-update-service-fee").removeClass('hide');
-	$("#serviceFee").numberOnly();
-	$("#serviceFee").focus();
-	$("#serviceFee").select();
-}
-
-
-
-function disActiveServiceFee(){
-	$("#serviceFee").attr('disabled', 'disabled');
-	$("#btn-edit-service-fee").removeClass('hide');
-	$("#btn-update-service-fee").addClass('hide');
-}
-
-
-
-function updateServiceFee()
-{
-	var order_code = $("#order_code").val();
-	var fee = parseFloat($("#serviceFee").val());
-	if( isNaN( fee) ){ swal("ค่าจัดส่งไม่ถูกต้อง"); return false; }
-	$.ajax({
-		url:"controller/orderController.php?updateServiceFee",
-		type:"POST",cache: "false", data: { "order_code" : order_code, "fee" : fee },
-		success: function(rs){
-			var rs = $.trim(rs);
-			if( rs == 'success' ){
-				swal({ title : "สำเร็จ", text: "", timer: 1000, type: "success"});
-				disActiveServiceFee();
-				changeServiceFee();
-				Summary();
-			}else{
-				swal("ข้อผิดพลาด!!", "แก้ไขค่าจัดส่งไม่สำเร็จ", "error");
-			}
-		}
-	});
-}
-
-function changeServiceFee(){
-	var fee = $("#serviceFee").val();
-	$("#service-td").text( addCommas( parseFloat(fee).toFixed(2) ) );
-}
-
-
-
-$("#serviceFee").keyup(function(e) {
-    if( e.keyCode == 13 ){
-		updateServiceFee();
-	}
-});
-
-
 
 function Summary(){
 	var amount 		= parseFloat( removeCommas($("#total-td").text() ) );
 	var discount 	= parseFloat( removeCommas( $("#discount-td").text() ) );
-	var shipping 	= parseFloat( removeCommas( $("#shipping-td").text() ) );
-	var service 		= parseFloat( removeCommas( $("#service-td").text() ) );
-
-	var netAmount = amount - discount + shipping + service;
+	var netAmount = amount - discount;
 	$("#netAmount-td").text( addCommas( parseFloat(netAmount).toFixed(2) ) );
 
 }
@@ -798,24 +680,24 @@ function getSummary()
 {
 	var order_code = $("#order_code").val();
 	$.ajax({
-		url:"controller/orderController.php?getSummary",
-		type:"POST", cache:"false", data:{ "order_code" : order_code },
+		url:BASE_URL + 'orders/orders/get_summary',
+		type:"POST",
+		cache:"false",
+		data:{
+			"order_code" : order_code
+		},
 		success: function(rs){
 			$("#summaryText").html(rs);
 		}
 	});
+
 	$("#orderSummaryTab").modal("show");
 }
 
 
 
-$("#Fname").keyup(function(e){ if( e.keyCode == 13 ){ $("#Lname").focus(); 	} });
-$("#Lname").keyup(function(e){ if( e.keyCode == 13 ){ $("#address1").focus(); 	} });
-$("#address1").keyup(function(e){ if( e.keyCode == 13 ){ $("#address2").focus(); 	} });
-$("#address2").keyup(function(e){ if( e.keyCode == 13 ){ $("#district").focus(); 	} });
-$("#district").keyup(function(e){ if( e.keyCode == 13 ){ $("#province").focus(); 	} });
-$("#province").keyup(function(e){ if( e.keyCode == 13 ){ $("#postcode").focus(); 	} });
-$("#postcode").keyup(function(e){ if( e.keyCode == 13 ){ $("#phone").focus(); 	} });
+$("#Fname").keyup(function(e){ if( e.keyCode == 13 ){ $("#address1").focus(); 	} });
+$("#address1").keyup(function(e){ if( e.keyCode == 13 ){ $("#sub_district").focus(); 	} });
 $("#phone").keyup(function(e){ if( e.keyCode == 13 ){ $("#email").focus(); 	} });
 $("#email").keyup(function(e){ if( e.keyCode == 13 ){ $("#alias").focus(); 	} });
 $("#alias").keyup(function(e){ if( e.keyCode == 13 ){ saveAddress(); } });
