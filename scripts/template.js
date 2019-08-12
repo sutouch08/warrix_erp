@@ -18,6 +18,18 @@ function checkError(){
 }
 
 
+//--- save side bar layout to cookie
+function toggle_layout(){
+	var sidebar_layout = getCookie('sidebar_layout');
+	if(sidebar_layout == 'menu-min'){
+		setCookie('sidebar_layout', '', 90);
+	}else{
+		setCookie('sidebar_layout', 'menu-min', 90);
+	}
+}
+
+
+
 function load_in(){
 	var x = ($(document).innerWidth()/2)-50;
 	$("#loader").css("display","");
@@ -190,4 +202,28 @@ function printOut(url)
 {
 	var center = ($(document).width() - 800) /2;
 	window.open(url, "_blank", "width=800, height=900. left="+center+", scrollbars=yes");
+}
+
+
+
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
 }

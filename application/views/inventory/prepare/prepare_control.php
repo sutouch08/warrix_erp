@@ -15,11 +15,11 @@
   </div>
   <div class="col-sm-1">
     <label class="display-block not-show">Submit</label>
-    <button type="button" class="btn btn-sm btn-default" id="btn-submit" onclick="doPrepare()" disabled>ตกลง</button>
+    <button type="button" class="btn btn-xs btn-default" id="btn-submit" onclick="doPrepare()" disabled>ตกลง</button>
   </div>
   <div class="col-sm-2">
     <label class="display-block not-show">changeZone</label>
-    <button type="button" class="btn btn-sm btn-info btn-block" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
+    <button type="button" class="btn btn-xs btn-info btn-block" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
   </div>
 
   <input type="hidden" name="zone_code" id="zone_code" />

@@ -8,7 +8,7 @@
 		<title><?php echo $this->title; ?></title>
 		<meta name="description" content="" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-
+		<link rel="shortcut icon" href="<?php echo base_url(); ?>assets/img/favicon.ico">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/css/chosen.css">
 		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/bootstrap.css" />
 		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/font-awesome.css" />
@@ -110,12 +110,12 @@
 		<!-- /section:basics/navbar.layout -->
 		<div class="main-container" id="main-container">
 			<!-- #section:basics/sidebar -->
-			<div id="sidebar" class="sidebar responsive">
+			<div id="sidebar" class="sidebar responsive <?php echo get_cookie('sidebar_layout'); ?>">
 						<!--- side menu  ------>
 				<?php $this->load->view("include/side_menu"); ?>
 
 				<!-- #section:basics/sidebar.layout.minimize -->
-				<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+				<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse" onclick="toggle_layout()">
 					<i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
 				</div>
 
@@ -133,3 +133,12 @@
 						<div class="row">
 							<div class="col-xs-12">
 								<!-- PAGE CONTENT BEGINS -->
+
+<?php
+//--- if user don't have permission to access this page then deny_page;
+//_can_view_page($this->pm->can_view);
+	if($this->pm->can_view == 0)
+	{
+		$this->load->view('deny_page');
+	}
+?>

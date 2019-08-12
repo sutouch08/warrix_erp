@@ -12,9 +12,12 @@ function productTabMenu($mode = 'order')
 	{
 		if( hasChild($rs->id) === TRUE)
 		{
-			$sc .= '<li class="dropdown" onmouseover="expandTab((this))" onmouseout="collapseTab((this))">';
-			$sc .= '<a id="ul-'.$rs->id.'" class="dropdown-toggle" role="tab" data-toggle="tab" href="#cat-'.$rs->id.'" onClick="'.$ajax.'(\''.$rs->id.'\')" >';
+			//$sc .= '<li class="dropdown" onmouseover="expandTab((this))" onmouseout="collapseTab((this))">';
+			$sc .= '<li class="dropdown pointer">';
+			//$sc .= '<a id="ul-'.$rs->id.'" class="dropdown-toggle" role="tab" data-toggle="tab" href="#cat-'.$rs->id.'" onClick="'.$ajax.'(\''.$rs->id.'\')" >';
+			$sc .= '<a id="ul-'.$rs->id.'" class="dropdown-toggle" role="tab" data-toggle="dropdown" aria-expanded="false">';
 			$sc .=  $rs->name.'<span class="caret"></span></a>';
+			//$sc .=  $rs->name.'</a>';
 			$sc .= 	'<ul class="dropdown-menu" role="menu" aria-labelledby="ul-'.$rs->id.'">';
 			$sc .= 	getSubTab($rs->id, $ajax);
 			$sc .=  '</ul>';
@@ -42,10 +45,10 @@ function getSubTab($parent, $ajax)
 		{
 			if( hasChild($rs->id) === TRUE ) //----- ถ้ามี sub category
 			{
-				$sc .= '<li class="dropdown-submenu" >';
-				$sc .= '<a id="ul-'.$rs->id.'" class="dropdown-toggle" href="#cat-'.$rs->id.'" role="tab" data-toggle="tab" onClick="'.$ajax.'(\''.$rs->id.'\')">';
-				$sc .=  $rs->name.'</a>';
-				$sc .= 	'<ul class="dropdown-menu" role="menu" aria-labelledby="ul-'.$rs->id.'">';
+				$sc .= '<li class="dropup dropdown-hover" onClick="'.$ajax.'(\''.$rs->id.'\')">';
+				$sc .= '<a id="ul-'.$rs->id.'" class="clearfix" href="#cat-'.$rs->id.'" role="tab" data-toggle="tab">';
+				$sc .=  '<span class="pull-left">'.$rs->name.'</span><i class="ace-icon fa fa-caret-left pull-right"></i></a>';
+				$sc .= 	'<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="ul-'.$rs->id.'">';
 				$sc .= 	getSubTab($rs->id, $ajax);
 				$sc .=  '</ul>';
 				$sc .= '</li>';
@@ -74,11 +77,11 @@ function getSubCategoryTab($parent, $ajax)
 		{
 			if( hasChild($rs->id) === TRUE ) //----- ถ้ามี sub category
 			{
-				$sc .= '<li class="dropdown-submenu" >';
+				$sc .= '<li class="dropdown-hover" onmouseover="expandTab((this))" onmouseout="collapseTab((this))">';
 				$sc .= '<a id="ul-'.$rs->id.'" class="dropdown-toggle" href="#cat-'.$rs->id.'" data-toggle="tab" onClick="'.$ajax.'(\''.$rs->id.'\')">';
 				$sc .=  $rs->name.'</a>';
 				$sc .= 	'<ul class="dropdown-menu" role="menu" aria-labelledby="ul-'.$rs->id.'">';
-				$sc .= 	subCategoryTab($rs->id, $ajax);
+				$sc .= 	getSubTab($rs->id, $ajax);
 				$sc .=  '</ul>';
 				$sc .= '</li>';
 			}

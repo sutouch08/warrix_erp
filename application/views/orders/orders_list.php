@@ -2,7 +2,7 @@
 <div class="row">
 	<div class="col-sm-6">
     <h3 class="title">
-      <i class="fa fa-users"></i> <?php echo $this->title; ?>
+      <?php echo $this->title; ?>
     </h3>
     </div>
     <div class="col-sm-6">
@@ -79,14 +79,14 @@
 </form>
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-12 table-responsive">
 		<table class="table table-striped table-bordered table-hover">
 			<thead>
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-10 middle text-center">วันที่</th>
-					<th class="width-20 middle">เลขที่เอกสาร</th>
-					<th class="width-25 middle">ลูกค้า</th>
+					<th class="width-15 middle">เลขที่เอกสาร</th>
+					<th class="middle">ลูกค้า</th>
 					<th class="width-10 middle">ยอดเงิน</th>
 					<th class="width-10 middle">ช่องทางขาย</th>
 					<th class="width-10 middle">การชำระเงิน</th>
@@ -97,10 +97,11 @@
         <?php if(!empty($orders)) : ?>
           <?php $no = $this->uri->segment(4) + 1; ?>
           <?php foreach($orders as $rs) : ?>
+						<?php $ref = empty($rs->reference) ? '' :' ['.$rs->reference.']'; ?>
             <tr id="row-<?php echo $rs->code; ?>" style="<?php echo state_color($rs->state, $rs->status, $rs->is_expired); ?>">
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $no; ?></td>
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo thai_date($rs->date_add); ?></td>
-              <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->code; ?></td>
+              <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->code.$ref; ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->customer_name; ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo number($rs->total_amount, 2); ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->channels_name; ?></td>

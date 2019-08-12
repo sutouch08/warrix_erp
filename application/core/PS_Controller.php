@@ -16,8 +16,6 @@ class PS_Controller extends CI_Controller
     //--- get permission for user
     $this->pm = get_permission($this->menu_code, get_cookie('uid'), get_cookie('id_profile'));
 
-    //--- if user don't have permission to access this page then deny_page;
-    _can_view_page($this->pm->can_view);
   }
 }
 

@@ -19,17 +19,17 @@
 <div class="row">
   <div class="col-sm-1 col-1-harf padding-5 first">
     <label>รหัส</label>
-    <input type="text" class="width-100" name="code" id="code" value="<?php echo $code; ?>" />
+    <input type="text" class="form-control input-sm" name="code" id="code" value="<?php echo $code; ?>" />
   </div>
 
   <div class="col-sm-1 col-1-harf padding-5">
     <label>ชื่อ</label>
-    <input type="text" class="width-100" name="name" id="name" value="<?php echo $name; ?>" />
+    <input type="text" class="form-control input-sm" name="name" id="name" value="<?php echo $name; ?>" />
   </div>
 
 	<div class="col-sm-1 col-1-harf padding-5">
     <label>กลุ่มลูกค้า</label>
-    <select class="form-control filter" name="group" id="customer_group">
+    <select class="form-control input-sm filter" name="group" id="customer_group">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_group($group); ?>
 		</select>
@@ -37,7 +37,7 @@
 
 	<div class="col-sm-1 col-1-harf padding-5">
     <label>ประเภทลูกค้า</label>
-    <select class="form-control filter" name="kind" id="customer_kind">
+    <select class="form-control input-sm filter" name="kind" id="customer_kind">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_kind($kind); ?>
 		</select>
@@ -45,7 +45,7 @@
 
 	<div class="col-sm-1 col-1-harf padding-5">
     <label>ชนิดลูกค้า</label>
-    <select class="form-control filter" name="type" id="customer_type">
+    <select class="form-control input-sm filter" name="type" id="customer_type">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_type($type); ?>
 		</select>
@@ -53,7 +53,7 @@
 
 	<div class="col-sm-1 col-1-harf padding-5">
     <label>เกรดลูกค้า</label>
-    <select class="form-control filter" name="class" id="customer_class">
+    <select class="form-control input-sm filter" name="class" id="customer_class">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_class($class); ?>
 		</select>
@@ -61,7 +61,7 @@
 
 	<div class="col-sm-1 col-1-harf padding-5">
     <label>เขตการขาย</label>
-    <select class="form-control filter" name="area" id="customer_area">
+    <select class="form-control input-sm filter" name="area" id="customer_area">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_area($area); ?>
 		</select>
@@ -70,8 +70,8 @@
   <div class="col-sm-1 col-1-harf padding-5 last">
     <label class="display-block not-show">buton</label>
 		<div class="btn-group width-100">
-			<button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-search"></i> Search</button>
-			<button type="button" class="btn btn-sm btn-warning" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
+			<button type="submit" class="btn btn-sm btn-primary width-50">Search</button>
+			<button type="button" class="btn btn-sm btn-warning width-50" onclick="clearFilter()">Reset</button>
 		</div>
   </div>
 
@@ -82,26 +82,25 @@
 
 <div class="row">
 	<div class="col-sm-12">
-		<table class="table table-striped table-bordered table-hover">
+		<table class="table table-striped table-hover border-1">
 			<thead>
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-10 middle">รหัส</th>
-					<th class="width-15 middle">ชื่อ</th>
+					<th class="width-25 middle">ชื่อ</th>
 					<th class="width-10 middle">กลุ่มลูกค้า</th>
 					<th class="width-10 middle">ประเภทลูกค้า</th>
 					<th class="width-10 middle">ชนิดลูกค้า</th>
 					<th class="width-10 middle">เกรด</th>
-					<th class="width-10 middle">พื้นที่ขาย</th>
-          <th class="width-10 middle">ปรับปรุงล่าสุด</th>
-					<th class="width-5"></th>
+					<th class="width-5 middle">CardType</th>
+					<th class="width-10"></th>
 				</tr>
 			</thead>
 			<tbody>
 			<?php if(!empty($data)) : ?>
 				<?php $no = $this->uri->segment(4) + 1; ?>
 				<?php foreach($data as $rs) : ?>
-					<tr>
+					<tr style="font-size:11px;">
 						<td class="middle text-center"><?php echo $no; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
@@ -109,8 +108,7 @@
 						<td class="middle"><?php echo $rs->kind; ?></td>
 						<td class="middle"><?php echo $rs->type; ?></td>
 						<td class="middle"><?php echo $rs->class; ?></td>
-						<td class="middle"><?php echo $rs->area; ?></td>
-            <td class="middle"><?php echo thai_date($rs->date_upd, '/', TRUE); ?></td>
+            <td class="middle text-center"><?php echo $rs->CardType; ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">

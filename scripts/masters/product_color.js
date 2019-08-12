@@ -39,6 +39,24 @@ function getDelete(code, name){
 }
 
 
+function toggleActive(option, code)
+{
+  $.ajax({
+    url:BASE_URL + 'masters/product_color/set_active',
+    type:'POST',
+    cache:'false',
+    data:{
+      'code' : code,
+      'active' : option
+    },
+    success:function(rs){
+      if(rs != ''){
+        $('#'+code).html(rs);
+      }
+    }
+  });
+}
+
 
 function getSearch(){
   $('#searchForm').submit();

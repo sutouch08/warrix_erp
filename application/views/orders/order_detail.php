@@ -6,7 +6,8 @@
 <form id="discount-form">
 <div class="row">
 	<div class="col-sm-12">
-    	<table class="table table-striped border-1">
+		<div class="table-responsive">
+			<table class="table table-striped border-1">
         <thead>
         	<tr class="font-size-12">
             	<th class="width-5 text-center">No.</th>
@@ -126,8 +127,10 @@
                 <td class="text-center"><b>THB.</b></td>
             </tr>
 
-        </tbody>
+        	</tbody>
         </table>
+			</div>
+
     </div>
 </div>
 <!--  End Order Detail ----------------->

@@ -1,4 +1,19 @@
 <?php
+
+//---	ตัดข้อความแล้วเติม ... ข้างหลัง
+function limitText($str, $length)
+{
+	$txt = '...';
+	if( strlen($str) >= $length)
+	{
+		return mb_substr($str, 0, $length).$txt;
+	}
+	else
+	{
+		return $str;
+	}
+}
+
 function is_selected($val, $select)
 {
   return $val == $select ? 'selected' : '';
@@ -91,10 +106,10 @@ function number($val, $digit = 0)
 
 
 
-function getConfig($name)
+function getConfig($code)
 {
   $CI =& get_instance();
-  $rs = $CI->db->select('value')->where('name', $name)->get('config');
+  $rs = $CI->db->select('value')->where('code', $code)->get('config');
   if($rs->num_rows() == 1)
   {
     return $rs->row()->value;

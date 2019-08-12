@@ -99,7 +99,7 @@ function select_customer_area($code = '')
 
 function customer_in($txt)
 {
-  $sc = "'0'";
+  $sc = array('0');
   $CI =& get_instance();
   $CI->load->model('masters/customers_model');
   $rs = $CI->customers_model->search($txt);
@@ -108,7 +108,7 @@ function customer_in($txt)
   {
     foreach($rs as $cs)
     {
-      $sc .= ", '".$cs->code."'";
+      $sc[] = $cs->code;
     }
   }
 

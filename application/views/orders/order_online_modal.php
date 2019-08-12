@@ -1,13 +1,12 @@
 
 <!--  สรุปยอดส่ง Line --------->
 <div class="modal fade" id="orderSummaryTab" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:300px;">
+    <div class="modal-dialog" style="max-width:500px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body" >
-            <button class="btn btn-sm btn-info btn-block" data-dismiss="modal" data-clipboard-action="copy" data-clipboard-target="#summaryText">Copy</button>
             <div id="summaryText"></div>
             </div>
             <div class="modal-footer">
@@ -20,7 +19,7 @@
 
 <!--  Add New Address Modal  --------->
 <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:500px;">
+    <div class="modal-dialog" style="max-width:500px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -30,40 +29,40 @@
             <form id="addAddressForm"	>
             <input type="hidden" name="id_address" id="id_address" />
             <div class="row">
-            	<div class="col-sm-12">
+            	<div class="col-sm-12 col-xs-12">
                 	<label class="input-label">ชื่อ</label>
                     <input type="text" class="form-control input-sm" name="Fname" id="Fname" placeholder="ชื่อผู้รับ (จำเป็น)" />
                 </div>
-                <div class="col-sm-12">
+                <div class="col-sm-12 col-xs-12">
                 	<label class="input-label">ที่อยู่</label>
                     <input type="text" class="form-control input-sm" name="address" id="address1" placeholder="เลขที่, หมู่บ้าน, ถนน (จำเป็น)" />
                 </div>
 
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">ตำบล/แขวง</label>
                     <input type="text" class="form-control input-sm" name="sub_district" id="sub_district" placeholder="ตำบล" />
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">อำเภอ/เขต</label>
                     <input type="text" class="form-control input-sm" name="district" id="district" placeholder="อำเภอ (จำเป็น)" />
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">จังหวัด</label>
                     <input type="text" class="form-control input-sm" name="province" id="province" placeholder="จังหวัด (จำเป็น)" />
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">รหัสไปรษณีย์</label>
                     <input type="text" class="form-control input-sm" name="postcode" id="postcode" placeholder="รหัสไปรษณีย์" />
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">เบอร์โทรศัพท์</label>
                     <input type="text" class="form-control input-sm" name="phone" id="phone" placeholder="000 000 0000" />
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">อีเมล์</label>
                     <input type="text" class="form-control input-sm" name="email" id="email" placeholder="someone@somesite.com" />
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-xs-12">
                 	<label class="input-label">ชื่อเรียก</label>
                     <input type="text" class="form-control input-sm" name="alias" id="alias" placeholder="ใช้เรียกที่อยู่ เช่น บ้าน, ที่ทำงาน (จำเป็น)" />
                 </div>
@@ -81,7 +80,7 @@
 
 <!---  เลือกธนาคารที่แจ้งชำระ  --------->
 <div class="modal fade" id="selectBankModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:400px;">
+    <div class="modal-dialog" style="max-width:400px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -124,7 +123,7 @@
 	<input type="hidden" name="orderAmount" id="orderAmount" value="" />
 	<input type="file" name="image" id="image" accept="image/*" style="display:none;" />
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="width:400px;">
+  <div class="modal-dialog" style="max-width:400px;">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -204,7 +203,7 @@
 
 
 <div class="modal fade" id="deliveryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog " style="width: 350px;">
+	<div class="modal-dialog " style="max-width:350px;">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
@@ -212,10 +211,10 @@
 			</div>
 			<div class="modal-body">
 				<div class="row">
-                	<div class="col-sm-12">
-                        <input type="text" class="form-control input-sm" name="emsNo" id="emsNo" placeholder="เลขที่ EMS หรือ เลขที่การจัดส่ง" />
-                    </div>
-                </div>
+          <div class="col-sm-12 col-xs-12">
+            <input type="text" class="form-control input-sm text-center" name="emsNo" id="emsNo" placeholder="เลขที่ EMS หรือ เลขที่การจัดส่ง" />
+          </div>
+        </div>
 			</div>
 			<div class="modal-footer">
             	<button type="button" class="btn btn-sm btn-primary btn-block" onClick="saveDeliveryNo()">บันทึก</button>
@@ -226,7 +225,7 @@
 
 
 <div class="modal fade" id="paymentDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog " style="width:400px;">
+	<div class="modal-dialog " style="max-width:400px;">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
@@ -258,7 +257,7 @@
 </div>
 
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:500px;">
+    <div class="modal-dialog" style="max-width:500px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
@@ -324,19 +323,19 @@
 </div>
 <hr/>
 <div class="row">
-	<div class="col-sm-4 label-left">ยอดที่ต้องชำระ :</div><div class="col-sm-8">{{ orderAmount }}</div>
-	<div class="col-sm-4 label-left">ยอดโอนชำระ : </div><div class="col-sm-8"><span style="font-weight:bold; color:#E9573F;">฿ {{ payAmount }}</span></div>
-	<div class="col-sm-4 label-left">วันที่โอน : </div><div class="col-sm-8">{{ payDate }}</div>
-	<div class="col-sm-4 label-left">ธนาคาร : </div><div class="col-sm-8">{{ bankName }}</div>
-	<div class="col-sm-4 label-left">สาขา : </div><div class="col-sm-8">{{ branch }}</div>
-	<div class="col-sm-4 label-left">เลขที่บัญชี : </div><div class="col-sm-8"><span style="font-weight:bold; color:#E9573F;">{{ accNo }}</span></div>
-	<div class="col-sm-4 label-left">ชื่อบัญชี : </div><div class="col-sm-8">{{ accName }}</div>
-	<div class="col-sm-4 label-left">เวลาแจ้งชำระ : </div><div class="col-sm-8">{{date_add}}</div>
+	<div class="col-sm-4 col-xs-4 label-left">ยอดที่ต้องชำระ :</div><div class="col-sm-8 col-xs-8">{{ orderAmount }}</div>
+	<div class="col-sm-4 col-xs-4 label-left">ยอดโอนชำระ : </div><div class="col-sm-8 col-xs-8"><span style="font-weight:bold; color:#E9573F;">฿ {{ payAmount }}</span></div>
+	<div class="col-sm-4 col-xs-4 label-left">วันที่โอน : </div><div class="col-sm-8 col-xs-8">{{ payDate }}</div>
+	<div class="col-sm-4 col-xs-4 label-left">ธนาคาร : </div><div class="col-sm-8 col-xs-8">{{ bankName }}</div>
+	<div class="col-sm-4 col-xs-4 label-left">สาขา : </div><div class="col-sm-8 col-xs-8">{{ branch }}</div>
+	<div class="col-sm-4 col-xs-4 label-left">เลขที่บัญชี : </div><div class="col-sm-8 col-xs-8"><span style="font-weight:bold; color:#E9573F;">{{ accNo }}</span></div>
+	<div class="col-sm-4 col-xs-4 label-left">ชื่อบัญชี : </div><div class="col-sm-8 col-xs-8">{{ accName }}</div>
+	<div class="col-sm-4 col-xs-4 label-left">เวลาแจ้งชำระ : </div><div class="col-sm-8 col-xs-8">{{date_add}}</div>
 	{{#if imageUrl}}
-		<div class="col-sm-12 top-row top-col text-center">
+		<div class="col-sm-12 col-xs-12 top-row top-col text-center">
       <a href="javascript:void(0)" onClick="viewImage('{{ imageUrl }}')">รูปสลิปแนบ <i class="fa fa-paperclip fa-rotate-90"></i></a> </div>
 	{{else}}
-		<div class="col-sm-12 top-row top-col text-center">---  ไม่พบไฟล์แนบ  ---</div>
+		<div class="col-sm-12 col-xs-12 top-row top-col text-center">---  ไม่พบไฟล์แนบ  ---</div>
 	{{/if}}
 </div>
 </script>

@@ -20,6 +20,24 @@ class Address_model extends CI_Model
 
 
 
+  public function get_default_address($code)
+  {
+    $rs = $this->db
+    ->where('is_default', 1)
+    ->where('code', $code)
+    ->order_by('is_default', 'DESC')
+    ->limit(1)
+    ->get('address_ship_to');
+
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
 
   public function get_shipping_address($code)
   {
@@ -58,7 +76,7 @@ class Address_model extends CI_Model
     return $this->db->where('id', $id)->delete('address_ship_to');
   }
 
-  
+
 
   public function set_default_shipping_address($id)
   {
@@ -74,6 +92,28 @@ class Address_model extends CI_Model
 
     return $this->db->update('address_ship_to');
   }
+
+
+
+  public function get_id($code)
+  {
+    $rs = $this->db->select('id')->where('code', $code)->order_by('is_default', 'DESC')->limit(1)->get('address_ship_to');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->id;
+    }
+
+    return FALSE;
+  }
+  
+
+  public function count_address($code)
+  {
+    return $this->db->where('code', $code)->count_all_results('address_ship_to');
+  }
+
+
+
 
 } //--- end class
 

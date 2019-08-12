@@ -139,6 +139,14 @@ class Products_model extends CI_Model
 
 
 
+  public function get_style_code($code)
+  {
+    $rs = $this->db->select('style_code')->where('code', $code)->get('products');
+    return $rs->row()->style_code;
+  }
+
+
+
   public function get_data($ds, $perpage = '', $offset = '')
   {
     if(!empty($ds))

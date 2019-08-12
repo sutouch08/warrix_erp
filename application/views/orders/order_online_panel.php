@@ -24,6 +24,7 @@
 				<div role="tabpanel" class="tab-pane fade" id="address">
           <div class='row'>
             <div class="col-sm-12">
+            <div class="table-responsive">
               <table class='table table-bordered' style="margin-bottom:0px;">
                 <thead>
                   <tr>
@@ -73,6 +74,7 @@
                 </tbody>
               </table>
             </div>
+            </div>
           </div><!-- /row-->
       </div>
 <?php endif; ?>
@@ -83,4 +85,5 @@
       </div>
 	</div>
 </div>
+<hr/>
 <?php endif; ?>

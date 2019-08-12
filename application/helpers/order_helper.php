@@ -60,6 +60,7 @@ function getSpace($amount, $length)
 
 
 
+
 function get_summary($order, $details, $banks)
 {
 	$payAmount = 0;
@@ -67,13 +68,15 @@ function get_summary($order, $details, $banks)
 	$discount = 0;
 	$totalAmount = 0;
 
-	$orderTxt = 'สรุปการสั่งซื้อ<br/> ';
-	$orderTxt .= 'Order No : '.$order->code.' <br/>';
-	$orderTxt .= '====================<br/>';
+	$orderTxt = '<div>สรุปการสั่งซื้อ</div>';
+	$orderTxt .= '<div>Order No : '.$order->code.'</div>';
+	$orderTxt .= '<div style="width:100%; border-bottom:solid 1px #CCC;">&nbsp;</div>';
 
 	foreach($details as $rs)
 	{
-		$orderTxt .=   $rs->product_code.' :  ('.number($rs->qty).') x '.number($rs->price, 2).' <br/>';
+		$orderTxt .= '<div class="width-100">';
+		$orderTxt .=   $rs->product_code.' <span class="pull-right">('.number($rs->qty).') x '.number($rs->price, 2);
+		$orderTxt .= '</div>';
 		$orderAmount += $rs->qty * $rs->price;
 		$discount += $rs->discount_amount;
 		$totalAmount += $rs->total_amount;
@@ -122,5 +125,107 @@ function get_summary($order, $details, $banks)
 
 	return $orderTxt;
 }
+
+
+
+
+// function get_summary($order, $details, $banks)
+// {
+// 	$payAmount = 0;
+// 	$orderAmount = 0;
+// 	$discount = 0;
+// 	$totalAmount = 0;
+//
+// 	$orderTxt = 'สรุปการสั่งซื้อ<br/> ';
+// 	$orderTxt .= 'Order No : '.$order->code.' <br/>';
+// 	$orderTxt .= '====================<br/>';
+//
+// 	foreach($details as $rs)
+// 	{
+// 		$orderTxt .=   $rs->product_code.' :  ('.number($rs->qty).') x '.number($rs->price, 2).' <br/>';
+// 		$orderAmount += $rs->qty * $rs->price;
+// 		$discount += $rs->discount_amount;
+// 		$totalAmount += $rs->total_amount;
+// 	}
+//
+// 	$orderTxt .= "<br/>";
+// 	$orderTxt .= 'ค่าสินค้ารวม'.getSpace(number( $orderAmount, 2), 24).'<br/><br/>';
+//
+// 	if( ($discount + $order->bDiscAmount) > 0 )
+// 	{
+// 		$orderTxt .= 'ส่วนลดรวม'.getSpace('- '.number( ($discount + $order->bDiscAmount), 2), 27).'<br/>';
+// 		$orderTxt .= '<br/>';
+// 	}
+//
+// 	// if( $order->shipping_fee > 0 )
+// 	// {
+// 	// 	$orderTxt .= 'ค่าจัดส่ง'.getSpace(number($order->shipping_fee, 2), 31).'<br/>';
+// 	//  	$orderTxt .= '<br/>';
+// 	// }
+// 	//
+// 	// if( $order->service_fee > 0 )
+// 	// {
+// 	// 	$orderTxt .= 'อื่นๆ'.getSpace(number($order->service_fee, 2), 36).'<br/>';
+// 	//  	$orderTxt .= '<br/>';
+// 	// }
+//
+// 	$payAmount = $orderAmount - ($discount + $order->bDiscAmount);
+// 	$orderTxt .= 'ยอดชำระ' . getSpace(number( $payAmount, 2), 29).'<br/>';
+//
+//
+// 	$orderTxt .= '====================<br/><br/>';
+//
+// 	if(!empty($banks))
+// 	{
+// 		$orderTxt .= 'สามารถชำระได้ที่ <br/>';
+// 		$orderTxt .= '<br/>';
+// 		foreach($banks as $rs)
+// 		{
+// 			$orderTxt .= '- '.$rs->bank_name.'<br/>';
+// 			$orderTxt .= '&nbsp;&nbsp;&nbsp;&nbsp;สาขา '.$rs->branch.'<br/>';
+// 			$orderTxt .= '&nbsp;&nbsp;&nbsp;&nbsp;ชื่อบัญชี '.$rs->acc_name.'<br/>';
+// 			$orderTxt .= '&nbsp;&nbsp;&nbsp;&nbsp;เลขที่บัญชี '.$rs->acc_no.'<br/>';
+// 			$orderTxt .= '--------------------<br/>';
+// 		}
+// 	}
+//
+// 	return $orderTxt;
+// }
+
+
+
+function select_order_role($role = '')
+{
+	$sc = '';
+	$CI =& get_instance();
+	$rs = $CI->db->query("SELECT * FROM order_role");
+	if($rs->num_rows() > 0)
+	{
+		foreach($rs->result() as $role)
+		{
+			$sc .= '<option value="'.$role->code.'" '.is_selected($role, $role->code).'>'.$role->name.'</option>';
+		}
+	}
+
+	return $sc;
+}
+
+
+function role_name($role)
+{
+	$ds = array(
+		'C' => 'ฝากขาย',
+		'L'	=> 'ยิม',
+		'M'	=> 'ตัดยอดฝากขาย',
+		'P'	=> 'สปอนเซอร์',
+		'R'	=> 'เบิก',
+		'S'	=> 'ขาย',
+		'T'	=> 'แปรสภาพ',
+		'U'	=> 'อภินันท์',
+	);
+
+	return isset($ds[$role]) ? $ds[$role] : NULL;
+}
+
 
  ?>

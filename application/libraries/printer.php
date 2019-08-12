@@ -25,12 +25,6 @@ public $custom_header = '';
 public $header_row	= array();
 
 public $sub_header	= "";
-private $loader = "<script>
-						var load_time;  function load_in(){ $('#xloader').modal('show'); console.log('load_in'); var time = 0;
-						load_time = window.setInterval(function(){ if(time < 90){ time++; }else{ time += 0.01; } $('#preloader').css('width', time+'%');}, 1000); }
-						function load_out(){ $('#xloader').modal('hide'); window.clearInterval(load_time); $('#preloader').css('width', '0%'); console.log('load_out'); }
-						</script>";
-
 
 
 public function __construct()
@@ -76,7 +70,6 @@ public function doc_header($pageTitle = 'print pages')
 	$header .= "	<script src='".base_url()."assets/js/jquery.min.js'></script>";
 	$header .= "	<script src='".base_url()."assets/js/bootstrap.min.js'></script> ";
 	$header .= "	<style> .page_layout{ border: solid 1px #AAA; border-radius:5px; 	} @media print{ 	.page_layout{ border: none; } } 	</style>";
-	$header .= 		$this->loader;
 	$header .= "	</head>";
 	$header .= "	<body>";
 	$header .= "	<div class='modal fade' id='xloader' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true' data-backdrop='static'>";
@@ -89,7 +82,6 @@ public function doc_header($pageTitle = 'print pages')
 	$header .= "	<div id='preloader' style='margin-top:-10px; height:10px; width:1%; background-color:#09F;'></div>";
 	$header .= "	<div style='width:100%;  text-align:center; margin-top:15px; font-size:12px;'><span><strong>Loading....</strong></span></div>";
 	$header .= "	</div></div></div></div></div> "; // modal fade;
-	$header .= "	<script> load_in(); </script>";
 	$header .= "	<div class='hidden-print' style='margin-top:10px; padding-bottom:10px; padding-right:5mm; width:200mm; margin-left:auto; margin-right:auto; text-align:right'>";
 	$header .= "	<button class='btn btn-primary' onclick='print()'><i class='fa fa-print'></i>&nbspพิมพ์</button>";
 	$header .= "	</div><div style='width:100%'>";
@@ -172,7 +164,7 @@ public function thead(array $dataset)
 
 public function doc_footer()
 {
-	return "</div><script>$(window).load(function(){ load_out(); });</script></body></html>";
+	return "</div></body></html>";
 }
 
 
@@ -207,7 +199,18 @@ public function print_header()
 	{
 		foreach($rd[$i] as $label => $value)
 		{
-			$header .= "<div style='width:50%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; '>".$label." : ".$value."</div>";
+			$header .= '<div style="width:50%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px;">';
+			$header .= '<input type="text" class="print-row" value="'.$label.' : &nbsp;&nbsp;'.$value.'" />';
+			$header .= '</div>';
+
+			//$header .= "<div style='width:50%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; '>".$label." : ".$value."</div>";
+
+			// $header .= '<div style="width:10%; min-height:10mm; line-height:10mm; float:left; padding-left:5px; padding-right:5px; font-size:12px;">';
+			// $header .= '<span class="pull-left">'.$label.' : </span>';
+			// $header .= '</div>';
+			// $header .= '<div style="width:40%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:5px; font-size:12px;">';
+			// $header .= '<input type="text" class="print-row" value="'.$value.'" />';
+			// $header .= '</div>';
 		}
 		$i++;
 	}
@@ -336,7 +339,7 @@ public function print_row($data)
 	}
 	foreach($data as $n=>$value)
 	{
-		$row .= "<td style='".$pattern[$n]."'>".$value."</td>";
+		$row .= "<td class='middle' style='".$pattern[$n]."'>".$value."</td>";
 	}
 	$row .= "</tr>";
 	return $row;

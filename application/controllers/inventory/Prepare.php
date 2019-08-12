@@ -5,7 +5,7 @@ class Prepare extends PS_Controller
 {
   public $menu_code = 'ICODPR';
 	public $menu_group_code = 'IC';
-  public $menu_sub_group_code = 'INVENTORY';
+  public $menu_sub_group_code = 'PICKPACK';
 	public $title = 'จัดสินค้า';
   public $filter;
   public function __construct()
@@ -15,8 +15,6 @@ class Prepare extends PS_Controller
     $this->load->model('inventory/prepare_model');
     $this->load->model('orders/orders_model');
     $this->load->model('orders/order_state_model');
-
-    $this->load->helper('prepare');
   }
 
 
@@ -33,23 +31,59 @@ class Prepare extends PS_Controller
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
-		$perpage = get_rows();
+		$perpage = ''; //get_rows();
 		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
-		if($perpage > 300)
-		{
-			$perpage = 20;
-		}
+		// if($perpage > 300)
+		// {
+		// 	$perpage = 20;
+		// }
 
 		$segment  = 4; //-- url segment
-		$rows     = $this->prepare_model->count_rows($filter);
+		//$rows     = $this->prepare_model->count_rows($filter, 3);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-		$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
-		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment));
+		//$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
+		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 3);
 
     $filter['orders'] = $orders;
 
-		$this->pagination->initialize($init);
+		//$this->pagination->initialize($init);
     $this->load->view('inventory/prepare/prepare_list', $filter);
+  }
+
+
+
+
+
+  public function view_process()
+  {
+    $this->load->helper('channels');
+    $filter = array(
+      'code'          => get_filter('code', 'code', ''),
+      'customer'      => get_filter('customer', 'customer', ''),
+      'user'          => get_filter('user', 'user', ''),
+      'channels'      => get_filter('channels', 'channels', ''),
+      'from_date'     => get_filter('from_date', 'from_date', ''),
+      'to_date'       => get_filter('to_date', 'to_date', '')
+    );
+
+		//--- แสดงผลกี่รายการต่อหน้า
+		$perpage = ''; //get_rows();
+		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
+		// if($perpage > 300)
+		// {
+		// 	$perpage = 20;
+		// }
+
+		$segment  = 4; //-- url segment
+		//$rows     = $this->prepare_model->count_rows($filter, 4);
+		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
+		//$init	    = pagination_config($this->home.'/view_process/', $rows, $perpage, $segment);
+		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 4);
+
+    $filter['orders'] = $orders;
+
+		//$this->pagination->initialize($init);
+    $this->load->view('inventory/prepare/prepare_view_process', $filter);
   }
 
 
@@ -58,9 +92,9 @@ class Prepare extends PS_Controller
   {
     $this->load->model('masters/customers_model');
     $this->load->model('masters/channels_model');
-    $order = $this->orders_model->get($code);
+    $state = $this->orders_model->get_state($code);
 
-    if($order->state == 3)
+    if($state == 3)
     {
       $rs = $this->orders_model->change_state($code, 4);
       if($rs)
@@ -74,6 +108,7 @@ class Prepare extends PS_Controller
       }
     }
 
+    $order = $this->orders_model->get($code);
     $order->customer_name = $this->customers_model->get_name($order->customer_code);
     $order->channels_name = $this->channels_model->get_name($order->channels_code);
 
@@ -338,6 +373,34 @@ class Prepare extends PS_Controller
     echo $sc === TRUE ? 'success' : $message;
   }
 
+
+
+  public function check_state()
+  {
+    $code = $this->input->get('order_code');
+    $rs = $this->orders_model->get_state($code);
+    echo $rs;
+  }
+
+
+  public function pull_order_back()
+  {
+    $code = $this->input->post('order_code');
+    $state = $this->orders_model->get_state($code);
+    if($state == 4)
+    {
+      $arr = array(
+        'order_code' => $code,
+        'state' => 3,
+        'update_user' => get_cookie('uname')
+      );
+
+      $this->orders_model->change_state($code, 3);
+      $this->order_state_model->add_state($arr);
+    }
+
+    echo 'success';
+  }
 
 
 

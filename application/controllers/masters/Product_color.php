@@ -20,6 +20,7 @@ class Product_color extends PS_Controller
   {
 		$code = get_filter('code', 'code', '');
 		$name = get_filter('name', 'name', '');
+    $status = get_filter('status', 'status', 2);
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -30,10 +31,10 @@ class Product_color extends PS_Controller
 		}
 
 		$segment = 4; //-- url segment
-		$rows = $this->product_color_model->count_rows($code, $name);
+		$rows = $this->product_color_model->count_rows($code, $name, $status);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	= pagination_config($this->home.'/index/', $rows, $perpage, $segment);
-		$color = $this->product_color_model->get_data($code, $name, $perpage, $this->uri->segment($segment));
+		$color = $this->product_color_model->get_data($code, $name, $status, $perpage, $this->uri->segment($segment));
 
     $data = array();
 
@@ -55,6 +56,7 @@ class Product_color extends PS_Controller
     $ds = array(
       'code' => $code,
       'name' => $name,
+      'status' => $status,
 			'data' => $data
     );
 
@@ -62,6 +64,25 @@ class Product_color extends PS_Controller
     $this->load->view('masters/product_color/product_color_view', $ds);
   }
 
+
+
+  public function set_active()
+  {
+    $code = $this->input->post('code');
+    $active = $this->input->post('active') == 1 ? 0 :1;
+    if($code)
+    {
+      $rs = $this->product_color_model->set_active($code, $active);
+      if($rs)
+      {
+        $sc = "<span class=\"pointer\" onClick=\"toggleActive({$active}, '{$code}')\">";
+        $sc .= is_active($active);
+        $sc .= "</span>";
+
+        echo $sc;
+      }
+    }
+  }
 
   public function add_new()
   {

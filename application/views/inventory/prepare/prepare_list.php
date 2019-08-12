@@ -1,10 +1,15 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-6">
     <h3 class="title">
       <?php echo $this->title; ?>
     </h3>
     </div>
+		<div class="col-sm-6">
+			<p class="pull-right top-p">
+				<button type="button" class="btn btn-sm btn-primary" onclick="goProcess()">กำลังจัด</button>
+			</p>
+		</div>
 </div><!-- End Row -->
 <hr class=""/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
@@ -51,7 +56,7 @@
 </div>
 <hr class="margin-top-15">
 </form>
-<?php echo $this->pagination->create_links(); ?>
+<?php //echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-sm-12">
 		<table class="table table-striped table-hover border-1">
@@ -71,7 +76,7 @@
           <?php foreach($orders as $rs) : ?>
             <?php $customer_name = (!empty($rs->customer_ref)) ? $rs->customer_ref : $rs->customer_name; ?>
             <tr id="row-<?php echo $rs->code; ?>">
-              <td class="middle text-center"><?php echo $no; ?></td>
+              <td class="middle text-center no"><?php echo $no; ?></td>
               <td class="middle"><?php echo $rs->code; ?></td>
               <td class="middle"><?php echo $customer_name; ?></td>
               <td class="middle"><?php echo $rs->channels_name; ?></td>

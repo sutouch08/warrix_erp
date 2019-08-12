@@ -17,6 +17,7 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
                 	<select class="form-control input-sm" style="padding-top:0px; padding-bottom:0px;" id="stateList">
                     	<option value="0">เลือกสถานะ</option>
 							<?php if( $order->state != 9 && $order->is_expired == 0 && $order->status == 1) : ?>
+
                  <?php if( $order->state <=3 && $this->pm->can_edit) : ?>
                         <?php if($order->state != 1): ?>
 													<option value="1">รอดำเนินการ</option>
@@ -24,11 +25,12 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
 												<?php if($order->state != 2 && $order->is_term == 0) : ?>
                         <option value="2">รอชำระเงิน</option>
 												<?php endif; ?>
-												<?php if($order->state != 3 ) : ?>
+												<?php if($order->state != 3 && $order->role == 'S') : ?>
 													<?php if($order->is_paid == 1 OR $order->is_term == 1 OR $canSkip) : ?>
                         		<option value="3">รอจัดสินค้า</option>
 													<?php endif; ?>
 												<?php endif; ?>
+
 								 <?php elseif($order->state > 3 && $order->state < 8 && $canChange ) : ?>
 											 <option value="1">รอดำเนินการ</option>
 											 <option value="2">รอชำระเงิน</option>

@@ -37,9 +37,14 @@ class Product_color_model extends CI_Model
   }
 
 
-  public function count_rows($code = '', $name = '')
+  public function count_rows($code = '', $name = '', $status = 2)
   {
     $this->db->select('code');
+
+    if($status != 2)
+    {
+      $this->db->where('active', $status);
+    }
 
     if($code != '')
     {
@@ -81,8 +86,13 @@ class Product_color_model extends CI_Model
 
 
 
-  public function get_data($code = '', $name = '', $perpage = '', $offset = '')
+  public function get_data($code = '', $name = '', $status = 1, $perpage = '', $offset = '')
   {
+    if($status != 2)
+    {
+      $this->db->where('active', $status);
+    }
+
     if($code != '')
     {
       $this->db->like('code', $code);
@@ -144,6 +154,11 @@ class Product_color_model extends CI_Model
   }
 
 
+
+  public function set_active($code, $active)
+  {
+    return $this->db->set('active', $active)->where('code', $code)->update('product_color');
+  }
 
   public function count_members($code)
   {

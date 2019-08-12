@@ -102,7 +102,7 @@ class Orders extends PS_Controller
       $code = $this->get_new_code($date_add);
       $role = 'S'; //--- S = ขาย
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment'));
-
+      $sale_code = $this->customers_model->get_sale_code($this->input->post('customerCode'));
       $ds = array(
         'code' => $code,
         'role' => $role,
@@ -112,6 +112,7 @@ class Orders extends PS_Controller
         'customer_ref' => $this->input->post('customer_ref'),
         'channels_code' => $this->input->post('channels'),
         'payment_code' => $this->input->post('payment'),
+        'sale_code' => $sale_code,
         'is_term' => ($has_term === TRUE ? 1 : 0),
         'user' => get_cookie('uname'),
         'remark' => addslashes($this->input->post('remark'))
@@ -176,8 +177,24 @@ class Orders extends PS_Controller
             if( $this->orders_model->is_exists_detail($order_code, $code) === FALSE )
             {
               //---- คำนวณ ส่วนลดจากนโยบายส่วนลด
-              $discount 	= $this->discount_model->get_item_discount($item->code, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
+              $discount = array(
+                'amount' => 0,
+                'id_rule' => NULL,
+                'discLabel1' => 0,
+                'discLabel2' => 0,
+                'discLabel3' => 0
+              );
 
+              if($order->role == 'S')
+              {
+                $discount = $this->discount_model->get_item_discount($item->code, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
+              }
+
+              if($order->role == 'C' OR $order->role == 'N')
+              {
+                $discount['amount'] = ($item->price * ($order->gp * 0.01)) * $qty;
+                $discount['discLabel1'] = $order->gp.'%';
+              }
 
               $arr = array(
                       "order_code"	=> $order_code,
@@ -208,8 +225,21 @@ class Orders extends PS_Controller
             {
               $detail 	= $this->orders_model->get_order_detail($order_code, $item->code);
               $qty			= $qty + $detail->qty;
+
+              $discount = array(
+                'amount' => 0,
+                'id_rule' => NULL,
+                'discLabel1' => 0,
+                'discLabel2' => 0,
+                'discLabel3' => 0
+              );
+
               //---- คำนวณ ส่วนลดจากนโยบายส่วนลด
-              $discount 	= $this->discount_model->get_item_discount($item->code, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
+              if($order->role == 'S')
+              {
+                $discount 	= $this->discount_model->get_item_discount($item->code, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
+              }
+
 
               $arr = array(
                         "qty"		=> $qty,
@@ -219,8 +249,7 @@ class Orders extends PS_Controller
                         "discount_amount" => $discount['amount'],
                         "total_amount"	=> ($item->price * $qty) - $discount['amount'],
                         "id_rule"	=> $discount['id_rule'],
-                        "valid" => 0,
-                        "is_saved" => 0
+                        "valid" => 0
                         );
 
               if( $this->orders_model->update_detail($detail->id, $arr) === FALSE )
@@ -238,6 +267,11 @@ class Orders extends PS_Controller
             $error = "Error : สินค้าไม่เพียงพอ";
           } 	//--- if getStock
         }	//--- if qty > 0
+      }
+
+      if($result === TRUE)
+      {
+        $this->orders_model->set_status($order_code, 0);
       }
     }
 
@@ -309,15 +343,18 @@ class Orders extends PS_Controller
       $code = $this->input->post('order_code');
       $recal = $this->input->post('recal');
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment_code'));
+      $sale_code = $this->customers_model->get_sale_code($this->input->post('customer_code'));
       $ds = array(
         'reference' => $this->input->post('reference'),
         'customer_code' => $this->input->post('customer_code'),
         'customer_ref' => $this->input->post('customer_ref'),
         'channels_code' => $this->input->post('channels_code'),
         'payment_code' => $this->input->post('payment_code'),
+        'sale_code' => $sale_code,
         'is_term' => $has_term,
         'date_add' => db_date($this->input->post('date_add')),
-        'remark' => $this->input->post('remark')
+        'remark' => $this->input->post('remark'),
+        'status' => 0
       );
 
       $rs = $this->orders_model->update($code, $ds);
@@ -454,7 +491,7 @@ class Orders extends PS_Controller
   				$ds	.= 			'<div class="description" style="font-size:10px; min-height:50px;">';
   				$ds	.= 				'<a href="javascript:void(0)" onClick="getOrderGrid(\''.$style->code.'\')">';
   				$ds	.= 			$style->code.'<br/>'. number($style->price,2);
-  				$ds 	.=  		$style->count_stock == 1 ? ' | <span style="color:red;">'.$this->stock_model->get_style_sell_stock($style->code).'</span>' : '';
+  				$ds 	.=  		$style->count_stock == 1 ? ' | <span style="color:red;">'.$this->get_style_sell_stock($style->code).'</span>' : '';
   				$ds	.= 				'</a>';
   				$ds 	.= 			'</div>';
   				$ds	.= 		'</div>';
@@ -471,6 +508,16 @@ class Orders extends PS_Controller
   }
 
 
+
+  public function get_style_sell_stock($style_code)
+  {
+    $sell_stock = $this->stock_model->get_style_sell_stock($style_code);
+    $reserv_stock = $this->orders_model->get_reserv_stock_by_style($style_code);
+
+    $available = $sell_stock - $reserv_stock;
+
+    return $available >= 0 ? $available : 0;
+  }
 
 
   public function get_order_grid()
@@ -757,6 +804,28 @@ class Orders extends PS_Controller
 
 
 
+  public function print_order_sheet($code, $barcode = '')
+  {
+    $this->load->model('masters/products_model');
+
+    $this->load->library('printer');
+    $order = $this->orders_model->get($code);
+    $order->customer_name = $this->customers_model->get_name($order->customer_code);
+    $details = $this->orders_model->get_order_details($code);
+    if(!empty($details))
+    {
+      foreach($details as $rs)
+      {
+        $rs->barcode = $this->products_model->get_barcode($rs->product_code);
+      }
+    }
+
+    $ds['order'] = $order;
+    $ds['details'] = $details;
+    $ds['is_barcode'] = $barcode != '' ? TRUE : FALSE;
+    $this->load->view('print/print_order_sheet', $ds);
+  }
+
   public function get_sell_stock($item_code)
   {
     $sell_stock = $this->stock_model->get_sell_stock($item_code);
@@ -792,7 +861,7 @@ class Orders extends PS_Controller
                 "cost"				=> $rs->cost,
                 "price"	=> number_format($rs->price, 2),
                 "qty"	=> number_format($rs->qty),
-                "discount"	=> ($order->role == 'C' ? $rs->gp .' %' : discountLabel($rs->discount1, $rs->discount2, $rs->discount3)),
+                "discount"	=> discountLabel($rs->discount1, $rs->discount2, $rs->discount3),
                 "amount"	=> number_format($rs->total_amount, 2)
                 );
         array_push($ds, $arr);
@@ -1179,6 +1248,8 @@ class Orders extends PS_Controller
 
   public function order_state_change()
   {
+    $sc = TRUE;
+
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
@@ -1186,25 +1257,69 @@ class Orders extends PS_Controller
       $order = $this->orders_model->get($code);
       if(!empty($order))
       {
+        //--- ถ้าเป็นเบิกแปรสภาพ จะมีการผูกสินค้าไว้
+        if($order->role == 'T')
+        {
+          $this->load->model('inventory/transform_model');
+          //--- หากมีการรับสินค้าที่ผูกไว้แล้วจะไม่อนุญาติให้เปลี่ยนสถานะใดๆ
+          $is_received = $this->transform_model->is_received($code);
+          if($is_received === TRUE)
+          {
+            $sc = FALSE;
+            $message = 'ใบเบิกมีการรับสินค้าแล้วไม่อนุญาติให้ย้อนสถานะ';
+          }
+        }
+
+        $this->db->trans_start();
+
         //--- ถ้าเปิดบิลแล้ว
-        if($order->state == 8 && $state < 8 && $state != 9)
+        if($sc === TRUE && $order->state == 8)
         {
-          //---- set is_complete = 0
-          $this->orders_model->un_complete($code);
+          if($state < 8)
+          {
+            $this->roll_back_action($code, $order->role);
+          }
+
+          if($state == 9)
+          {
+            $this->roll_back_action($code, $order->role);
+            $this->cancle_order($code, $order->role);
+          }
         }
 
-        $rs = $this->orders_model->change_state($code, $state);
-        if($rs)
+        else if($sc === TRUE && $order->state != 8)
         {
-          $arr = array(
-            'order_code' => $code,
-            'state' => $state,
-            'update_user' => get_cookie('uname')
-          );
-          $this->order_state_model->add_state($arr);
+          if($state == 9)
+          {
+            $this->cancle_order($code, $order->role);
+          }
         }
 
-        echo $rs === TRUE ? 'success' : 'เปลี่ยนสถานะไม่สำเร็จ';
+        if($sc === TRUE)
+        {
+          $rs = $this->orders_model->change_state($code, $state);
+
+          if($rs)
+          {
+            $arr = array(
+              'order_code' => $code,
+              'state' => $state,
+              'update_user' => get_cookie('uname')
+            );
+
+            $this->order_state_model->add_state($arr);
+          }
+        }
+
+
+        $this->db->trans_complete();
+
+        if($this->db->trans_status() === FALSE)
+        {
+          $sc = FALSE;
+        }
+
+        echo $sc === TRUE ? 'success' : $message;
       }
     }
     else
@@ -1214,6 +1329,118 @@ class Orders extends PS_Controller
   }
 
 
+
+
+  public function roll_back_action($code, $role)
+  {
+    $this->load->model('inventory/movement_model');
+    $this->load->model('inventory/buffer_model');
+    $this->load->model('inventory/cancle_model');
+    $this->load->model('inventory/invoice_model');
+    $this->load->model('inventory/transform_model');
+    //---- set is_complete = 0
+    $this->orders_model->un_complete($code);
+
+    //---- move cancle product back to  buffer
+    $this->cancle_model->restore_buffer($code);
+
+    //--- remove movement
+    $this->movement_model->drop_movement($code);
+
+    //--- restore sold product back to buffer
+    $sold = $this->invoice_model->get_details($code);
+    if(!empty($sold))
+    {
+      foreach($sold as $rs)
+      {
+        if($rs->is_count == 1)
+        {
+          //---- restore_buffer
+          if($this->buffer_model->is_exists($rs->reference, $rs->product_code, $rs->zone_code) === TRUE)
+          {
+            $this->buffer_model->update($rs->reference, $rs->product_code, $rs->zone_code, $rs->qty);
+          }
+          else
+          {
+            $ds = array(
+              'order_code' => $rs->reference,
+              'product_code' => $rs->product_code,
+              'warehouse_code' => $rs->warehouse_code,
+              'zone_code' => $rs->zone_code,
+              'qty' => $rs->qty,
+              'user' => $rs->user
+            );
+
+            $this->buffer_model->add($ds);
+          }
+        }
+
+        $this->invoice_model->drop_sold($rs->id);
+        //------ หากเป็นออเดอร์เบิกแปรสภาพ
+        if($role == 'T')
+        {
+          $this->transform_model->reset_sold_qty($code);
+        }
+      } //--- end foreach
+    } //---- end sold
+  }
+
+
+  public function cancle_order($code, $role)
+  {
+    $this->load->model('inventory/prepare_model');
+    $this->load->model('inventory/qc_model');
+    $this->load->model('inventory/transform_model');
+
+    //---- เมื่อมีการยกเลิกออเดอร์
+    //--- 1. เคลียร์ buffer เข้า cancle
+    $this->clear_buffer($code);
+    //--- 2. ลบประวัติการจัดสินค้า
+    $this->prepare_model->clear_prepare($code);
+    //--- 3. ลบประวัติการตรวจสินค้า
+    $this->qc_model->clear_qc($code);
+    //--- 4. ลบรายการสั่งซื้อ
+    $this->orders_model->clear_order_detail($code);
+    //--- 5. ยกเลิกออเดอร์
+    $this->orders_model->set_status($code, 2);
+    //--- 6. ลบรายการที่ผู้ไว้ใน order_transform_detail (กรณีเบิกแปรสภาพ)
+    if($role == 'T')
+    {
+      $this->transform_model->clear_transform_detail($code);
+      $this->transform_model->close_transform($code);
+    }
+
+  }
+
+
+  //--- เคลียร์ยอดค้างที่จัดเกินมาไปที่ cancle หรือ เคลียร์ยอดที่เป็น 0
+  public function clear_buffer($code)
+  {
+    $this->load->model('inventory/buffer_model');
+    $buffer = $this->buffer_model->get_all_details($code);
+    //--- ถ้ายังมีรายการที่ค้างอยู่ใน buffer เคลียร์เข้า cancle
+    if(!empty($buffer))
+    {
+      foreach($buffer as $rs)
+      {
+        if($rs->qty != 0)
+        {
+          $arr = array(
+            'order_code' => $rs->order_code,
+            'product_code' => $rs->product_code,
+            'warehouse_code' => $rs->warehouse_code,
+            'zone_code' => $rs->zone_code,
+            'qty' => $rs->qty,
+            'user' => get_cookie('uname')
+          );
+          //--- move buffer to cancle
+          $this->cancle_model->add($arr);
+        }
+        //--- delete cancle
+        $this->buffer_model->delete($rs->id);
+      }
+    }
+  }
 
 
   public function update_discount()
@@ -1287,6 +1514,8 @@ class Orders extends PS_Controller
   				}	//--- end if detail
   			} //--- End if value
   		}	//--- end foreach
+
+      $this->orders_model->set_status($code, 0);
   	}
     echo 'success';
   }
@@ -1340,6 +1569,8 @@ class Orders extends PS_Controller
             $cs = $this->orders_model->update_detail($id, $arr);
           }	//--- end if detail
         } //--- End if value
+
+        $this->orders_model->set_status($code, 0);
 
       echo 'success';
     }
@@ -1408,6 +1639,8 @@ class Orders extends PS_Controller
   			}	//--- end if detail
   		} //--- End if value
   	}	//--- end foreach
+
+    $this->orders_model->set_status($code, 0);
 
   	echo 'success';
   }

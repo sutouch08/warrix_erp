@@ -41,9 +41,9 @@ function getDiscLabel($disc)
 	$arr = explode('%', $disc);
 	if( count($arr) > 1)
 	{
-		return number_format(trim($arr[0]),2).' %';
+		return trim($arr[0]).'%';
 	}
-	return number_format($arr[0],2);
+	return $arr[0];
 }
 
 

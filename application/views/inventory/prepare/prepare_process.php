@@ -6,7 +6,7 @@
   <div class="col-sm-6">
     <p class="pull-right top-p">
       <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> รอจัด</button>
-      <button type="button" class="btn btn-sm btn-warning" onclick="goProcess()"><i class="fa fa-arrow-left"></i> กำลังจัด</button>
+      <button type="button" class="btn btn-sm btn-yellow" onclick="goProcess()"><i class="fa fa-arrow-left"></i> กำลังจัด</button>
     </p>
   </div>
 

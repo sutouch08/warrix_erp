@@ -155,11 +155,10 @@ class Orders_model extends CI_Model
 
   public function get_valid_details($code)
   {
-    $rs = $this->db
-    ->where('order_code', $code)
-    ->where('valid', 1)
-    ->or_where('is_count', 0)
-    ->get('order_details');
+    $qr  = "SELECT * FROM order_details
+            WHERE order_code = '{$code}'
+            AND (valid = 1 OR is_count = 0)";
+    $rs = $this->db->query($qr);
 
     if($rs->num_rows() > 0)
     {
@@ -257,54 +256,69 @@ class Orders_model extends CI_Model
 
 
 
-  public function count_rows(array $ds = array())
+  public function count_rows(array $ds = array(), $role = 'S')
   {
     $this->db->select('status');
+    $this->db->where('role', $role);
+
     //---- เลขที่เอกสาร
-    if($ds['code'] != '')
+    if( ! empty($ds['code']))
     {
       $this->db->like('code', $ds['code']);
     }
 
     //--- รหัส/ชื่อ ลูกค้า
-    if($ds['customer'] != '')
+    if( ! empty($ds['customer']))
     {
       $customers = customer_in($ds['customer']);
       $this->db->where_in('customer_code', $customers);
     }
 
     //---- user name / display name
-    if($ds['user'] != '')
+    if( ! empty($ds['user']))
     {
       $users = user_in($ds['user']);
       $this->db->where_in('user', $users);
     }
 
     //---- เลขที่อ้างอิงออเดอร์ภายนอก
-    if($ds['reference'] != '')
+    if( ! empty($ds['reference']))
     {
       $this->db->like('reference', $ds['reference']);
     }
 
     //---เลขที่จัดส่ง
-    if($ds['ship_code'] != '')
+    if( ! empty($ds['ship_code']))
     {
       $this->db->like('shipping_code', $ds['ship_code']);
     }
 
     //--- ช่องทางการขาย
-    if($ds['channels'] != '')
+    if( ! empty($ds['channels']))
     {
       $this->db->where('channels_code', $ds['channels']);
     }
 
     //--- ช่องทางการชำระเงิน
-    if($ds['payment'] != '')
+    if( ! empty($ds['payment']))
     {
       $this->db->where('payment_code', $ds['payment']);
     }
 
-    if($ds['from_date'] != '' && $ds['to_date'] != '')
+
+    if( ! empty($ds['zone_code']))
+    {
+      $zone_in = get_zone_in($ds['zone_code']);
+      $this->db->where_in('zone_code', $zone_in);
+    }
+
+    if( !empty($ds['user_ref']))
+    {
+      $this->db->like('user_ref', $ds['user_ref']);
+    }
+
+
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
       $this->db->where('date_add >=', from_date($ds['from_date']));
       $this->db->where('date_add <=', to_date($ds['to_date']));
@@ -320,57 +334,73 @@ class Orders_model extends CI_Model
 
 
 
-  public function get_data(array $ds = array(), $perpage = '', $offset = '')
+  public function get_data(array $ds = array(), $perpage = '', $offset = '', $role = 'S')
   {
+      $this->db->where('role', $role);
+
       //---- เลขที่เอกสาร
-      if($ds['code'] != '')
+      if( ! empty($ds['code']))
       {
         $this->db->like('code', $ds['code']);
       }
 
       //--- รหัส/ชื่อ ลูกค้า
-      if($ds['customer'] != '')
+      if( ! empty($ds['customer']))
       {
         $customers = customer_in($ds['customer']);
         $this->db->where_in('customer_code', $customers);
       }
 
       //---- user name / display name
-      if($ds['user'] != '')
+      if( ! empty($ds['user']))
       {
         $users = user_in($ds['user']);
         $this->db->where_in('user', $users);
       }
 
       //---- เลขที่อ้างอิงออเดอร์ภายนอก
-      if($ds['reference'] != '')
+      if( ! empty($ds['reference']))
       {
         $this->db->like('reference', $ds['reference']);
       }
 
       //---เลขที่จัดส่ง
-      if($ds['ship_code'] != '')
+      if( ! empty($ds['ship_code']))
       {
         $this->db->like('shipping_code', $ds['ship_code']);
       }
 
       //--- ช่องทางการขาย
-      if($ds['channels'] != '')
+      if( ! empty($ds['channels']))
       {
         $this->db->where('channels_code', $ds['channels']);
       }
 
       //--- ช่องทางการชำระเงิน
-      if($ds['payment'] != '')
+      if( ! empty($ds['payment']))
       {
         $this->db->where('payment_code', $ds['payment']);
       }
 
-      if($ds['from_date'] != '' && $ds['to_date'] != '')
+
+      if( ! empty($ds['zone_code']))
+      {
+        $zone_in = get_zone_in($ds['zone_code']);
+        $this->db->where_in('zone_code', $zone_in);
+      }
+
+      if( !empty($ds['user_ref']))
+      {
+        $this->db->like('user_ref', $ds['user_ref']);
+      }
+
+      if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
       {
         $this->db->where('date_add >=', from_date($ds['from_date']));
         $this->db->where('date_add <=', to_date($ds['to_date']));
       }
+
+      $this->db->order_by('code', 'DESC');
 
       if($perpage != '')
       {
@@ -379,7 +409,7 @@ class Orders_model extends CI_Model
       }
 
       $rs = $this->db->get('orders');
-
+      //echo $this->db->get_compiled_select('orders');
       return $rs->result();
   }
 
@@ -406,16 +436,29 @@ class Orders_model extends CI_Model
   }
 
 
+
+  public function get_order_total_qty($code)
+  {
+    $this->db->select_sum('qty', 'qty');
+    $this->db->where('order_code', $code);
+    $rs = $this->db->get('order_details');
+    return $rs->row()->qty;
+  }
+
+
   //--- ใช้คำนวนยอดเครดิตคงเหลือ
   public function get_sum_not_complete_amount($customer_code)
   {
-    $qr = "SELECT SUM(od.total_amount) AS amount
-            FROM order_details AS od
-            JOIN orders AS o ON od.order_code = o.code
-            WHERE o.customer_code = '{$customer_code}'
-              AND od.is_complete = 0
-              AND od.is_expired = 0";
-    $rs = $this->db->query($qr);
+    $rs = $this->db
+    ->select_sum('order_details.total_amount', 'amount')
+    ->from('order_details')
+    ->join('orders', 'orders.code = order_details.order_code', 'left')
+    ->where_in('orders.role', array('S', 'C', 'N'))
+    ->where('orders.customer_code', $customer_code)
+    ->where('order_details.is_complete', 0)
+    ->where('orders.is_expired', 0)
+    ->get();
+
     if($rs->num_rows() === 1)
     {
       return $rs->row()->amount;
@@ -457,7 +500,7 @@ class Orders_model extends CI_Model
   {
     $rs = $this->db->select_sum('qty')
     ->where('product_code', $item_code)
-    ->where('valid', 0)
+    ->where('is_complete', 0)
     ->where('is_expired', 0)
     ->where('is_count', 1)
     ->get('order_details');
@@ -476,7 +519,7 @@ class Orders_model extends CI_Model
   {
     $rs = $this->db->select_sum('qty')
     ->where('style_code', $style_code)
-    ->where('valid', 0)
+    ->where('is_complete', 0)
     ->where('is_expired', 0)
     ->where('is_count', 1)
     ->get('order_details');
@@ -492,6 +535,12 @@ class Orders_model extends CI_Model
   public function set_status($code, $status)
   {
     return $this->db->set('status', $status)->where('code', $code)->update('orders');
+  }
+
+
+  public function clear_order_detail($code)
+  {
+    return $this->db->where('order_code', $code)->delete('order_details');
   }
 
 

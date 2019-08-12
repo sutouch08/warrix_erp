@@ -24,7 +24,7 @@
 <?php  if(!empty($uncomplete_details)) : ?>
 <?php   foreach($uncomplete_details as $rs) : ?>
     <tr class="font-size-12 incomplete" id="incomplete-<?php echo $rs->id; ?>">
-      <td class="middle text-center"><?php echo $rs->barcode; ?></td>
+      <td class="middle text-center b-click"><?php echo $rs->barcode; ?></td>
       <td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
       <td class="middle text-center" id="order-qty-<?php echo $rs->id; ?>"><?php echo number($rs->qty); ?></td>
       <td class="middle text-center" id="prepared-qty-<?php echo $rs->id; ?>"><?php echo number($rs->prepared); ?></td>
@@ -55,15 +55,16 @@
 
     <tr>
       <td colspan="6" class="text-center">
-        <div id="force-bar" class="<?php echo $force; ?>">
-          <label style="margin-right:15px;">
-            <input type="checkbox" id="force-close" style="margin-right:5px;" onchange="toggleForceClose()" />
-            สินค้าไม่ครบ
-          </label>
-          <button type="button" class="btn btn-sm btn-danger hide" id="btn-force-close" onclick="forceClose()">
+        <div id="force-bar" class="">
+          <button type="button" class="btn btn-sm btn-danger not-show" id="btn-force-close" onclick="forceClose()">
             <i class="fa fa-exclamation-triangle"></i>
             &nbsp; บังคับจบ
           </button>
+          <label style="margin-left:15px;">
+            <input type="checkbox" id="force-close" class="ace" style="margin-right:5px;" onchange="toggleForceClose()" />
+            <span class="lbl">  สินค้าไม่ครบ</span>
+          </label>
+
         </div>
 
 

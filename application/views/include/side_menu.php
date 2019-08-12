@@ -12,16 +12,38 @@ $menu_group = $this->menu_group_code;
 			<b class="arrow fa fa-angle-down"></b>
 		</a>
 		<ul class="submenu">
-			<?php echo side_menu($menu, 'ICTRFM',  'inventory/transform', 'เบิกสินค้าเพื่อแปรสภาพ'); ?>
-			<?php echo side_menu($menu, 'ICSUPP',  'inventory/support', 'เบิกสินค้าอภินันท์'); ?>
-			<?php echo side_menu($menu, 'ICLEND',  'inventory/lend', 'เบิกยืมสินค้า'); ?>
-			<?php echo side_menu($menu, 'ICTRRC',  'inventory/receive_transform', 'รับสินค้าจากการแปรสภาพ'); ?>
-			<?php echo side_menu($menu, 'ICPURC',  'inventory/receive_po', 'รับสินค้าจากการสั่งซื้อ'); ?>
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'RECEIVE'); ?>">
+				<a href="#" class="dropdown-toggle">
+					<i class="menu-icon fa fa-caret-right"></i> รับสินค้า <b class="arrow fa fa-angle-down"></b>
+				</a>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'ICPURC',  'inventory/receive_po', 'รับสินค้าจากการสั่งซื้อ'); ?>
+					<?php echo side_menu($menu, 'ICTRRC',  'inventory/receive_transform', 'รับสินค้าจากการแปรสภาพ'); ?>
+				</ul>
+			</li>
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'REQUEST'); ?>">
+				<a href="#" class="dropdown-toggle">
+					<i class="menu-icon fa fa-caret-right"></i> เบิก/ยืม สินค้า <b class="arrow fa fa-angle-down"></b>
+				</a>
+				<ul class="submenu">
+				<?php echo side_menu($menu, 'ICTRFM',  'inventory/transform', 'เบิกสินค้าเพื่อแปรสภาพ'); ?>
+				<?php echo side_menu($menu, 'ICSUPP',  'inventory/support', 'เบิกสินค้าอภินันท์'); ?>
+				<?php echo side_menu($menu, 'ICLEND',  'inventory/lend', 'เบิกยืมสินค้า'); ?>
+				</ul>
+			</li>
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'PICKPACK'); ?>">
+				<a href="#" class="dropdown-toggle">
+					<i class="menu-icon fa fa-caret-right"></i> จัด/ตรวจ สินค้า
+					<b class="arrow fa fa-angle-down"></b>
+				</a>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'ICODPR',  'inventory/prepare', 'จัดสินค้า'); ?>
+					<?php echo side_menu($menu, 'ICODQC',  'inventory/qc', 'ตรวจสินค้า'); ?>
+					<?php echo side_menu($menu, 'ICODDO',  'inventory/delivery_order', 'ออเดอร์รอการจัดส่ง'); ?>
+					<?php echo side_menu($menu, 'ICODIV',  'inventory/invoice', 'ออเดอร์จัดส่งแล้ว'); ?>
+				</ul>
+			</li>
 			<?php echo side_menu($menu, 'ICTRWH',  'inventory/transfer', 'โอน/ย้าย สินค้า'); ?>
-			<?php echo side_menu($menu, 'ICODPR',  'inventory/prepare', 'จัดสินค้า'); ?>
-			<?php echo side_menu($menu, 'ICODQC',  'inventory/qc', 'ตรวจสินค้า'); ?>
-			<?php echo side_menu($menu, 'ICODDO',  'inventory/delivery', 'ออเดอร์รอการจัดส่ง'); ?>
-			<?php echo side_menu($menu, 'ICODIV',  'inventory/invoice', 'ออเดอร์จัดส่งแล้ว'); ?>
 			<?php echo side_menu($menu, 'ICCKBF',  'inventory/buffer', 'ตรวจสอบ BUFFER'); ?>
 			<?php echo side_menu($menu, 'ICCKCN',  'inventory/cancle', 'ตรวจสอบ CANCLE'); ?>
 			<?php echo side_menu($menu, 'ICCKMV',  'inventory/movement', 'ตรวจสอบ MOVEMENT'); ?>

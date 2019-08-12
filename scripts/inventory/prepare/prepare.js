@@ -19,24 +19,19 @@ function goProcess(){
 }
 
 
-function pullBack(id){
+function pullBack(code){
   $.ajax({
-    url:'controller/prepareController.php?pullOrderBack',
+    url:HOME + '/pull_order_back',
     type:'POST',
     cache:'false',
     data:{
-      'id_order' : id
+      'order_code' : code
     },
     success:function(rs){
       var rs = $.trim(rs);
       if(rs == 'success'){
-        swal({
-          title:'Success',
-          timer: 1000,
-          type:'success'
-        });
-
-        setTimeout(function(){ window.location.reload(); }, 1500);
+        $('#row-'+code).remove();
+        reIndex();
       }else{
         swal('Error', rs, 'error');
       }

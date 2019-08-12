@@ -1,8 +1,6 @@
 <?php
-include "../../config.php";
-include "../../functions.php";
 
-$codeType = getConfig('BARCODE_TYPE');
+$codeType = 'code128';
 
 $version = phpversion();
 

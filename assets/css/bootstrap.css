@@ -2236,10 +2236,10 @@ table th[class*="col-"] {
 @media screen and (max-width: 767px) {
   .table-responsive {
     width: 100%;
-    margin-bottom: 15px;
+    /*margin-bottom: 15px;*/
     overflow-y: hidden;
     -ms-overflow-style: -ms-autohiding-scrollbar;
-    border: 1px solid #dddddd;
+    /*border: 1px solid #dddddd;*/
   }
   .table-responsive > .table {
     margin-bottom: 0;
@@ -2371,7 +2371,7 @@ output {
   color: #999999;
 }
 .form-control[disabled],
-.form-control[readonly],
+/*.form-control[readonly],*/
 fieldset[disabled] .form-control {
   cursor: not-allowed;
   background-color: #eeeeee;

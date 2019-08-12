@@ -2,7 +2,7 @@
 <div class="row">
 	<div class="col-sm-3">
     <h3 class="title">
-      <i class="fa fa-shopping-basket"></i> <?php echo $this->title; ?>
+      <?php echo $this->title; ?>
     </h3>
     </div>
     <div class="col-sm-9">
@@ -45,5 +45,6 @@
 <script src="<?php echo base_url(); ?>scripts/orders/orders.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_add.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_online.js"></script>
+<script src="<?php echo base_url(); ?>scripts/print/print_order.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

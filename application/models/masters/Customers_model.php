@@ -10,15 +10,17 @@ class Customers_model extends CI_Model
 
   public function get_credit($code)
   {
-    // $rs = $this->ms->select('CreditLine')->where('CardCode', $code)->get('OCRD');
-    // if($rs->num_rows() === 1)
-    // {
-    //   return $rs->row()->CreditLine;
-    // }
-    //
-    // return 0.00;
+    $rs = $this->ms
+    ->select('CreditLine, Balance, DNotesBal, OrdersBal')
+    ->where('CardCode', $code)
+    ->get('OCRD');
+    if($rs->num_rows() === 1)
+    {
+      $balance = $rs->row()->CreditLine - ($rs->row()->Balance + $rs->row()->DNotesBal + $rs->row()->OrdersBal);
+      return $balance;
+    }
 
-    return 30000;
+    return 0.00;
   }
 
 
@@ -27,7 +29,7 @@ class Customers_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return  $this->db->replace('customers', $ds);
+      return  $this->db->insert('customers', $ds);
     }
 
     return FALSE;
@@ -210,10 +212,22 @@ class Customers_model extends CI_Model
 
 
 
+  public function get_sale_code($code)
+  {
+    $rs = $this->db->select('sale_code')->where('code', $code)->get('customers');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->sale_code;
+    }
+
+    return NULL;
+  }
+
+
   public function get_updte_data()
   {
-    $this->ms->select("CardCode, CardName");
-    $this->ms->where("UpdateDate >=", from_date());
+    $this->ms->select("CardCode, CardName, CardType, SlpCode");
+    //$this->ms->where("UpdateDate >=", from_date());
     $rs = $this->ms->get('OCRD');
     return $rs->result();
   }

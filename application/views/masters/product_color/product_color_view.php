@@ -2,7 +2,7 @@
 <div class="row">
 	<div class="col-sm-6">
     <h3 class="title">
-      <i class="fa fa-users"></i> <?php echo $this->title; ?>
+      <?php echo $this->title; ?>
     </h3>
     </div>
     <div class="col-sm-6">
@@ -18,12 +18,21 @@
 <div class="row">
   <div class="col-sm-2">
     <label>รหัส</label>
-    <input type="text" class="width-100" name="code" id="code" value="<?php echo $code; ?>" />
+    <input type="text" class="form-control input-sm" name="code" id="code" value="<?php echo $code; ?>" />
   </div>
 
   <div class="col-sm-2">
     <label>ชื่อ</label>
-    <input type="text" class="width-100" name="name" id="name" value="<?php echo $name; ?>" />
+    <input type="text" class="form-control input-sm" name="name" id="name" value="<?php echo $name; ?>" />
+  </div>
+
+	<div class="col-sm-2">
+    <label>สถานะ</label>
+    <select class="form-control inpupt-sm" name="status" id="status" onchange="getSearch()">
+			<option value="2">ทั้งหมด</option>
+			<option value="1" <?php echo is_selected(1, $status); ?>>ใช้งาน</option>
+			<option value="0" <?php echo is_selected(0, $status); ?>>ไม่ใช้งาน</option>
+		</select>
   </div>
 
   <div class="col-sm-2">
@@ -61,7 +70,15 @@
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle text-center"><?php echo number($rs->menber); ?></td>
-						<td class="middle text-center"><?php echo is_active($rs->active); ?></td>
+						<td class="middle text-center" id="<?php echo $rs->code; ?>">
+							<?php if($this->pm->can_edit): ?>
+								<span class="pointer" onclick="toggleActive(<?php echo $rs->active; ?>, '<?php echo $rs->code; ?>')">
+									<?php echo is_active($rs->active); ?>
+								</span>
+							<?php else : ?>
+								<?php echo is_active($rs->active); ?>
+							<?php endif; ?>
+						</td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">

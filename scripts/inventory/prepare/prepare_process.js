@@ -148,7 +148,7 @@ $("#barcode-zone").keyup(function(e){
               $("#qty").select();
             }else{
               beep();
-              swal("Error!", rs, "error");
+              swal("Error!", 'โซนไม่ถูกต้อง', "error");
               $("#zone_code").val('');
             }
         }
@@ -159,6 +159,16 @@ $("#barcode-zone").keyup(function(e){
 
 
 
+
+$('.b-click').click(function(){
+  if(!$('#barcode-item').prop('disabled'))
+  {
+    var barcode = $.trim($(this).text());
+    $('#barcode-item').val(barcode);
+    $('#barcode-item').focus();
+  }
+
+});
 
 
 function changeZone(){
@@ -202,9 +212,9 @@ $("#barcode-item").keyup(function(e){
 //--- เปิด/ปิด การแสดงที่เก็บ
 function toggleForceClose(){
   if( $("#force-close").prop('checked') == true){
-    $("#btn-force-close").removeClass('hide');
+    $("#btn-force-close").removeClass('not-show');
   }else{
-    $("#btn-force-close").addClass('hide');
+    $("#btn-force-close").addClass('not-show');
   }
 }
 
@@ -238,21 +248,20 @@ function setZoneLabel(showZone){
 
 
 
-// var intv = setInterval(function(){
-//   var order_code = $('#order_code').val();
-//   $.ajax({
-//     url: 'controller/prepareController.php?checkStatusAndState',
-//     type:'GET',
-//     cache:'false',
-//     data:{'order_code':order_code},
-//     success:function(rs){
-//       var rs = $.trim(rs);
-//       if( isJson(rs) ){
-//         var ds = $.parseJSON(rs);
-//         if( ds.status == 0 || ds.state != 4){
-//           window.location.reload();
-//         }
-//       }
-//     }
-//   })
-// }, 10000);
+var intv = setInterval(function(){
+  var order_code = $('#order_code').val();
+  $.ajax({
+    url: BASE_URL + 'inventory/prepare/check_state',
+    type:'GET',
+    cache:'false',
+    data:{
+      'order_code':order_code
+    },
+    success:function(rs){
+      var rs = $.trim(rs);
+      if(rs != 4){
+        window.location.reload();
+      }
+    }
+  })
+}, 10000);
