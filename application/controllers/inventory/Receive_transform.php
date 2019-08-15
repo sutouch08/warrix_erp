@@ -86,31 +86,27 @@ class Receive_transform extends PS_Controller
     $this->load->library('printer');
     $this->load->model('inventory/zone_model');
     $this->load->model('masters/products_model');
+    $this->load->model('orders/orders_model');
 
     $doc = $this->receive_transform_model->get($code);
+    $order = $this->orders_model->get($doc->order_code);
     if(!empty($doc))
     {
       $zone = $this->zone_model->get($doc->zone_code);
       $doc->zone_name = $zone->name;
       $doc->warehouse_name = $zone->warehouse_name;
+      $doc->requester = $this->user_model->get_name($order->user);
+      $doc->user_name = $this->user_model->get_name($doc->user);
     }
 
     $details = $this->receive_transform_model->get_details($code);
-
-    if(!empty($details))
-    {
-      foreach($details as $rs)
-      {
-        $rs->barcode = $this->products_model->get_barcode($rs->product_code);
-      }
-    }
 
     $ds = array(
       'doc' => $doc,
       'details' => $details
     );
 
-    $this->load->view('print/print_received', $ds);
+    $this->load->view('print/print_received_transform', $ds);
   }
 
 

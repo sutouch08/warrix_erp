@@ -182,6 +182,18 @@ class Orders_model extends CI_Model
 
 
 
+  public function get_order_code_by_reference($reference)
+  {
+    $rs = $this->db->select('code')->where('reference', $reference)->get('orders');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row()->code;
+    }
+
+    return FALSE;
+  }
+
+
 
   public function valid_detail($id)
   {

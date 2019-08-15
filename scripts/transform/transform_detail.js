@@ -11,7 +11,7 @@ function removeTransformProduct(id_order_detail, product_code){
 		closeOnConfirm:false
 	}, function(){
 		$.ajax({
-			url:BASE_URL + 'inventory/transform/remove_transform_product',
+			url:HOME + 'remove_transform_product',
 			type:'POST',
 			cache:'false',
 			data:{
@@ -98,7 +98,7 @@ function addToTransform(){
 	}
 
 	$.ajax({
-		url:BASE_URL + 'inventory/transform/add_transform_product',
+		url:HOME + 'add_transform_product',
 		type:'POST',
 		cache:'false',
 		data:{
@@ -201,7 +201,7 @@ $('#trans-product').autocomplete({
 function isConnected(id){
 	//---	ตรวจสอบว่ามีการเชื่อมโยงบ้างหรือไม่
 	$.ajax({
-		url:BASE_URL + 'inventory/transform/is_exists_connected',//'controller/transformController.php?isExistsConnected',
+		url:HOME + 'is_exists_connected',//'controller/transformController.php?isExistsConnected',
 		type:'GET',
 		cache:'false',
 		data:{
@@ -225,7 +225,7 @@ function isConnected(id){
           if(isConfirm){
             //---	ลบรายการเชื่อมโยง
   					$.ajax({
-  						url:BASE_URL + 'inventory/transform/remove_transform_detail', //'controller/transformController.php?removeTransformDetail',
+  						url: HOME + 'remove_transform_detail', //'controller/transformController.php?removeTransformDetail',
   						type:'POST',
   						cache:'false',
   						data:{

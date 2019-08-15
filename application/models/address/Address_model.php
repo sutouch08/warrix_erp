@@ -95,9 +95,15 @@ class Address_model extends CI_Model
 
 
 
-  public function get_id($code)
+  public function get_id($code, $address = NULL)
   {
-    $rs = $this->db->select('id')->where('code', $code)->order_by('is_default', 'DESC')->limit(1)->get('address_ship_to');
+    $this->db->select('id')->where('code', $code);
+    if($address != NULL)
+    {
+      $this->db->where('address', $address);
+    }
+    $this->db->order_by('is_default', 'DESC')->limit(1);
+    $rs = $this->db->get('address_ship_to');
     if($rs->num_rows() === 1)
     {
       return $rs->row()->id;
@@ -105,7 +111,7 @@ class Address_model extends CI_Model
 
     return FALSE;
   }
-  
+
 
   public function count_address($code)
   {

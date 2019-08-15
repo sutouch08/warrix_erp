@@ -6,8 +6,9 @@ class Transform extends PS_Controller
   public $menu_code = 'ICTRFM';
 	public $menu_group_code = 'IC';
   public $menu_sub_group_code = 'REQUEST';
-	public $title = 'เบิกแปรสภาพ';
+	public $title = 'เบิกแปรสภาพ(ขาย)';
   public $filter;
+  public $role = 'T';
   public function __construct()
   {
     parent::__construct();
@@ -91,10 +92,6 @@ class Transform extends PS_Controller
       $code = $this->get_new_code($date_add);
       $role = 'T'; //--- T = เบิกแปรสภาพ
 
-      //--- transform role
-      //---- 1 = เพื่อขาย 2 = เพื่ออภินันท์ 3 = เพื่อสต็อก
-      $tf_role = $this->input->post('role');
-
       $ds = array(
         'code' => $code,
         'role' => $role,
@@ -107,7 +104,8 @@ class Transform extends PS_Controller
 
       if($this->orders_model->add($ds) === TRUE)
       {
-        $this->transform_model->add($code, $tf_role);
+        $this->transform_model->add($code);
+
         $arr = array(
           'order_code' => $code,
           'state' => 1,
@@ -146,7 +144,6 @@ class Transform extends PS_Controller
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
-      $rs->tf_role = $this->transform_model->get_role($code);
     }
 
     $state = $this->order_state_model->get_order_state($code);
@@ -226,7 +223,6 @@ class Transform extends PS_Controller
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
-      $rs->tf_role = $this->transform_model->get_role($code);
     }
 
     $state = $this->order_state_model->get_order_state($code);
@@ -411,7 +407,7 @@ class Transform extends PS_Controller
           'productCode' => $rs->product_code,
           'productName' => $rs->product_name,
           'qty' => number($rs->qty),
-          'transProduct' => $transform_product === FALSE ? '' : $transform_product,
+          'transProduct' => $transform_product === FALSE ? '' : getTransformProducts($transform_product, $order->state, $order->is_expired),
           'trans_qty' => $this->transform_model->get_sum_transform_product_qty($rs->id),
           'checkbox' => $checked,
           'button' => $hasTransformProduct === FALSE ? '' : 'show'

@@ -5,7 +5,7 @@ class Channels extends PS_Controller
 {
   public $menu_code = 'DBCHAN';
 	public $menu_group_code = 'DB';
-	public $title = 'Sale Channels';
+	public $title = 'ช่องทางการขาย';
 
   public function __construct()
   {
@@ -48,7 +48,8 @@ class Channels extends PS_Controller
   {
     $data['code'] = $this->session->flashdata('code');
     $data['name'] = $this->session->flashdata('name');
-    $this->title = 'New Channels';
+    $data['customer_code'] = $this->session->flashdata('customer_code');
+    $data['customer_name'] = $this->session->flashdata('customer_name');
     $this->load->view('masters/channels/channels_add_view', $data);
   }
 
@@ -60,9 +61,13 @@ class Channels extends PS_Controller
       $sc = TRUE;
       $code = $this->input->post('code');
       $name = $this->input->post('name');
+      $customer_code = $this->input->post('customer_code');
+      $customer_name = $this->input->post('customer_name');
       $ds = array(
         'code' => $code,
-        'name' => $name
+        'name' => $name,
+        'customer_code' => empty($customer_code) ? NULL : $customer_code,
+        'customer_name' => empty($customer_name) ? NULL : $customer_code
       );
 
       if($this->channels_model->is_exists($code) === TRUE)
@@ -91,6 +96,8 @@ class Channels extends PS_Controller
       {
         $this->session->set_flashdata('code', $code);
         $this->session->set_flashdata('name', $name);
+        $this->session->set_flashdata('customer_code', $customer_code);
+        $this->session->set_flashdata('customer_name', $customer_name);
       }
     }
     else
@@ -105,7 +112,6 @@ class Channels extends PS_Controller
 
   public function edit($code)
   {
-    $this->title = 'Edit Channels';
     $data['data'] = $this->channels_model->get_channels($code);
     $this->load->view('masters/channels/channels_edit_view', $data);
   }
@@ -122,10 +128,14 @@ class Channels extends PS_Controller
       $old_name = $this->input->post('channels_name');
       $code = $this->input->post('code');
       $name = $this->input->post('name');
+      $customer_code = $this->input->post('customer_code');
+      $customer_name = $this->input->post('customer_name');
 
       $ds = array(
         'code' => $code,
-        'name' => $name
+        'name' => $name,
+        'customer_code' => empty($customer_code) ? NULL : $customer_code,
+        'customer_name' => empty($customer_name) ? NULL : $customer_name
       );
 
       if($sc === TRUE && $this->channels_model->is_exists($code, $old_code) === TRUE)

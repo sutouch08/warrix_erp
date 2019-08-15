@@ -219,6 +219,10 @@ class Orders extends PS_Controller
                 $error = "Error : Insert fail";
                 $err_qty++;
               }
+              else
+              {
+                $this->update_api_stock($item->code);
+              }
 
             }
             else  //--- ถ้ามีรายการในออเดอร์อยู่แล้ว
@@ -258,6 +262,11 @@ class Orders extends PS_Controller
                 $error = "Error : Update Fail";
                 $err_qty++;
               }
+              else
+              {
+
+                $this->update_api_stock($item->code);
+              }
 
             }	//--- end if isExistsDetail
           }
@@ -283,7 +292,13 @@ class Orders extends PS_Controller
 
   public function remove_detail($id)
   {
+    $detail = $this->orders_model->get_detail($id);
     $rs = $this->orders_model->remove_detail($id);
+    if($rs)
+    {
+      $this->update_api_stock($detail->product_code);
+    }
+
     echo $rs === TRUE ? 'success' : 'Can not delete please try again';
   }
 
@@ -577,7 +592,7 @@ class Orders extends PS_Controller
       $sc 	.= $i%2 == 0 ? '<tr>' : '';
       $active	= $item->active == 0 ? 'Disactive' : ( $item->can_sell == 0 ? 'Not for sell' : ( $item->is_deleted == 1 ? 'Deleted' : TRUE ) );
       $stock	= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_stock($item->code) )  : 0 ) : 0; //---- สต็อกทั้งหมดทุกคลัง
-			$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_sell_stock($item->code) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
+			$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
 			$disabled  = $isVisual === TRUE  && $active == TRUE ? '' : ( ($active !== TRUE OR $qty < 1 ) ? 'disabled' : '');
 
       if( $qty < 1 && $active === TRUE )
@@ -1661,6 +1676,22 @@ class Orders extends PS_Controller
   }
 
 
+
+  public function get_available_stock($item)
+  {
+    $sell_stock = $this->stock_model->get_sell_stock($item);
+    $reserv_stock = $this->orders_model->get_reserv_stock($item);
+    $availableStock = $sell_stock - $reserv_stock;
+    return $availableStock < 0 ? 0 : $availableStock;
+  }
+
+
+  public function update_api_stock($item)
+  {
+    $this->load->library('api');
+    $available_stock = $this->get_available_stock($item);
+    $this->api->update_web_stock($item, $available_stock);
+  }
 
   public function clear_filter()
   {

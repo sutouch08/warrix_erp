@@ -10,22 +10,24 @@
         <thead>
         	<tr class="font-size-12">
             	<th class="width-5 text-center">No.</th>
-              <th class="width-5 text-center"></th>
-              <th class="width-15">รหัสสินค้า</th>
-              <th class="width-30">ชื่อสินค้า</th>
-              <th class="width-10 text-center">จำนวน</th>
-							<th class="width-5 text-center">ไม่คืน</th>
-              <th class="width-15 text-center">สินค้าแปรสภาพ</th>
-              <th class="width-10 text-center"></th>
-							<th class="width-5 text-center"></th>
+                <th class="width-5 text-center"></th>
+                <th class="width-15">รหัสสินค้า</th>
+                <th class="width-25">ชื่อสินค้า</th>
+                <th class="width-10 text-center">ราคา</th>
+                <th class="width-10 text-center">จำนวน</th>
+                <th class="width-15 text-center">ส่วนลด</th>
+                <th class="width-10 text-right">มูลค่า</th>
+                <th class="width-5 text-center"></th>
             </tr>
         </thead>
         <tbody id="detail-table">
           <?php   $no = 1;              ?>
           <?php   $total_qty = 0;       ?>
+          <?php   $total_discount = 0;  ?>
+          <?php   $total_amount = 0;    ?>
+          <?php   $order_amount = 0;    ?>
           <?php if(!empty($details)) : ?>
           <?php   foreach($details as $rs) : ?>
-
             <tr class="font-size-10" id="row_<?php echo $rs->id; ?>">
             	<td class="middle text-center">
       					<?php echo $no; ?>
@@ -40,27 +42,26 @@
       				</td>
 
               <td class="middle">
-      					<?php echo inputRow($rs->product_name, 'border:0; padding:0; background-color:transparent;'); ?>
+      					<?php echo $rs->product_name; ?>
       				</td>
+
+              <td class="middle text-center">
+								<?php echo number($rs->price, 2); ?>
+							</td>
 
               <td class="middle text-center">
       						<?php echo number($rs->qty); ?>
       				</td>
 
               <td class="middle text-center">
-              	<input type="checkbox" class="ace not-return" id="chk-<?php echo $rs->id; ?>" onchange="toggleReturn(<?php echo $rs->id; ?>)" />
-								<span class="lbl"></span>
+  							-
               </td>
 
               <td class="middle text-right">
-
+      					<?php echo number($rs->total_amount, 2); ?>
       				</td>
 
-							<td class="middle text-right">
-
-      				</td>
-
-              <td class="middle text-right">
+              <td class="middle text-right">						
               <?php if( ( $order->is_paid == 0 && $order->state != 2 && $order->is_expired == 0 ) && ($edit OR $add) && $order->state < 4 ) : ?>
               	<button type="button" class="btn btn-mini btn-danger" onclick="removeDetail(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"><i class="fa fa-trash"></i></button>
               <?php endif; ?>
@@ -69,19 +70,38 @@
           </tr>
 
       <?php			$total_qty += $rs->qty;	?>
+      <?php 		$order_amount += $rs->qty * $rs->price; ?>
+      <?php			$total_amount += $rs->total_amount; ?>
       <?php			$no++; ?>
           <?php   endforeach; ?>
           <?php else : ?>
             <tr>
-              <td colspan="9" class="text-center"><h4>ไม่พบรายการ</h4></td>
+              <td colspan="10" class="text-center"><h4>ไม่พบรายการ</h4></td>
             </tr>
           <?php endif; ?>
 
-						<tr class="font-size-12">
-            		<td colspan="7" class="text-right">จำนวนรวม</td>
+			<tr class="font-size-12">
+            	<td colspan="6" rowspan="4"></td>
+                <td style="border-left:solid 1px #CCC;"><b>จำนวนรวม</b></td>
                 <td class="text-right"><b><?php echo number($total_qty); ?></b></td>
                 <td class="text-center"><b>Pcs.</b></td>
             </tr>
+           <tr class="font-size-12">
+                <td style="border-left:solid 1px #CCC;"><b>มูลค่ารวม</b></td>
+                <td class="text-right" id="total-td" style="font-weight:bold;"><?php echo number($order_amount, 2); ?></td>
+                <td class="text-center"><b>THB.</b></td>
+            </tr>
+            <tr class="font-size-12">
+                <td style="border-left:solid 1px #CCC;"><b>ส่วนลดรวม</b></td>
+                <td class="text-right" id="discount-td" style="font-weight:bold;">0.00</td>
+                <td class="text-center"><b>THB.</b></td>
+            </tr>
+            <tr class="font-size-12">
+                <td style="border-left:solid 1px #CCC;"><b>สุทธิ</b></td>
+                <td class="text-right" style="font-weight:bold;" id="netAmount-td"><?php echo number( $total_amount, 2); ?></td>
+                <td class="text-center"><b>THB.</b></td>
+            </tr>
+
         </tbody>
         </table>
     </div>

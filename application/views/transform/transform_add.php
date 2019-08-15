@@ -24,26 +24,15 @@
     <input type="text" class="form-control input-sm text-center" name="date" id="date" value="<?php echo date('d-m-Y'); ?>" required />
   </div>
 
-  <div class="col-sm-4 padding-5">
+  <div class="col-sm-5 padding-5">
     <label>ลูกค้า[ในระบบ]</label>
     <input type="text" class="form-control input-sm" name="customer" id="customer" value="" required />
   </div>
 
-	<div class="col-sm-3 padding-5">
+	<div class="col-sm-4 padding-5 last">
     <label>ผู้เบิก[คนสั่ง]</label>
     <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
-
-	<div class="col-sm-2 padding-5 last">
-    <label>วัตถุประสงค์</label>
-    <select class="form-control input-sm" name="role" id="role" required>
-    	<option value="">โปรดเลือก</option>
-			<option value="1">เพื่อขาย</option>
-			<option value="2">เพื่ออภินันท์</option>
-			<option value="3">เพื่อสต็อก</option>
-    </select>
-  </div>
-
   <div class="col-sm-11 padding-5 first">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="">
@@ -55,6 +44,7 @@
 </div>
 <hr class="margin-top-15">
 <input type="hidden" name="customerCode" id="customerCode" value="" />
+<input type="hidden" name="role" id="role" value="<?php echo $this->role; ?>" />
 </form>
 
 <script src="<?php echo base_url(); ?>scripts/transform/transform.js"></script>

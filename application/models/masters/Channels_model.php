@@ -70,6 +70,29 @@ class Channels_model extends CI_Model
   }
 
 
+  public function get($code)
+  {
+    $rs = $this->db->where('code', $code)->get('channels');
+    if($rs->num_rows() == 1 )
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function get_default()
+  {
+    $rs = $this->db->where('is_default', 1)->get('channels');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
 
   public function get_name($code)
   {

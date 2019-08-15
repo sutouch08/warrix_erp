@@ -7,21 +7,9 @@ class Transform_model extends CI_Model
   }
 
 
-  public function add($order_code, $role = 1)
+  public function add($order_code)
   {
-    return $this->db->insert('order_transform', array('order_code' => $order_code, 'role' => $role));
-  }
-
-
-  public function get_role($code)
-  {
-    $rs = $this->db->select('role')->where('order_code', $code)->get('order_transform');
-    if($rs->num_rows() === 1)
-    {
-      return $rs->row()->role;
-    }
-
-    return NULL;
+    return $this->db->insert('order_transform', array('order_code' => $order_code));
   }
 
 

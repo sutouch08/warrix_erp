@@ -14,6 +14,10 @@
     'คลัง' => $doc->warehouse_name,
     'พนักงาน' => $this->user_model->get_name($doc->user)
 	);
+  if($doc->remark != '')
+  {
+    $header['หมายเหตุ'] = $doc->remark;
+  }
 
 	$this->printer->add_header($header);
 

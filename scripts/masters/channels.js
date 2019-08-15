@@ -37,3 +37,22 @@ function getDelete(code, name){
     window.location.href = BASE_URL + 'masters/channels/delete/' + code;
   })
 }
+
+
+$('#customer_name').autocomplete({
+  source:BASE_URL + 'auto_complete/get_customer_code_and_name',
+  autoFocus: true,
+	close: function(){
+		var rs = $.trim($(this).val());
+		var arr = rs.split(' | ');
+		if( arr.length == 2 ){
+			var code = arr[0];
+			var name = arr[1];
+			$("#customer_code").val(code);
+			$("#customer_name").val(name);
+		}else{
+			$("#customer_code").val('');
+			$(this).val('');
+		}
+	}
+})

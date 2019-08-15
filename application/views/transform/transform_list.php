@@ -54,8 +54,10 @@
     <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
 </div>
-<hr class="margin-top-15">
+<input type="hidden" name="role" id="role" value="<?php echo $this->role; ?>" />
 </form>
+<hr class="margin-top-15">
+
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-sm-12">

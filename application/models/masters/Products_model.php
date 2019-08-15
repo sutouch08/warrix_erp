@@ -126,7 +126,12 @@ class Products_model extends CI_Model
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('products');
-    return $rs->row();
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
   }
 
 
@@ -134,7 +139,12 @@ class Products_model extends CI_Model
   public function get_name($code)
   {
     $rs = $this->db->select('name')->where('code', $code)->get('products');
-    return $rs->row()->name;
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row()->name;
+    }
+
+    return NULL;
   }
 
 
@@ -142,7 +152,12 @@ class Products_model extends CI_Model
   public function get_style_code($code)
   {
     $rs = $this->db->select('style_code')->where('code', $code)->get('products');
-    return $rs->row()->style_code;
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row()->style_code;
+    }
+
+    return NULL;
   }
 
 
@@ -170,6 +185,7 @@ class Products_model extends CI_Model
       return $rs->result();
     }
 
+    return FALSE;
   }
 
 
@@ -183,7 +199,12 @@ class Products_model extends CI_Model
           ORDER BY c.code ASC, s.position ASC";
 
     $rs = $this->db->query($qr);
-    return $rs->result();
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 

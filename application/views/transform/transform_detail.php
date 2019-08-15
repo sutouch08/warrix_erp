@@ -1,7 +1,7 @@
 
 <div class="row">
 	<div class="col-sm-12">
-
+		<p class="pull-right red">** เชื่อมโยงสินค้าได้เฉพาะสถานะ "รอดำเนินการ" เท่านั้น</p>
     	<table class="table table-striped border-1">
         <thead>
         	<tr class="font-size-12">
@@ -48,7 +48,14 @@
 
 				<td class="middle text-center">
 				<?php if( $order->is_expired == 0) : ?>
-					<input type="checkbox" class="ace not-return" id="chk-<?php echo $rs->id; ?>" onchange="toggleReturn(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')" <?php echo $checked; ?> />
+				<?php  $active = $order->state < 3 ? '' : 'disabled'; ?>
+					<input type="checkbox"
+					class="ace not-return"
+					id="chk-<?php echo $rs->id; ?>"
+					onchange="toggleReturn(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"
+					<?php echo $checked; ?>
+					<?php echo $active;?>
+					/>
           <span class="lbl"></span>
 				<?php else : ?>
 					<?php echo $rs->hasTransformProduct === TRUE ? '' : is_active(1); ?>
@@ -66,7 +73,7 @@
 				</td>
 
         <td class="text-center" id="connect-box-<?php echo $rs->id; ?>">
-				<?php if( $order->is_expired == 0 && $rs->hasTransformProduct === TRUE ) : ?>
+				<?php if( $order->is_expired == 0 && $rs->hasTransformProduct === TRUE && $order->state < 3 ) : ?>
 					<button type="button" class="btn btn-xs btn-success btn-block connect" id="btn-connect-<?php echo $rs->id; ?>" onclick="addTransformProduct(<?php echo $rs->id; ?>,'<?php echo $rs->product_code; ?>')"><i class="fa fa-plus"></i> เชื่อมโยง</button>
 				<?php endif; ?>
         </td>
@@ -197,7 +204,7 @@
 						</td>
 
             <td class="middle" id="transform-box-{{ id }}">
-							{{{ transProduct }}}
+							{{{transProduct }}}
 							<input type="hidden" id="transform-qty-{{ id }}" value="{{ trans_qty }}" />
 						</td>
 

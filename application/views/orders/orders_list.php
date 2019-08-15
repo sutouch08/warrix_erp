@@ -1,4 +1,5 @@
 <?php $this->load->view('include/header'); ?>
+<?php $can_upload = getConfig('ALLOW_UPLOAD_ORDER'); ?>
 <div class="row">
 	<div class="col-sm-6">
     <h3 class="title">
@@ -6,10 +7,14 @@
     </h3>
     </div>
     <div class="col-sm-6">
-    	<p class="pull-right">
+    	<p class="pull-right top-p">
       <?php if($this->pm->can_add) : ?>
+				<?php if($can_upload == 1) : ?>
+					<button type="button" class="btn btn-sm btn-purple" onclick="getUploadFile()">นำเข้าออเดอร์</button>
+				<?php endif;?>
         <button type="button" class="btn btn-sm btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
       <?php endif; ?>
+
       </p>
     </div>
 </div><!-- End Row -->
@@ -117,6 +122,11 @@
 	</div>
 </div>
 
+<?php
+if($can_upload == 1) :
+	 $this->load->view('orders/import_order');
+endif;
+?>
 <script src="<?php echo base_url(); ?>scripts/orders/orders.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

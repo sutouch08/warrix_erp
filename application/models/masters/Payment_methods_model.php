@@ -73,6 +73,29 @@ class Payment_methods_model extends CI_Model
 
 
 
+  public function get($code)
+  {
+    $rs = $this->db->where('code', $code)->get('payment_method');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_default()
+  {
+    $rs = $this->db->where('is_default', 1)->get('payment_method');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
 
   public function get_data($c_code = '', $c_name = '', $term = '', $perpage = '', $offset = '')
   {
@@ -155,7 +178,7 @@ class Payment_methods_model extends CI_Model
     return FALSE;
   }
 
-  
+
 
   public function has_term($code)
   {

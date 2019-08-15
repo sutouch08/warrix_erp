@@ -110,12 +110,6 @@ function add(){
     return false;
   }
 
-  if(role == '')
-  {
-    swal('กรุณาเลือกวัตถุประสงค์');
-    return false;
-  }
-
   $('#addForm').submit();
 }
 
@@ -185,7 +179,7 @@ function addToOrder(){
 function updateDetailTable(){
 	var order_code = $("#order_code").val();
 	$.ajax({
-		url: BASE_URL + 'inventory/transform/get_detail_table/'+order_code,
+		url: HOME + 'get_detail_table/'+order_code,
 		type:"GET",
     cache:"false",
 		success: function(rs){

@@ -1,4 +1,15 @@
-var HOME = BASE_URL + 'inventory/transform/';
+
+var ROLE = $('#role').val();
+if(ROLE == 'Q')
+{
+  var HOME = BASE_URL + 'inventory/transform_stock/';
+}
+else
+{
+  var HOME = BASE_URL + 'inventory/transform/';
+}
+
+
 
 function addNew(){
   window.location.href = HOME + 'add_new';

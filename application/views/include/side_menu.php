@@ -26,7 +26,8 @@ $menu_group = $this->menu_group_code;
 					<i class="menu-icon fa fa-caret-right"></i> เบิก/ยืม สินค้า <b class="arrow fa fa-angle-down"></b>
 				</a>
 				<ul class="submenu">
-				<?php echo side_menu($menu, 'ICTRFM',  'inventory/transform', 'เบิกสินค้าเพื่อแปรสภาพ'); ?>
+				<?php echo side_menu($menu, 'ICTRFM',  'inventory/transform', 'เบิกแปรสภาพ(ขาย)'); ?>
+				<?php echo side_menu($menu, 'ICTRFS',  'inventory/transform_stock', 'เบิกแปรสภาพ(สต็อก)'); ?>
 				<?php echo side_menu($menu, 'ICSUPP',  'inventory/support', 'เบิกสินค้าอภินันท์'); ?>
 				<?php echo side_menu($menu, 'ICLEND',  'inventory/lend', 'เบิกยืมสินค้า'); ?>
 				</ul>

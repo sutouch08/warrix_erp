@@ -32,7 +32,6 @@
     </div>
 </div><!-- End Row -->
 <hr/>
-<input type="hidden" id="order_code" value="<?php echo $order->code; ?>" />
 <input type="hidden" id="id_order" name="id_order" value="<?php echo $order->code; ?>" />
 <?php $this->load->view('transform/transform_edit_header'); ?>
 <?php $this->load->view('orders/order_state'); ?>

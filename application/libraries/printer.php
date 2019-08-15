@@ -174,12 +174,15 @@ public function doc_footer()
 public function add_header(array $data)
 {
 	$i = 0;
+	$count = 0;
 	foreach($data as $label => $value)
 	{
 		$this->header_row[$i] = array($label => $value);
 		$i++;
+		$count++;
 	}
 
+	$this->header_rows = ceil($count/2);
 	return true;
 }
 
@@ -194,12 +197,15 @@ public function print_header()
 	$r = count($rd);
 	$height = ($this->header_rows * $this->row_height) +1;
 	$i	= 0;
+	$v  = 1;
 	$header = "<div style='width:".$this->content_width."mm; min-height:".$height."mm; margin:auto; margin-bottom:2mm; border:solid 2px #ccc; border-radius: 10px;' >";
-	while(	$i<$r)
+	while(	$i < $r)
 	{
 		foreach($rd[$i] as $label => $value)
 		{
-			$header .= '<div style="width:50%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px;">';
+			$od = ($i+1)%2;
+			$width = ($r == $v && $od == 1) ? '100%' : '50%';
+			$header .= '<div style="width:'.$width.'; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px;">';
 			$header .= '<input type="text" class="print-row" value="'.$label.' : &nbsp;&nbsp;'.$value.'" />';
 			$header .= '</div>';
 
@@ -213,6 +219,7 @@ public function print_header()
 			// $header .= '</div>';
 		}
 		$i++;
+		$v++;
 	}
 	$header .= "</div>";
 	return $header;
