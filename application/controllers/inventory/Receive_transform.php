@@ -8,6 +8,7 @@ class Receive_transform extends PS_Controller
   public $menu_sub_group_code = 'RECEIVE';
 	public $title = 'รับสินค้าจากการแปรสภาพ';
   public $filter;
+  public $error;
   public function __construct()
   {
     parent::__construct();
@@ -227,6 +228,11 @@ class Receive_transform extends PS_Controller
       $message = 'ไม่พบข้อมูล';
     }
 
+    if($sc === TRUE)
+    {
+      $this->do_export($code);
+    }
+
     echo $sc === TRUE ? 'success' : $message;
   }
 
@@ -397,6 +403,26 @@ class Receive_transform extends PS_Controller
           redirect($this->home.'/add_new');
         }
       }
+    }
+  }
+
+
+
+  public function do_export($code)
+  {
+    return TRUE;
+  }
+
+
+  public function export_order($code)
+  {
+    if($this->do_export($code))
+    {
+      echo 'success';
+    }
+    else
+    {
+      echo $this->error;
     }
   }
 

@@ -212,6 +212,11 @@ class Receive_po extends PS_Controller
       $message = 'ไม่พบข้อมูล';
     }
 
+    if($sc === TRUE)
+    {
+      $this->do_export($code);
+    }
+    
     echo $sc === TRUE ? 'success' : $message;
   }
 

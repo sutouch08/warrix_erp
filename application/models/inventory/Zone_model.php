@@ -77,6 +77,18 @@ class Zone_model extends CI_Model
   }
 
 
+  public function get_zone_detail_in_warehouse($code, $warehouse)
+  {
+    $rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
   // public function search($txt)
   // {
   //   $rs = $this->ms->like('BinCode', $txt)->get('OBIN');
@@ -89,8 +101,13 @@ class Zone_model extends CI_Model
   // }
 
 
-  public function search($txt)
+  public function search($txt, $warehouse_code = '')
   {
+    if($warehouse_code != '')
+    {
+      $rs = $this->db->where('warehouse_code', $warehouse_code);
+    }
+
     $rs = $this->db->like('code', $txt)->get('zone');
     if($rs->num_rows() > 0)
     {

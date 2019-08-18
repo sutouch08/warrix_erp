@@ -18,7 +18,7 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
                     	<option value="0">เลือกสถานะ</option>
 							<?php if( $order->state != 9 && $order->is_expired == 0 && $order->status == 1) : ?>
 
-                 <?php if( $order->state <=3 && $this->pm->can_edit) : ?>
+                 <?php if( $order->state <=3 && $canChange) : ?>
                         <?php if($order->state != 1): ?>
 													<option value="1">รอดำเนินการ</option>
 												<?php endif; ?>
@@ -40,11 +40,13 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
                        <option value="2">รอชำระเงิน</option>
                        <option value="3">รอจัดสินค้า</option>
 								 <?php endif; ?>
+
                  <?php if( $order->state < 8 && $this->pm->can_delete ) : ?>
                         <option value="9">ยกเลิก</option>
 								 <?php elseif( $order->state >= 8 && $canUnbill) : ?>
 												<option value="9">ยกเลิก</option>
                  <?php endif; ?>
+
 							<?php elseif($order->is_expired == 1 && $this->pm->can_delete) : ?>
 												<option value="9">ยกเลิก</option>
 							<?php elseif($order->state == 9 && $this->pm->can_edit) : ?>
@@ -55,7 +57,9 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
                 <td class="width-25" style="border:0px; padding:5px;">
                 <?php if( $order->status == 1 && $order->is_expired == 0 ) : ?>
                 	<button class="btn btn-xs btn-primary btn-block" onclick="changeState()">เปลี่ยนสถานะ</button>
-								<?php elseif($order->is_expired == 1 && $delete) : ?>
+								<?php elseif($order->is_expired == 1 && $$this->pm->can_delete) : ?>
+									<button class="btn btn-xs btn-primary btn-block" onclick="changeState()">เปลี่ยนสถานะ</button>
+								<?php elseif($order->state == 9 && $this->pm->can_delete) : ?>
 									<button class="btn btn-xs btn-primary btn-block" onclick="changeState()">เปลี่ยนสถานะ</button>
                 <?php endif; ?>
                 </td>

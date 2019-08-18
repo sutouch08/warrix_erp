@@ -221,7 +221,10 @@ class Orders extends PS_Controller
               }
               else
               {
-                $this->update_api_stock($item->code);
+                if($item->count_stock == 1)
+                {
+                  $this->update_api_stock($item->code);
+                }
               }
 
             }
@@ -264,8 +267,10 @@ class Orders extends PS_Controller
               }
               else
               {
-
-                $this->update_api_stock($item->code);
+                if($item->count_stock == 1)
+                {
+                  $this->update_api_stock($item->code);
+                }
               }
 
             }	//--- end if isExistsDetail
@@ -296,7 +301,11 @@ class Orders extends PS_Controller
     $rs = $this->orders_model->remove_detail($id);
     if($rs)
     {
-      $this->update_api_stock($detail->product_code);
+      if($detail->is_count == 1)
+      {
+        $this->update_api_stock($detail->product_code);
+      }
+
     }
 
     echo $rs === TRUE ? 'success' : 'Can not delete please try again';
@@ -1267,9 +1276,11 @@ class Orders extends PS_Controller
 
     if($this->input->post('order_code'))
     {
+      $this->load->library('api');
       $code = $this->input->post('order_code');
       $state = $this->input->post('state');
       $order = $this->orders_model->get($code);
+      $details = $this->orders_model->get_order_details($code);
       if(!empty($order))
       {
         //--- ถ้าเป็นเบิกแปรสภาพ จะมีการผูกสินค้าไว้
@@ -1332,6 +1343,20 @@ class Orders extends PS_Controller
         if($this->db->trans_status() === FALSE)
         {
           $sc = FALSE;
+        }
+
+        if($sc === TRUE && $order->state == 8)
+        {
+          if(!empty($details))
+          {
+            foreach($details as $rs)
+            {
+              if($rs->is_count == 1 && $rs->is_complete == 1)
+              {
+                $this->update_api_stock($rs->product_code);
+              }
+            }
+          }
         }
 
         echo $sc === TRUE ? 'success' : $message;
@@ -1432,6 +1457,8 @@ class Orders extends PS_Controller
   public function clear_buffer($code)
   {
     $this->load->model('inventory/buffer_model');
+    $this->load->model('inventory/cancle_model');
+
     $buffer = $this->buffer_model->get_all_details($code);
     //--- ถ้ายังมีรายการที่ค้างอยู่ใน buffer เคลียร์เข้า cancle
     if(!empty($buffer))

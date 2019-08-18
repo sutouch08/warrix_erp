@@ -36,8 +36,7 @@ class stock_model extends CI_Model
     $this->ms->select_sum('OIBQ.OnHandQty', 'qty')
     ->from('OBIN')
     ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
-    ->join('OITM', 'OIBQ.ItemCode = OITM.ItemCode', 'left')
-    ->where('OITM.ItemCode', $pd_code)
+    ->where('OIBQ.ItemCode', $pd_code)
     ->where('OBIN.BinCode', $zone_code);
     $rs = $this->ms->get();
     if($rs->num_rows() == 1)
@@ -99,6 +98,25 @@ class stock_model extends CI_Model
     }
 
     return $result;
+  }
+
+
+  //---- สินค้าทั้งหมดที่อยู่ในโซน (ใช้โอนสินค้าระหว่างคลัง)
+  public function get_all_stock_in_zone($zone_code)
+  {
+    $rs = $this->ms
+    ->select('OIBQ.ItemCode AS product_code, OIBQ.OnHandQty AS qty')
+    ->from('OIBQ')
+    ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
+    ->where('OBIN.BinCode', $zone_code)
+    ->get();
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
 }//--- end class

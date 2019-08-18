@@ -21,6 +21,14 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICTRRC',  'inventory/receive_transform', 'รับสินค้าจากการแปรสภาพ'); ?>
 				</ul>
 			</li>
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'RETRUN'); ?>">
+				<a href="#" class="dropdown-toggle">
+					<i class="menu-icon fa fa-caret-right"></i> คืนสินค้า <b class="arrow fa fa-angle-down"></b>
+				</a>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'ICRTOR',  'inventory/return_order', 'รับคืนสินค้า(ลดหนี้)'); ?>
+				</ul>
+			</li>
 			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'REQUEST'); ?>">
 				<a href="#" class="dropdown-toggle">
 					<i class="menu-icon fa fa-caret-right"></i> เบิก/ยืม สินค้า <b class="arrow fa fa-angle-down"></b>

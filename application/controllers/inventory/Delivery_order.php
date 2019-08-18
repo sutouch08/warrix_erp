@@ -336,6 +336,11 @@ class Delivery_order extends PS_Controller
       $message = 'order code not found';
     }
 
+    if($sc === TRUE)
+    {
+      $this->do_export($code);
+    }
+
     echo $sc === TRUE ? 'success' : $message;
   }
 
@@ -368,6 +373,28 @@ class Delivery_order extends PS_Controller
     $code = $this->input->get('order_code');
     $state = $this->orders_model->get_state($code);
     echo $state;
+  }
+
+
+
+  public function do_export($code)
+  {
+    return TRUE;
+  }
+
+
+
+
+  public function export_order($code)
+  {
+    if($this->do_export($code))
+    {
+      echo 'success';
+    }
+    else
+    {
+      echo $this->error;
+    }
   }
 
 

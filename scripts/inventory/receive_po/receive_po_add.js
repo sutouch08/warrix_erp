@@ -200,8 +200,10 @@ function save(){
 				});
 
 				setTimeout(function(){
+					update_api_stock(code);
 					viewDetail(code);
 				}, 1200);
+
 			}
 			else
 			{
@@ -214,6 +216,11 @@ function save(){
 }	//--- end save
 
 
+
+function update_api_stock(code)
+{
+	$.post(BASE_URL + 'api/update_receive_stock/'+code);
+}
 
 
 function checkLimit(){

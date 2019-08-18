@@ -2,16 +2,16 @@
 
 //-------  ดึงรายการสินค้าในโซน
 function getProductInZone(){
-	var id_zone   = $("#from-zone-id").val();
-  var underZero = $('#underZero').val();
-	if( id_zone.length > 0 ){
+	var zone_code  = $("#from_zone_code").val();
+	var transfer_code = $('#transfer_code').val();
+	if( zone_code.length > 0 ){
 		$.ajax({
-			url:"controller/transferController.php?getProductInZone",
+			url: HOME + 'get_product_in_zone',
 			type:"GET",
       cache:"false",
       data:{
-        'id_zone' : id_zone,
-        'isAllowUnderZero' : underZero
+				'transfer_code' : transfer_code,
+        'zone_code' : zone_code
       },
 			success: function(rs){
 				var rs = 	$.trim(rs);
@@ -22,6 +22,7 @@ function getProductInZone(){
 					render(source, data, output);
 					$("#transfer-table").addClass('hide');
 					$("#zone-table").removeClass('hide');
+					inputQtyInit();
 				}
 			}
 		});
@@ -34,48 +35,27 @@ $(document).ready(function() {
 	to_zone_init();
 });
 
+
+
 function from_zone_init(){
-	var id = $('#from-warehouse-id').val();
+	var code = $('#from_warehouse_code').val();
 	$("#from-zone").autocomplete({
-		source: "controller/transferController.php?getTransferZone&id_warehouse="+ id,
+		source: HOME + 'get_transfer_zone/'+ code,
 		autoFocus: true,
 		close: function(){
 			var rs = $(this).val();
 			var rs = rs.split(' | ');
-			if( rs.length == 3 ){
-
-				$("#from-zone-id").val(rs[1]);
-
-	      //--- อนุญาติให้ติดลบได้มั้ย  0 = ไม่ได้  / 1 = ได้
-	      $('#underZero').val(rs[2]);
-
-	      //--- ถ้าไม่อนุญาติให้ติดลย
-	      if( rs[2] == 0){
-	        //--- ซ่อน checkbox อนุญาติให้ติดลยได้ทั้งหมด
-	        $('#underZeroLabel').addClass('hide');
-
-	      }else{
-	        //--- ยกเลิกการซ่อน
-	        $('#underZeroLabel').removeClass('hide');
-
-	      }
-
+			if( rs.length == 2 ){
+				$("#from_zone_code").val(rs[0]);
 	      //--- แสดงชื่อโซนใน text box
-				$(this).val(rs[0]);
-
+				$(this).val(rs[1]);
 				//---	แสดงชื่อโซนที่ หัวตาราง
-				$('#zoneName').text(rs[0]);
-
-
+				$('#zoneName').text(rs[1]);
 			}else{
 
-				$("#from-zone-id").val('');
-
-	      $('#underZero').val('0');
-
+				$("#from_zone_code").val('');
 				//---	ชื่อโซนที่ หัวตาราง
 				$('#zoneName').text('');
-
 				$(this).val('');
 			}
 		}
@@ -95,21 +75,19 @@ $("#from-zone").keyup(function(e) {
 
 
 function to_zone_init(){
-	var id = $('#to-warehouse-id').val();
+	var code = $('#to_warehouse_code').val();
 	$("#to-zone").autocomplete({
-		source: "controller/transferController.php?getTransferZone&id_warehouse="+ id,
+		source: HOME + 'get_transfer_zone/' + code,
 		autoFocus: true,
 		close: function(){
 			var rs = $(this).val();
 			var rs = rs.split(' | ');
-			if( rs.length == 3 ){
-				$("#to-zone-id").val(rs[1]);
-				$(this).val(rs[0]);
-				$("#btn-move-all").removeClass('not-show');
+			if( rs.length == 2 ){
+				$("#to_zone_code").val(rs[0]);
+				$(this).val(rs[1]);
 			}else{
-				$("#to-zone-id").val('');
+				$("#to_zone_code").val('');
 				$(this).val('');
-				$("#btn-move-all").addClass('not-show');
 			}
 		}
 	});
@@ -195,22 +173,21 @@ function hideZoneTable(){
 
 
 
+function inputQtyInit(){
+	$('.input-qty').keyup(function(){
+		var qty = parseInt($(this).val());
+		var limit = parseInt($(this).attr('max'));
+		qty = isNaN(qty) ? 0 : qty;
+		limit = isNaN(limit) ? 0 : limit;
 
-//-------  ใส่ได้เฉพาะตัวเลขเท่านั้น
-function validQty(id, qty){
-	var input = $("#moveQty_"+id).val();
-	if( input.length > 0 && isNaN( parseInt( input ) ) ){
-		swal('กรุณาใส่ตัวเลขเท่านั้น');
-		$("#moveQty_"+id).val('');
-		return false;
-	}
-
-    if( $("#underZero_"+id).is(':checked') == false && ( parseInt( input ) > parseInt(qty) ) ){
-		swal('จำนวนในโซนมีไม่พอ');
-		$("#moveQty_"+id).val('');
-		return false;
-	}
+		if(qty > limit)
+		{
+			swal('โอนได้ไม่เกิน ' + limit);
+			$(this).val(limit);
+		}
+	})
 }
+
 
 
 
@@ -235,7 +212,7 @@ function newToZone(){
 	$('#toZone-barcode').removeAttr('disabled');
 	$('#btn-new-to-zone').attr('disabled','disabled');
 	$('#zoneName-label').text('');
-	$("#to-zone-id").val("");
+	$("#to_zone_code").val("");
 	$("#toZone-barcode").val("");
 	$("#zone-table").addClass('hide');
 	$("#toZone-barcode").focus();
@@ -248,19 +225,19 @@ function newToZone(){
 //---	ดึงข้อมูลสินค้าในโซนต้นทาง
 function getZoneTo(){
 
-	var txt = $("#toZone-barcode").val();
+	var barcode = $("#toZone-barcode").val();
 
-	if( txt.length > 0 ){
+	if( barcode.length > 0 ){
 		//---	คลังปลายทาง
-		var id_wh = $("#to-warehouse-id").val();
+		var warehouse_code = $("#to_warehouse_code").val();
 
 		$.ajax({
-			url:"controller/transferController.php?getZone",
+			url: BASE_URL + 'inventory/zone/get_warehouse_zone',
 			type:"GET",
 			cache:"false",
 			data:{
-				"txt" : txt,
-				"id_warehouse" : id_wh
+				"barcode" : barcode,
+				"warehouse_code" : warehouse_code
 			},
 			success: function(rs){
 
@@ -272,10 +249,10 @@ function getZoneTo(){
 					var ds = $.parseJSON(rs);
 
 					//---	update id โซนปลายทาง
-					$("#to-zone-id").val(ds.id_zone);
+					$("#to_zone_code").val(ds.code);
 
 					//---	update ชื่อโซน
-					$("#zoneName-label").text(ds.zone_name);
+					$("#zoneName-label").val(ds.name);
 
 					//---	disabled ช่องยิงบาร์โค้ดโซน
 					$("#toZone-barcode").attr('disabled', 'disabled');
@@ -283,14 +260,20 @@ function getZoneTo(){
 					//--- active new zone button
 					$('#btn-new-to-zone').removeAttr('disabled');
 
-					//showTempTable();
+					$('#qty-to').removeAttr('disabled');
+
+					$('#barcode-item-to').removeAttr('disabled');
+
+					$('#barcode-item-to').focus();
+
+					showTempTable();
 
 				}else{
 
 					swal("ข้อผิดพลาด", rs, "error");
 
 					//---	ลบไอดีโซนปลายทาง
-					$("#to-zone-id").val("");
+					$("#to_zone_code").val("");
 
 					//---	ไม่แสดงชื่อโซน
 					$('#zoneName-label').val('');
@@ -327,16 +310,12 @@ $("#barcode-item-to").keyup(function(e) {
 		var barcode = $(this).val();
 
 		//---	ไอดีโซนปลายทาง
-		var id_zone	= $("#to-zone-id").val();
+		var zone_code	= $("#to_zone_code").val();
 
 		//---	ไอดีเอกสาร
-		var id_transfer = $("#id_transfer").val();
+		var transfer_code = $("#transfer_code").val();
 
-		//---	ไอดีของรายการโอนสินค้า
-		var id_transfer_detail = $("#row_"+barcode).val();
-
-
-		if( id_zone.length == 0 ){
+		if( zone_code.length == 0 ){
 			swal("กรุณาระบุโซนปลายทาง");
 			return false;
 		}
@@ -357,13 +336,12 @@ $("#barcode-item-to").keyup(function(e) {
 		if( qty != '' && qty != 0 ){
 			if( qty <= curQty ){
 				$.ajax({
-					url:"controller/transferController.php?moveBarcodeToZone",
+					url: HOME + 'move_to_zone', //"controller/transferController.php?moveBarcodeToZone",
 					type:"POST",
 					cache:"false",
 					data:{
-						"id_transfer_detail" : id_transfer_detail,
-						"id_transfer" : id_transfer,
-						"id_zone" : id_zone,
+						"transfer_code" : transfer_code,
+						"zone_code" : zone_code,
 						"qty" : qty,
 						"barcode" : barcode
 					},
@@ -372,7 +350,7 @@ $("#barcode-item-to").keyup(function(e) {
 						if( rs == 'success'){
 							curQty = curQty - qty;
 							if(curQty == 0 ){
-								$("#row-temp-"+id_transfer_detail).remove();
+								getTempTable();
 							}else{
 								$("#qty-label-"+barcode).text(curQty);
 								$("#qty-"+barcode).val(curQty);
@@ -413,9 +391,13 @@ function getMoveOut(){
 
 //---	เปลี่ยนโซนต้นทาง
 function newFromZone(){
-	$("#id_zone_from").val("");
+	$("#from_zone_code").val("");
 	$("#fromZone-barcode").val("");
 	$("#zone-table").addClass('hide');
+	$('#fromZone-barcode').removeAttr('disabled');
+	$('#btn-new-zone').attr('disabled', 'disabled');
+	$('#qty-from').attr('disabled', 'disabled');
+	$('#barcode-item-from').attr('disabled', 'disabled');
 	$("#fromZone-barcode").focus();
 }
 
@@ -425,19 +407,19 @@ function newFromZone(){
 //---	ดึงข้อมูลสินค้าในโซนต้นทาง
 function getZoneFrom(){
 
-	var txt = $("#fromZone-barcode").val();
+	var barcode = $("#fromZone-barcode").val();
 
-	if( txt.length > 0 ){
+	if( barcode.length > 0 ){
 		//---	คลังต้นทาง
-		var id_wh = $("#from-warehouse-id").val();
+		var warehouse_code = $("#from_warehouse_code").val();
 
 		$.ajax({
-			url:"controller/transferController.php?getZone",
+			url:BASE_URL + 'inventory/zone/get_warehouse_zone',
 			type:"GET",
 			cache:"false",
 			data:{
-				"txt" : txt,
-				"id_warehouse" : id_wh
+				"barcode" : barcode,
+				"warehouse_code" : warehouse_code
 			},
 			success: function(rs){
 
@@ -449,28 +431,17 @@ function getZoneFrom(){
 					var ds = $.parseJSON(rs);
 
 					//---	update id โซนต้นทาง
-					$("#from-zone-id").val(ds.id_zone);
+					$("#from_zone_code").val(ds.code);
 
 					//---	update ชื่อโซน
-					$("#zoneName").text(ds.zone_name);
+					$("#zoneName").text(ds.name);
 
-					//---	update allowUnderZero
-					$('#underZero').val(ds.isAllowUnderZero);
 
-					//--- ถ้าไม่อนุญาติให้ติดลบ
-					if( ds.isAllowUnderZero == 0){
-
-						//---	ซ่อน checkbox ติดลบได้
-						$('#underZeroLabel').addClass('hide');
-
-					}else{
-
-						//---	แสดง checkbox ติดลบได้
-						$('#underZeroLabel').removeClass('hide');
-
-					}
-
-					$("#fromZone-barcode").val("");
+					$("#fromZone-barcode").attr('disabled', 'disabled');
+					$('#btn-new-zone').removeAttr('disabled');
+					$('#qty-from').removeAttr('disabled');
+					$('#barcode-item-from').removeAttr('disabled');
+					$('#barcode-item-from').focus();
 
 					//---	แสดงรายการสินค้าในโซน
 					getProductInZone();
@@ -479,18 +450,13 @@ function getZoneFrom(){
 					swal("ข้อผิดพลาด", rs, "error");
 
 					//---	ลบไอดีโซนต้นทาง
-					$("#from-zone-id").val("");
+					$("#from_zone_code").val("");
 
 					//---	ไม่แสดงชื่อโซน
 					$('#zoneName').val('');
 
-					//---	ไม่ให้ติดลบ
-					$('#underZero').val(0);
-
-					//---	แสดง checkbox ติดลบได้
-					$('#underZeroLabel').removeClass('hide');
-
 					$("#zone-table").addClass('hide');
+
 					beep();
 				}
 			}
@@ -513,25 +479,19 @@ $("#fromZone-barcode").keyup(function(e) {
 $("#barcode-item-from").keyup(function(e) {
   if( e.keyCode == 13 ){
 		//---	โซนต้นทาง
-		var id_zone	= $("#from-zone-id").val();
+		var zone_code	= $("#from_zone_code").val();
 
 		//---	ID เอกสาร
-		var id_transfer = $("#id_transfer").val();
+		var transfer_code = $("#transfer_code").val();
 
 		//---	ตรวจสอบว่ายิงบาร์โค้ดโซนมาแล้วหรือยัง
-		if( id_zone.length == 0 ){
+		if( zone_code.length == 0 ){
 			swal("กรุณาระบุโซนปลายทาง");
 			return false;
 		}
 
 		//---	จำนวนที่ป้อนมา
 		var qty = parseInt($("#qty-from").val());
-
-		//---	โซนนี้ติดลบได้หรือไม่
-		var underZero = $('#underZero').val();
-
-		//---	อนุญาติให้ติดลบได้หรือไม่ (ถ้าได้ต้องติ๊กไว้)
-		var udz = ($("#allowUnderZeroAll").is(':checked') == true ? 1 : 0 );
 
 		//---	บาร์โค้ดสินค้า
 		var barcode = $(this).val();
@@ -548,23 +508,17 @@ $("#barcode-item-from").keyup(function(e) {
 			//---	ถ้าจำนวนที่ใส่มา น้อยกว่าหรือเท่ากับ จำนวนที่มีอยู่
 			//---	หรือ โซนนี้สามารถติดลบได้และติ๊กว่าให้ติดลบได้
 			//---	หากโซนนี้ไม่สามารถติดลบได้ ถึงจะติ๊กให้ติดลบได้ก็ไม่สามารถให้ติดลบได้
-			if( qty <= curQty || (underZero == 1 && udz == 1 ) ){
-
-				//---	ลดยอดสต็อกโซนต้นทาง
-				//---	เพิ่มรายการเข้า transfer_detail
+			if( qty <= curQty ){
 				//---	เพิ่มรายการเข้า temp
-				//---	บันทึก movement
 				$.ajax({
-					url:"controller/transferController.php?addBarcodeToTransfer",
+					url: HOME + 'add_to_temp',
 					type:"POST",
 					cache:"false",
 					data:{
-						"id_transfer" : id_transfer,
-						"from_zone" : id_zone,
+						"transfer_code" : transfer_code,
+						"from_zone" : zone_code,
 						"qty" : qty,
 						"barcode" : barcode,
-						"isAllowUnderZero" : underZero,
-						"underZero" : udz
 					},
 					success: function(rs){
 

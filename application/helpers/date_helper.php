@@ -41,7 +41,17 @@ function thai_short_text_date($date, $time = FALSE)
 
 function db_date($date, $time = FALSE, $sp = '-')
 {
-  return $time === TRUE ? date('Y-m-d H:i:s', strtotime($date)) : date('Y-m-d', strtotime($date));
+
+  if($time = TRUE)
+  {
+    $c_time = date('H:i:s', strtotime($date));
+    $c_time = $c_time == '00:00:00' ? date('H:i:s') : $c_time;
+    $date = $date . ' '.$c_time;
+    return date('Y-m-d H:i:s', strtotime($date));
+  }
+
+
+  return date('Y-m-d', strtotime($date));
 }
 
 

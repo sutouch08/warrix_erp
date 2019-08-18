@@ -1,5 +1,5 @@
 <?php
-class Api
+class Api extends CI_Controller
 {
   private $web_url = 'http://34.97.150.198/rest/V1/';
   private $userData = array('username' => 'user', 'password' => 'W@rr1X$p0rt');
@@ -7,7 +7,9 @@ class Api
   private $token;
   public function __construct()
   {
-    $this->get_token();
+    parent::__construct();
+    $this->load->model('stock/stock_model');
+    $this->load->model('orders/orders_model');
   }
 
   private function get_token()
@@ -20,6 +22,45 @@ class Api
 
     $this->token = trim(curl_exec($ch), '""');
   }
+
+
+  public function update_receive_stock($code)
+  {
+    $this->load->model('inventory/receive_po_model');
+    $details = $this->receive_po_model->get_details($code);
+    if(!empty($details))
+    {
+      $this->get_token();
+      if(!empty($this->token))
+      {
+        if(!empty($details))
+        {
+          foreach($details as $rs)
+          {
+            $this->update_web_stock($rs->product_code, $qty);
+          }
+        }
+      }
+    }
+  }
+
+
+  
+  public function get_available_stock($item)
+  {
+    $sell_stock = $this->stock_model->get_sell_stock($item);
+    $reserv_stock = $this->orders_model->get_reserv_stock($item);
+    $availableStock = $sell_stock - $reserv_stock;
+    return $availableStock < 0 ? 0 : $availableStock;
+  }
+
+
+  public function update_api_stock($item)
+  {
+    $available_stock = $this->get_available_stock($item);
+    $this->update_web_stock($item, $available_stock);
+  }
+
 
   public function update_web_stock($item, $qty)
   {
@@ -40,12 +81,7 @@ class Api
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $setHeaders);
     $result = curl_exec($ch);
-
-    return $result;
-    // $response = json_decode( curl_exec($ch), TRUE);
-    curl_close($ch);
   }
-
 
 }
 

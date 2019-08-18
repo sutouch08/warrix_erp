@@ -23,6 +23,28 @@ class Zone extends CI_Controller
 
     echo $sc === TRUE ? $code : 'not_exists';
   }
-}
+
+
+
+  public function get_warehouse_zone()
+  {
+    $sc = TRUE;
+    if($this->input->get('barcode'))
+    {
+      $code = trim($this->input->get('barcode'));
+      $warehouse = $this->input->get('warehouse_code');
+      $zone = $this->zone_model->get_zone_detail_in_warehouse($code, $warehouse);
+      if($zone === FALSE)
+      {
+        $sc = FALSE;
+      }
+    }
+
+    echo $sc === TRUE ? json_encode($zone) : 'not_exists';
+  }
+
+
+
+} //--- end class
 
  ?>

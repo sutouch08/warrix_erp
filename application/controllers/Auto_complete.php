@@ -43,6 +43,7 @@ class Auto_complete extends CI_Controller
     ->where('CardType', 'C')
     ->like('code', $txt)
     ->or_like('name', $txt)
+    ->limit(20)
     ->get('customers');
 
     if($rs->num_rows() > 0)
@@ -446,6 +447,34 @@ public function get_style_code()
     else
     {
       $sc[] = 'no item found';
+    }
+
+    echo json_encode($sc);
+  }
+
+
+  public function get_warehouse_code_and_name()
+  {
+    $txt = $_REQUEST['term'];
+    $sc  = array();
+    $this->ms->select('WhsCode, WhsName');
+    if($txt != '*')
+    {
+      $this->ms->like('WhsCode', $txt);
+      $this->ms->or_like('WhsName', $txt);
+    }
+    $rs = $this->ms->limit(20)->get('OWHS');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $wh)
+      {
+        $sc[] = $wh->WhsCode.' | '.$wh->WhsName;
+      }
+    }
+    else
+    {
+      $sc[] = 'not found';
     }
 
     echo json_encode($sc);
