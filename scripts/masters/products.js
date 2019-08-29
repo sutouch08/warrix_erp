@@ -85,3 +85,29 @@ function getDelete(code){
 function getSearch(){
   $('#searchForm').submit();
 }
+
+
+function doExport(code){
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'masters/products/export_products/'+code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      load_out();
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
+      }else{
+        swal({
+          title:'Error',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}

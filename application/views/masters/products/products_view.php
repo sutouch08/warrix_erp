@@ -1,12 +1,10 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
 	<div class="col-sm-6">
-    <h3 class="title">
-      <i class="fa fa-users"></i> <?php echo $this->title; ?>
-    </h3>
+    <h3 class="title"><?php echo $this->title; ?></h3>
     </div>
     <div class="col-sm-6">
-    	<p class="pull-right">
+    	<p class="pull-right top-p">
       <?php if($this->pm->can_add) : ?>
         <button type="button" class="btn btn-sm btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
       <?php endif; ?>
@@ -133,7 +131,7 @@
 						<td class="middle text-center"><?php echo is_active($rs->sell); ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->active); ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->api); ?></td>
-						<td class="text-right">
+						<td class="middle text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">
 									<i class="fa fa-pencil"></i>

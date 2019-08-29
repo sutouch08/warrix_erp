@@ -1,12 +1,9 @@
 <?php
 class Receive_transform_model extends CI_Model
 {
-  public $ms;
-
   public function __construct()
   {
     parent::__construct();
-    $this->ms = $this->load->database('ms', TRUE);
   }
 
 
@@ -67,7 +64,7 @@ class Receive_transform_model extends CI_Model
     ->join('products', 'products.code = receive_transform_detail.product_code', 'left')
     ->where('receive_code', $code)
     ->get();
-    
+
     if($rs->num_rows() > 0)
     {
       return $rs->result();

@@ -3,11 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Prepare_model extends CI_Model
 {
-  public $ms;
   public function __construct()
   {
     parent::__construct();
-    $this->ms = $this->load->database('ms', TRUE);
   }
 
 

@@ -3,7 +3,7 @@
  * Set default time zone
 */
 date_default_timezone_set('Asia/Bangkok');
- 
+
 /**
  * CodeIgniter
  *

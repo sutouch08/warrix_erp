@@ -1,11 +1,9 @@
 <?php
 class Zone_model extends CI_Model
 {
-  public $ms;
   public function __construct()
   {
     parent::__construct();
-    $this->ms = $this->load->database('ms', TRUE);
   }
 
   public function get($code)

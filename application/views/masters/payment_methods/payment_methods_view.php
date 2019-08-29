@@ -84,7 +84,7 @@
 								<i class="fa fa-times"></i>
 							<?php endif; ?>
 						</td>
-            <td class="middle"><?php echo thai_date($rs->date_upd, '/', TRUE); ?></td>
+            <td class="middle"><?php echo thai_date($rs->date_upd,TRUE, '/'); ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">

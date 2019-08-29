@@ -75,7 +75,7 @@
         <?php if(!empty($orders)) : ?>
           <?php $no = $this->uri->segment(4) + 1; ?>
           <?php foreach($orders as $rs) : ?>
-            <tr id="row-<?php echo $rs->code; ?>" class="font-size-10" style="<?php echo state_color($rs->state, $rs->status, $rs->is_expired); ?>">
+            <tr id="row-<?php echo $rs->code; ?>" class="font-size-12" style="<?php echo state_color($rs->state, $rs->status, $rs->is_expired); ?>">
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $no; ?></td>
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo thai_date($rs->date_add); ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->code; ?></td>

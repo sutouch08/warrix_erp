@@ -123,6 +123,19 @@ function render(source, data, output){
 	output.html(html);
 }
 
+function render_prepend(source, data, output){
+	var template = Handlebars.compile(source);
+	var html = template(data);
+	output.prepend(html);
+}
+
+
+function render_append(source, data, output){
+	var template = Handlebars.compile(source);
+	var html = template(data);
+	output.append(html);
+}
+
 
 
 

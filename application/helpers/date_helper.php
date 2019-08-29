@@ -39,6 +39,19 @@ function thai_short_text_date($date, $time = FALSE)
 
 
 
+function now()
+{
+  return date('Y-m-d H:i:s');
+}
+
+
+
+function today()
+{
+  return date('Y-m-d');
+}
+
+
 function db_date($date, $time = FALSE, $sp = '-')
 {
 

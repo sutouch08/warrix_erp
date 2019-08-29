@@ -302,7 +302,7 @@ class Discount_rule_model extends CI_Model
     {
       foreach($rs->result() as $rd)
       {
-        $sc[$rd->calss_code] = $rd->class_code;
+        $sc[$rd->class_code] = $rd->class_code;
       }
     }
 

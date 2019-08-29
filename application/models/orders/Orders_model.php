@@ -448,6 +448,17 @@ class Orders_model extends CI_Model
   }
 
 
+  public function get_bill_total_amount($code)
+  {
+    $rs = $this->db
+    ->select_sum('total_amount', 'amount')
+    ->where('reference', $code)
+    ->get('order_sold');
+
+    return $rs->row()->amount;
+  }
+
+
 
   public function get_order_total_qty($code)
   {

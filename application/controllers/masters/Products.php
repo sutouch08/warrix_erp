@@ -35,6 +35,7 @@ class Products extends PS_Controller
     $this->load->helper('product_category');
     $this->load->helper('product_sub_group');
     $this->load->helper('product_images');
+    $this->load->helper('unit');
 
   }
 
@@ -99,7 +100,6 @@ class Products extends PS_Controller
 
   public function add_new()
   {
-    $this->title = 'เพิ่ม สินค้า';
     $this->load->view('masters/products/products_add_view');
   }
 
@@ -119,6 +119,7 @@ class Products extends PS_Controller
       $year     = $this->input->post('year');
       $cost     = $this->input->post('cost');
       $price    = $this->input->post('price');
+      $unit     = $this->input->post('unit_code');
       $count_stock = $this->input->post('count_stock') === NULL ? 0 :1;
       $can_sell = $this->input->post('can_sell') === NULL ? 0 : 1;
       $is_api   = $this->input->post('is_api') === NULL ? 0 : 1;
@@ -137,6 +138,7 @@ class Products extends PS_Controller
         'year' => $year,
         'cost' => $cost,
         'price' => $price,
+        'unit_code' => $unit,
         'count_stock' => $count_stock,
         'can_sell' => $can_sell,
         'active' => $active,
@@ -179,7 +181,6 @@ class Products extends PS_Controller
 
   public function edit($code, $tab = 'styleTab')
   {
-    $this->title = 'แก้ไข สินค้า';
     $style = $this->product_style_model->get($code);
     if(!empty($style))
     {
@@ -247,6 +248,7 @@ class Products extends PS_Controller
       $name = $this->input->post('name'); //--- style name
       $cost = $this->input->post('cost'); //--- style cost
       $price = $this->input->post('price'); //--- style price
+      $unit = $this->input->post('unit_code');
       $brand = $this->input->post('brand_code');
       $group = $this->input->post('group_code');
       $sub_group = $this->input->post('sub_group_code');
@@ -273,6 +275,7 @@ class Products extends PS_Controller
         'year' => $year,
         'cost' => ($cost === NULL ? 0.00 : $cost),
         'price' => ($price === NULL ? 0.00 : $price),
+        'unit_code' => $unit,
         'count_stock' => ($count === NULL ? 0 : 1),
         'can_sell' => ($sell === NULL ? 0 : 1),
         'active' => ($active === NULL ? 0 : 1),
@@ -305,6 +308,7 @@ class Products extends PS_Controller
             'year' => $year,
             'cost' => ($cost === NULL ? 0.00 : $cost),
             'price' => ($price === NULL ? 0.00 : $price),
+            'unit_code' => $unit,
             'count_stock' => ($count === NULL ? 0 : 1),
             'can_sell' => ($sell === NULL ? 0 : 1),
             'active' => ($active === NULL ? 0 : 1),
@@ -453,7 +457,6 @@ class Products extends PS_Controller
 
   public function item_gen($code)
   {
-    $this->title = 'สร้างรายการสินค้า';
     $style = $this->product_style_model->get($code);
     $data = array(
       'style' => $style,
@@ -668,12 +671,18 @@ class Products extends PS_Controller
 
     if($item != '')
     {
-      $rs = $this->products_model->delete_item($item);
-
-      if($rs !== TRUE)
+      if(! $this->products_model->has_transection($item))
+      {
+        if(! $this->products_model->delete_item($item))
+        {
+          $sc = FALSE;
+          $message = "ลบรายการไม่สำเร็จ";
+        }
+      }
+      else
       {
         $sc = FALSE;
-        $message = $this->db->_error_message();
+        $message = "ไม่สามารถลบ {$item} ได้ เนื่องจากสินค้ามี Transcetion เกิดขึ้นแล้ว";
       }
     }
     else
@@ -860,8 +869,6 @@ class Products extends PS_Controller
     {
       echo 'ไม่พบรายการที่ไม่มีบาร์โค้ด';
     }
-
-
   }
 
 
@@ -901,17 +908,86 @@ class Products extends PS_Controller
   }
 
 
+
+  public function do_export($code)
+  {
+    $item = $this->products_model->get($code);
+    $ds = array(
+      'ItemCode' => $item->code, //--- รหัสสินค้า
+      'ItemName' => $item->name, //--- ชื่อสินค้า
+      'FrgnName' => NULL,   //--- ชื่อสินค้าภาษาต่างประเทศ
+      'ItmsGrpCod' => getConfig('ITEM_GROUP_CODE'),  //--- กลุ่มสินค้า (ต้องตรงกับ SAP)
+      'VatGourpSa' => getConfig('SALE_VATE_CODE'), //--- รหัสกลุ่มภาษีขาย
+      'CodeBars' => $item->barcode, //--- บาร์โค้ด
+      'VATLiable' => 'Y', //--- มี vat หรือไม่
+      'PrchseItem' => 'Y', //--- สินค้าสำหรับซื้อหรือไม่
+      'SellItem' => 'Y', //--- สินค้าสำหรับขายหรือไม่
+      'InvntItem' => $item->count_stock, //--- นับสต้อกหรือไม่
+      'SalUnitMsr' => $item->unit_code, //--- หน่วยขาย
+      'BuyUnitMsr' => $item->unit_code, //--- หน่วยซื้อ
+      'VatGroupPu' => getConfig('PURCHASE_VAT_CODE'), //---- รหัสกลุ่มภาษีซื้อ (ต้องตรงกับ SAP)
+      'ItemType' => 'I', //--- ประเภทของรายการ F=Fixed Assets, I=Items, L=Labor, T=Travel
+      'InvntryUom' => $item->unit_code, //--- หน่วยในการนับสต็อก
+      'U_MODEL' => $item->style_code,
+      'U_COLOR' => $item->color_code,
+      'U_SIZE' => $item->size_code,
+      'U_GROUP' => $item->group_code,
+      'U_MAJOR' => $item->sub_group_code,
+      'U_CATE' => $item->category_code,
+      'U_SUBTYPE' => $item->kind_code,
+      'U_TYPE' => $item->type_code,
+      'U_BRAND' => $item->brand_code,
+      'U_YEAR' => $item->year,
+      'U_COST' => $item->cost,
+      'U_PRICE' => $item->price
+    );
+
+    if($this->products_model->sap_item_exists($item->code))
+    {
+      return $this->products_model->update_item($item->code, $ds);
+    }
+    else
+    {
+      return $this->products_model->add_item($ds);
+    }
+
+  }
+
+
+  public function export_products($style_code)
+  {
+    $sc = TRUE;
+    $success = 0;
+    $fail = 0;
+
+    $products = $this->products_model->get_style_items($style_code);
+
+    if(!empty($products))
+    {
+      foreach($products as $item)
+      {
+        if($this->do_export($item->code))
+        {
+          $success++;
+        }
+        else
+        {
+          $sc = FALSE;
+          $fail++;
+        }
+      }
+    }
+
+    echo $sc === TRUE ? 'success' : "Success : {$success}, Fail : {$fail}";
+  }
+
+
+
+
   public function clear_filter()
 	{
-		$this->session->unset_userdata('code');
-    $this->session->unset_userdata('name');
-    $this->session->unset_userdata('group');
-    $this->session->unset_userdata('kind');
-    $this->session->unset_userdata('type');
-    $this->session->unset_userdata('class');
-    $this->session->unset_userdata('area');
-
-		echo 'done';
+    $filter = array('code','name','group','sub_group','category','kind','type','brand','year');
+    clear_filter($filter);
 	}
 }
 

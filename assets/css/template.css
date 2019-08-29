@@ -1083,6 +1083,10 @@ td.one-attribute{
 }
 
 
+td {
+  white-space: nowrap;
+}
+
 
 
 .qc-table > tbody > tr:first-child > td{

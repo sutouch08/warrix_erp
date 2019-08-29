@@ -4,7 +4,7 @@
     <h3 class="title"><?php echo $this->title; ?></h3>
   </div>
 	<div class="col-sm-6">
-		<p class="pull-right">
+		<p class="pull-right top-p">
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> Back</button>
 		</p>
 	</div>

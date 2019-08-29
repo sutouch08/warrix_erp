@@ -1,4 +1,81 @@
 <?php
+function select_GroupCode($code = '')
+{
+  $sc = '';
+  $CI =& get_instance();
+  $CI->load->model('masters/customers_model');
+  $options = $CI->customers_model->getGroupCode(); //--- OCRG
+
+  if(!empty($options))
+  {
+    foreach($options as $rs)
+    {
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+    }
+  }
+
+  return $sc;
+}
+
+
+
+function select_GroupNum($code = '')
+{
+  $sc = '';
+  $CI =& get_instance();
+  $CI->load->model('masters/customers_model');
+  $options = $CI->customers_model->getGroupNum(); //--- OCRG
+
+  if(!empty($options))
+  {
+    foreach($options as $rs)
+    {
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+    }
+  }
+
+  return $sc;
+}
+
+
+
+function select_DebPayAcct($code = '')
+{
+  $sc = '';
+  $CI =& get_instance();
+  $CI->load->model('masters/customers_model');
+  $options = $CI->customers_model->getDebPayAcct(); //--- OCRG
+
+  if(!empty($options))
+  {
+    foreach($options as $rs)
+    {
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->code.' => '.$rs->name.'</option>';
+    }
+  }
+
+  return $sc;
+}
+
+
+
+function select_sale($code='')
+{
+  $sc = '';
+  $CI =& get_instance();
+  $CI->load->model('masters/customers_model');
+  $options = $CI->customers_model->getSlp();
+
+  if(!empty($options))
+  {
+    foreach($options as $rs)
+    {
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+    }
+  }
+
+  return $sc;
+}
 
 function select_customer_group($code = '')
 {

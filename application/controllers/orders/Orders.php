@@ -221,7 +221,7 @@ class Orders extends PS_Controller
               }
               else
               {
-                if($item->count_stock == 1)
+                if($item->count_stock == 1 && $item->is_api == 1)
                 {
                   $this->update_api_stock($item->code);
                 }
@@ -267,7 +267,7 @@ class Orders extends PS_Controller
               }
               else
               {
-                if($item->count_stock == 1)
+                if($item->count_stock == 1 && $item->is_api == 1)
                 {
                   $this->update_api_stock($item->code);
                 }
@@ -298,12 +298,13 @@ class Orders extends PS_Controller
   public function remove_detail($id)
   {
     $detail = $this->orders_model->get_detail($id);
+    $item = $this->products_model->get($detail->product_code);
     $rs = $this->orders_model->remove_detail($id);
     if($rs)
     {
-      if($detail->is_count == 1)
+      if($rs->is_count == 1 && $item->is_api == 1)
       {
-        $this->update_api_stock($detail->product_code);
+        $this->update_api_stock($item->code);
       }
 
     }
@@ -1351,7 +1352,8 @@ class Orders extends PS_Controller
           {
             foreach($details as $rs)
             {
-              if($rs->is_count == 1 && $rs->is_complete == 1)
+              $item = $this->products_model->get($rs->product_code);
+              if($rs->is_count == 1 && $item->is_api == 1 && $rs->is_complete == 1)
               {
                 $this->update_api_stock($rs->product_code);
               }

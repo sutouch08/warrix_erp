@@ -30,6 +30,54 @@
     <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
   </div>
 
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">เลขประจำตัว/Tax ID</label>
+    <div class="col-xs-12 col-sm-3">
+			<input type="text" name="Tax_id" id="Tax_id" class="width-100" value="<?php echo $Tax_Id; ?>" />
+    </div>
+  </div>
+
+	<div class="form-group">
+ 	 <label class="col-sm-3 control-label no-padding-right">รหัสบัญชีลูกหนี้</label>
+ 	 <div class="col-xs-12 col-sm-3">
+ 		 <select name="DebPayAcct" id="DebPayAcct" class="form-control" required>
+			 <option value="">เลือกรายการ</option>
+ 			 <?php echo select_DebPayAcct($DebPayAcct); ?>
+ 		 </select>
+ 	 </div>
+  </div>
+
+
+
+	<div class="form-group">
+ 	 <label class="col-sm-3 control-label no-padding-right">กลุ่มลูกหนี้</label>
+ 	 <div class="col-xs-12 col-sm-3">
+ 		 <select name="GroupCode" id="GroupCode" class="form-control" required>
+ 			 <?php echo select_GroupCode($GroupCode); ?>
+ 		 </select>
+ 	 </div>
+  </div>
+
+	<div class="form-group">
+ 	 <label class="col-sm-3 control-label no-padding-right">รูปแบบ</label>
+ 	 <div class="col-xs-12 col-sm-3">
+ 		 <select name="cmpPrivate" id="cmpPrivate" class="form-control">
+ 			<option value="C" <?php echo is_selected('C', $cmpPrivate); ?>>บริษัท/ร้าน</option>
+			<option value="G" <?php echo is_selected('G', $cmpPrivate); ?>>หน่วนงานรัฐ</option>
+			<option value="I" <?php echo is_selected('I', $cmpPrivate); ?>>บุคคลทั่วไป</option>
+ 		 </select>
+ 	 </div>
+  </div>
+
+	<div class="form-group">
+ 	 <label class="col-sm-3 control-label no-padding-right">รหัสกลุ่มเครดิต</label>
+ 	 <div class="col-xs-12 col-sm-3">
+ 		 <select name="GroupNum" id="GroupNum" class="form-control">
+ 			 <?php echo select_GroupNum($GroupNum); ?>
+ 		 </select>
+ 	 </div>
+  </div>
+
 
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">กลุ่มลูกค้า</label>
@@ -90,9 +138,25 @@
     </div>
     <div class="help-block col-xs-12 col-sm-reset inline red" id="area-error"></div>
   </div>
-	<div class="divider-hidden">
 
+	<div class="form-group">
+	 <label class="col-sm-3 control-label no-padding-right">พนักงานขาย</label>
+	 <div class="col-xs-12 col-sm-3">
+		 <select name="sale" id="sale" class="form-control">
+			 <?php echo select_sale($sale); ?>
+		 </select>
+	 </div>
 	</div>
+
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">วงเงินเครดิต</label>
+    <div class="col-xs-12 col-sm-3">
+			<input type="number" name="CreditLine" id="CreditLine" class="width-100" value="<?php echo $CreditLine; ?>" />
+    </div>
+  </div>
+
+
+	<div class="divider-hidden"></div>
   <div class="form-group">
     <label class="col-sm-3 control-label no-padding-right"></label>
     <div class="col-xs-12 col-sm-3">

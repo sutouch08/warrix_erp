@@ -1,22 +1,24 @@
 <?php
-class Warehouse_model extends CI_Model
+class Slp_model extends CI_Model
 {
   public function __construct()
   {
     parent::__construct();
   }
 
+
   public function get_name($code)
   {
-    $rs = $this->ms->select('WhsName')->where('WhsCode', $code)->get('OWHS');
+    $rs = $this->ms->select('SlpName')->where('SlpCode', $code)->get('OSLP');
     if($rs->num_rows() === 1)
     {
-      return $rs->row()->WhsName;
+      return $rs->row()->SlpName;
     }
 
     return NULL;
   }
 
-} //--- end class
+
+} //--- End class
 
  ?>

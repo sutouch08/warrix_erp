@@ -68,3 +68,31 @@ function syncData(){
     }
   });
 }
+
+
+function doExport(){
+  var code = $('#customers_code').val();
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'masters/customers/export_customer/'+code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      load_out();
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          text:'ส่งข้อมูลไป SAP เรียบร้อยแล้ว',
+          type:'success',
+          timer:1000
+        });
+      }else{
+        swal({
+          title:'Error!',
+          text: rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}

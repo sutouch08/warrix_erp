@@ -1,12 +1,49 @@
 <?php
 class Customers_model extends CI_Model
 {
-  public $ms;
   public function __construct()
   {
     parent::__construct();
-    $this->ms = $this->load->database('ms', TRUE);
   }
+
+
+
+  public function add_sap_customer(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('OCRD', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_customer($code, $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('CardCode', $code)->update('OCRD', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function sap_customer_exists($code)
+  {
+    $rs = $this->mc->where('CardCode', $code)->get('OCRD');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+
 
   public function get_credit($code)
   {
@@ -224,11 +261,20 @@ class Customers_model extends CI_Model
   }
 
 
-  public function get_updte_data()
+  public function get_update_data()
   {
-    $this->ms->select("CardCode, CardName, CardType, SlpCode");
-    //$this->ms->where("UpdateDate >=", from_date());
-    $rs = $this->ms->get('OCRD');
+    $rs = $this->ms
+    ->select("CardCode AS code")
+    ->select("CardName AS name")
+    ->select("LicTradNum AS Tax_Id")
+    ->select("DebPayAcct, CardType")
+    ->select("GroupCode, CmpPrivate")
+    ->select("GroupNum, SlpCode AS sale_code")
+    ->select("CreditLine")
+    ->where('CardType', 'C')
+    ->where("UpdateDate >=", date('Y-m-d 00:00:00'))
+    ->get('OCRD');
+
     return $rs->result();
   }
 
@@ -248,6 +294,74 @@ class Customers_model extends CI_Model
       return array();
     }
 
+  }
+
+
+
+  public function getGroupCode()
+  {
+    $rs = $this->ms
+    ->select('GroupCode AS code, GroupName AS name')
+    ->where('GroupType', 'C')
+    ->get('OCRG');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+
+  public function getGroupNum()
+  {
+    $rs = $this->ms
+    ->select('GroupNum AS code, PymntGroup AS name')
+    ->order_by('GroupNum', 'ASC')
+    ->get('OCTG');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function getDebPayAcct()
+  {
+    $rs = $this->ms
+    ->select('AcctCode AS code, AcctName AS name')
+    ->order_by('AcctCode', 'ASC')
+    ->get('OACT');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function getSlp()
+  {
+    $rs = $this->ms
+    ->select('SlpCode AS code, SlpName AS name')
+    ->where('Active', 'Y')
+    ->get('OSLP');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 }

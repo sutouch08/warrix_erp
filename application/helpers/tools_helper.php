@@ -119,6 +119,50 @@ function getConfig($code)
 
 
 
+function get_vat_amount($amount)
+{
+	$vat = getConfig('SALE_VAT_RATE');
+	if($vat != 0)
+	{
+		$re_vat = $vat * 0.01;
+		return $amount * $re_vat;
+	}
+
+	return $amount;
+}
+
+
+
+function remove_vat($amount)
+{
+	$vat = getConfig('SALE_VAT_RATE'); //-- 7
+	if( $vat != 0 )
+	{
+		$re_vat	= ($vat + 100) / 100;
+		return $amount/$re_vat;
+	}
+
+	return $amount;
+}
+
+
+
+
+
+
+function add_vat($amount)
+{
+	$vat = getConfig('SALE_VAT_RATE');
+	if( $vat != 0 )
+	{
+		$re_vat = $vat * 0.01;
+		return ($amount * $re_vat) + $amount;
+	}
+
+	return $amount;
+}
+
+
 
 function set_error($message)
 {

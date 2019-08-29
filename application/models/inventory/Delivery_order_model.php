@@ -6,6 +6,22 @@ class Delivery_order_model extends CI_Model
     parent::__construct();
   }
 
+
+
+  public function get_sold_details($reference)
+  {
+    $rs = $this->db->where('reference', $reference)->get('order_sold');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+
   public function count_rows(array $ds = array(), $state = 7)
   {
     $this->db->select('state')
@@ -202,6 +218,95 @@ class Delivery_order_model extends CI_Model
 
       return FALSE;
     }
+
+
+    public function add_sap_delivery_order(array $ds = array())
+    {
+      return $this->mc->insert('ODLN', $ds);
+    }
+
+
+    public function update_sap_delivery_order($code, $ds)
+    {
+      return $this->mc->where('U_ECOMNO', $code)->update('ODLN', $ds);
+    }
+
+
+    public function add_delivery_row(array $ds = array())
+    {
+      return $this->mc->insert('DLN1', $ds);
+    }
+
+
+    public function is_doc_exists($code)
+    {
+      $rs = $this->mc->select('U_ECOMNO')->where('U_ECOMNO', $code)->get('ODLN');
+      if($rs->num_rows() > 0)
+      {
+        return TRUE;
+      }
+
+      return FALSE;
+    }
+
+
+
+    public function get_sap_delivery_order($code)
+    {
+      $rs = $this->mc
+      ->select('U_ECOMNO, CANCELED, DocStatus')
+      ->where('U_ECOMNO', $code)
+      ->get('ODLN');
+      if($rs->num_rows() === 1)
+      {
+        return $rs->row();
+      }
+
+      return FALSE;
+    }
+
+
+    public function sap_exists_details($code)
+    {
+      $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('DLN1');
+      if($rs->num_rows() > 0)
+      {
+        return TRUE;
+      }
+
+      return FALSE;
+    }
+
+
+
+    public function drop_sap_exists_details($code)
+    {
+      return $this->mc->where('U_ECOMNO', $code)->delete('DLN1');
+    }
+
+
+
+
+    public function update_delivery_row($DocEntry, $line, $ds = array())
+    {
+
+      return $this->mc->where('DocEntry', $DocEntry)->where('LineNum', $line)->update('DLN1', $ds);
+    }
+
+
+
+    public function getDocEntry($code)
+    {
+      $rs = $this->mc->select('DocEntry')->where('U_ECOMNO', $code)->get('ODLN');
+      if($rs->num_rows() === 1)
+      {
+        return $rs->row()->DocEntry;
+      }
+
+      return FALSE;
+    }
+
+
 }
 
  ?>

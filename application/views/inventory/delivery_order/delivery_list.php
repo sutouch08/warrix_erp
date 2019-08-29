@@ -7,7 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-			
+
 			</p>
 		</div>
 </div><!-- End Row -->
@@ -107,11 +107,11 @@
             <?php echo number($rs->total_amount,2); ?>
           </td>
 
-          <td class="pointer text-center" onclick="goDetail(<?php echo $rs->code; ?>)">
+          <td class="pointer text-center" onclick="goDetail('<?php echo $rs->code; ?>')">
             <?php echo role_name($rs->role); ?>
           </td>
 
-          <td class="pointer text-center hide-text" onclick="goDetail(<?php echo $rs->code; ?>)">
+          <td class="pointer text-center hide-text" onclick="goDetail('<?php echo $rs->code; ?>')">
             <?php echo $rs->user; ?>
           </td>
 

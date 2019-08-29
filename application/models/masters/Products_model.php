@@ -1,12 +1,12 @@
 <?php
 class Products_model extends CI_Model
 {
-  public $ms;
   public function __construct()
   {
     parent::__construct();
-    $this->ms = $this->load->database('ms', TRUE);
   }
+
+
 
 
   public function add(array $ds = array())
@@ -18,6 +18,46 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
+
+
+
+  //--- Export item to SAP
+  public function add_item(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('OITM', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  //--- Export item tot SAP
+  public function update_item($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('ItemCode', $code)->update('OITM', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function sap_item_exists($code)
+  {
+    $rs = $this->mc->select('ItemCode')->where('ItemCode', $code)->get('OITM');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 
 
 
@@ -89,13 +129,7 @@ class Products_model extends CI_Model
 
   public function delete_item($code)
   {
-    $rs = $this->db->where('code', $code)->delete('products');
-    if($rs)
-    {
-      return TRUE;
-    }
-
-    return $this->db->_error_message();
+    return $this->db->where('code', $code)->delete('products');
   }
 
 
@@ -415,6 +449,40 @@ class Products_model extends CI_Model
     return FALSE;
   }
 
+
+  public function get_unit_code($code)
+  {
+    $rs = $this->db
+    ->select('unit_code')
+    ->where('code', $code)
+    ->get('products');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->unit_code;
+    }
+
+    return NULL;
+  }
+
+
+
+  public function has_transection($code)
+  {
+    $od = $this->db->select('product_code')->where('product_code', $code)->count_all_results('order_details');
+    $oc = $this->db->select('product_code')->where('product_code', $code)->count_all_results('order_transform_detail');
+    $rc = $this->db->select('product_code')->where('product_code', $code)->count_all_results('receive_product_detail');
+    $rt = $this->db->select('product_code')->where('product_code', $code)->count_all_results('receive_transform_detail');
+    $tf = $this->db->select('product_code')->where('product_code', $code)->count_all_results('transfer_detail');
+    $cn = $this->db->select('product_code')->where('product_code', $code)->count_all_results('return_order_detail');
+
+    $all = $od+$oc+$rc+$rt+$tf+$cn;
+    if($all > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
 
 }
 ?>

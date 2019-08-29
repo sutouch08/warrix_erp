@@ -1,14 +1,70 @@
 <?php
 class Transfer_model extends CI_Model
 {
-  public $ms;
-  public $mc;
   public function __construct()
   {
     parent::__construct();
-    $this->ms = $this->load->database('ms', TRUE);
-    $this->mc = $this->load->database('mc', TRUE);
   }
+
+
+
+  public function get_sap_transfer_doc($code)
+  {
+    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function add_sap_transfer_doc(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('OWTR', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+
+  public function update_sap_transfer_doc($code, $ds = array())
+  {
+    if(! empty($code) && ! empty($ds))
+    {
+      return $this->mc->where('U_ECOMNO', $code)->update('OWTR', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function add_sap_transfer_detail(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('WTR1', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+
+  public function drop_sap_exists_details($code)
+  {
+    return $this->mc->where('U_ECOMNO', $code)->delete('WTR1');
+  }
+
+
 
 
   public function add(array $ds = array())

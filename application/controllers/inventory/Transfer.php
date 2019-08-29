@@ -823,10 +823,141 @@ class Transfer extends PS_Controller
 
   private function do_export($code)
   {
-    //$doc = $this->transfer_model->get($code);
-    //$details = $this->transfer_model->get_details($code);
+    $doc = $this->transfer_model->get($code);
+    $tr = $this->transfer_model->get_sap_transfer_doc($code);
+    if(!empty($doc))
+    {
+      if(empty($tr) OR $tr->DocStatus == 'O')
+      {
+        if($doc->status == 1)
+        {
+          $currency = getConfig('CURRENCY');
+          $vat_rate = getConfig('SALE_VAT_RATE');
+          $vat_code = getConfig('SALE_VAT_CODE');
 
-    return TRUE;
+          $ds = array(
+            'U_ECOMNO' => $doc->code,
+            'DocType' => 'I',
+            'CANCELED' => 'N',
+            'DocDate' => $doc->date_add,
+            'DocDueDate' => $doc->date_add,
+            'CardCode' => NULL,
+            'CardName' => NULL,
+            'VatPercent' => 0.000000,
+            'VatSum' => 0.000000,
+            'VatSumFc' => 0.000000,
+            'DiscPrcnt' => 0.000000,
+            'DiscSum' => 0.000000,
+            'DiscSumFC' => 0.000000,
+            'DocCur' => $currency,
+            'DocRate' => 1,
+            'DocTotal' => 0.000000,
+            'DocTotalFC' => 0.000000,
+            'Filler' => $doc->from_warehouse,
+            'ToWhsCode' => $doc->to_warehouse,
+            'Comments' => $doc->remark,
+            'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
+            'F_E_CommerceDate' => now(),
+            'U_BOOKCODE' => $doc->bookcode
+          );
+
+          $this->mc->trans_start();
+
+          if(!empty($tr))
+          {
+            $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
+          }
+          else
+          {
+            $sc = $this->transfer_model->add_sap_transfer_doc($ds);
+          }
+
+          if($sc)
+          {
+            if(!empty($tr))
+            {
+              $this->transfer_model->drop_sap_exists_details($code);
+            }
+
+            $details = $this->transfer_model->get_details($code);
+
+            if(!empty($details))
+            {
+              $line = 0;
+              foreach($details as $rs)
+              {
+                $arr = array(
+                  'U_ECOMNO' => $rs->transfer_code,
+                  'LineNum' => $line,
+                  'ItemCode' => $rs->product_code,
+                  'Dscription' => $rs->product_name,
+                  'Quantity' => $rs->qty,
+                  'unitMsr' => NULL,
+                  'PriceBefDi' => 0.000000,
+                  'LineTotal' => 0.000000,
+                  'ShipDate' => $doc->date_add,
+                  'Currency' => $currency,
+                  'Rate' => 1,
+                  'DiscPrcnt' => 0.000000,
+                  'Price' => 0.000000,
+                  'TotalFrgn' => 0.000000,
+                  'FromWhsCod' => $doc->from_warehouse,
+                  'WhsCode' => $doc->to_warehouse,
+                  'FisrtBin' => $rs->from_zone,
+                  'AllocBinC' => $rs->to_zone,
+                  'TaxStatus' => 'Y',
+                  'VatPrcnt' => 0.000000,
+                  'VatGroup' => NULL,
+                  'PriceAfVAT' => 0.000000,
+                  'VatSum' => 0.000000,
+                  'TaxType' => 'Y',
+                  'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
+                  'F_E_CommerceDate' => now()
+                );
+
+                if( ! $this->transfer_model->add_sap_transfer_detail($arr))
+                {
+                  $this->error = 'เพิ่มรายการไม่สำเร็จ';
+                }
+
+                $line++;
+              }
+            }
+            else
+            {
+              $this->error = "ไม่พบรายการสินค้า";
+            }
+          }
+          else
+          {
+            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+          }
+
+          $this->mc->trans_complete();
+
+          if($this->mc->trans_status() === FALSE)
+          {
+            return FALSE;
+          }
+
+          return TRUE;
+        }
+        else
+        {
+          $this->error = "สถานะเอกสารไม่ถูกต้อง";
+        }
+      }
+      else
+      {
+        $this->error = "เอกสารถูกปิดไปแล้ว";
+      }
+    }
+    else
+    {
+      $this->error = "ไม่พบเอกสาร {$code}";
+    }
+
+    return FALSE;
   }
 
 

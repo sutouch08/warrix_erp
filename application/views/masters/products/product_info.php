@@ -33,6 +33,17 @@
 	</div>
 
 	<div class="form-group">
+		<label class="col-sm-3 control-label no-padding-right">หน่วยนับ</label>
+		<div class="col-xs-12 col-sm-3">
+			<select class="form-control input-sm" name="unit_code" id="unit_code" required>
+				<option value="">เลือกรายการ</option>
+				<?php echo select_unit($unit_code); ?>
+			</select>
+		</div>
+		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
+	</div>
+
+	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">ยี่ห้อ</label>
 		<div class="col-xs-12 col-sm-3">
 			<select name="brand_code" id="brand" class="form-control" required>
@@ -164,11 +175,6 @@
 		<div class="help-block col-xs-12 col-sm-reset inline red"></div>
 	</div>
 
-	<select class="hide" name="valid" id="valid" required>
-		<option value="">notvalid</option>
-		<option value="1">valid</option>
-	</select>
-
 	<div class="form-group">
 		<label class="col-sm-3 control-label not-show">บันทึก</label>
 		<div class="col-xs-12 col-sm-3">
@@ -177,6 +183,6 @@
 		<div class="help-block col-xs-12 col-sm-reset inline red"></div>
 	</div>
 
-
+	<input type="hidden" name="valid" id="valid" value=""/>
 </div>
 </form>

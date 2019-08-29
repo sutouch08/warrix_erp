@@ -98,34 +98,7 @@
               <div class="hide" id="colorBox"></div>
               <div class="hide" id="sizeBox"></div>
               <div class="hide" id="imageSet"></div>
-      <!--        <div class="col-xs-12 col-sm-6">
-								<div class="widget-box">
-									<div class="widget-header">
-										<h4 class="widget-title">สี</h4>
-									</div>
-									<div class="widget-body">
-										<div class="widget-main" id="colorBox" style="height: 200px; overflow:scroll;">
-
-										</div>
-									</div>
-								</div>
-							</div>
-
-              <div class="col-xs-12 col-sm-6">
-								<div class="widget-box">
-									<div class="widget-header">
-										<h4 class="widget-title">ไซส์</h4>
-									</div>
-									<div class="widget-body">
-										<div class="widget-main" id="sizeBox" style="height: 200px; overflow:scroll;">
-
-										</div>
-									</div>
-								</div>
-							</div>
-              <hr /> -->
-
-              <div class="row" style="min-height:400px;">
+                    <div class="row" style="min-height:400px;">
                 <?php if(!empty($images)) : ?>
                   <?php foreach($images as $img) : ?>
                     <div class="col-sm-1 col-1-harf">

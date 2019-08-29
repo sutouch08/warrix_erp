@@ -208,6 +208,35 @@ public function get_style_code()
   }
 
 
+  public function get_zone_code_and_name($warehouse = '')
+  {
+    $sc = array();
+    $txt = $_REQUEST['term'];
+    $this->db->select('code, name');
+    if(!empty($warehouse))
+    {
+      $this->db->where('warehouse_code', $warehouse);
+    }
+    $this->db->like('code', $txt);
+    $this->db->or_like('name', $txt);
+    $rs = $this->db->get('zone');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $zone)
+      {
+        $sc[] = $zone->code.' | '.$zone->name;
+      }
+    }
+    else
+    {
+      $sc[] = 'ไม่พบรายการ';
+    }
+
+    echo json_encode($sc);
+  }
+
+
 
   public function get_zone_code()
   {
@@ -232,6 +261,7 @@ public function get_style_code()
         $sc[] = $rs->BinCode;
       }
     }
+
 
     echo json_encode($sc);
   }

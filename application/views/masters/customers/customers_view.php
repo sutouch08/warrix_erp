@@ -87,12 +87,11 @@
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-10 middle">รหัส</th>
-					<th class="width-25 middle">ชื่อ</th>
+					<th class="width-35 middle">ชื่อ</th>
 					<th class="width-10 middle">กลุ่มลูกค้า</th>
 					<th class="width-10 middle">ประเภทลูกค้า</th>
 					<th class="width-10 middle">ชนิดลูกค้า</th>
 					<th class="width-10 middle">เกรด</th>
-					<th class="width-5 middle">CardType</th>
 					<th class="width-10"></th>
 				</tr>
 			</thead>
@@ -108,7 +107,6 @@
 						<td class="middle"><?php echo $rs->kind; ?></td>
 						<td class="middle"><?php echo $rs->type; ?></td>
 						<td class="middle"><?php echo $rs->class; ?></td>
-            <td class="middle text-center"><?php echo $rs->CardType; ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">
