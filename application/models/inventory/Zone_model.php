@@ -1,15 +1,17 @@
 <?php
 class Zone_model extends CI_Model
 {
+  public $ms;
   public function __construct()
   {
     parent::__construct();
+    $this->ms = $this->load->database('ms', TRUE);
   }
 
   public function get($code)
   {
     $rs = $this->ms
-    ->select('OBIN.BinCode AS code, OBIN.BinCode AS name, OWHS.WhsCode AS warehouse_code, OWHS.WhsName AS warehouse_name')
+    ->select('OBIN.BinCode AS code, OBIN.SL1Code AS name, OWHS.WhsCode AS warehouse_code, OWHS.WhsName AS warehouse_name')
     ->from('OBIN')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
     ->where('OBIN.BinCode', $code)
@@ -38,21 +40,10 @@ class Zone_model extends CI_Model
 
 
 
-  // public function get_name($code)
-  // {
-  //   $rs = $this->ms->select('BinCode')->where('BinCode', $code)->get('OBIN');
-  //   if($rs->num_rows() === 1)
-  //   {
-  //     return $rs->row()->BinCode;
-  //   }
-  //
-  //   return NULL;
-  // }
-
-
   public function get_name($code)
   {
-    $rs = $this->db->select('name')->where('code', $code)->get('zone');
+    $rs = $this->ms->select('SL1Code', 'name')->where('BinCode', $code)->get('OBIN');
+    //$rs = $this->db->select('name')->where('code', $code)->get('zone');
     if($rs->num_rows() === 1)
     {
       return $rs->row()->name;
@@ -77,7 +68,13 @@ class Zone_model extends CI_Model
 
   public function get_zone_detail_in_warehouse($code, $warehouse)
   {
-    $rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
+    $rs = $this->ms
+    ->select('BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code')
+    ->where('WhsCode', $warehouse)
+    ->where('BinCode', $code)
+    ->get('OBIN');
+
+    //$rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -87,26 +84,14 @@ class Zone_model extends CI_Model
   }
 
 
-  // public function search($txt)
-  // {
-  //   $rs = $this->ms->like('BinCode', $txt)->get('OBIN');
-  //   if($rs->num_rows() > 0)
-  //   {
-  //     return $rs->result();
-  //   }
-  //
-  //   return FALSE;
-  // }
-
-
-  public function search($txt, $warehouse_code = '')
+  public function search($txt, $warehouse_code)
   {
     if($warehouse_code != '')
     {
-      $rs = $this->db->where('warehouse_code', $warehouse_code);
+      $this->ms->where('WhsCode', $warehouse_code);
     }
 
-    $rs = $this->db->like('code', $txt)->get('zone');
+    $rs = $this->ms->like('BinCode', $txt)->get('OBIN');
     if($rs->num_rows() > 0)
     {
       return $rs->result();
@@ -114,8 +99,6 @@ class Zone_model extends CI_Model
 
     return FALSE;
   }
-
-
 
 } //--- end class
 

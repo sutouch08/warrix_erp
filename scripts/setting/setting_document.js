@@ -17,9 +17,10 @@ function checkDocumentSetting(){
       $(this).addClass('has-error');
       error_message ='กรุณากำหนดรหัสเอกสาร 2 ตัวอักษร';
       prefix_error++;
+      return false;
     }
 
-    if(pre[value] != undefined){
+    if(pre[value] !== undefined){
       $(this).addClass('has-error');
       error_message = error_message + pre[value]+', ';
       prefix_error++;
@@ -76,7 +77,7 @@ function checkPrefix(){
       return false;
     }
 
-    if(pre[value] != undefined){
+    if(pre[value] !== undefined){
       $(this).addClass('has-error');
       swal('รหัสเอกสาร '+ pre[value] +' ซ้ำ');
       return false;
@@ -89,6 +90,7 @@ function checkPrefix(){
 
   return data;
 }
+
 
 
 function checkDigit(){

@@ -10,9 +10,13 @@ function _check_login()
 }
 
 
-function get_permission($menu, $uid, $id_profile)
+function get_permission($menu, $uid = NULL, $id_profile = NULL)
 {
   $CI =& get_instance();
+  
+  $uid = $uid === NULL ? get_cookie('uid') : $uid;
+  $id_profile = $id_profile === NULL ? get_cookie('id_profile') : $id_profile;
+
   $pm = $CI->user_model->get_permission($menu, $uid, $id_profile);
   if(empty($pm))
   {

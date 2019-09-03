@@ -44,7 +44,7 @@
 
 	<div class="col-sm-1 col-1-harf col-xs-12 padding-5 last">
     <label>การชำระเงิน</label>
-		<select class="form-control input-sm" name="payment" required>
+		<select class="form-control input-sm" name="payment" id="payment" onchange="get_credit_payment()" required>
 			<option value="">ทั้งหมด</option>
 			<?php echo select_payment_method(); ?>
 		</select>
@@ -61,7 +61,7 @@
   </div>
   <div class="col-sm-2 padding-5 col-xs-12 last">
     <label class="display-block not-show">Submit</label>
-    <button type="submit" class="btn btn-xs btn-success btn-block" onclick="add()"><i class="fa fa-plus"></i> เพิ่ม</button>
+    <button type="submit" class="btn btn-xs btn-success btn-block"><i class="fa fa-plus"></i> เพิ่ม</button>
   </div>
 </div>
 <hr class="margin-top-15">

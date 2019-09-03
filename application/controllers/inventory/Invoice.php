@@ -79,6 +79,8 @@ class Invoice extends PS_Controller
   }
 
 
+
+
   public function print_order($code, $barcode = '')
   {
     $this->load->model('masters/products_model');

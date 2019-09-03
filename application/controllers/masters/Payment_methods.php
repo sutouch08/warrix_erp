@@ -206,6 +206,15 @@ class Payment_methods extends PS_Controller
 
 
 
+  //--- เช็คว่าการชำระเงินเป็นแบบเครดิตหรือไม่
+  public function is_credit_payment($code)
+  {
+    //---- ตรวจสอบว่าเป็นเครดิตหรือไม่
+    $rs = $this->payment_methods_model->has_term($code);
+    echo $rs === TRUE ? 1 : 0;
+  }
+
+
   public function clear_filter()
 	{
 		$this->session->unset_userdata('code');

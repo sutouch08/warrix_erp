@@ -72,6 +72,11 @@ class Delivery_order extends PS_Controller
         $this->load->model('inventory/transform_model');
       }
 
+      if($order->role == 'L')
+      {
+        $this->load->model('inventory/lend_model');
+      }
+
       if($order->state == 7)
       {
         $this->db->trans_start();
@@ -85,10 +90,12 @@ class Delivery_order extends PS_Controller
           'state' => 8,
           'update_user' => get_cookie('uname')
         );
+
         $this->order_state_model->add_state($arr);
 
         //---- รายการทีรอการเปิดบิล
         $bill = $this->delivery_order_model->get_bill_detail($code);
+
         if(!empty($bill))
         {
           foreach($bill as $rs)
@@ -230,8 +237,33 @@ class Delivery_order extends PS_Controller
                 }
               }
             }
+
+
+            //--- if lend
+            if($order->role == 'L')
+            {
+              //--- ตัวเลขที่มีการเปิดบิล
+              $sold_qty = ($rs->order_qty >= $rs->qc) ? $rs->qc : $rs->order_qty;
+
+              $arr = array(
+                'order_code' => $code,
+                'product_code' => $rs->product_code,
+                'qty' => $sold_qty,
+                'customer_code' => $order->customer_code
+              );
+
+              if($this->lend_model->add_detail($arr) === FALSE)
+              {
+                $sc = FALSE;
+                $message = 'เพิ่มรายการค้างรับไม่สำเร็จ';
+              }
+            }
+
           } //--- end foreach $bill
         } //--- end if empty($bill)
+
+
+
 
         //--- เคลียร์ยอดค้างที่จัดเกินมาไปที่ cancle หรือ เคลียร์ยอดที่เป็น 0
         $buffer = $this->buffer_model->get_all_details($code);
@@ -531,8 +563,8 @@ class Delivery_order extends PS_Controller
             'CardCode' => $cust->code,
             'CardName' => $cust->name,
             'VatPercent' => $vat_rate,
-            'VatSum' => get_vat_amount($total_amount),
-            'VatSumFc' => get_vat_amount($total_amount),
+            'VatSum' => round(get_vat_amount($total_amount), 6),
+            'VatSumFc' => round(get_vat_amount($total_amount), 6),
             'DiscPrcnt' => 0.000000,
             'DiscSum' => 0.000000,
             'DiscSumFC' => 0.000000,
@@ -580,15 +612,15 @@ class Delivery_order extends PS_Controller
                   'Dscription' => $rs->product_name,
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
-                  'PriceBefDi' => remove_vat($rs->price),
-                  'LineTotal' => remove_vat($rs->total_amount),
+                  'PriceBefDi' => round(remove_vat($rs->price),6),
+                  'LineTotal' => round(remove_vat($rs->total_amount),6),
                   'ShipDate' => $doc->date_add,
                   'Currency' => $currency,
                   'Rate' => 1,
                   //--- คำนวณส่วนลดจากยอดเงินกลับมาเป็น % (เพราะบางทีมีส่วนลดหลายชั้น)
                   'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
-                  'Price' => remove_vat($rs->price),
-                  'TotalFrgn' => remove_vat($rs->total_amount),
+                  'Price' => round(remove_vat($rs->price),6),
+                  'TotalFrgn' => round(remove_vat($rs->total_amount),6),
                   'FromWhsCod' => $rs->warehouse_code,
                   'WhsCode' => $doc->warehouse_code,
                   'FisrtBin' => $rs->zone_code,
@@ -597,7 +629,7 @@ class Delivery_order extends PS_Controller
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,
                   'PriceAfVAT' => $rs->price,
-                  'VatSum' => get_vat_amount($rs->total_amount),
+                  'VatSum' => round(get_vat_amount($rs->total_amount),6),
                   'TaxType' => 'Y',
                   'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
                   'F_E_CommerceDate' => now()
@@ -648,6 +680,156 @@ class Delivery_order extends PS_Controller
     return FALSE;
   }
 //--- end export transfer
+
+
+
+private function export_transform($code)
+{
+  $this->load->model('inventory/transfer_model');
+  $this->load->model('masters/customers_model');
+  $this->load->model('masters/products_model');
+  $this->load->helper('discount');
+
+  $doc = $this->orders_model->get($code);
+  $tr = $this->transfer_model->get_sap_transfer_doc($code);
+  $cust = $this->customers_model->get($doc->customer_code);
+
+  if(!empty($doc))
+  {
+    if(empty($tr) OR $tr->DocStatus == 'O')
+    {
+      if($doc->status == 1)
+      {
+        $currency = getConfig('CURRENCY');
+        $vat_rate = getConfig('SALE_VAT_RATE');
+        $vat_code = getConfig('SALE_VAT_CODE');
+        $total_amount = $this->orders_model->get_bill_total_amount($code);
+        $ds = array(
+          'U_ECOMNO' => $doc->code,
+          'DocType' => 'I',
+          'CANCELED' => 'N',
+          'DocDate' => $doc->date_add,
+          'DocDueDate' => $doc->date_add,
+          'CardCode' => $cust->code,
+          'CardName' => $cust->name,
+          'VatPercent' => $vat_rate,
+          'VatSum' => get_vat_amount($total_amount),
+          'VatSumFc' => get_vat_amount($total_amount),
+          'DiscPrcnt' => 0.000000,
+          'DiscSum' => 0.000000,
+          'DiscSumFC' => 0.000000,
+          'DocCur' => $currency,
+          'DocRate' => 1,
+          'DocTotal' => remove_vat($total_amount),
+          'DocTotalFC' => remove_vat($total_amount),
+          'Filler' => $doc->warehouse_code,
+          'ToWhsCode' => $doc->warehouse_code,
+          'Comments' => $doc->remark,
+          'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
+          'F_E_CommerceDate' => now(),
+          'U_BOOKCODE' => $doc->bookcode
+        );
+
+        $this->mc->trans_start();
+
+        if(!empty($tr))
+        {
+          $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
+        }
+        else
+        {
+          $sc = $this->transfer_model->add_sap_transfer_doc($ds);
+        }
+
+        if($sc)
+        {
+          if(!empty($tr))
+          {
+            $this->transfer_model->drop_sap_exists_details($code);
+          }
+
+          $details = $this->delivery_order_model->get_sold_details($code);
+
+          if(!empty($details))
+          {
+            $line = 0;
+            foreach($details as $rs)
+            {
+              $arr = array(
+                'U_ECOMNO' => $rs->reference,
+                'LineNum' => $line,
+                'ItemCode' => $rs->product_code,
+                'Dscription' => $rs->product_name,
+                'Quantity' => $rs->qty,
+                'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
+                'PriceBefDi' => remove_vat($rs->price),
+                'LineTotal' => remove_vat($rs->total_amount),
+                'ShipDate' => $doc->date_add,
+                'Currency' => $currency,
+                'Rate' => 1,
+                //--- คำนวณส่วนลดจากยอดเงินกลับมาเป็น % (เพราะบางทีมีส่วนลดหลายชั้น)
+                'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
+                'Price' => remove_vat($rs->price),
+                'TotalFrgn' => remove_vat($rs->total_amount),
+                'FromWhsCod' => $rs->warehouse_code,
+                'WhsCode' => $doc->warehouse_code,
+                'FisrtBin' => $rs->zone_code,
+                'AllocBinC' => $doc->zone_code,
+                'TaxStatus' => 'Y',
+                'VatPrcnt' => $vat_rate,
+                'VatGroup' => $vat_code,
+                'PriceAfVAT' => $rs->price,
+                'VatSum' => get_vat_amount($rs->total_amount),
+                'TaxType' => 'Y',
+                'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
+                'F_E_CommerceDate' => now()
+              );
+
+              if( ! $this->transfer_model->add_sap_transfer_detail($arr))
+              {
+                $this->error = 'เพิ่มรายการไม่สำเร็จ';
+              }
+
+              $line++;
+            }
+          }
+          else
+          {
+            $this->error = "ไม่พบรายการสินค้า";
+          }
+        }
+        else
+        {
+          $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+        }
+
+        $this->mc->trans_complete();
+
+        if($this->mc->trans_status() === FALSE)
+        {
+          return FALSE;
+        }
+
+        return TRUE;
+      }
+      else
+      {
+        $this->error = "สถานะเอกสารไม่ถูกต้อง";
+      }
+    }
+    else
+    {
+      $this->error = "เอกสารถูกปิดไปแล้ว";
+    }
+  }
+  else
+  {
+    $this->error = "ไม่พบเอกสาร {$code}";
+  }
+
+  return FALSE;
+}
+//--- end export transform
 
 
   //--- manual export by client

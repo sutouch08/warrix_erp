@@ -33,6 +33,7 @@ class Channels extends PS_Controller
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	= pagination_config($this->home.'/index/', $rows, $perpage, $segment);
 		$rs = $this->channels_model->get_data($code, $name, $perpage, $this->uri->segment($segment));
+        
     $ds = array(
       'code' => $code,
       'name' => $name,

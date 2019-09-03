@@ -13,7 +13,6 @@ class Configs extends PS_Controller
     parent::__construct();
     $this->home = base_url().'setting/configs';
     $this->load->model('setting/config_model');
-
   }
 
 
@@ -21,11 +20,52 @@ class Configs extends PS_Controller
   public function index()
   {
     $groups = $this->config_model->get_group();
-    $ds = array(
-      'tabs' => $groups
-    );
+    $ps = get_permission('SCSYSC');
+    $cando = ($ps->can_add + $ps->can_edit + $ps->can_delete) > 0 ? TRUE : FALSE;
+    $ds = array();
+    foreach($groups as $rs)
+    {
+       $group = $this->config_model->get_config_by_group($rs->code);
+       if(!empty($group))
+       {
+         foreach($group as $rd)
+         {
+           $ds[$rd->code] = $this->config_model->get($rd->code);
+         }
+       }
+    }
+
+    $ds['cando'] = $cando;
 
     $this->load->view('setting/configs', $ds);
   }
 
-}
+
+
+  public function update_config()
+  {
+    $sc = TRUE;
+    if($this->input->post())
+    {
+      $this->error = "Cannot update : ";
+      $configs = $this->input->post();
+      foreach($configs as $name => $value)
+      {
+        if(! $this->config_model->update($name, $value))
+        {
+          $sc = FALSE;
+          $this->error .= "{$name}, ";
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Form content not found";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+} //-- end class
+?>

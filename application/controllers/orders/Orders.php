@@ -97,43 +97,59 @@ class Orders extends PS_Controller
   {
     if($this->input->post('customerCode'))
     {
+      $this->load->model('inventory/invoice_model');
+
       $book_code = getConfig('BOOK_CODE_ORDER');
       $date_add = db_date($this->input->post('date'));
       $code = $this->get_new_code($date_add);
       $role = 'S'; //--- S = ขาย
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment'));
       $sale_code = $this->customers_model->get_sale_code($this->input->post('customerCode'));
-      $ds = array(
-        'code' => $code,
-        'role' => $role,
-        'bookcode' => $book_code,
-        'reference' => $this->input->post('reference'),
-        'customer_code' => $this->input->post('customerCode'),
-        'customer_ref' => $this->input->post('customer_ref'),
-        'channels_code' => $this->input->post('channels'),
-        'payment_code' => $this->input->post('payment'),
-        'sale_code' => $sale_code,
-        'is_term' => ($has_term === TRUE ? 1 : 0),
-        'user' => get_cookie('uname'),
-        'remark' => addslashes($this->input->post('remark'))
-      );
 
-      if($this->orders_model->add($ds) === TRUE)
+      //--- check over due
+      $overDue = $this->invoice_model->is_over_due($this->input->post('customerCode'));
+
+      //--- ถ้ามียอดค้างชำระ และ เป็นออเดอร์แบบเครดิต
+      //--- ไม่ให้เพิ่มออเดอร์
+      if($overDue && $has_term)
       {
-        $arr = array(
-          'order_code' => $code,
-          'state' => 1,
-          'update_user' => get_cookie('uname')
-        );
-
-        $this->order_state_model->add_state($arr);
-
-        redirect($this->home.'/edit_detail/'.$code);
+        set_error('มียอดค้างชำระเกินกำหนดไม่อนุญาติให้ขาย');
+        redirect($this->home.'/add_new');
       }
       else
       {
-        set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-        redirect($this->home.'/add_new');
+        $ds = array(
+          'code' => $code,
+          'role' => $role,
+          'bookcode' => $book_code,
+          'reference' => $this->input->post('reference'),
+          'customer_code' => $this->input->post('customerCode'),
+          'customer_ref' => $this->input->post('customer_ref'),
+          'channels_code' => $this->input->post('channels'),
+          'payment_code' => $this->input->post('payment'),
+          'sale_code' => $sale_code,
+          'is_term' => ($has_term === TRUE ? 1 : 0),
+          'user' => get_cookie('uname'),
+          'remark' => addslashes($this->input->post('remark'))
+        );
+
+        if($this->orders_model->add($ds) === TRUE)
+        {
+          $arr = array(
+            'order_code' => $code,
+            'state' => 1,
+            'update_user' => get_cookie('uname')
+          );
+
+          $this->order_state_model->add_state($arr);
+
+          redirect($this->home.'/edit_detail/'.$code);
+        }
+        else
+        {
+          set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+          redirect($this->home.'/add_new');
+        }
       }
     }
     else
@@ -365,61 +381,76 @@ class Orders extends PS_Controller
 
     if($this->input->post('order_code'))
     {
+      $this->load->model('inventory/invoice_model');
+
       $code = $this->input->post('order_code');
       $recal = $this->input->post('recal');
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment_code'));
       $sale_code = $this->customers_model->get_sale_code($this->input->post('customer_code'));
-      $ds = array(
-        'reference' => $this->input->post('reference'),
-        'customer_code' => $this->input->post('customer_code'),
-        'customer_ref' => $this->input->post('customer_ref'),
-        'channels_code' => $this->input->post('channels_code'),
-        'payment_code' => $this->input->post('payment_code'),
-        'sale_code' => $sale_code,
-        'is_term' => $has_term,
-        'date_add' => db_date($this->input->post('date_add')),
-        'remark' => $this->input->post('remark'),
-        'status' => 0
-      );
+      //--- check over due
+      $overDue = $this->invoice_model->is_over_due($this->input->post('customer_code'));
 
-      $rs = $this->orders_model->update($code, $ds);
-
-      if($rs === TRUE)
+      //--- ถ้ามียอดค้างชำระ และ เป็นออเดอร์แบบเครดิต
+      //--- ไม่ให้เพิ่มออเดอร์
+      if($overDue && $has_term)
       {
-        if($recal == 1)
-        {
-          $order = $this->orders_model->get($code);
-
-          //---- Recal discount
-          $details = $this->orders_model->get_order_details($code);
-          if(!empty($details))
-          {
-            foreach($details as $detail)
-            {
-              $qty	= $detail->qty;
-
-              //---- คำนวณ ส่วนลดจากนโยบายส่วนลด
-              $discount 	= $this->discount_model->get_item_recal_discount($detail->order_code, $detail->product_code, $detail->price, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
-
-              $arr = array(
-                "qty"		=> $qty,
-                "discount1"	=> $discount['discLabel1'],
-                "discount2" => $discount['discLabel2'],
-                "discount3" => $discount['discLabel3'],
-                "discount_amount" => $discount['amount'],
-                "total_amount"	=> ($detail->price * $qty) - $discount['amount'],
-                "id_rule"	=> $discount['id_rule']
-              );
-
-              $this->orders_model->update_detail($detail->id, $arr);
-            }
-          }
-        }
+        $sc = FALSE;
+        $message = 'มียอดค้างชำระเกินกำหนดไม่อนุญาติให้แก้ไขการชำระเงิน';
       }
       else
       {
-        $sc = FALSE;
-        $message = 'ปรับปรุงรายการไม่สำเร็จ';
+        $ds = array(
+          'reference' => $this->input->post('reference'),
+          'customer_code' => $this->input->post('customer_code'),
+          'customer_ref' => $this->input->post('customer_ref'),
+          'channels_code' => $this->input->post('channels_code'),
+          'payment_code' => $this->input->post('payment_code'),
+          'sale_code' => $sale_code,
+          'is_term' => $has_term,
+          'date_add' => db_date($this->input->post('date_add')),
+          'remark' => $this->input->post('remark'),
+          'status' => 0
+        );
+
+        $rs = $this->orders_model->update($code, $ds);
+
+        if($rs === TRUE)
+        {
+          if($recal == 1)
+          {
+            $order = $this->orders_model->get($code);
+
+            //---- Recal discount
+            $details = $this->orders_model->get_order_details($code);
+            if(!empty($details))
+            {
+              foreach($details as $detail)
+              {
+                $qty	= $detail->qty;
+
+                //---- คำนวณ ส่วนลดจากนโยบายส่วนลด
+                $discount 	= $this->discount_model->get_item_recal_discount($detail->order_code, $detail->product_code, $detail->price, $order->customer_code, $qty, $order->payment_code, $order->channels_code, $order->date_add);
+
+                $arr = array(
+                  "qty"		=> $qty,
+                  "discount1"	=> $discount['discLabel1'],
+                  "discount2" => $discount['discLabel2'],
+                  "discount3" => $discount['discLabel3'],
+                  "discount_amount" => $discount['amount'],
+                  "total_amount"	=> ($detail->price * $qty) - $discount['amount'],
+                  "id_rule"	=> $discount['id_rule']
+                );
+
+                $this->orders_model->update_detail($detail->id, $arr);
+              }
+            }
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $message = 'ปรับปรุงรายการไม่สำเร็จ';
+        }
       }
     }
     else
@@ -1277,7 +1308,6 @@ class Orders extends PS_Controller
 
     if($this->input->post('order_code'))
     {
-      $this->load->library('api');
       $code = $this->input->post('order_code');
       $state = $this->input->post('state');
       $order = $this->orders_model->get($code);

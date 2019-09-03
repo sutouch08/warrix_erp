@@ -54,6 +54,26 @@ class Invoice_model extends CI_Model
     return $this->db->where('id', $id)->delete('order_sold');
   }
 
+
+
+  public function is_over_due($customer_code)
+  {
+    $control_day = getConfig('OVER_DUE_DATE');
+    $rs = $this->ms
+    ->select('DocEntry', FALSE)
+    ->where('CardCode', $customer_code)
+    ->where('DocTotal >', 'PaidToDate', FALSE)
+    ->where("DATEADD(day,{$control_day}, DocDueDate) < ", "GETDATE()", FALSE)
+    ->get('OINV');
+
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 } //--- end class
 
  ?>

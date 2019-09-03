@@ -7,6 +7,20 @@ class Config_model extends CI_Model
   }
 
 
+
+  public function get($code)
+  {
+    $rs = $this->db->where('code', $code)->get('config');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->value;
+    }
+
+    return FALSE;
+  }
+
+
+
   public function get_group()
   {
     $rs = $this->db
@@ -38,7 +52,7 @@ class Config_model extends CI_Model
 
   public function update($code, $value)
   {
-    return $this->db->set('value', $value)->where('code', $name)->update('config');
+    return $this->db->set('value', $value)->where('code', $code)->update('config');
   }
 
 

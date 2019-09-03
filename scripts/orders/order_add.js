@@ -42,35 +42,13 @@ $("#customer").autocomplete({
 			var name = arr[1];
 			$("#customerCode").val(code);
 			$("#customer").val(name);
+      check_over_due(code);
 		}else{
 			$("#customerCode").val('');
 			$(this).val('');
 		}
 	}
 });
-
-
-
-function add(){
-  var customer_code = $('#customerCode').val();
-  var customer_name = $('#customer').val();
-  var date_add = $('#date').val();
-
-  if(customer_code.length == 0 || customer_name.length == 0){
-    swal('ชื่อลูกค้าไม่ถูกต้อง');
-    console.log('customer error');
-    return false;
-  }
-
-  if(!isDate(date_add))
-  {
-    swal('วันที่ไม่ถูกต้อง');
-    console.log('date error');
-    return false;
-  }
-
-  console.log('success');
-}
 
 
 var customer;
@@ -338,6 +316,7 @@ function changeState(){
     var order_code = $("#order_code").val();
     var state = $("#stateList").val();
     if( state != 0){
+      load_in();
         $.ajax({
             url:BASE_URL + 'orders/orders/order_state_change',
             type:"POST",
@@ -347,6 +326,7 @@ function changeState(){
               "state" : state
             },
             success:function(rs){
+              load_out();
                 var rs = $.trim(rs);
                 if(rs == 'success'){
                     swal({

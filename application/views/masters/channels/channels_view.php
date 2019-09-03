@@ -46,10 +46,10 @@
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-15 middle">รหัส</th>
-					<th class="width-30 middle">ชื่อ</th>
+					<th class="width-20 middle">ชื่อ</th>
+					<th class="width-30 middle">ลูกค้าเริ่มต้น</th>
 					<th class="width-5 middle text-center">Default</th>
-					<th class="width-15 middle">วันที่สร้าง</th>
-          <th class="width-15 middle">ปรับปรุงล่าสุด</th>
+					<th class="width-15 middle">ปรับปรุง</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -61,6 +61,7 @@
 						<td class="middle text-center"><?php echo $no; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
+						<td class="middle"><?php echo $rs->customer_name; ?></td>
 						<td class="middle text-center">
 							<?php if($rs->is_default) : ?>
 								<i class="fa fa-check green"></i>
@@ -68,7 +69,6 @@
 								<i class="fa fa-times"></i>
 							<?php endif; ?>
 						</td>
-						<td class="middle"><?php echo thai_date($rs->date_add, TRUE, '/'); ?></td>
             <td class="middle"><?php echo thai_date($rs->date_upd, TRUE, '/'); ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>

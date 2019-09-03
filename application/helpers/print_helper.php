@@ -81,7 +81,7 @@ function get_header($order)
 				$header		= array(
 								"เลขที่"	=> $order->code,
 								"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
-								"ผู้ยืม"	=> $rs->customer_name,
+								"ผู้ยืม"	=> $order->customer_name,
 								"ผู้ทำรายการ" => $CI->user_model->get_name($order->user)
 							);
 	}

@@ -1,39 +1,10 @@
-CKEDITOR.replace( 'content',{
-	toolbarGroups: [
-		{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
-		{ name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
-		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-		{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-		{ name: 'links' },
-		{ name: 'styles' },
-		{ name: 'colors' },
-		{ name: 'tools' },
-		{ name: 'others' },
-		{ name: 'about' }
-	]
-});
-
-//------------  UPDATE TEXT AREA BEFORE SERIALIZE ---------------//
-function CKupdate()
-{
-    for ( instance in CKEDITOR.instances )
-	{
-        CKEDITOR.instances[instance].updateElement();
-	}
-}
-
-
 
 function updateConfig(formName)
 {
 	load_in();
-	if(formName == 'systemForm'){
-		CKupdate();
-	}
-
 	var formData = $("#"+formName).serialize();
 	$.ajax({
-		url:"controller/settingController.php?updateConfig",
+		url: BASE_URL + "setting/configs/update_config",
 		type:"POST",
     cache:"false",
     data: formData,
@@ -71,23 +42,6 @@ function closeSystem()
 	$("#btn-close").addClass('btn-danger');
 }
 
-
-
-function toggleCreditLimit(option)
-{
-	$('#creditLimit').val(option);
-	if(option == 1){
-		$('#btn-credit-yes').addClass('btn-success');
-		$('#btn-credit-no').removeClass('btn-danger');
-		return;
-	}
-
-	if(option == 0){
-		$('#btn-credit-yes').removeClass('btn-success');
-		$('#btn-credit-no').addClass('btn-danger');
-		return;
-	}
-}
 
 
 function toggleEditDiscount(option)
@@ -190,71 +144,4 @@ function checkCompanySetting(){
 
 
 	updateConfig('companyForm');
-}
-
-
-function checkExportSetting(){
-	error = 0;
-	message = 'จำเป็นต้องระบุ PATH';
-
-	$('.export').each(function(index, el){
-		if($(this).val() == ''){
-			$(this).addClass('has-error');
-			error++;
-		}else{
-			$(this).removeClass('has-error');
-		}
-	});
-
-	if(error > 0){
-		swal('Error', message, 'error');
-		return false;
-	}
-
-	updateConfig('exportForm');
-}
-
-
-function checkImportSetting(){
-	error = 0;
-	message = 'จำเป็นต้องระบุ PATH';
-
-	$('.import').each(function(index, el){
-		if($(this).val() == ''){
-			$(this).addClass('has-error');
-			error++;
-		}else{
-			$(this).removeClass('has-error');
-		}
-	});
-
-	if(error > 0 ){
-		swal('Error', message, 'error');
-		return false;
-	}
-
-	updateConfig('importForm');
-}
-
-
-
-function checkMoveSetting(){
-	error = 0;
-	message = 'จำเป็นต้องระบุ PATH';
-
-	$('.move').each(function(index, el){
-		if($(this).val() == ''){
-			$(this).addClass('has-error');
-			error++;
-		}else{
-			$(this).removeClass('has-error');
-		}
-	});
-
-	if(error > 0 ){
-		swal('Error', message, 'error');
-		return false;
-	}
-
-	updateConfig('moveForm');
 }

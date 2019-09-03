@@ -62,6 +62,7 @@ $("#toDate").datepicker({
 
 function approve(){
   var order_code = $('#order_code').val();
+  load_in();
   $.ajax({
     url:BASE_URL + 'orders/orders/order_state_change',
     type:'POST',
@@ -71,6 +72,7 @@ function approve(){
       'state' : 3
     },
     success:function(rs){
+      load_out();
       if(rs === 'success'){
         swal({
           title:'Success',

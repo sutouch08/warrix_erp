@@ -272,20 +272,22 @@ public function get_style_code()
   {
     $sc = array();
     $txt = $_REQUEST['term'];
-    $this->ms->select('CardCode, CardName')->where('CardType', 'C');
+    $this->ms->select('BpCode, BpName');
+
     if($txt != '*')
     {
-      $this->ms->like('CardCode', $txt)->or_like('CardName', $txt);
+      $this->ms->like('BpCode', $txt)->or_like('BpName', $txt);
     }
+
     $this->ms->limit(20);
 
-    $sponsor = $this->ms->get('OCRD');
+    $sponsor = $this->ms->get('OOAT');
 
     if($sponsor->num_rows() > 0)
     {
       foreach($sponsor->result() as $rs)
       {
-        $sc[] = $rs->CardCode.' | '.$rs->CardName;
+        $sc[] = $rs->BpCode.' | '.$rs->BpName;
       }
     }
     else
