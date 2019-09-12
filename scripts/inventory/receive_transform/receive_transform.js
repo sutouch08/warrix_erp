@@ -1,6 +1,35 @@
 // JavaScript Document
 var HOME = BASE_URL + 'inventory/receive_transform/';
 
+function doExport(){
+	var code = $('#receive_code').val();
+	load_in();
+	$.ajax({
+		url: HOME + 'do_export/'+code,
+		type:'POST',
+		cache:false,
+		success:function(rs){
+			load_out();
+			if(rs === 'success'){
+				swal({
+					title:'Success',
+					text:'ส่งข้อมูลเรียบร้อยแล้ว',
+					type:'success',
+					timer:1000
+				});
+			}else{
+				swal({
+					title:'Error!',
+					text:rs,
+					type:'error'
+				});
+			}
+		}
+	});
+}
+
+
+
 function goDelete(code){
 	swal({
 		title: "คุณแน่ใจ ?",

@@ -208,8 +208,34 @@ class Orders extends PS_Controller
 
               if($order->role == 'C' OR $order->role == 'N')
               {
-                $discount['amount'] = ($item->price * ($order->gp * 0.01)) * $qty;
-                $discount['discLabel1'] = $order->gp.'%';
+                $gp = $order->gp;
+                //------ คำนวณส่วนลดใหม่
+      					$step = explode('+', $gp);
+      					$discAmount = 0;
+      					$discLabel = array(0, 0, 0);
+      					$price = $item->price;
+      					$i = 0;
+      					foreach($step as $discText)
+      					{
+      						if($i < 3) //--- limit ไว้แค่ 3 เสต็ป
+      						{
+      							$disc = explode('%', $discText);
+      							$disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
+      							$amount = count($disc) == 1 ? $disc[0] : $price * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
+      							$discLabel[$i] = count($disc) == 1 ? $disc[0] : $disc[0].'%';
+      							$discAmount += $amount;
+      							$price -= $amount;
+      						}
+                  
+      						$i++;
+      					}
+
+                $total_discount = $qty * $discAmount; //---- ส่วนลดรวม
+      					//$total_amount = ( $qty * $price ) - $total_discount; //--- ยอดรวมสุดท้าย
+                $discount['amount'] = $total_discount;
+                $discount['discLabel1'] = $discLabel[0];
+                $discount['discLabel2'] = $discLabel[1];
+                $discount['discLabel3'] = $discLabel[2];
               }
 
               $arr = array(
@@ -318,7 +344,7 @@ class Orders extends PS_Controller
     $rs = $this->orders_model->remove_detail($id);
     if($rs)
     {
-      if($rs->is_count == 1 && $item->is_api == 1)
+      if($detail->is_count == 1 && $item->is_api == 1)
       {
         $this->update_api_stock($item->code);
       }
@@ -1747,9 +1773,12 @@ class Orders extends PS_Controller
 
   public function update_api_stock($item)
   {
-    $this->load->library('api');
-    $available_stock = $this->get_available_stock($item);
-    $this->api->update_web_stock($item, $available_stock);
+    if(getConfig('SYNC_WEB_STOCK') == 1)
+    {
+      $this->load->library('api');
+      $available_stock = $this->get_available_stock($item);
+      $this->api->update_web_stock($item, $available_stock);
+    }
   }
 
   public function clear_filter()

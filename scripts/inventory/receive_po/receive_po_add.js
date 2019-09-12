@@ -13,50 +13,6 @@ function editHeader(){
 }
 
 
-function updateHeader(){
-	id = $('#id_receive_product').val();
-	date_add = $('#dateAdd').val();
-	remark = $('#remark').val();
-
-	if(id == '' || id == undefined){
-		swal('ไม่พบเลขที่เอกสาร');
-		return false;
-	}
-
-	if(!isDate(date_add)){
-		swal('วันที่ไม่ถูกต้อง');
-		return false;
-	}
-
-	load_in();
-	$.ajax({
-		url:'controller/receiveProductController.php?update',
-		type:'POST',
-		cache:'false',
-		data:{
-			'id_receive_product' : id,
-			'date_add' : date_add,
-			'remark' : remark
-		},
-		success:function(rs){
-			load_out();
-			rs = $.trim(rs);
-			if(rs == 'success'){
-				swal({
-					title:'Success',
-					type:'success',
-					timer: 1000
-				});
-
-				$('.header-box').attr('disabled', 'disabled');
-				$('#btn-update').addClass('hide');
-				$('#btn-edit').removeClass('hide');
-			}else{
-				swal('Error!', rs, 'error');
-			}
-		}
-	});
-}
 
 
 function receiveProduct(pdCode){
@@ -109,6 +65,9 @@ function save(){
 
 	//--- นับจำนวนรายการในใบสั่งซื้อ
 	count = $(".receive-box").length;
+
+	//--- ราคาสินค้าแต่ละตัว
+	price = $('#prices').val()
 
 	//--- ตรวจสอบความถูกต้องของข้อมูล
 	if(code == '' || code == undefined){
@@ -164,6 +123,8 @@ function save(){
 		name = "receive["+pdCode+"]";
 		backlogs = $('#limit_'+pdCode).val();
 		bname = "backlogs["+pdCode+"]";
+		pname = "prices["+pdCode+"]";
+		price = $('#price_'+pdCode).val();
 		if($(this).val() > 0 && !isNaN(qty)){
 			ds.push({
 				'name' : name, 'value' : qty
@@ -172,10 +133,14 @@ function save(){
 			ds.push({
 				'name' : bname, 'value' : backlogs
 			});
+
+			ds.push({
+				'name' : pname, 'value' : price
+			});
 		}
 	});
 
-	if(ds.length < 9){
+	if(ds.length < 10){
 		swal('ไม่พบรายการรับเข้า');
 		return false;
 	}

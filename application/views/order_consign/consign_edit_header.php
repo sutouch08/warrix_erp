@@ -18,7 +18,7 @@
 
 	  <div class="col-sm-1 padding-5 last">
 	    <label>GP[%]</label>
-			<input type="number" class="form-control input-sm text-center edit" name="gp" id="gp" value="<?php echo $order->gp; ?>" disabled />
+			<input type="text" class="form-control input-sm text-center edit" name="gp" id="gp" value="<?php echo $order->gp; ?>" disabled />
 	  </div>
 
 		<div class="col-sm-10 padding-5 first">

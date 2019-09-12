@@ -15,7 +15,7 @@ class Return_order extends PS_Controller
     $this->home = base_url().'inventory/return_order';
     $this->load->model('inventory/return_order_model');
     $this->load->model('inventory/warehouse_model');
-    $this->load->model('inventory/zone_model');
+    $this->load->model('masters/zone_model');
     $this->load->model('masters/customers_model');
     $this->load->model('masters/products_model');
   }
@@ -638,7 +638,7 @@ class Return_order extends PS_Controller
                   'Price' => remove_vat($rs->price),
                   'TotalFrgn' => remove_vat($rs->amount),
                   'WhsCode' => $doc->warehouse_code,
-                  'BinCode' => $doc->zone_code,
+                  //'BinCode' => $doc->zone_code,
                   'TaxStatus' => 'Y',
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,

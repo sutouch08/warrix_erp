@@ -19,7 +19,7 @@ class Consign_so extends PS_Controller
     $this->load->model('stock/stock_model');
     $this->load->model('masters/product_style_model');
     $this->load->model('masters/products_model');
-    $this->load->model('inventory/zone_model');
+    $this->load->model('masters/zone_model');
 
     $this->load->helper('order');
     $this->load->helper('customer');
@@ -94,33 +94,42 @@ class Consign_so extends PS_Controller
       $date_add = db_date($this->input->post('date'));
       $code = $this->get_new_code($date_add);
       $role = 'C'; //--- C = ฝากขายเปิดใบกำกับ
-
-      $ds = array(
-        'code' => $code,
-        'role' => $role,
-        'bookcode' => $book_code,
-        'customer_code' => $this->input->post('customerCode'),
-        'gp' => $this->input->post('gp'),
-        'user' => get_cookie('uname'),
-        'remark' => $this->input->post('remark'),
-        'zone_code' => $this->input->post('zone_code')
-      );
-
-      if($this->orders_model->add($ds) === TRUE)
+      $zone = $this->zone_model->get($this->input->post('zone_code'));
+      if(!empty($zone))
       {
-        $arr = array(
-          'order_code' => $code,
-          'state' => 1,
-          'update_user' => get_cookie('uname')
+        $ds = array(
+          'code' => $code,
+          'role' => $role,
+          'bookcode' => $book_code,
+          'customer_code' => $this->input->post('customerCode'),
+          'gp' => $this->input->post('gp'),
+          'user' => get_cookie('uname'),
+          'remark' => $this->input->post('remark'),
+          'zone_code' => $zone->code,
+          'warehouse_code' => $zone->warehouse_code
         );
 
-        $this->order_state_model->add_state($arr);
+        if($this->orders_model->add($ds) === TRUE)
+        {
+          $arr = array(
+            'order_code' => $code,
+            'state' => 1,
+            'update_user' => get_cookie('uname')
+          );
 
-        redirect($this->home.'/edit_detail/'.$code);
+          $this->order_state_model->add_state($arr);
+
+          redirect($this->home.'/edit_detail/'.$code);
+        }
+        else
+        {
+          set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+          redirect($this->home.'/add_new');
+        }
       }
       else
       {
-        set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        set_error('ไม่พบโซนฝากขาย');
         redirect($this->home.'/add_new');
       }
     }
@@ -197,21 +206,30 @@ class Consign_so extends PS_Controller
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
+      $zone = $this->zone_model->get($this->input->post('zone_code'));
+      if(!empty($code))
+      {
+        $ds = array(
+          'customer_code' => $this->input->post('customer_code'),
+          'gp' => $this->input->post('gp'),
+          'date_add' => db_date($this->input->post('date_add')),
+          'remark' => $this->input->post('remark'),
+          'zone_code' => $zone->code,
+          'warehouse_code' => $zone->warehouse_code
+        );
 
-      $ds = array(
-        'customer_code' => $this->input->post('customer_code'),
-        'gp' => $this->input->post('gp'),
-        'date_add' => db_date($this->input->post('date_add')),
-        'remark' => $this->input->post('remark'),
-        'zone_code' => $this->input->post('zone_code')
-      );
+        $rs = $this->orders_model->update($code, $ds);
 
-      $rs = $this->orders_model->update($code, $ds);
-
-      if($rs !== TRUE)
+        if($rs !== TRUE)
+        {
+          $sc = FALSE;
+          $message = 'ปรับปรุงข้อมูลไม่สำเร็จ';
+        }
+      }
+      else
       {
         $sc = FALSE;
-        $message = 'ปรับปรุงข้อมูลไม่สำเร็จ';
+        $message = '่ไม่พบโซน';
       }
     }
     else

@@ -11,6 +11,7 @@ class PS_Controller extends CI_Controller
   {
     parent::__construct();
 
+
     //--- check is user has logged in ?
     _check_login();
 

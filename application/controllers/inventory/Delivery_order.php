@@ -387,7 +387,7 @@ class Delivery_order extends PS_Controller
     $order->customer_name = $this->customers_model->get_name($order->customer_code);
     if($order->role == 'C' OR $order->role == 'N')
     {
-      $this->load->model('inventory/zone_model');
+      $this->load->model('masters/zone_model');
       $order->zone_name = $this->zone_model->get_name($order->zone_code);
     }
     $details = $this->delivery_order_model->get_billed_detail($code);
@@ -623,8 +623,8 @@ class Delivery_order extends PS_Controller
                   'TotalFrgn' => round(remove_vat($rs->total_amount),6),
                   'FromWhsCod' => $rs->warehouse_code,
                   'WhsCode' => $doc->warehouse_code,
-                  'FisrtBin' => $rs->zone_code,
-                  'AllocBinC' => $doc->zone_code,
+                  'FisrtBin' => $doc->zone_code, //-- โซนปลายทาง
+                  //'AllocBinC' => $doc->zone_code, //--- โซนต้นทาง
                   'TaxStatus' => 'Y',
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,
@@ -723,7 +723,7 @@ private function export_transform($code)
           'DocTotal' => remove_vat($total_amount),
           'DocTotalFC' => remove_vat($total_amount),
           'Filler' => $doc->warehouse_code,
-          'ToWhsCode' => $doc->warehouse_code,
+          'ToWhsCode' => getConfig('TRANSFORM_WAREHOUSE'),
           'Comments' => $doc->remark,
           'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
           'F_E_CommerceDate' => now(),
@@ -773,8 +773,8 @@ private function export_transform($code)
                 'TotalFrgn' => remove_vat($rs->total_amount),
                 'FromWhsCod' => $rs->warehouse_code,
                 'WhsCode' => $doc->warehouse_code,
-                'FisrtBin' => $rs->zone_code,
-                'AllocBinC' => $doc->zone_code,
+                'FisrtBin' => $doc->zone_code, //--- zone ปลายทาง
+                //'AllocBinC' => $rs->zone_code,
                 'TaxStatus' => 'Y',
                 'VatPrcnt' => $vat_rate,
                 'VatGroup' => $vat_code,

@@ -36,7 +36,7 @@
 
   <div class="col-sm-1 padding-5 last">
     <label>GP[%]</label>
-		<input type="number" class="form-control input-sm" name="gp" value="" />
+		<input type="text" class="form-control input-sm" name="gp" value="" />
   </div>
 
   <div class="col-sm-10 padding-5 first">

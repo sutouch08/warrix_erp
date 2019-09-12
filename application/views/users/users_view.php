@@ -68,7 +68,7 @@
 						<td class="middle"><?php echo $rs->uname; ?></td>
 						<td class="middle"><?php echo $rs->dname; ?></td>
 						<td class="middle"><?php echo $rs->pname; ?></td>
-						<td class="middle"><?php echo thai_date($rs->date_add, '/', TRUE); ?></td>
+						<td class="middle"><?php echo thai_date($rs->date_add, TRUE, '/'); ?></td>
 						<td class="middle">
 								<span class="label label-sm label-success arrowed <?php echo $active; ?>" id="label-active-<?php echo $rs->id; ?>">Actived</span>
 								<span class="label labes-sm label-warning arrowed <?php echo $disActive; ?>" id="label-disActive-<?php echo $rs->id; ?>">Suspended</span>

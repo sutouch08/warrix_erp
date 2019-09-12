@@ -18,6 +18,14 @@
       </div>
       <div class="divider-hidden"></div>
 
+			<div class="col-sm-3">
+        <span class="form-control left-label">รหัสคลังยืมสินค้า</span>
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control input-sm input-small" name="LEND_WAREHOUSE" value="<?php echo $LEND_WAREHOUSE; ?>" />
+      </div>
+      <div class="divider-hidden"></div>
+
 
       <div class="col-sm-9 col-sm-offset-3">
         <button type="button" class="btn btn-sm btn-success input-small" onClick="updateConfig('inventoryForm')">

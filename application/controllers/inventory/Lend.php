@@ -20,7 +20,7 @@ class Lend extends PS_Controller
     $this->load->model('stock/stock_model');
     $this->load->model('masters/product_style_model');
     $this->load->model('masters/products_model');
-    $this->load->model('inventory/zone_model');
+    $this->load->model('masters/zone_model');
 
     $this->load->helper('order');
     $this->load->helper('customer');

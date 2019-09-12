@@ -117,16 +117,6 @@ function checkCompanySetting(){
 	vat = parseFloat($('#VAT').val());
 	year = parseInt($('#startYear').val());
 
-	if(isNaN(vat)){
-		swal('อัตราภาษีมูลค่าเพิ่มไม่ถูกต้อง');
-		return false;
-	}
-
-	if(vat < 0 || vat > 99 ){
-		swal('อัตราภาษีมูลค่าเพิ่มไม่ถูกต้อง');
-		return false;
-	}
-
 	if(isNaN(year)){
 		swal('ปีที่เริ่มต้นกิจการไม่ถูกต้อง');
 		return false;

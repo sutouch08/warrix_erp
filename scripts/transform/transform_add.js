@@ -66,6 +66,24 @@ $('#customer').focusout(function(){
 });
 
 
+$("#zone").autocomplete({
+	source: BASE_URL + 'auto_complete/get_transform_zone',
+	autoFocus: true,
+	close: function(){
+		var rs = $.trim($(this).val());
+		var arr = rs.split(' | ');
+		if( arr.length == 2 ){
+			var code = arr[0];
+			var name = arr[1];
+			$("#zoneCode").val(code);
+			$(this).val(name);
+		}else{
+			$("#zoneCode").val('');
+			$(this).val('');
+		}
+	}
+});
+
 
 $("#empName").autocomplete({
 	source: BASE_URL + 'auto_complete/get_user',
@@ -91,6 +109,8 @@ function add(){
   var date_add = $('#date').val();
   var empName = $('#empName').val();
   var role = $('#role').val();
+  var zoneCode = $('#zoneCode').val();
+  var zoneName = $('#zone').val();
 
   if(customer_code.length == 0 || customer_name.length == 0){
     swal('ชื่อผู้รับไม่ถูกต้อง');
@@ -107,6 +127,12 @@ function add(){
   if(empName.length == 0)
   {
     swal('ชื่อผู้เบิกไม่ถูกต้อง');
+    return false;
+  }
+
+  if(zoneCode.length == 0 || zoneName.length == 0 )
+  {
+    swal('โซนแปรสภาพไม่ถูกต้อง');
     return false;
   }
 

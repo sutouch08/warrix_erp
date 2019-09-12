@@ -7,6 +7,45 @@ class Receive_transform_model extends CI_Model
   }
 
 
+  public function get_sap_receive_transform($code)
+  {
+    $rs = $this->mc
+    ->select('CANCELED, DocStatus')
+    ->where('U_ECOMNO', $code)
+    ->get('OIGN');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_receive_transform(array $ds = array())
+  {
+    return $this->mc->insert('OIGN', $ds);
+  }
+
+
+  public function update_sap_receive_transform($code, $ds)
+  {
+    return $this->mc->where('U_ECOMNO', $code)->update('OIGN', $ds);
+  }
+
+
+  public function add_sap_receive_transform_detail(array $ds = array())
+  {
+    return $this->mc->insert('IGN1', $ds);
+  }
+
+
+  public function drop_sap_exists_details($code)
+  {
+    return $this->mc->where('U_ECOMNO', $code)->delete('IGN1');
+  }
+
+
 
   public function add(array $ds = array())
   {
@@ -93,7 +132,7 @@ class Receive_transform_model extends CI_Model
   public function get_transform_details($order_code)
   {
     $rs = $this->db
-    ->select('order_transform_detail.*, products.name, products.barcode')
+    ->select('order_transform_detail.*, products.name, products.price, products.barcode')
     ->select_sum('order_transform_detail.sold_qty', 'sold_qty')
     ->select_sum('order_transform_detail.receive_qty', 'receive_qty')
     ->from('order_transform_detail')
@@ -121,6 +160,14 @@ class Receive_transform_model extends CI_Model
     ->get('receive_transform_detail');
 
     return intval($rs->row()->qty);
+  }
+
+
+
+  public function get_sum_amount($code)
+  {
+    $rs = $this->db->select_sum('amount')->where('receive_code', $code)->get('receive_transform_detail');
+    return $rs->row()->amount === NULL ? 0.00 : $rs->row()->amount;
   }
 
 

@@ -66,7 +66,7 @@ class Invoice extends PS_Controller
 
     if($order->role == 'C' OR $order->role == 'N')
     {
-      $this->load->model('inventory/zone_model');
+      $this->load->model('masters/zone_model');
       $order->zone_name = $this->zone_model->get_name($order->zone_code);
     }
 

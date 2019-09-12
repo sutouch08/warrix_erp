@@ -16,7 +16,12 @@
       <input type="text" class="form-control input-sm edit" id="user_ref" name="user_ref" value="<?php echo $order->user_ref; ?>" disabled />
     </div>
 
-		<div class="col-sm-11 padding-5 first">
+		<div class="col-sm-3 padding-5 first">
+			<label>โซนแปรสภาพ</label>
+			<input type="text" class="form-control input-sm edit" name="zone" id="zone" placeholder="ระบุโซนแปรสภาพ" value="<?php echo $order->zone_name; ?>" disabled>
+		</div>
+
+		<div class="col-sm-8 padding-5">
 		 	<label>หมายเหตุ</label>
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
 		</div>
@@ -30,5 +35,6 @@
     <input type="hidden" name="order_code" id="order_code" value="<?php echo $order->code; ?>" />
     <input type="hidden" name="customerCode" id="customerCode" value="<?php echo $order->customer_code; ?>" />
 		<input type="hidden" id="role" name="role" value="<?php echo $this->role; ?>" />
+		<input type="hidden" name="zoneCode" id="zoneCode" value="<?php echo $order->zone_code; ?>">
 </div>
 <hr class="margin-bottom-15"/>

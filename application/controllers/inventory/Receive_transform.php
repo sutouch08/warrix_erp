@@ -61,7 +61,7 @@ class Receive_transform extends PS_Controller
 
   public function view_detail($code)
   {
-    $this->load->model('inventory/zone_model');
+    $this->load->model('masters/zone_model');
     $this->load->model('masters/products_model');
 
     $doc = $this->receive_transform_model->get($code);
@@ -85,7 +85,7 @@ class Receive_transform extends PS_Controller
   public function print_detail($code)
   {
     $this->load->library('printer');
-    $this->load->model('inventory/zone_model');
+    $this->load->model('masters/zone_model');
     $this->load->model('masters/products_model');
     $this->load->model('orders/orders_model');
 
@@ -121,7 +121,7 @@ class Receive_transform extends PS_Controller
     if($this->input->post('receive_code'))
     {
       $this->load->model('masters/products_model');
-      $this->load->model('inventory/zone_model');
+      $this->load->model('masters/zone_model');
 
       $code = $this->input->post('receive_code');
       $doc = $this->receive_transform_model->get($code);
@@ -131,6 +131,7 @@ class Receive_transform extends PS_Controller
       $warehouse_code = $this->zone_model->get_warehouse_code($zone_code);
       $receive = $this->input->post('receive');
       $backlogs = $this->input->post('backlogs');
+      $prices = $this->input->post('prices');
 
       $arr = array(
         'order_code' => $order_code,
@@ -166,7 +167,9 @@ class Receive_transform extends PS_Controller
                 'style_code' => $pd->style_code,
                 'product_code' => $item,
                 'product_name' => $pd->name,
-                'qty' => $qty
+                'price' => $prices[$item],
+                'qty' => $qty,
+                'amount' => $qty * $prices[$item]
               );
 
               if($this->receive_transform_model->add_detail($ds) === FALSE)
@@ -230,7 +233,7 @@ class Receive_transform extends PS_Controller
 
     if($sc === TRUE)
     {
-      $this->do_export($code);
+      $this->export_receive($code);
     }
 
     echo $sc === TRUE ? 'success' : $message;
@@ -322,6 +325,7 @@ class Receive_transform extends PS_Controller
           'pdCode' => $rs->product_code,
           'pdName' => $rs->name,
           'qty' => number($rs->sold_qty),
+          'price' => number($rs->price,2),
           'limit' => $diff,
           'backlog' => number($diff)
         );
@@ -410,21 +414,138 @@ class Receive_transform extends PS_Controller
 
   public function do_export($code)
   {
-    return TRUE;
+    $rs = $this->export_receive($code);
+    echo $rs === TRUE ? 'success' : $this->error;
   }
 
 
-  public function export_order($code)
+  private function export_receive($code)
   {
-    if($this->do_export($code))
+    $this->load->model('masters/products_model');
+    $doc = $this->receive_transform_model->get($code);
+    $sap = $this->receive_transform_model->get_sap_receive_transform($code);
+
+    if(!empty($doc))
     {
-      echo 'success';
+      if(empty($sap) OR $tr->DocStatus == 'O')
+      {
+        if($doc->status == 1)
+        {
+          $currency = getConfig('CURRENCY');
+          $vat_rate = getConfig('PURCHASE_VAT_RATE');
+          $vat_code = getConfig('PURCHASE_VAT_CODE');
+          $total_amount = $this->receive_transform_model->get_sum_amount($code);
+          $ds = array(
+            'U_ECOMNO' => $doc->code,
+            'DocType' => 'I',
+            'CANCELED' => 'N',
+            'DocDate' => $doc->date_add,
+            'DocDueDate' => $doc->date_add,
+            'DocCur' => $currency,
+            'DocRate' => 1,
+            'DocTotal' => remove_vat($total_amount),
+            'Comments' => $doc->remark,
+            'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
+            'F_E_CommerceDate' => now()
+          );
+
+          $this->mc->trans_start();
+
+          if(!empty($sap))
+          {
+            $sc = $this->receive_transform_model->update_sap_receive_transform($code, $ds);
+          }
+          else
+          {
+            $sc = $this->receive_transform_model->add_sap_receive_transform($ds);
+          }
+
+          if($sc)
+          {
+            if(!empty($sap))
+            {
+              $this->receive_transform_model->drop_sap_exists_details($code);
+            }
+
+            $details = $this->receive_transform_model->get_details($code);
+
+            if(!empty($details))
+            {
+              $line = 0;
+              foreach($details as $rs)
+              {
+                $arr = array(
+                  'U_ECOMNO' => $rs->receive_code,
+                  'LineNum' => $line,
+                  'ItemCode' => $rs->product_code,
+                  'Dscription' => $rs->product_name,
+                  'Quantity' => $rs->qty,
+                  'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
+                  'PriceBefDi' => remove_vat($rs->price),
+                  'LineTotal' => remove_vat($rs->amount),
+                  'ShipDate' => $doc->date_add,
+                  'Currency' => $currency,
+                  'Rate' => 1,
+                  'Price' => remove_vat($rs->price),
+                  'TotalFrgn' => remove_vat($rs->amount),
+                  'WhsCode' => $doc->warehouse_code,
+                  'FisrtBin' => $doc->zone_code,
+                  'BaseRef' => $doc->order_code,
+                  'TaxStatus' => 'Y',
+                  'VatPrcnt' => $vat_rate,
+                  'VatGroup' => $vat_code,
+                  'PriceAfVAT' => $rs->price,
+                  'VatSum' => get_vat_amount($rs->amount),
+                  'TaxType' => 'Y',
+                  'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
+                  'F_E_CommerceDate' => now()
+                );
+
+                if( ! $this->receive_transform_model->add_sap_receive_transform_detail($arr))
+                {
+                  $this->error = 'เพิ่มรายการไม่สำเร็จ';
+                }
+
+                $line++;
+              }
+            }
+            else
+            {
+              $this->error = "ไม่พบรายการสินค้า";
+            }
+          }
+          else
+          {
+            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+          }
+
+          $this->mc->trans_complete();
+
+          if($this->mc->trans_status() === FALSE)
+          {
+            return FALSE;
+          }
+
+          return TRUE;
+        }
+        else
+        {
+          $this->error = "สถานะเอกสารไม่ถูกต้อง";
+        }
+      }
+      else
+      {
+        $this->error = "เอกสารถูกปิดไปแล้ว";
+      }
     }
     else
     {
-      echo $this->error;
+      $this->error = "ไม่พบเอกสาร {$code}";
     }
+
+    return FALSE;
   }
+  //--- end export transform
 
 
 

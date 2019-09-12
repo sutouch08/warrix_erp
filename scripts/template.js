@@ -240,3 +240,12 @@ function getCookie(cname) {
   }
   return "";
 }
+
+
+function parseDefault(value, def){
+	if(isNaN(value)){
+		return def; //--- return default value 
+	}
+
+	return value;
+}

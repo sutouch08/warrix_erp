@@ -166,6 +166,7 @@
 						</td>
             <td class="middle text-center">
                 <input type="text" class="form-control input-sm text-center receive-box pdCode" name="receive[{{pdCode}}]" id="receive_{{pdCode}}" />
+								<input type="hidden" name="prices[{{pdCode}}]" id="price_{{pdCode}}" value="{{price}}" />
             </td>
         </tr>
     {{/if}}

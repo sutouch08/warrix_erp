@@ -33,7 +33,11 @@
     <label>ผู้เบิก[คนสั่ง]</label>
     <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
-  <div class="col-sm-11 padding-5 first">
+	<div class="col-sm-3 padding-5 first">
+		<label>โซนแปรสภาพ</label>
+		<input type="text" class="form-control input-sm" name="zone" id="zone" placeholder="ระบุโซนแปรสภาพ" value="">
+	</div>
+  <div class="col-sm-8 padding-5">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="">
   </div>
@@ -45,6 +49,7 @@
 <hr class="margin-top-15">
 <input type="hidden" name="customerCode" id="customerCode" value="" />
 <input type="hidden" name="role" id="role" value="<?php echo $this->role; ?>" />
+<input type="hidden" name="zoneCode" id="zoneCode" value="">
 </form>
 
 <script src="<?php echo base_url(); ?>scripts/transform/transform.js"></script>

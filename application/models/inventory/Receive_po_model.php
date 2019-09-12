@@ -81,10 +81,12 @@ class Receive_po_model extends CI_Model
     return $this->db->set('is_cancle', 1)->where('receive_code', $code)->update('receive_product_detail');
   }
 
+
+
   public function get_po_details($po_code)
   {
     $rs = $this->ms
-    ->select('ItemCode, Dscription, Quantity, OpenQty')
+    ->select('ItemCode, Dscription, Quantity, OpenQty, PriceAfVAT AS price')
     ->where('DocEntry', $po_code)
     ->where('LineStatus', 'O')
     ->get('POR1');
@@ -98,6 +100,46 @@ class Receive_po_model extends CI_Model
   }
 
 
+  public function get_sap_receive_doc($code)
+  {
+    $rs = $this->mc
+    ->select('CANCELED, DocStatus')
+    ->where('U_ECOMNO', $code)
+    ->get('OPDN');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_receive_po(array $ds = array())
+  {
+    return $this->mc->insert('OPDN', $ds);
+  }
+
+
+  public function update_sap_receive_po($code, $ds)
+  {
+    return $this->mc->where('U_ECOMNO', $code)->update('OPDN', $ds);
+  }
+
+
+  public function add_sap_receive_po_detail(array $ds = array())
+  {
+    return $this->mc->insert('PDN1', $ds);
+  }
+
+
+  public function drop_sap_exists_details($code)
+  {
+    return $this->mc->where('U_ECOMNO', $code)->delete('PDN1');
+  }
+
+
+
 
   public function get_sum_qty($code)
   {
@@ -107,6 +149,15 @@ class Receive_po_model extends CI_Model
 
     return intval($rs->row()->qty);
   }
+
+
+
+  public function get_sum_amount($code)
+  {
+    $rs = $this->db->select_sum('amount')->where('receive_code', $code)->get('receive_product_detail');
+    return $rs->row()->amount === NULL ? 0.00 : $rs->row()->amount;
+  }
+
 
 
 

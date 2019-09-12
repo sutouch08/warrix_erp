@@ -341,7 +341,7 @@ class Import_order extends CI_Controller
                 }
                 else
                 {
-                  $this->update_stock($item->code);
+                  $this->update_api_stock($item->code);
                 }
               }
               else
@@ -375,7 +375,7 @@ class Import_order extends CI_Controller
                   }
                   else
                   {
-                    $this->update_stock($item->code);
+                    $this->update_api_stock($item->code);
                   }
                 } //--- enf force update
               } //--- end if exists detail
@@ -397,12 +397,16 @@ class Import_order extends CI_Controller
 
 
 
-  public function update_stock($item)
+  public function update_api_stock($item)
   {
-    $sell_stock = $this->stock_model->get_sell_stock($item);
-    $reserv_stock = $this->orders_model->get_reserv_stock($item);
-    $availableStock = $sell_stock - $reserv_stock;
-    $this->api->update_stock($item, $availableStock);
+    if(getConfig('SYNC_WEB_STOCK'))
+    {
+      $sell_stock = $this->stock_model->get_sell_stock($item);
+      $reserv_stock = $this->orders_model->get_reserv_stock($item);
+      $availableStock = $sell_stock - $reserv_stock;
+      $this->api->update_stock($item, $availableStock);
+    }
+
   }
 
 

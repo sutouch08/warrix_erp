@@ -42,7 +42,7 @@ $("#customer").autocomplete({
 			var name = arr[1];
 			$("#customerCode").val(code);
 			$("#customer").val(name);
-      zoneInit(code);
+      zoneInit(code, true);
 		}else{
 			$("#customerCode").val('');
 			$(this).val('');
@@ -55,15 +55,20 @@ $("#customer").autocomplete({
 //---	กำหนดให้สามารถค้นหาโซนได้ก่อนจะค้นหาลูกค้า(กรณี edit header)
 $(document).ready(function(){
 	var customer_code = $('#customerCode').val();
-	zoneInit(customer_code);
+	zoneInit(customer_code, false);
 });
 
 
 
-function zoneInit(customer_code)
+function zoneInit(customer_code, edit)
 {
+  if(edit){
+    $('#zone_code').val('');
+    $('#zone').val('');
+  }
+
   $('#zone').autocomplete({
-    source:BASE_URL + 'auto_complete/get_customer_zone/' + customer_code,
+    source:BASE_URL + 'auto_complete/get_consign_zone/' + customer_code,
     autoFocus: true,
     close:function(){
       var rs = $.trim($(this).val());

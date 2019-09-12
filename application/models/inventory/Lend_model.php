@@ -6,6 +6,16 @@ class Lend_model extends CI_Model
     parent::__construct();
   }
 
+  public function get($code)
+  {
+    $rs = $this->db->where('code', $code)->get('orders');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
 
   public function add_detail(array $ds = array())
   {
@@ -17,7 +27,14 @@ class Lend_model extends CI_Model
     return FALSE;
   }
 
-} //--- End class 
+
+
+
+
+
+
+
+} //--- End class
 
 
  ?>

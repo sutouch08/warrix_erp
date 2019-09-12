@@ -145,7 +145,12 @@ class Customers_model extends CI_Model
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('customers');
-    return $rs->row();
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
   }
 
 
@@ -153,7 +158,12 @@ class Customers_model extends CI_Model
   public function get_name($code)
   {
     $rs = $this->db->select('name')->where('code', $code)->get('customers');
-    return $rs->row()->name;
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->name;
+    }
+
+    return NULL;
   }
 
 
@@ -205,7 +215,12 @@ class Customers_model extends CI_Model
 
     $rs = $this->db->get('customers');
 
-    return $rs->result();
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 
@@ -275,7 +290,12 @@ class Customers_model extends CI_Model
     ->where("UpdateDate >=", date('Y-m-d 00:00:00'))
     ->get('OCRD');
 
-    return $rs->result();
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 

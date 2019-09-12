@@ -208,15 +208,47 @@ public function get_style_code()
   }
 
 
+
+  public function get_valid_lend_code($customer_code = '')
+  {
+    $sc = array();
+    $txt = $_REQUEST['term'];
+    $this->db->select('order_code');
+    if($txt != '*')
+    {
+      $this->db->like('order_code', $txt);
+    }
+
+    if(!empty($customer_code))
+    {
+      $this->db->where('customer_code', $customer_code);
+    }
+
+    $this->db->where('valid' , 0)->group_by('order_code')->limit(20);
+    $rs = $this->db->get('order_lend_detail');
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $ds)
+      {
+        $sc[] = $ds->order_code;
+      }
+    }
+
+    echo json_encode($sc);
+  }
+
+
   public function get_zone_code_and_name($warehouse = '')
   {
     $sc = array();
     $txt = $_REQUEST['term'];
     $this->db->select('code, name');
+    
     if(!empty($warehouse))
     {
       $this->db->where('warehouse_code', $warehouse);
     }
+
     $this->db->like('code', $txt);
     $this->db->or_like('name', $txt);
     $rs = $this->db->get('zone');
@@ -246,7 +278,8 @@ public function get_style_code()
     ->select('OBIN.BinCode')
     ->from('OBIN')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_WH_MAIN', 'Y');
+    ->where('OWHS.U_WH_MAIN', 'Y')
+    ->where('OBIN.SysBin', 'N');
     if($txt != '*')
     {
       $this->ms->like('OBIN.BinCode', $txt);
@@ -265,6 +298,92 @@ public function get_style_code()
 
     echo json_encode($sc);
   }
+
+
+
+  public function get_transform_zone()
+  {
+    $sc = array();
+    $txt = $_REQUEST['term'];
+    $this->db
+    ->select('zone.code AS code, zone.name AS name')
+    ->from('zone')
+    ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left')
+    ->where('warehouse.role', 6); //--- 6 =  คลังแปรสภาพ ดู table warehouse_role
+
+    if($txt != '*')
+    {
+      $this->db->like('zone.code', $txt);
+      $this->db->or_like('zone.name', $txt);
+    }
+
+    $this->db->limit(20);
+
+    $zone = $this->db->get();
+
+    if($zone->num_rows() > 0)
+    {
+      foreach($zone->result() as $rs)
+      {
+        $sc[] = $rs->code.' | '.$rs->name;
+      }
+    }
+    else
+    {
+      $sc[] = "not found";
+    }
+
+    echo json_encode($sc);
+  }
+
+
+
+
+  public function get_lend_zone($customer_code = '')
+  {
+    $sc = array();
+    if(!empty($customer_code))
+    {
+      $txt = $_REQUEST['term'];
+      $this->db
+      ->select('zone.code AS code, zone.name AS name')
+      ->from('zone')
+      ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left')
+      ->join('zone_customer', 'zone_customer.zone_code = zone.code')
+      ->where('warehouse.role', 8) //--- 8 =  คลังยืมสินค้า ดู table warehouse_role
+      ->where('zone_customer.customer_code', $customer_code);
+
+      if($txt != '*')
+      {
+        $this->db->like('zone.code', $txt);
+        $this->db->or_like('zone.name', $txt);
+      }
+
+      $this->db->limit(20);
+
+      $zone = $this->db->get();
+
+      if($zone->num_rows() > 0)
+      {
+        foreach($zone->result() as $rs)
+        {
+          $sc[] = $rs->code.' | '.$rs->name;
+        }
+      }
+      else
+      {
+        $sc[] = "not found";
+      }
+    }
+    else
+    {
+      $sc[] = "กรุณาระบุผู้ยืม";
+    }
+
+    echo json_encode($sc);
+  }
+
+
 
 
 
@@ -390,7 +509,7 @@ public function get_style_code()
   }
 
 
-  public function get_customer_zone($customer_code = '')
+  public function get_consign_zone($customer_code = '')
   {
     if($customer_code == '')
     {
@@ -402,6 +521,8 @@ public function get_style_code()
       ->select('zone.code, zone.name')
       ->from('zone_customer')
       ->join('zone', 'zone.code = zone_customer.zone_code', 'left')
+      ->join('warehouse', 'zone.warehouse_code = warehouse.code', 'left')
+      ->where('warehouse.role', 2) //--- 2 = คลังฝากขาย
       ->where('zone_customer.customer_code', $customer_code);
 
       if($_REQUEST['term'] != '*')
@@ -430,33 +551,6 @@ public function get_style_code()
     }
   }
 
-
-  public function get_lend_zone()
-  {
-    $sc = array();
-    $txt = $_REQUEST['term'];
-    $this->ms->select('BinCode AS code, SL1Code AS name')
-    ->from('OBIN')
-    ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_WH_MAIN', 'Y');
-
-    if($txt != '*')
-    {
-      $this->ms->like('OBIN.BinCode', $txt);
-    }
-
-    $this->ms->limit(20);
-    $zone = $this->ms->get();
-    if(!empty($zone))
-    {
-      foreach($zone->result() as $rs)
-      {
-        $sc[] = $rs->code.' | '.$rs->name;
-      }
-    }
-
-    echo json_encode($sc);
-  }
 
 
   public function get_product_code()

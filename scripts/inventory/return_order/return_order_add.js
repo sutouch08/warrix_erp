@@ -196,7 +196,7 @@ function addNew()
 	var invoice = $('#invoice').val();
 	var customer_code = $('#customer_code').val();
 	var warehouse_code = $('#warehouse_code').val();
-	var zone_code = $('#zone_code').val();
+	//var zone_code = $('#zone_code').val();
 
   if(!isDate(date_add)){
     swal('วันที่ไม่ถูกต้อง');
@@ -218,10 +218,10 @@ function addNew()
 		return false;
 	}
 
-	if(zone_code.length == 0){
-		swal('กรุณาระบุโซนรับสินค้า');
-		return false;
-	}
+	// if(zone_code.length == 0){
+	// 	swal('กรุณาระบุโซนรับสินค้า');
+	// 	return false;
+	// }
 
   $('#addForm').submit();
 }

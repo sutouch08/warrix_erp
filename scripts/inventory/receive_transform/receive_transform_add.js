@@ -13,51 +13,6 @@ function editHeader(){
 }
 
 
-function updateHeader(){
-	id = $('#id_receive_product').val();
-	date_add = $('#dateAdd').val();
-	remark = $('#remark').val();
-
-	if(id == '' || id == undefined){
-		swal('ไม่พบเลขที่เอกสาร');
-		return false;
-	}
-
-	if(!isDate(date_add)){
-		swal('วันที่ไม่ถูกต้อง');
-		return false;
-	}
-
-	load_in();
-	$.ajax({
-		url:'controller/receiveProductController.php?update',
-		type:'POST',
-		cache:'false',
-		data:{
-			'id_receive_product' : id,
-			'date_add' : date_add,
-			'remark' : remark
-		},
-		success:function(rs){
-			load_out();
-			rs = $.trim(rs);
-			if(rs == 'success'){
-				swal({
-					title:'Success',
-					type:'success',
-					timer: 1000
-				});
-
-				$('.header-box').attr('disabled', 'disabled');
-				$('#btn-update').addClass('hide');
-				$('#btn-edit').removeClass('hide');
-			}else{
-				swal('Error!', rs, 'error');
-			}
-		}
-	});
-}
-
 
 function receiveProduct(pdCode){
 	var qty = isNaN( parseInt( $("#qty").val() ) ) ? 1 : parseInt( $("#qty").val() );
@@ -107,7 +62,7 @@ function save(){
 	//--- นับจำนวนรายการในใบสั่งซื้อ
 	count = $(".receive-box").length;
 
-	
+
 	//--- ตรวจสอบความถูกต้องของข้อมูล
 	if(code == '' || code == undefined){
 		swal('ไม่พบเลขที่เอกสาร', 'หากคุณเห็นข้อผิดพลาดนี้มากกว่า 1 ครับ ให้ลองออกจากหน้านี้แล้วกลับเข้ามาทำรายการใหม่', 'error');
@@ -157,9 +112,15 @@ function save(){
 		name = "receive["+pdCode+"]";
 		backlogs = $('#limit_'+pdCode).val();
 		bname = "backlogs["+pdCode+"]";
+		pname = "prices["+pdCode+"]";
+		price = $('#price_'+pdCode).val();
 		if($(this).val() > 0 && !isNaN(qty)){
 			ds.push({
 				'name' : name, 'value' : qty
+			});
+
+			ds.push({
+				'name' : pname, 'value' : price
 			});
 
 			ds.push({

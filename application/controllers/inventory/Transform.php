@@ -87,10 +87,14 @@ class Transform extends PS_Controller
   {
     if($this->input->post('customerCode'))
     {
+      $this->load->model('masters/zone_model');
+
       $book_code = getConfig('BOOK_CODE_TRANSFORM');
       $date_add = db_date($this->input->post('date'));
       $code = $this->get_new_code($date_add);
       $role = 'T'; //--- T = เบิกแปรสภาพ
+      $zone_code = $this->input->post('zoneCode');
+      $warehouse_code = $this->zone_model->get_warehouse_code($zone_code);
 
       $ds = array(
         'code' => $code,
@@ -99,7 +103,9 @@ class Transform extends PS_Controller
         'customer_code' => $this->input->post('customerCode'),
         'user' => get_cookie('uname'),
         'remark' => $this->input->post('remark'),
-        'user_ref' => $this->input->post('empName')
+        'user_ref' => $this->input->post('empName'),
+        'zone_code' => $zone_code,
+        'warehouse_code' => $warehouse_code
       );
 
       if($this->orders_model->add($ds) === TRUE)
@@ -135,6 +141,8 @@ class Transform extends PS_Controller
   {
     $this->load->helper('print');
     $this->load->helper('transform');
+    $this->load->model('masters/zone_model');
+    $this->load->model('masters/warehouse_model');
 
     $ds = array();
     $rs = $this->orders_model->get($code);
@@ -144,6 +152,8 @@ class Transform extends PS_Controller
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
+      $rs->zone_name     = $this->zone_model->get_name($rs->zone_code);
+      $rs->warehouse_name = $this->warehouse_model->get_name($rs->warehouse_code);
     }
 
     $state = $this->order_state_model->get_order_state($code);
@@ -181,13 +191,20 @@ class Transform extends PS_Controller
 
     if($this->input->post('order_code'))
     {
+      $this->load->model('masters/zone_model');
+
       $code = $this->input->post('order_code');
+      $zone_code = $this->input->post('zoneCode');
+      $warehouse_code = $this->zone_model->get_warehouse_code($zone_code);
+
       $ds = array(
         'customer_code' => $this->input->post('customer_code'),
         'date_add' => db_date($this->input->post('date_add')),
         'user_ref' => $this->input->post('user_ref'),
         'remark' => $this->input->post('remark'),
-        'status' => 0
+        'status' => 0,
+        'zone_code' => $zone_code,
+        'warehouse_code' => $warehouse_code
       );
 
       $rs = $this->orders_model->update($code, $ds);
@@ -214,6 +231,7 @@ class Transform extends PS_Controller
     $this->load->helper('print');
     $this->load->helper('transform');
     $this->load->helper('product_tab');
+    $this->load->model('masters/zone_model');
 
     $ds = array();
     $rs = $this->orders_model->get($code);
@@ -223,6 +241,7 @@ class Transform extends PS_Controller
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
+      $rs->zone_name   = $this->zone_model->get_name($rs->zone_code);
     }
 
     $state = $this->order_state_model->get_order_state($code);

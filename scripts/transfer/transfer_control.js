@@ -232,7 +232,7 @@ function getZoneTo(){
 		var warehouse_code = $("#to_warehouse_code").val();
 
 		$.ajax({
-			url: BASE_URL + 'inventory/zone/get_warehouse_zone',
+			url: BASE_URL + 'masters/zone/get_warehouse_zone',
 			type:"GET",
 			cache:"false",
 			data:{
@@ -414,7 +414,7 @@ function getZoneFrom(){
 		var warehouse_code = $("#from_warehouse_code").val();
 
 		$.ajax({
-			url:BASE_URL + 'inventory/zone/get_warehouse_zone',
+			url:BASE_URL + 'masters/zone/get_warehouse_zone',
 			type:"GET",
 			cache:"false",
 			data:{

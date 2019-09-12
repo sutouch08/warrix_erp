@@ -15,7 +15,7 @@ class Transfer extends PS_Controller
     $this->home = base_url().'inventory/transfer';
     $this->load->model('inventory/transfer_model');
     $this->load->model('inventory/warehouse_model');
-    $this->load->model('inventory/zone_model');
+    $this->load->model('masters/zone_model');
     $this->load->model('stock/stock_model');
 
   }

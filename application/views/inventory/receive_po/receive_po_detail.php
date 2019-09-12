@@ -7,6 +7,7 @@
     <p class="pull-right top-p">
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
       <button type="button" class="btn btn-sm btn-info" onclick="printReceived()"><i class="fa fa-print"></i> พิมพ์</button>
+			<button type="button" class="btn btn-sm btn-success" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
     </p>
   </div>
 </div>

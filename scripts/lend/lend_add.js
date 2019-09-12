@@ -48,6 +48,7 @@ $("#customer").autocomplete({
 			$("#customerCode").val('');
 			$(this).val('');
 		}
+    zoneInit();
 	}
 });
 
@@ -58,29 +59,40 @@ $('#customer').focusout(function(){
   if(code.length == 0)
   {
     $('#customerCode').val('');
+    zoneInit();
   }
 });
 
 
-
-$('#zone').autocomplete({
-  source:BASE_URL + 'auto_complete/get_lend_zone',
-  autoFocus: true,
-  close:function(){
-    var rs = $.trim($(this).val());
-    var arr = rs.split(' | ');
-    if(arr.length == 2)
-    {
-      var code = arr[0];
-      var name = arr[1];
-      $('#zone_code').val(code);
-      $('#zone').val(name);
-    }else{
-      $('#zone_code').val('');
-      $('#zone').val('');
+function zoneInit(){
+  let customerCode = $('#customerCode').val();
+  $('#zone_code').val('');
+  $('#zone').val('');
+  
+  $('#zone').autocomplete({
+    source:BASE_URL + 'auto_complete/get_lend_zone/'+customerCode,
+    autoFocus: true,
+    close:function(){
+      var rs = $.trim($(this).val());
+      var arr = rs.split(' | ');
+      if(arr.length == 2)
+      {
+        var code = arr[0];
+        var name = arr[1];
+        $('#zone_code').val(code);
+        $('#zone').val(name);
+      }else{
+        $('#zone_code').val('');
+        $('#zone').val('');
+      }
     }
-  }
-});
+  });
+}
+
+
+$(document).ready(function() {
+  zoneInit();
+})
 
 function add(){
   var customer_code = $('#customerCode').val();

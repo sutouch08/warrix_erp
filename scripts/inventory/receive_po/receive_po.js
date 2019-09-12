@@ -116,6 +116,34 @@ function printReceived(){
 
 
 
+function doExport(){
+	var code = $('#receive_code').val();
+	load_in();
+	$.ajax({
+		url: HOME + 'do_export/'+code,
+		type:'POST',
+		cache:false,
+		success:function(rs){
+			load_out();
+			if(rs == 'success'){
+				swal({
+					title:'Success',
+					text:'Send data successfully',
+					type:'success',
+					timer:1000
+				});
+			}else{
+				swal({
+					title:'Errow!',
+					text: rs,
+					type:'error'
+				});
+			}
+		}
+	})
+}
+
+
 function clearFilter(){
   var url = HOME + 'clear_filter';
   $.get(url, function(rs){

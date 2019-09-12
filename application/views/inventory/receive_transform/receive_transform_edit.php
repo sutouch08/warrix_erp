@@ -157,6 +157,7 @@
             <td class="middle text-center">
 						{{backlog}}
 						<input type="hidden" id="backlog_{{pdCode}}" value="{{backlog}}" />
+						<input type="hidden" id="price_{{pdCode}}" value="{{price}}" />
 						</td>
             <td class="middle text-center">
                 <input type="text" class="form-control input-sm text-center receive-box pdCode" name="receive[{{pdCode}}]" id="receive_{{pdCode}}" />

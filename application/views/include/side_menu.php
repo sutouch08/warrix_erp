@@ -27,6 +27,7 @@ $menu_group = $this->menu_group_code;
 				</a>
 				<ul class="submenu">
 					<?php echo side_menu($menu, 'ICRTOR',  'inventory/return_order', 'รับคืนสินค้า(ลดหนี้)'); ?>
+					<?php echo side_menu($menu, 'ICRTLD',  'inventory/return_lend', 'รับคืนสินค้าจาการยืม'); ?>
 				</ul>
 			</li>
 			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'REQUEST'); ?>">
@@ -128,6 +129,15 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'DBCGRP', 'masters/customer_group','เพิ่ม/แก้ไข กลุ่มลูกค้า'); ?>
 					<?php echo side_menu($menu, 'DBCKIN', 'masters/customer_kind','เพิ่ม/แก้ไข ประเภทลูกค้า'); ?>
 					<?php echo side_menu($menu, 'DBCTYP', 'masters/customer_type','เพิ่ม/แก้ไข ชนิดลูกค้า'); ?>
+				</ul>
+			</li>
+
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'WAREHOUSE'); ?>">
+				<a href="#" class="dropdown-toggle"><i class="menu-icon fa fa-caret-right"></i> ฐานข้อมูลคลังสินค้า <b class="arrow fa fa-angle-down"></b></a>
+				<b class="arrow"></b>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'DBWRHS', 'masters/warehouse','เพิ่ม/แก้ไข คลังสินค้า'); ?>
+					<?php echo side_menu($menu, 'DBZONE', 'masters/zone','เพิ่ม/แก้ไข โซน'); ?>
 				</ul>
 			</li>
 
