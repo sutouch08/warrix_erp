@@ -1,6 +1,6 @@
-// JavaScript Document
-var HOME = BASE_URL + 'inventory/return_lend/';
+var HOME = BASE_URL + 'inventory/consign_check/';
 
+//--- delete all data and cancle document 
 function goDelete(code){
 	swal({
 		title: "คุณแน่ใจ ?",
@@ -13,7 +13,7 @@ function goDelete(code){
 		closeOnConfirm: false
 		}, function(){
 			$.ajax({
-				url: HOME + 'cancle_return/'+code,
+				url: HOME + 'cancle/'+code,
 				type:"POST",
 				cache:"false",
 				success: function(rs){
@@ -59,21 +59,6 @@ function goBack(){
 }
 
 
-function leave(){
-	swal({
-		title: 'ยกเลิกข้อมูลนี้ ?',
-		type: 'warning',
-		showCancelButton: true,
-		cancelButtonText: 'No',
-		confirmButtonText: 'Yes',
-		closeOnConfirm: false
-	}, function(){
-		goBack();
-	});
-
-}
-
-
 function getSearch(){
 	$("#searchForm").submit();
 }
@@ -106,10 +91,10 @@ $("#toDate").datepicker({
 
 
 // JavaScript Document
-function printReturn(){
-	var code = $("#return_code").val();
+function printConsignBox(id){
+	var code = $("#check_code").val();
 	var center = ($(document).width() - 800) /2;
-  var target = HOME + 'print_return/'+code;
+  var target = HOME + 'print/'+ code + '/'+id;
   window.open(target, "_blank", "width=800, height=900, left="+center+", scrollbars=yes");
 }
 

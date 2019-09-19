@@ -8,8 +8,13 @@
     <div class="col-sm-6">
       <p class="pull-right top-p">
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
+				<?php if($doc->status == 1 && $this->pm->can_delete) : ?>
+					<button type="button" class="btn btn-sm btn-danger" onclick="unsave()">ยกเลิกการบันทึก</button>
+				<?php endif; ?>
+				<?php if($doc->status == 1) : ?>
 				<button type="button" class="btn btn-sm btn-info" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP </button>
-				<button type="button" class="btn btn-sm btn-success" onclick="print_return()"><i class="fa fa-print"></i> พิมพ์</button>
+				<?php endif; ?>
+				<button type="button" class="btn btn-sm btn-success" onclick="printReturn()"><i class="fa fa-print"></i> พิมพ์</button>
       </p>
     </div>
 </div>
@@ -52,8 +57,13 @@
     	<label>หมายเหตุ</label>
         <input type="text" class="form-control input-sm" value="<?php echo $doc->remark; ?>" disabled/>
     </div>
-
 </div>
+<?php
+if($doc->status == 2)
+{
+  $this->load->view('cancle_watermark');
+}
+?>
 <hr class="margin-top-15"/>
 <div class="row">
 	<div class="col-sm-12">
@@ -77,22 +87,22 @@
 	<?php $total_qty = 0; ?>
 	<?php $total_backlogs = 0; ?>
 	<?php foreach($details as $rs) : ?>
-		<?php $backlogs = $rs->lend_qty - $rs->receive; ?>
+		<?php $backlogs = $rs->qty - $rs->receive; ?>
 		<?php $backlogs = $backlogs < 0 ? 0 : $backlogs; ?>
 				<tr>
 					<td class="middle text-center no"><?php echo $no; ?></td>
 					<td class="middle"><?php echo $rs->product_code; ?></td>
 					<td class="middle"><?php echo $rs->product_name; ?></td>
-					<td class="middle text-right"><?php echo number($rs->lend_qty); ?></td>
-					<td class="middle text-right"><?php echo number($rs->receive); ?></td>
-					<td class="middle text-right"><?php echo number($rs->qty); ?></td>
-					<td class="middle text-right"><?php echo number($backlogs); ?></td>
+					<td class="middle text-right"><?php echo ac_format($rs->qty); ?></td>
+					<td class="middle text-right"><?php echo ac_format($rs->receive); ?></td>
+					<td class="middle text-right"><?php echo ac_format($rs->return_qty); ?></td>
+					<td class="middle text-right"><?php echo ac_format($backlogs); ?></td>
 				</tr>
 	<?php
 				$no++;
-				$total_lend += $rs->lend_qty;
+				$total_lend += $rs->qty;
 				$total_receive += $rs->receive;
-				$total_qty += $rs->qty;
+				$total_qty += $rs->return_qty;
 				$total_backlogs += $backlogs;
 	?>
 	<?php endforeach; ?>

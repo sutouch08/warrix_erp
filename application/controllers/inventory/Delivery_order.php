@@ -248,6 +248,7 @@ class Delivery_order extends PS_Controller
               $arr = array(
                 'order_code' => $code,
                 'product_code' => $rs->product_code,
+                'product_name' => $rs->product_name,
                 'qty' => $sold_qty,
                 'customer_code' => $order->customer_code
               );

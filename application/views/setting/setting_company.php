@@ -19,10 +19,18 @@
       <div class="divider-hidden"></div>
 
       <div class="col-sm-3">
-        <span class="form-control left-label">ที่อยู่</span>
+        <span class="form-control left-label">ที่อยู่บรรทัด 1</span>
       </div>
-      <div class="col-sm-9">
-        <input type="text" class="form-control input-sm" name="COMPANY_ADDRESS" id="cAddress" value="<?php echo $COMPANY_ADDRESS; ?>" />
+      <div class="col-sm-5">
+        <input type="text" class="form-control input-sm" name="COMPANY_ADDRESS1" id="cAddress1" placeholder="เลขที่ หมู่ ถนน ตำบล" value="<?php echo $COMPANY_ADDRESS1; ?>" />
+      </div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3">
+        <span class="form-control left-label">ที่อยู่บรรทัด 2</span>
+      </div>
+      <div class="col-sm-5">
+        <input type="text" class="form-control input-sm" name="COMPANY_ADDRESS2" id="cAddress2" placeholder="อำเภอ จังหวัด" value="<?php echo $COMPANY_ADDRESS2; ?>" />
       </div>
       <div class="divider-hidden"></div>
 

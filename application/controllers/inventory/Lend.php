@@ -90,6 +90,7 @@ class Lend extends PS_Controller
       $code = $this->get_new_code($date_add);
       $role = 'L'; //--- L = ยืมสินค้า
       $has_term = 1; //--- ถือว่าเป็นเครดิต
+      $zone = $this->zone_model->get($this->input->post('zone_code'));
 
       $ds = array(
         'code' => $code,
@@ -99,7 +100,8 @@ class Lend extends PS_Controller
         'user' => get_cookie('uname'),
         'remark' => $this->input->post('remark'),
         'user_ref' => $this->input->post('empName'),
-        'zone_code' => $this->input->post('zone_code')
+        'zone_code' => $zone->code,
+        'warehouse' => $zone->warehouse_code
       );
 
       if($this->orders_model->add($ds) === TRUE)

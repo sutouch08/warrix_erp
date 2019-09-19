@@ -21,7 +21,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICTRRC',  'inventory/receive_transform', 'รับสินค้าจากการแปรสภาพ'); ?>
 				</ul>
 			</li>
-			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'RETRUN'); ?>">
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'RETURN'); ?>">
 				<a href="#" class="dropdown-toggle">
 					<i class="menu-icon fa fa-caret-right"></i> คืนสินค้า <b class="arrow fa fa-angle-down"></b>
 				</a>
@@ -53,10 +53,30 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICODIV',  'inventory/invoice', 'ออเดอร์จัดส่งแล้ว'); ?>
 				</ul>
 			</li>
-			<?php echo side_menu($menu, 'ICTRWH',  'inventory/transfer', 'โอน/ย้าย สินค้า'); ?>
-			<?php echo side_menu($menu, 'ICCKBF',  'inventory/buffer', 'ตรวจสอบ BUFFER'); ?>
-			<?php echo side_menu($menu, 'ICCKCN',  'inventory/cancle', 'ตรวจสอบ CANCLE'); ?>
-			<?php echo side_menu($menu, 'ICCKMV',  'inventory/movement', 'ตรวจสอบ MOVEMENT'); ?>
+
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'TRANSFER'); ?>">
+				<a href="#" class="dropdown-toggle">
+					<i class="menu-icon fa fa-caret-right"></i> โอน/ย้าย สินค้า
+					<b class="arrow fa fa-angle-down"></b>
+				</a>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'ICTRWH',  'inventory/transfer', 'โอน สินค้า'); ?>
+					<?php echo side_menu($menu, 'ICTRZN',  'inventory/move', 'ย้าย สินค้า'); ?>
+				</ul>
+			</li>
+
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'CHECK'); ?>">
+				<a href="#" class="dropdown-toggle">
+					<i class="menu-icon fa fa-caret-right"></i> ตรวจสอบ
+					<b class="arrow fa fa-angle-down"></b>
+				</a>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'ICCKBF',  'inventory/buffer', 'ตรวจสอบ BUFFER'); ?>
+					<?php echo side_menu($menu, 'ICCKCN',  'inventory/cancle', 'ตรวจสอบ CANCLE'); ?>
+					<?php echo side_menu($menu, 'ICCKMV',  'inventory/movement', 'ตรวจสอบ MOVEMENT'); ?>
+				</ul>
+			</li>
+			<?php echo side_menu($menu, 'ICCSRC',  'inventory/consign_check', 'กระทบยอดสินค้า'); ?>
 		</ul>
 	</li>
 
@@ -72,8 +92,18 @@ $menu_group = $this->menu_group_code;
 			<?php echo side_menu($menu, 'SOODSP',  'orders/sponsor', 'สปอนเซอร์'); ?>
 			<?php echo side_menu($menu, 'SOCCSO',  'orders/consign_so', 'ฝากขาย(ใบกำกับ)'); ?>
 			<?php echo side_menu($menu, 'SOCCTR',  'orders/consign_tr', 'ฝากขาย(โอนคลัง)'); ?>
-			<?php echo side_menu($menu, 'SOPMCF',  'orders/order_payment', 'ตรวจสอบยอดชำระเงิน'); ?>
+		</ul>
+	</li>
 
+	<li class="<?php echo isActiveOpenMenu($menu_group, 'AC'); ?>">
+		<a href="#" class="dropdown-toggle">
+			<i class="menu-icon fa fa-calculator"></i>
+			<span class="menu-text">ระบบบัญชี</span>
+			<b class="arrow fa fa-angle-down"></b>
+		</a>
+		<ul class="submenu">
+			<?php echo side_menu($menu, 'ACPMCF',  'orders/order_payment', 'ตรวจสอบยอดชำระเงิน'); ?>
+			<?php echo side_menu($menu, 'ACCSOD',  'account/consign', 'ตัดยอดฝากขาย'); ?>
 		</ul>
 	</li>
 

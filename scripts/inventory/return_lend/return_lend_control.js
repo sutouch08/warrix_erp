@@ -28,6 +28,8 @@ function qtyInit(){
     if(qty > limit){
       swal("จำนวนเกินยอดค้างรับ");
       $(this).addClass('has-error');
+    }else{
+      $(this).removeClass('has-error');
     }
     recalTotal();
   })
@@ -35,8 +37,8 @@ function qtyInit(){
 
 $(document).ready(function(){
   lend_code_init();
+  qtyInit();
 });
-
 
 function load_lend_details(){
   let code = $('#lend_code').val();
@@ -129,6 +131,24 @@ function setZone(){
   }
   $('#barcode').focus();
 }
+
+
+function changeZone(){
+  $('#zone_code').val('');
+  $('#zone').val('');
+  $('#zone').removeAttr('disabled');
+  $('#btn-change-zone').addClass('hide');
+  $('#btn-set-zone').removeClass('hide');
+  $('#zone').focus();
+}
+
+
+
+function addToBarcode(barcode){
+  $('#barcode').val(barcode);
+  $('#barcode').focus();
+}
+
 
 
 function doReceive(){

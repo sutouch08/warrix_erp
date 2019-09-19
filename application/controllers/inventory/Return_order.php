@@ -68,10 +68,10 @@ class Return_order extends PS_Controller
   public function add_details($code)
   {
     $sc = TRUE;
-    // print_r($this->input->post());
-    // return;
+
     if($this->input->post('qty'))
     {
+      $this->load->model('inventory/movement_model');
       //--- start transection
       $this->db->trans_begin();
 
@@ -113,6 +113,23 @@ class Return_order extends PS_Controller
                 $sc = FALSE;
                 $this->error = 'บันทึกรายการไม่สำเร็จ';
                 break;
+              }
+              else
+              {
+                $ds = array(
+                  'reference' => $code,
+                  'warehouse_code' => $doc->warehouse_code,
+                  'zone_code' => $doc->zone_code,
+                  'product_code' => $item,
+                  'move_in' => $qty,
+                  'date_add' => $doc->date_add
+                );
+
+                if($this->movement_model->add($ds) === FALSE)
+                {
+                  $sc = FALSE;
+                  $message = 'บันทึก movement ไม่สำเร็จ';
+                }
               }
             }
 
@@ -181,12 +198,21 @@ class Return_order extends PS_Controller
   public function unsave($code)
   {
     $sc = TRUE;
+    $this->load->model('inventory/movement_model');
     if($this->pm->can_edit)
     {
       if($this->return_order_model->set_status($code, 0) === FALSE)
       {
         $sc = FALSE;
         $message = 'ยกเลิกการบันทึกไม่สำเร็จ';
+      }
+      else
+      {
+        if($this->movement_model->drop_movement($code) === FALSE)
+        {
+          $sc = FALSE;
+          $message = 'ลบ movement ไม่สำเร็จ';
+        }
       }
     }
     else
@@ -236,8 +262,7 @@ class Return_order extends PS_Controller
       $date_add = db_date($this->input->post('date_add'), TRUE);
       $invoice = trim($this->input->post('invoice'));
       $customer_code = trim($this->input->post('customer_code'));
-      $warehouse_code = $this->input->post('warehouse_code');
-      $zone_code = $this->input->post('zone_code');
+      $zone = $this->zone_model->get($this->input->post('zone_code'));
       $remark = trim($this->input->post('remark'));
 
       $code = $this->get_new_code($date_add);
@@ -246,8 +271,8 @@ class Return_order extends PS_Controller
         'bookcode' => getConfig('BOOK_CODE_RETURN_ORDER'),
         'invoice' => $invoice,
         'customer_code' => $customer_code,
-        'warehouse_code' => $warehouse_code,
-        'zone_code' => $zone_code,
+        'warehouse_code' => $zone->warehouse_code,
+        'zone_code' => $zone->code,
         'user' => get_cookie('uname'),
         'date_add' => $date_add,
         'remark' => $remark
@@ -276,7 +301,6 @@ class Return_order extends PS_Controller
   {
     $doc = $this->return_order_model->get($code);
     $doc->customer_name = $this->customers_model->get_name($doc->customer_code);
-    $doc->warehouse_name = $this->warehouse_model->get_name($doc->warehouse_code);
     $doc->zone_name = $this->zone_model->get_name($doc->zone_code);
 
     $details = $this->return_order_model->get_details($code);
@@ -374,16 +398,15 @@ class Return_order extends PS_Controller
       $date_add = db_date($this->input->post('date_add'), TRUE);
       $invoice = trim($this->input->post('invoice'));
       $customer_code = $this->input->post('customer_code');
-      $warehouse_code = $this->input->post('warehouse_code');
-      $zone_code = $this->input->post('zone_code');
+      $zone = $this->zone_model->get($this->input->post('zone_code'));
       $remark = $this->input->post('remark');
 
       $arr = array(
         'date_add' => $date_add,
         'invoice' => $invoice,
         'customer_code' => $customer_code,
-        'warehouse_code' => $warehouse_code,
-        'zone_code' => $zone_code,
+        'warehouse_code' => $zone->warehouse_code,
+        'zone_code' => $zone->code,
         'remark' => $remark,
         'update_user' => get_cookie('uname')
       );

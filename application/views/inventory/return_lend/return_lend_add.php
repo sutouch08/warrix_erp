@@ -116,7 +116,7 @@
 			<tr>
 				<td class="middle text-center no">{{no}}</td>
 				<td class="middle">
-					{{barcode}}
+					<span class="barcode" onClick="addToBarcode('{{barcode}}')">{{barcode}}</span>
 					<input type="hidden" id="barcode_{{barcode}}" value="{{itemCode}}">
 				</td>
 				<td class="middle">{{itemCode}}</td>

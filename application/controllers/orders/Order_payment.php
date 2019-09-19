@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Order_payment extends PS_Controller
 {
-  public $menu_code = 'SOPMCF';
-	public $menu_group_code = 'SO';
-  public $menu_sub_group_code = 'ORDER';
+  public $menu_code = 'ACPMCF';
+	public $menu_group_code = 'AC';
+  public $menu_sub_group_code = '';
 	public $title = 'ตรวจสอบยอดชำระเงิน';
   public $filter;
   public function __construct()

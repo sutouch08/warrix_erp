@@ -37,15 +37,15 @@
 			<label>ลูกค้า</label>
 			<input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" disabled/>
 		</div>
-		<div class="col-sm-3 padding-5 last">
+		<!-- <div class="col-sm-3 padding-5 last">
 			<label>คลัง[รับคืน]</label>
 			<input type="text" class="form-control input-sm edit" name="warehouse" id="warehouse" value="<?php echo $doc->warehouse_name; ?>" disabled />
-		</div>
-		<div class="col-sm-3 padding-5 first">
+		</div> -->
+		<div class="col-sm-3 padding-5 last">
 			<label>โซน[รับคืน]</label>
 			<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" disabled />
 		</div>
-    <div class="col-sm-8 padding-5">
+    <div class="col-sm-11 padding-5 first">
     	<label>หมายเหตุ</label>
         <input type="text" class="form-control input-sm edit" name="remark" id="remark" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" value="<?php echo $doc->remark; ?>" disabled />
     </div>

@@ -195,8 +195,8 @@ function addNew()
   var date_add = $('#dateAdd').val();
 	var invoice = $('#invoice').val();
 	var customer_code = $('#customer_code').val();
-	var warehouse_code = $('#warehouse_code').val();
-	//var zone_code = $('#zone_code').val();
+	//var warehouse_code = $('#warehouse_code').val();
+	var zone_code = $('#zone_code').val();
 
   if(!isDate(date_add)){
     swal('วันที่ไม่ถูกต้อง');
@@ -213,15 +213,15 @@ function addNew()
 		return false;
 	}
 
-	if(warehouse_code.length == 0){
-		swal('กรุณาระบุคลังสินค้า');
-		return false;
-	}
-
-	// if(zone_code.length == 0){
-	// 	swal('กรุณาระบุโซนรับสินค้า');
+	// if(warehouse_code.length == 0){
+	// 	swal('กรุณาระบุคลังสินค้า');
 	// 	return false;
 	// }
+
+	if(zone_code.length == 0){
+		swal('กรุณาระบุโซนรับสินค้า');
+		return false;
+	}
 
   $('#addForm').submit();
 }
@@ -261,27 +261,42 @@ $('#customer').autocomplete({
 });
 
 
-function zoneInit(){
-	$('#zone_code').val('');
-	$('#zone').val('');
-	var warehouse = $('#warehouse_code').val();
-	if(warehouse.length > 0){
-		$('#zone').autocomplete({
-			source : BASE_URL + 'auto_complete/get_zone_code_and_name/'+warehouse,
-			autoFocus:true,
-			close:function(){
-				var arr = $(this).val().split(' | ');
-				if(arr.length == 2){
-					$(this).val(arr[1]);
-					$('#zone_code').val(arr[0]);
-				}else{
-					$(this).val('');
-					$('#zone_code').val('');
-				}
-			}
-		})
+// function zoneInit(){
+// 	$('#zone_code').val('');
+// 	$('#zone').val('');
+// 	var warehouse = $('#warehouse_code').val();
+// 	if(warehouse.length > 0){
+// 		$('#zone').autocomplete({
+// 			source : BASE_URL + 'auto_complete/get_zone_code_and_name/'+warehouse,
+// 			autoFocus:true,
+// 			close:function(){
+// 				var arr = $(this).val().split(' | ');
+// 				if(arr.length == 2){
+// 					$(this).val(arr[1]);
+// 					$('#zone_code').val(arr[0]);
+// 				}else{
+// 					$(this).val('');
+// 					$('#zone_code').val('');
+// 				}
+// 			}
+// 		})
+// 	}
+// }
+
+$('#zone').autocomplete({
+	source : BASE_URL + 'auto_complete/get_zone_code_and_name',
+	autoFocus:true,
+	close:function(){
+		var arr = $(this).val().split(' | ');
+		if(arr.length == 2){
+			$(this).val(arr[1]);
+			$('#zone_code').val(arr[0]);
+		}else{
+			$(this).val('');
+			$('#zone_code').val('');
+		}
 	}
-}
+})
 
 
 function inputQtyInit(){

@@ -60,7 +60,7 @@ class Address extends PS_Controller
         'cusPhone' => $adr->phone,
         'cusCode' => $code,
         'cName' => getConfig('COMPANY_FULL_NAME'),
-        'cAddress' => getConfig('COMPANY_ADDRESS'),
+        'cAddress' => getConfig('COMPANY_ADDRESS1').'<br>'.getConfig('COMPANY_ADDRESS2'),
         'cPhone' => getConfig('COMPANY_PHONE'),
         'cPostCode' => getConfig("COMPANY_POST_CODE")
       );
@@ -83,7 +83,7 @@ class Address extends PS_Controller
       'ad' => $this->address_model->get_shipping_detail($id_address),
       'sd' => $this->transport_model->get_sender($id_sender),
       'cName' => getConfig('COMPANY_FULL_NAME'),
-      'cAddress' => getConfig('COMPANY_ADDRESS'),
+      'cAddress' => getConfig('COMPANY_ADDRESS1').'<br>'.getConfig('COMPANY_ADDRESS2'),
       'cPostCode' => getConfig('COMPANY_POST_CODE'),
       'cPhone' => getConfig('COMPANY_PHONE')
     );

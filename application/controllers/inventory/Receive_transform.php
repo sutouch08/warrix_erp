@@ -280,10 +280,12 @@ class Receive_transform extends PS_Controller
   {
     if($this->input->post('receive_code'))
     {
+      $this->load->model('inventory/movement_model');
       $code = $this->input->post('receive_code');
       $this->db->trans_start();
       $this->receive_transform_model->cancle_details($code);
       $this->receive_transform_model->set_status($code, 2); //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
+      $this->movement_model->drop_movement($code);
       $this->db->trans_complete();
 
       if($this->db->trans_status() === FALSE)

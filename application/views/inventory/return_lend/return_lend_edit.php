@@ -7,205 +7,178 @@
 	</div>
     <div class="col-sm-6">
       <p class="pull-right top-p">
-				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-	<?php if($doc->status == 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
+				<button type="button" class="btn btn-sm btn-warning" onclick="leave()"><i class="fa fa-arrow-left"></i> กลับ</button>
+				<?php if($this->pm->can_add) : ?>
 				<button type="button" class="btn btn-sm btn-success" onclick="save()"><i class="fa fa-save"></i> บันทึก</button>
-	<?php endif; ?>
-	<?php if($doc->status == 1 && $this->pm->can_approve) : ?>
-				<button type="button" class="btn btn-sm btn-primary" id="btn-approve" onclick="approve()"><i class="fa fa-save"></i> อนุมัติ</button>
-	<?php endif; ?>
+				<?php	endif; ?>
       </p>
     </div>
 </div>
 <hr />
 
-
+<form id="addForm" action="<?php echo $this->home.'/update'; ?>" method="post">
 <div class="row">
     <div class="col-sm-1 col-1-harf padding-5 first">
     	<label>เลขที่เอกสาร</label>
-        <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->code; ?>" disabled />
+        <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->code; ?>" disabled readonly/>
     </div>
 		<div class="col-sm-1 col-1-harf padding-5">
     	<label>วันที่</label>
-      <input type="text" class="form-control input-sm text-center edit" name="date_add" id="dateAdd" value="<?php echo thai_date($doc->date_add, FALSE); ?>" readonly disabled/>
+      <input type="text" class="form-control input-sm text-center" name="date_add" id="dateAdd" value="<?php echo thai_date($doc->date_add) ?>" disabled readonly />
     </div>
-		<div class="col-sm-1 col-1-harf padding-5">
-			<label>ใบยืมสินค้า</label>
-			<input type="text" class="form-control input-sm text-center edit" name="lend_code" id="lend_code" value="<?php echo $doc->lend_code; ?>" />
+		<div class="col-sm-3 padding-5">
+			<label>ผู้ยืม</label>
+			<input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" placeholder="ชื่อผู้ยืม(พนักงาน)" required/>
 		</div>
-		<div class="col-sm-4 padding-5">
-			<label>ลูกค้า</label>
-			<input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" />
-		</div>
-		<div class="col-sm-3 padding-5 last">
-			<label>โซน[รับคืน]</label>
-			<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" />
-		</div>
-    <div class="col-sm-11 padding-5 first">
+		<div class="col-sm-6 padding-5 last">
     	<label>หมายเหตุ</label>
-        <input type="text" class="form-control input-sm edit" name="remark" id="remark" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" value="<?php echo $doc->remark; ?>" />
+        <input type="text" class="form-control input-sm" name="remark" id="remark" value="<?php echo $doc->remark; ?>" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" />
     </div>
-		<div class="col-sm-1 padding-5 last">
-			<label class="display-block not-show">save</label>
-			<?php 	if($doc->status == 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
-							<button type="button" class="btn btn-xs btn-warning btn-block" id="btn-edit" onclick="editHeader()">แก้ไข</button>
-							<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-update" onclick="updateHeader()">ปรับปรุง</button>
-			<?php	endif; ?>
+
+		<div class="divider-hidden"></div>
+
+		<div class="col-sm-1 col-1-harf padding-5 first">
+			<label>ใบยืมสินค้า</label>
+			<input type="text" class="form-control input-sm text-center" name="lend_code" id="lend_code" value="<?php echo $doc->lend_code; ?>" placeholder="ระบุเลขที่ใบยืมสินค้า" disabled >
 		</div>
+		<div class="col-sm-1 padding-5">
+			<label class="display-block not-show">doc</label>
+			<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-set-code" onclick="load_lend_details()">ดึงข้อมูล</button>
+			<button type="button" class="btn btn-xs btn-primary btn-block" id="btn-change-code" onclick="change_lend_code()">เปลี่ยน</button>
+		</div>
+		<div class="col-sm-3 padding-5">
+			<label>โซน[รับคืน]</label>
+			<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" placeholder="กำหนดโซนที่จะรับสินค้าเข้า" disabled >
+		</div>
+		<div class="col-sm-1 padding-5">
+			<label class="display-block not-show">chang</label>
+			<button type="button" class="btn btn-xs btn-primary btn-block" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
+			<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-set-zone" onclick="setZone()">ตกลง</button>
+		</div>
+
+		<div class="col-sm-1 padding-5">
+			<label>จำนวน</label>
+			<input type="number" class="form-control input-sm text-center" id="qty" value="1">
+		</div>
+
+		<div class="col-sm-3 padding-5">
+			<label>บาร์โค้ดสินค้า</label>
+			<input type="text" class="form-control input-sm text-center" id="barcode" placeholder="ยิงบาร์โค้ดสินค้า">
+		</div>
+		<div class="col-sm-1 padding-5">
+			<label class="display-block not-show">barcode</label>
+			<button type="button" class="btn btn-xs btn-success btn-block" onclick="doReceive()">ตกลง</button>
+		</div>
+
 </div>
-
-<input type="hidden" id="return_code" value="<?php echo $doc->code; ?>" />
-<input type="hidden" id="customer_code" value="<?php echo $doc->customer_code; ?>" />
-<input type="hidden" name="from_warehouse" id="from_warehouse" value="<?php echo $doc->from_warehouse; ?>"/>
-<input type="hidden" name="from_zone" id="from_zone" value="<?php echo $doc->from_zone; ?>" />
-<input type="hidden" name="to_warehouse" id="to_warehouse" value="<?php echo $doc->to_warehouse; ?>" />
-<input type="hidden" name="to_zone" id="to_zone" value="<?php echo $doc->to_zone; ?>" />
-
 <hr class="margin-top-15"/>
 <div class="row">
-	<div class="col-sm-1 padding-5 first">
-    	<label>จำนวน</label>
-        <input type="number" class="form-control input-sm text-center" id="qty" value="1" />
-    </div>
-    <div class="col-sm-2 padding-5">
-    	<label>บาร์โค้ดสินค้า</label>
-        <input type="text" class="form-control input-sm text-center" id="barcode" placeholder="ยิงบาร์โค้ดเพื่อรับสินค้า" autocomplete="off"  />
-    </div>
-    <div class="col-sm-1 padding-5">
-    	<label class="display-block not-show">ok</label>
-        <button type="button" class="btn btn-xs btn-primary" onclick="doReceive()"><i class="fa fa-check"></i> ตกลง</button>
-    </div>
-
-
-		<div class="col-sm-2 col-sm-offset-5 padding-5">
-			<label>เพิ่มบิล[SAP]</label>
-			<input type="text" class="form-control input-sm text-center" id="invoice-box" placeholder="ดึงใบกำกับเพิ่มเติม" />
-		</div>
-		<div class="col-sm-1 padding-5 last">
-			<label class="display-block not-show">btn</label>
-			<button type="button" class="btn btn-xs btn-info btn-block" onclick="load_invoice()">ดึงข้อมูล</button>
-		</div>
-</div>
-<hr class="margin-top-15 margin-bottom-15"/>
-<form id="detailsForm" method="post" action="<?php echo $this->home.'/add_details/'.$doc->code; ?>">
-<div class="row">
 	<div class="col-sm-12">
-		<table class="table table-striped border-1" style="margin-bottom:0px;">
+		<table class="table table-striped border-1">
 			<thead>
 				<tr>
-					<th class="width-5 text-center">ลำดับ</th>
-					<th class="width-10">บาร์โค้ด</th>
-					<th class="">สินค้า</th>
-					<th class="width-8 text-center">อ้างอิง</th>
-					<th class="width-8 text-right">จำนวน</th>
-					<th class="width-8 text-right">ราคา</th>
-					<th class="width-8 text-right">ส่วนลด</th>
-					<th class="width-8 text-right">คืน</th>
-					<th class="width-10 text-right">มูลค่า</th>
-					<th class="width-5"></th>
+					<th class="width-5 middle text-center">No.</th>
+					<th class="width-15 middle">บาร์โค้ด</th>
+					<th class="width-40 middle">สินค้า</th>
+					<th class="width-10 middle text-right">ยืม</th>
+					<th class="width-10 middle text-right">คืนแล้ว</th>
+					<th class="width-10 middle text-right">ค้าง</th>
+					<th class="width-10 middle text-right">ครั้งนี้</th>
 				</tr>
 			</thead>
-			<tbody id="detail-table">
-<?php  $total_qty = 0; ?>
-<?php  $total_amount = 0; ?>
+			<tbody id="result">
 <?php if(!empty($details)) : ?>
-<?php  $no = 1; ?>
-<?php  foreach($details as $rs) : ?>
-				<tr id="row_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>">
+<?php 	$no = 1; ?>
+<?php 	$total_lend = 0; ?>
+<?php 	$total_receive = 0; ?>
+<?php   $total_backlogs = 0; ?>
+<?php   $total_qty = 0; ?>
+<?php 	foreach($details as $rs) : ?>
+				<tr>
 					<td class="middle text-center no"><?php echo $no; ?></td>
-					<td class="middle <?php echo $rs->product_code; ?>"><?php echo $rs->barcode; ?></td>
-					<td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
-					<td class="middle text-center invoice <?php echo $rs->invoice_code; ?>">
-						<?php echo $rs->invoice_code; ?>
-					</td>
-					<td class="middle text-right inv_qty">
-						<?php echo round($rs->sold_qty); ?>
-						<input type="hidden"
-						name="sold_qty[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="inv_qty_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round($rs->sold_qty); ?>"/>
-					</td>
-					<td class="middle text-right">
-						<?php echo round($rs->price, 2); ?>
-						<input type="hidden" class="input-price"
-						name="price[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="price_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round($rs->price, 2); ?>" />
-					</td>
-					<td class="middle text-right">
-						<?php echo round($rs->discount_percent, 2).' %'; ?>
-						<input type="hidden" name="discount[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="discount_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round($rs->discount_percent, 2); ?>" />
-					</td>
 					<td class="middle">
-						<input
-							type="number" class="form-control input-sm text-right input-qty"
-							name="qty[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-							id="qty_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-							value="<?php echo round($rs->qty,2); ?>" />
+						<span class="barcode" onclick="addToBarcode('<?php echo $rs->barcode; ?>')"><?php echo $rs->barcode; ?></span>
+						<input type="hidden" id="barcode_<?php echo $rs->barcode; ?>" value="<?php echo $rs->product_code; ?>">
 					</td>
-					<td class="middle text-right amount-label" id="amount_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>">
-						<?php echo number(($rs->price * $rs->qty),2); ?>
+					<td class="middle"><?php echo $rs->product_code; ?></td>
+					<td class="middle text-right"><?php echo intval($rs->lend_qty); ?></td>
+					<td class="middle text-right"><?php echo intval($rs->receive); ?></td>
+					<td class="middle text-right">
+						<?php echo $rs->backlogs; ?>
+						<input type="hidden" id="backlogs_<?php echo $rs->product_code; ?>" value="<?php echo intval($rs->backlogs); ?>">
 					</td>
-					<td class="middle text-center">
-						<button type="button" class="btn btn-minier btn-danger"
-						onclick="removeRow('<?php echo $rs->product_code."_".$rs->invoice_code; ?>', <?php echo $rs->id; ?>)">
-							<i class="fa fa-trash"></i>
-						</button>
+					<td class="middle text-right">
+						<input type="number" class="form-control input-sm text-right qty" name="qty[<?php echo $rs->product_code; ?>]" id="qty_<?php echo $rs->product_code; ?>" value="<?php echo intval($rs->qty); ?>">
 					</td>
 				</tr>
 <?php
 				$no++;
+				$total_lend += $rs->lend_qty;
+				$total_receive += $rs->receive;
+				$total_backlogs += $rs->backlogs;
 				$total_qty += $rs->qty;
-				$total_amount += ($rs->qty * $rs->price);
 ?>
-<?php  endforeach; ?>
+<?php 	endforeach; ?>
+				<tr class="font-size-14">
+					<td colspan="3" class="middle text-right">รวม</td>
+					<td class="middle text-right"><?php echo $total_lend; ?></td>
+					<td class="middle text-right"><?php echo $total_receive; ?></td>
+					<td class="middle text-right"><?php echo $total_backlogs; ?></td>
+					<td class="middle text-right" id="totalQty"><?php echo $total_qty; ?></td>
+				</tr>
 <?php endif; ?>
 			</tbody>
 		</table>
 	</div>
 </div>
-<table class="table border-1">
-	<tr>
-		<td class="middle width-75 text-right">รวม</td>
-		<td class="middle widht-10 text-right" id="total-qty"><?php echo number($total_qty); ?></td>
-		<td class="middle width-10 text-right" id="total-amount"><?php echo number($total_amount, 2); ?></td>
-		<td class="width-5"></td>
-	</tr>
-</table>
+<input type="hidden" name="customer_code" id="customer_code" value="<?php echo $doc->customer_code; ?>">
+<input type="hidden" name="zone_code" id="zone_code" value="<?php echo $doc->to_zone; ?>">
+<input type="hidden" name="lendCode" id="lendCode" value="<?php echo $doc->lend_code; ?>">
+<input type="hidden" name="return_code" id="return_code" value="<?php echo $doc->code; ?>">
 </form>
 
-
-<script type="text/x-handlebarsTemplate" id="row-template">
-{{#each this}}
-	<tr id="row_{{code}}_{{invoice}}">
-		<td class="middle text-center no"></td>
-		<td class="middle {{code}}">{{barcode}}</td>
-		<td class="middle">{{code}} : {{name}}</td>
-		<td class="middle text-center invoice {{invoice}}">{{invoice}}</td>
-		<td class="middle text-right inv_qty">
-		{{qty}}
-		<input type="hidden" name="sold_qty[{{code}}][{{invoice}}]" id="inv_qty_{{code}}_{{invoice}}" value="{{qty}}" />
-		</td>
-		<td class="middle text-right">
-			{{price}}
-			<input type="hidden" class="input-price" name="price[{{code}}][{{invoice}}]" id="price_{{code}}_{{invoice}}" value="{{price}}" />
-		</td>
-		<td class="middle text-right">
-			{{discount}} %
-			<input type="hidden" name="discount[{{code}}][{{invoice}}]" id="discount_{{code}}_{{invoice}}" value="{{discount}}" />
-		</td>
-		<td class="middle">
-			<input type="number" class="form-control input-sm text-right input-qty" name="qty[{{code}}][{{invoice}}]" id="qty_{{code}}_{{invoice}}" value="0" />
-		</td>
-		<td class="middle text-right amount-label" id="amount_{{code}}_{{invoice}}">{{amount}}</td>
-		<td class="middle text-center">
-			<button type="button" class="btn btn-minier btn-danger" onclick="removeRow('{{code}}_{{invoice}}', '')"><i class="fa fa-trash"></i></button>
-		</td>
-	</tr>
-	{{/each}}
+<script id="template" type="text/x-handlebarsTemplate">
+{{#each details}}
+	{{#if nodata}}
+		<tr>
+			<td colspan="7" class="middle text-center">ไม่พบข้อมูล</td>
+		</tr>
+	{{else}}
+		{{#if @last}}
+			<tr class="font-size-14">
+				<td colspan="3" class="middle text-right">รวม</td>
+				<td class="middle text-right">{{totalLend}}</td>
+				<td class="middle text-right">{{totalReceived}}</td>
+				<td class="middle text-right">{{totalBacklogs}}</td>
+				<td class="middle text-right" id="totalQty">0</td>
+			</tr>
+		{{else}}
+			<tr>
+				<td class="middle text-center no">{{no}}</td>
+				<td class="middle">
+					<span class="barcode" onClick="addToBarcode('{{barcode}}')">{{barcode}}</span>
+					<input type="hidden" id="barcode_{{barcode}}" value="{{itemCode}}">
+				</td>
+				<td class="middle">{{itemCode}}</td>
+				<td class="middle text-right">{{lendQty}}</td>
+				<td class="middle text-right">{{received}}</td>
+				<td class="middle text-right">
+					{{backlogs}}
+					<input type="hidden" id="backlogs_{{itemCode}}" value="{{backlogs}}">
+				</td>
+				<td class="middle text-right">
+				{{#if backlogs}}
+					<input type="number" class="form-control input-sm text-right qty" name="qty[{{itemCode}}]" id="qty_{{itemCode}}" value="">
+				{{/if}}
+				</td>
+			</tr>
+		{{/if}}
+	{{/if}}
+{{/each}}
 </script>
+
+
+
 <script src="<?php echo base_url(); ?>scripts/inventory/return_lend/return_lend.js"></script>
 <script src="<?php echo base_url(); ?>scripts/inventory/return_lend/return_lend_add.js"></script>
 <script src="<?php echo base_url(); ?>scripts/inventory/return_lend/return_lend_control.js"></script>

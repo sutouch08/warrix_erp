@@ -75,6 +75,7 @@ class Return_lend extends PS_Controller
     if($this->input->post('date_add'))
     {
       $this->load->model('inventory/lend_model');
+      $this->load->model('inventory/movement_model');
       //--- retrive data form
       $date_add = db_date($this->input->post('date_add', TRUE));
       $customer_code = $this->input->post('customer_code');
@@ -106,7 +107,7 @@ class Return_lend extends PS_Controller
       );
 
       //--- start transection;
-      $this->db->trans_start();
+      $this->db->trans_begin();
 
       //--- add new lend return
       $rs = $this->return_lend_model->add($arr);
@@ -121,6 +122,7 @@ class Return_lend extends PS_Controller
             $amount = $qty * $item->price;
             $ds = array(
               'return_code' => $code,
+              'lend_code' => $lend_code,
               'product_code' => $item->code,
               'product_name' => $item->name,
               'qty' => $qty,
@@ -136,6 +138,30 @@ class Return_lend extends PS_Controller
             }
             else
             {
+              //--- insert Movement out
+              $arr = array(
+                'reference' => $code,
+                'warehouse_code' => $lend->warehouse_code,
+                'zone_code' => $lend->zone_code,
+                'product_code' => $item->code,
+                'move_in' => 0,
+                'move_out' => $qty,
+                'date_add' => db_date($this->input->post('date_add'), TRUE)
+              );
+              $this->movement_model->add($arr);
+
+              //--- insert Movement in
+              $arr = array(
+                'reference' => $code,
+                'warehouse_code' => $zone->warehouse_code,
+                'zone_code' => $zone->code,
+                'product_code' => $item->code,
+                'move_in' => $qty,
+                'move_out' => 0,
+                'date_add' => db_date($this->input->post('date_add'), TRUE)
+              );
+              $this->movement_model->add($arr);
+
               if( ! $this->return_lend_model->update_receive($lend_code, $item->code, $qty))
               {
                 $sc = FALSE;
@@ -151,7 +177,14 @@ class Return_lend extends PS_Controller
         $this->error = "เพิ่มเอกสารไม่สำเร็จ";
       }
 
-      $this->db->trans_complete();
+      if($sc === FALSE)
+      {
+        $this->db->trans_rollback();
+      }
+      else
+      {
+        $this->db->trans_commit();
+      }
 
       if($sc === FALSE)
       {
@@ -175,8 +208,398 @@ class Return_lend extends PS_Controller
 
 
 
+  public function unsave($code)
+  {
+    $sc = TRUE;
+    $doc = $this->return_lend_model->get($code);
+    if(!empty($doc))
+    {
+      $this->load->model('inventory/movement_model');
+      $this->load->model('inventory/lend_model');
+
+      //--- start transection
+      $this->db->trans_begin();
+
+      //--- 1 remove movement
+      if( ! $this->movement_model->drop_movement($code) )
+      {
+        $sc = FALSE;
+        $this->error = "ลบ movement ไม่สำเร็จ";
+      }
+
+      //--- 2 update order_lend_detail
+      if($sc === TRUE)
+      {
+        $details = $this->return_lend_model->get_lend_details($code);
+        if(!empty($details))
+        {
+          foreach($details as $rs)
+          {
+            //--- exit loop if any error
+            if($sc === FALSE)
+            {
+              break;
+            }
+
+            $qty = $rs->qty * -1;  //--- convert to negative for add in function
+            if( ! $this->return_lend_model->update_receive($rs->lend_code, $rs->product_code, $qty))
+            {
+              $sc = FALSE;
+              $this->error = "ปรับปรุง ยอดรับ {$rs->product_code} ไม่สำเร็จ";
+            }
+          } //-- end foreach
+        } //--- end if !empty $details
+      } //--- end if $sc
+
+      //--- 3. change lend_details status to 0 (not save)
+      if($sc === TRUE)
+      {
+        if( ! $this->return_lend_model->change_details_status($code, 0))
+        {
+          $sc = FALSE;
+          $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
+        }
+      }
+
+      //--- 4. change return_lend document to 0 (not save)
+      if($sc === TRUE)
+      {
+        if( ! $this->return_lend_model->change_status($code, 0))
+        {
+          $sc = FALSE;
+          $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+        }
+      }
+
+      //--- commit or rollback transection
+      if($sc === TRUE)
+      {
+        $this->db->trans_commit();
+      }
+      else
+      {
+        $this->db->trans_rollback();
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เลขที่เอกสารไม่ถูกต้อง : {$code}";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
+
+
+  public function edit($code)
+  {
+    $doc = $this->return_lend_model->get($code);
+    if(!empty($doc))
+    {
+      $doc->zone_name = $this->zone_model->get_name($doc->to_zone);
+    }
+
+    $details = $this->return_lend_model->get_details($code);
+    if(!empty($details))
+    {
+      foreach($details as $rs)
+      {
+        $rs->barcode = $this->products_model->get_barcode($rs->product_code);
+        $rs->backlogs = $rs->lend_qty - $rs->receive;
+      }
+    }
+
+    $ds['doc'] = $doc;
+    $ds['details'] = $details;
+
+    $this->load->view('inventory/return_lend/return_lend_edit', $ds);
+  }
+
+
+
+
+
+  public function update()
+  {
+    $sc = TRUE;
+    $code = $this->input->post('return_code');
+    if($code)
+    {
+      $this->load->model('inventory/lend_model');
+      $this->load->model('inventory/movement_model');
+
+      //--- retrive data form
+      $date_add = db_date($this->input->post('date_add', TRUE));
+      $customer_code = $this->input->post('customer_code');
+      $customer_name = $this->input->post('customer');
+      $zone_code = $this->input->post('zone_code');
+      $lend_code = $this->input->post('lendCode');
+      $remark = $this->input->post('remark');
+      $qtys = $this->input->post('qty');
+      //--- end data form
+
+      $lend = $this->lend_model->get($lend_code);
+      $zone = $this->zone_model->get($zone_code);
+
+      $arr = array(
+        'lend_code' => $lend_code,
+        'customer_code' => $customer_code,
+        'customer_name' => $customer_name,
+        'from_warehouse' => $lend->warehouse_code, //--- warehouse ต้นทาง ดึงจากเอกสารยืม
+        'from_zone' => $lend->zone_code, //--- zone ต้นทาง ดึงจากเอกสารยืม
+        'to_warehouse' => $zone->warehouse_code,
+        'to_zone' => $zone->code,
+        'date_add' => $date_add,
+        'update_user' => get_cookie('uname'),
+        'remark' => $remark,
+        'status' => 1
+      );
+
+      //--- start transection;
+      $this->db->trans_begin();
+
+      //--- update lend return
+      $update = $this->return_lend_model->update($code, $arr);
+
+      if($update)
+      {
+        //--- drop all details before add new details
+        if(! $this->return_lend_model->drop_details($code))
+        {
+          $sc = FALSE;
+          $thsi->error = "ลบรายการเก่าไม่สำเร็จ";
+        }
+
+        if($sc === TRUE)
+        {
+          foreach($qtys as $pdCode => $qty)
+          {
+            if($qty > 0)
+            {
+              $item = $this->products_model->get($pdCode);
+              $amount = $qty * $item->price;
+              $ds = array(
+                'return_code' => $code,
+                'lend_code' => $lend_code,
+                'product_code' => $item->code,
+                'product_name' => $item->name,
+                'qty' => $qty,
+                'price' => $item->price,
+                'amount' => $amount,
+                'vat_amount' => get_vat_amount($amount)
+              );
+
+              if(! $this->return_lend_model->add_detail($ds))
+              {
+                $sc = FALSE;
+                $this->error = "เพิ่มรายการไม่สำเร็จ : {$item->code}";
+              }
+              else
+              {
+                //--- insert Movement out
+                $arr = array(
+                  'reference' => $code,
+                  'warehouse_code' => $lend->warehouse_code,
+                  'zone_code' => $lend->zone_code,
+                  'product_code' => $item->code,
+                  'move_in' => 0,
+                  'move_out' => $qty,
+                  'date_add' => db_date($this->input->post('date_add'), TRUE)
+                );
+
+                $this->movement_model->add($arr);
+
+                //--- insert Movement in
+                $arr = array(
+                  'reference' => $code,
+                  'warehouse_code' => $zone->warehouse_code,
+                  'zone_code' => $zone->code,
+                  'product_code' => $item->code,
+                  'move_in' => $qty,
+                  'move_out' => 0,
+                  'date_add' => db_date($this->input->post('date_add'), TRUE)
+                );
+
+                $this->movement_model->add($arr);
+
+                //--- update backlogs
+                if( ! $this->return_lend_model->update_receive($lend_code, $item->code, $qty))
+                {
+                  $sc = FALSE;
+                  $this->error = "Update ยอดรับไม่สำเร็จ {$item->code}";
+                }
+              } //--- end add detail
+            } //-- end if qty
+          } //--- end foreach;
+        } //--- end if $sc
+      }
+      else //-- if $rs
+      {
+        $sc = FALSE;
+        $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+      }
+
+      if($sc === FALSE)
+      {
+        $this->db->trans_rollback();
+      }
+      else
+      {
+        $this->db->trans_commit();
+      }
+
+      if($sc === FALSE)
+      {
+        set_error($this->error);
+        redirect($this->home.'/add_new');
+      }
+      else
+      {
+        $this->export_return_lend($code);
+
+        redirect($this->home.'/view_detail/'.$code);
+      }
+    }
+    else
+    {
+      set_error("ไม่พบเอกสาร {$code}");
+      redirect($this->home.'/edit/'.$code);
+    }
+  }
+
+
+
+  public function cancle_return($code)
+  {
+    $sc = TRUE;
+
+    $doc = $this->return_lend_model->get($code);
+    if(!empty($doc))
+    {
+      //--- if document saved
+      if($doc->status == 1)
+      {
+        $this->load->model('inventory/movement_model');
+        $this->load->model('inventory/lend_model');
+
+        //--- start transection
+        $this->db->trans_begin();
+
+        //--- 1 remove movement
+        if( ! $this->movement_model->drop_movement($code) )
+        {
+          $sc = FALSE;
+          $this->error = "ลบ movement ไม่สำเร็จ";
+        }
+
+        //--- 2 update order_lend_detail
+        if($sc === TRUE)
+        {
+          $details = $this->return_lend_model->get_lend_details($code);
+          if(!empty($details))
+          {
+            foreach($details as $rs)
+            {
+              //--- exit loop if any error
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              $qty = $rs->qty * -1;  //--- convert to negative for add in function
+              if( ! $this->return_lend_model->update_receive($rs->lend_code, $rs->product_code, $qty))
+              {
+                $sc = FALSE;
+                $this->error = "ปรับปรุง ยอดรับ {$rs->product_code} ไม่สำเร็จ";
+              }
+            } //-- end foreach
+          } //--- end if !empty $details
+        } //--- end if $sc
+
+        //--- 3. change lend_details status to 2 (cancle)
+        if($sc === TRUE)
+        {
+          if( ! $this->return_lend_model->change_details_status($code, 2))
+          {
+            $sc = FALSE;
+            $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
+          }
+        }
+
+        //--- 4. change return_lend document to 0 (not save)
+        if($sc === TRUE)
+        {
+          if( ! $this->return_lend_model->change_status($code, 2))
+          {
+            $sc = FALSE;
+            $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+          }
+        }
+
+        //--- commit or rollback transection
+        if($sc === TRUE)
+        {
+          $this->db->trans_commit();
+        }
+        else
+        {
+          $this->db->trans_rollback();
+        }
+      }
+      else if($doc->status == 0)  //--- if not save
+      {
+        //--- just change status
+        $this->db->trans_begin();
+
+        if($sc === TRUE)
+        {
+          //--- change lend_details status to 2 (cancle)
+          if( ! $this->return_lend_model->change_details_status($code, 2))
+          {
+            $sc = FALSE;
+            $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
+          }
+        }
+
+        //--- change return_lend document to 0 (not save)
+        if($sc === TRUE)
+        {
+          if( ! $this->return_lend_model->change_status($code, 2))
+          {
+            $sc = FALSE;
+            $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+          }
+        }
+
+        //--- commit or rollback transection
+        if($sc === TRUE)
+        {
+          $this->db->trans_commit();
+        }
+        else
+        {
+          $this->db->trans_rollback();
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบเลขที่เอกสาร";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
+
   public function view_detail($code)
   {
+    $this->load->model('inventory/lend_model');
     $doc = $this->return_lend_model->get($code);
     if(!empty($doc))
     {
@@ -185,8 +608,18 @@ class Return_lend extends PS_Controller
       $doc->user_name = $this->user_model->get_name($doc->user);
     }
 
+    $details = $this->lend_model->get_backlogs_list($doc->lend_code);
+
+    if(!empty($details))
+    {
+      foreach($details as $rs)
+      {
+        $rs->return_qty = $this->return_lend_model->get_return_qty($doc->code, $rs->product_code);
+      }
+    }
+
     $data['doc'] = $doc;
-    $data['details'] = $this->return_lend_model->get_details($code);
+    $data['details'] = $details;
     $this->load->view('inventory/return_lend/return_lend_view_detail', $data);
   }
 
@@ -418,6 +851,37 @@ class Return_lend extends PS_Controller
  }
 
 
+
+  public function print_return($code)
+  {
+    $this->load->model('inventory/lend_model');
+    $this->load->library('printer');
+    $doc = $this->return_lend_model->get($code);
+    $doc->from_warehouse_name = $this->warehouse_model->get_name($doc->from_warehouse);
+    $doc->to_warehouse_name = $this->warehouse_model->get_name($doc->to_warehouse);
+    $doc->from_zone_name = $this->zone_model->get_name($doc->from_zone);
+    $doc->to_zone_name = $this->zone_model->get_name($doc->to_zone);
+
+    $details = $this->lend_model->get_backlogs_list($doc->lend_code);
+
+    if(!empty($details))
+    {
+      foreach($details as $rs)
+      {
+        $rs->return_qty = $this->return_lend_model->get_return_qty($doc->code, $rs->product_code);
+      }
+    }
+
+    $ds = array(
+      'doc' => $doc,
+      'details' => $details
+    );
+
+    $this->load->view('print/print_return_lend', $ds);
+  }
+
+
+
   public function get_new_code($date = '')
   {
     $date = $date == '' ? date('Y-m-d') : $date;
@@ -443,7 +907,7 @@ class Return_lend extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'invoice', 'customer_code', 'from_date', 'to_date');
+    $filter = array('code','lend_code','customer_code','from_date','to_date','status');
     clear_filter($filter);
   }
 

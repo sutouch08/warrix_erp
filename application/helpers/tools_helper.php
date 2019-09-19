@@ -14,10 +14,14 @@ function limitText($str, $length)
 	}
 }
 
+
+
+
 function is_selected($val, $select)
 {
   return $val == $select ? 'selected' : '';
 }
+
 
 
 
@@ -32,6 +36,9 @@ function is_active($val)
 {
   return $val == 1 ? '<i class="fa fa-check green"></i>' : '<i class="fa fa-times red"></i>';
 }
+
+
+
 
 function get_filter($postName, $cookieName, $defaultValue = "")
 {
@@ -54,6 +61,7 @@ function get_filter($postName, $cookieName, $defaultValue = "")
 
 	return $sc;
 }
+
 
 
 
@@ -91,11 +99,15 @@ function set_rows($value = 20)
 
 
 
+
+
 function get_rows()
 {
   $CI =& get_instance();
   return $CI->input->cookie('rows') === NULL ? 20 : $CI->input->cookie('rows');
 }
+
+
 
 
 function number($val, $digit = 0)
@@ -104,6 +116,12 @@ function number($val, $digit = 0)
 }
 
 
+
+
+function ac_format($val, $digit = 0)
+{
+	return $val == 0 ? '-' : number_format($val, $digit);
+}
 
 
 function getConfig($code)

@@ -129,7 +129,7 @@ $("#barcode-zone").keyup(function(e){
   if(e.keyCode == 13){
     if( $(this).val() != ""){
       $.ajax({
-        url: BASE_URL + 'inventory/zone/get_zone_code',
+        url: BASE_URL + 'masters/zone/get_zone_code',
         type:"GET",
         cache:"false",
         data:{

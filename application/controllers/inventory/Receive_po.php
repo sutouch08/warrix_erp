@@ -133,6 +133,7 @@ class Receive_po extends PS_Controller
     {
       $this->load->model('masters/products_model');
       $this->load->model('masters/zone_model');
+      $this->load->model('inventory/movement_model');
 
       $code = $this->input->post('receive_code');
       $vendor_code = $this->input->post('vendor_code');
@@ -145,6 +146,8 @@ class Receive_po extends PS_Controller
       $backlogs = $this->input->post('backlogs');
       $prices = $this->input->post('prices');
       $approver = $this->input->post('approver') == '' ? NULL : $this->input->post('approver');
+
+      $doc = $this->receive_po_model->get($code);
 
       $arr = array(
         'vendor_code' => $vendor_code,
@@ -195,6 +198,21 @@ class Receive_po extends PS_Controller
                 $sc = FALSE;
                 $message = 'Add Receive Row Fail';
                 break;
+              }
+              else
+              {
+                //--- insert Movement in
+                $arr = array(
+                  'reference' => $code,
+                  'warehouse_code' => $warehouse_code,
+                  'zone_code' => $zone_code,
+                  'product_code' => $item,
+                  'move_in' => $qty,
+                  'move_out' => 0,
+                  'date_add' => $doc->date_add
+                );
+
+                $this->movement_model->add($arr);
               }
             }
           }
@@ -379,10 +397,12 @@ class Receive_po extends PS_Controller
   {
     if($this->input->post('receive_code'))
     {
+      $this->load->model('inventory/movement_model');
       $code = $this->input->post('receive_code');
       $this->db->trans_start();
       $this->receive_po_model->cancle_details($code);
       $this->receive_po_model->set_status($code, 2); //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
+      $this->movement_model->drop_movement($code);
       $this->db->trans_complete();
 
       if($this->db->trans_status() === FALSE)

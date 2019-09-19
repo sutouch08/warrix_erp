@@ -1,3 +1,46 @@
+function unsave()
+{
+	var code = $('#return_code').val();
+	swal({
+		title:'คุณแน่ใจ ?',
+		text:'โปรดทราบ คุณต้องลบเอกสารใน SAP ด้วย ต้องการดำเนินการต่อหรือไม่ ?',
+		type:'warning',
+		showCancelButton:true,
+		confirmButtonText:'ดำเนินการต่อ',
+		confirmButtonColor:'#DD6B55',
+		cancelButtonText:'ยกเลิก',
+		closeOnConfirm:false
+	}, function(){
+		$.ajax({
+			url:HOME + 'unsave/'+code,
+			type:'POST',
+			cache:false,
+			success:function(rs){
+				if(rs == 'success'){
+					swal({
+						title:'Success',
+						text:'ยกเลิกการบันทึกเรียบร้อยแล้ว',
+						type:'success',
+						timer:1000
+					});
+
+					setTimeout(function(){
+						goEdit(code);
+					}, 1500);
+				}else{
+					swal({
+						title:'Error',
+						text:rs,
+						type:'error'
+					});
+				}
+			}
+		})
+	});
+}
+
+
+
 function save()
 {
 	var count = 0;
@@ -42,12 +85,7 @@ function save()
 			$(this).removeClass('has-error');
 		}
 
-		if(qty < 0 || qty == 0){
-			error++;
-			$(this).addClass('has-error');
-		}
-
-		if(qty > limit){
+		if(qty < 0 || qty > limit){
 			error++;
 			$(this).addClass('has-error');
 		}

@@ -11,7 +11,7 @@ class Menu extends CI_Model{
   public function get_menu_groups()
   {
     $this->db->order_by('position', 'ASC');
-    $rs = $this->db->get('menu_group');
+    $rs = $this->db->where('active', 1)->get('menu_group');
     return $rs->result();
   }
 

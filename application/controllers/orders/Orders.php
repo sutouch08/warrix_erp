@@ -226,7 +226,7 @@ class Orders extends PS_Controller
       							$discAmount += $amount;
       							$price -= $amount;
       						}
-                  
+
       						$i++;
       					}
 
@@ -1353,72 +1353,88 @@ class Orders extends PS_Controller
           }
         }
 
-        $this->db->trans_start();
-
-        //--- ถ้าเปิดบิลแล้ว
-        if($sc === TRUE && $order->state == 8)
+        //--- ถ้าเป็นยืมสินค้า
+        if($order->role == 'L')
         {
-          if($state < 8)
+          $this->load->model('inventory/lend_model');
+          //--- หากมีการรับสินค้าที่ผูกไว้แล้วจะไม่อนุญาติให้เปลี่ยนสถานะใดๆ
+          $is_received = $this->lend_model->is_received($code);
+          if($is_received === TRUE)
           {
-            $this->roll_back_action($code, $order->role);
-          }
-
-          if($state == 9)
-          {
-            $this->roll_back_action($code, $order->role);
-            $this->cancle_order($code, $order->role);
-          }
-        }
-
-        else if($sc === TRUE && $order->state != 8)
-        {
-          if($state == 9)
-          {
-            $this->cancle_order($code, $order->role);
+            $sc = FALSE;
+            $message = 'ใบเบิกมีการรับคืนสินค้าแล้วไม่อนุญาติให้ย้อนสถานะ';
           }
         }
 
         if($sc === TRUE)
         {
-          $rs = $this->orders_model->change_state($code, $state);
+          $this->db->trans_start();
 
-          if($rs)
+          //--- ถ้าเปิดบิลแล้ว
+          if($sc === TRUE && $order->state == 8)
           {
-            $arr = array(
-              'order_code' => $code,
-              'state' => $state,
-              'update_user' => get_cookie('uname')
-            );
-
-            $this->order_state_model->add_state($arr);
-          }
-        }
-
-
-        $this->db->trans_complete();
-
-        if($this->db->trans_status() === FALSE)
-        {
-          $sc = FALSE;
-        }
-
-        if($sc === TRUE && $order->state == 8)
-        {
-          if(!empty($details))
-          {
-            foreach($details as $rs)
+            if($state < 8)
             {
-              $item = $this->products_model->get($rs->product_code);
-              if($rs->is_count == 1 && $item->is_api == 1 && $rs->is_complete == 1)
+              $this->roll_back_action($code, $order->role);
+            }
+
+            if($state == 9)
+            {
+              $this->roll_back_action($code, $order->role);
+              $this->cancle_order($code, $order->role);
+            }
+          }
+
+          else if($sc === TRUE && $order->state != 8)
+          {
+            if($state == 9)
+            {
+              $this->cancle_order($code, $order->role);
+            }
+          }
+
+          if($sc === TRUE)
+          {
+            $rs = $this->orders_model->change_state($code, $state);
+
+            if($rs)
+            {
+              $arr = array(
+                'order_code' => $code,
+                'state' => $state,
+                'update_user' => get_cookie('uname')
+              );
+
+              $this->order_state_model->add_state($arr);
+            }
+          }
+
+
+          $this->db->trans_complete();
+
+          if($this->db->trans_status() === FALSE)
+          {
+            $sc = FALSE;
+          }
+
+          if($sc === TRUE && $order->state == 8)
+          {
+            if(!empty($details))
+            {
+              foreach($details as $rs)
               {
-                $this->update_api_stock($rs->product_code);
+                $item = $this->products_model->get($rs->product_code);
+                if($rs->is_count == 1 && $item->is_api == 1 && $rs->is_complete == 1)
+                {
+                  $this->update_api_stock($rs->product_code);
+                }
               }
             }
           }
         }
-
-        echo $sc === TRUE ? 'success' : $message;
       }
+
+      echo $sc === TRUE ? 'success' : $message;
     }
     else
     {
@@ -1436,6 +1452,7 @@ class Orders extends PS_Controller
     $this->load->model('inventory/cancle_model');
     $this->load->model('inventory/invoice_model');
     $this->load->model('inventory/transform_model');
+    $this->load->model('inventory/lend_model');
     //---- set is_complete = 0
     $this->orders_model->un_complete($code);
 
@@ -1447,6 +1464,7 @@ class Orders extends PS_Controller
 
     //--- restore sold product back to buffer
     $sold = $this->invoice_model->get_details($code);
+
     if(!empty($sold))
     {
       foreach($sold as $rs)
@@ -1478,6 +1496,12 @@ class Orders extends PS_Controller
         if($role == 'T')
         {
           $this->transform_model->reset_sold_qty($code);
+        }
+
+        //-- หากเป็นออเดอร์ยืม
+        if($role == 'L')
+        {
+          $this->lend_model->drop_backlogs_list($code);
         }
       } //--- end foreach
     } //---- end sold

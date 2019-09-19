@@ -32,15 +32,17 @@
 			<input type="text" class="form-control input-sm text-center" id="customer" value="" />
 		</div>
 		<div class="col-sm-3 padding-5 last">
-			<label>คลัง[รับคืน]</label>
-			<input type="text" class="form-control input-sm" name="warehouse" id="warehouse" value="" />
-		</div>
-		<!--
-		<div class="col-sm-3 padding-5 first">
 			<label>โซน[รับคืน]</label>
 			<input type="text" class="form-control input-sm" name="zone" id="zone" value="" />
 		</div>
-	-->
+
+		<!-- <div class="col-sm-3 padding-5 last">
+			<label>คลัง[รับคืน]</label>
+			<input type="text" class="form-control input-sm" name="warehouse" id="warehouse" value="" />
+		</div> -->
+
+
+
     <div class="col-sm-11 padding-5 first">
     	<label>หมายเหตุ</label>
         <input type="text" class="form-control input-sm" name="remark" id="remark" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" />
