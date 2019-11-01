@@ -353,7 +353,7 @@ function getData(){
 	var po = $("#poCode").val();
 	load_in();
 	$.ajax({
-		url: HOME + 'get_po_detail', //"controller/receiveProductController.php?getPoData",
+		url: HOME + 'get_po_detail',
 		type:"GET",
 		cache:"false",
 		data:{
@@ -371,6 +371,8 @@ function getData(){
 				$(".receive-box").keyup(function(e){
     				sumReceive();
 				});
+
+				update_vender(po);
 
 				$('#btn-get-po').addClass('hide');
 				$('#btn-change-po').removeClass('hide');
@@ -455,6 +457,21 @@ function poInit(){
 }
 
 
+
+function update_vender(po_code){
+	$.ajax({
+		url: BASE_URL + 'inventory/receive_po/get_vender_by_po/'+po_code,
+		type:'GET',
+		cache:false,
+		success:function(rs){
+			if(isJson(rs)){
+				var ds = $.parseJSON(rs);
+				$('#vendor_code').val(ds.code);
+				$('#vendorName').val(ds.name);
+			}
+		}
+	});
+}
 
 
 $('#poCode').keyup(function(e) {

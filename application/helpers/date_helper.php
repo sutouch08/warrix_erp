@@ -55,18 +55,34 @@ function today()
 function db_date($date, $time = FALSE, $sp = '-')
 {
 
-  if($time = TRUE)
+  if($time === TRUE)
   {
     $c_time = date('H:i:s', strtotime($date));
-    $c_time = $c_time == '00:00:00' ? date('H:i:s') : $c_time;
-    $date = $date . ' '.$c_time;
-    return date('Y-m-d H:i:s', strtotime($date));
+    $c_time = ($c_time === '00:00:00') ? date('H:i:s') : $c_time;
+    $date = date('Y-m-d', strtotime($date));
+    return $date .' '.$c_time;
   }
 
 
   return date('Y-m-d', strtotime($date));
 }
 
+
+function sap_date($date="", $time = FALSE)
+{
+  //$date = empty($date) ? date('Y-m-d H:i:s') : $date;
+
+  if($time === TRUE)
+  {
+    $c_time = date('H:i:s', strtotime($date));
+    $c_time = ($c_time === '00:00:00') ? date('H:i:s') : $c_time;
+    $date = date('Y-d-m', strtotime($date));
+    return $date .' '.$c_time;
+  }
+
+
+  return date('Y-d-m', strtotime($date));
+}
 
 
 function from_date($date = '')

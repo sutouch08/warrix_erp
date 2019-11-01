@@ -21,6 +21,8 @@
 	      <button type="button" class="btn btn-sm btn-success" onclick="closeCheck()">
 	        <i class="fa fa-bolt"></i> บันทึกการตรวจนับ
 	      </button>
+			<?php endif; ?>
+			<?php if($this->pm->can_edit && $doc->status != 2 && $doc->valid == 0) : ?>
 				<!--- consign_check_detail.js --->
 	      <button type="button" class="btn btn-sm btn-danger" onclick="openCheck()">
 	        <i class="fa fa-bolt"></i> ยกเลิกการบันทึก

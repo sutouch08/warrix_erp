@@ -76,6 +76,54 @@ class Consign_check_model extends CI_Model
   }
 
 
+  //--- get list for link with consign order
+  public function get_active_check_list($zone_code)
+  {
+    $rs = $this->db
+    ->select('code, date_add')
+    ->where('zone_code', $zone_code)
+    ->where('status', 1)
+    ->where('valid', 0)
+    ->get('consign_check');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function get_diff_details($code)
+  {
+    $rs = $this->db
+    ->select('product_code, product_name, (stock_qty - qty) AS diff')
+    ->where('check_code', $code)
+    ->where('stock_qty !=', 'qty')
+    ->get('consign_check_detail');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_ref_code($code, $consign_code, $valid)
+  {
+    $this->db
+    ->set('consign_code', $consign_code)
+    ->set('valid', $valid)
+    ->where('code', $code);
+
+    return $this->db->update('consign_check');
+  }
+
+
   //---- add detail row
   public function add_detail($ds = array())
   {
@@ -412,7 +460,7 @@ class Consign_check_model extends CI_Model
 
 
 
-  public function get_list($ds = array())
+  public function get_list($ds = array(), $perpage = NULL, $offset = NULL)
   {
     $this->db
     ->select('consign_check.*, zone.name AS zone_name')
@@ -460,6 +508,12 @@ class Consign_check_model extends CI_Model
       $this->db
       ->where('date_add >=', from_date($ds['from_date']))
       ->where('date_add <=', to_date($ds['to_date']));
+    }
+
+    if(!empty($perpage))
+    {
+      $offset = $offset === NULL ? 0 : $offset;
+      $this->db->limit($perpage, $offset);
     }
 
     $rs = $this->db->get();

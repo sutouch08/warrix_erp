@@ -177,8 +177,8 @@ class Warehouse_model extends CI_Model
   {
     $this->ms->select('WhsCode AS code, WhsName AS name');
     $this->ms->select('createDate, updateDate');
-    $this->ms->where('createDate >', $last_add);
-    $this->ms->or_where('updateDate >', $last_upd);
+    $this->ms->where('createDate >', sap_date($last_add));
+    $this->ms->or_where('updateDate >', sap_date($last_upd));
     $rs = $this->ms->get('OWHS');
     if($rs->num_rows() > 0)
     {
@@ -234,6 +234,18 @@ class Warehouse_model extends CI_Model
   {
     $rs = $this->ms->select('WhsCode')->where('WhsCode', $code)->get('OWHS');
     if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function is_auz($code)
+  {
+    $rs = $this->db->select('auz')->where('code', $code)->where('auz', 1)->get('warehouse');
+    if($rs->num_rows() === 1)
     {
       return TRUE;
     }

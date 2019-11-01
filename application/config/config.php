@@ -23,11 +23,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
+$doc_folder = 'flex';
 $config['base_url'] = 'http://localhost/flex/';
 $config['image_path'] = 'images/';
 $config['upload_path'] = 'upload/';
-$config['image_file_path'] = $_SERVER['DOCUMENT_ROOT'] .'/flex/images/';
-$config['upload_file_path'] = $_SERVER['DOCUMENT_ROOT'].'/flex/upload/';
+$config['image_file_path'] = $_SERVER['DOCUMENT_ROOT'] ."/{$doc_folder}/images/";
+$config['upload_file_path'] = $_SERVER['DOCUMENT_ROOT']."/{$doc_folder}/upload/";
+$config['consign_file_path'] = $_SERVER['DOCUMENT_ROOT']."/{$doc_folder}/upload/consign/";
 /*
 |--------------------------------------------------------------------------
 | Index File

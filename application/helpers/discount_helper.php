@@ -1,28 +1,39 @@
 <?php
-function showDiscountByProductGroup($id_customer, $id_product_group)
+
+//--- convert discount text to array
+function parse_discount_text($discText, $price)
 {
-	$sc = 0.00;
-	$qs = dbQuery("SELECT discount FROM tbl_customer_discount WHERE id_customer = '".$id_customer."' AND id_product_group = '".$id_product_group."'");
-	if( dbNumRows($qs) > 0 )
+	$disc = array(
+		'discount1' => 0,
+		'discount2' => 0,
+		'discount3' => 0,
+		'discount_amount' => 0
+	);
+
+	if(!empty($discText))
 	{
-		list( $sc ) = dbFetchArray($qs);
+		$step = explode('+', $discText);
+
+		$i = 1;
+		foreach($step as $discLabel)
+		{
+			if($i < 4)
+			{
+				$key = 'discount'.$i;
+				$arr = explode('%', $discLabel);
+				$arr[0] = floatval($arr[0]);
+				$discount = count($arr) == 1 ? $arr[0] : ($arr[0] * 0.01) * $price; //--- ส่วนลดต่อชิ้น
+				$disc[$key] = count($arr) == 1 ? $arr[0] : $arr[0].'%'; //--- discount label
+				$disc['discount_amount'] += $discount;
+				$price -= $discount;
+			}
+
+			$i++;
+		}
 	}
-	return $sc;
-}
 
-
-function getDiscountLabel($p_disc = 0, $a_disc = 0)
-{
-	return $p_disc > 0 ? $p_disc .' %' : $a_disc;
-}
-
-
-function getDiscountAmount($p_disc, $a_disc, $price)
-{
-	$disc = $p_disc > 0 ? ($p_disc * 0.01) * $price : $a_disc;
 	return $disc;
 }
-
 
 
 //--- แสดงป้ายส่วนลด

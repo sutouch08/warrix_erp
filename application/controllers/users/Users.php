@@ -52,7 +52,7 @@ class Users extends PS_Controller{
   public function add_user()
   {
 		$this->load->helper('profile');
-    $this->title = 'Add new user';
+		$this->load->helper('saleman');
     $this->load->view('users/user_add_view');
   }
 
@@ -60,7 +60,7 @@ class Users extends PS_Controller{
 	public function edit_user($id)
 	{
 		$this->load->helper('profile');
-		$this->title = 'Edit user';
+		$this->load->helper('saleman');
 		$ds['data'] = $this->user_model->get_user($id);
 		$this->load->view('users/user_edit_view', $ds);
 	}
@@ -116,12 +116,14 @@ class Users extends PS_Controller{
 			$uname = $this->input->post('uname');
 			$dname = $this->input->post('dname');
 			$id_profile = $this->input->post('profile') === '' ? NULL : $this->input->post('profile');
+			$sale_id = $this->input->post('sale_id') === '' ? NULL : $this->input->post('sale_id');
 			$status = $this->input->post('status');
 
 			$data = array(
 				'uname' => $uname,
 				'name' => $dname,
 				'id_profile' => $id_profile,
+				'sale_id' => $sale_id,
 				'active' => $status
 			);
 
@@ -156,6 +158,7 @@ class Users extends PS_Controller{
 			$pwd = password_hash($this->input->post('pwd'), PASSWORD_DEFAULT);
 			$uid = md5(uniqid());
 			$id_profile = $this->input->post('profile') === '' ? NULL : $this->input->post('profile');
+			$sale_id = $this->input->post('sale_id') === '' ? NULL : $this->input->post('sale_id');
 			$status = $this->input->post('status');
 
 			$data = array(
@@ -164,6 +167,7 @@ class Users extends PS_Controller{
 				'name' => $dname,
 				'uid' => $uid,
 				'id_profile' => $id_profile,
+				'sale_id' => $sale_id,
 				'active' => $status
 			);
 

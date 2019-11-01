@@ -95,12 +95,58 @@ $db['default'] = array(
 	'save_queries' => TRUE
 );
 
+
+// $db['ms'] = array(
+// 	'dsn'	=> '',
+// 	'hostname' => 'localhost',
+// 	'username' => 'wrx_admin',
+// 	'password' => 'W@rr1X$p0rt',
+// 	'database' => 'DBDemo',
+// 	'dbdriver' => 'sqlsrv',
+// 	'dbprefix' => '',
+// 	'pconnect' => FALSE,
+// 	'db_debug' => (ENVIRONMENT !== 'production'),
+// 	'cache_on' => FALSE,
+// 	'cachedir' => '',
+// 	'char_set' => 'utf8',
+// 	'dbcollat' => 'utf8_general_ci',
+// 	'swap_pre' => '',
+// 	'encrypt' => FALSE,
+// 	'compress' => FALSE,
+// 	'stricton' => FALSE,
+// 	'failover' => array(),
+// 	'save_queries' => TRUE
+// );
+//
+// $db['mc'] = array(
+// 	'dsn'	=> '',
+// 	'hostname' => 'localhost',
+// 	'username' => 'wrx_admin',
+// 	'password' => 'W@rr1X$p0rt',
+// 	'database' => 'DBMiddle',
+// 	'dbdriver' => 'sqlsrv',
+// 	'dbprefix' => '',
+// 	'pconnect' => FALSE,
+// 	'db_debug' => (ENVIRONMENT !== 'production'),
+// 	'cache_on' => FALSE,
+// 	'cachedir' => '',
+// 	'char_set' => 'utf8',
+// 	'dbcollat' => 'utf8_general_ci',
+// 	'swap_pre' => '',
+// 	'encrypt' => FALSE,
+// 	'compress' => FALSE,
+// 	'stricton' => FALSE,
+// 	'failover' => array(),
+// 	'save_queries' => TRUE
+// );
+
+
 $db['ms'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'wrx_admin',
-	'password' => 'W@rr1X$p0rt',
-	'database' => 'DBDemo',
+	'hostname' => '172.21.12.24',
+	'username' => 'sa',
+	'password' => 'Cltitcomp@123',
+	'database' => 'Warrix_Training',
 	'dbdriver' => 'sqlsrv',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -120,9 +166,9 @@ $db['ms'] = array(
 
 $db['mc'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'wrx_admin',
-	'password' => 'W@rr1X$p0rt',
+	'hostname' => '172.21.12.24',
+	'username' => 'sa',
+	'password' => 'Cltitcomp@123',
 	'database' => 'DBMiddle',
 	'dbdriver' => 'sqlsrv',
 	'dbprefix' => '',

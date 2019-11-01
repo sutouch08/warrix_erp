@@ -86,10 +86,13 @@ class Receive_po_model extends CI_Model
   public function get_po_details($po_code)
   {
     $rs = $this->ms
-    ->select('ItemCode, Dscription, Quantity, OpenQty, PriceAfVAT AS price')
-    ->where('DocEntry', $po_code)
-    ->where('LineStatus', 'O')
-    ->get('POR1');
+    ->select('POR1.LineNum, POR1.ItemCode, POR1.Dscription, POR1.Quantity, POR1.OpenQty, POR1.PriceAfVAT AS price')
+    ->from('POR1')
+    ->join('OPOR', 'POR1.DocEntry = OPOR.DocEntry', 'left')
+    ->where('OPOR.DocNum', $po_code)
+    ->where('OPOR.DocStatus', 'O')
+    ->where('POR1.LineStatus', 'O')
+    ->get();
 
     if(!empty($rs))
     {
@@ -267,6 +270,17 @@ class Receive_po_model extends CI_Model
     return FALSE;
   }
 
+
+  public function get_vender_by_po($po_code)
+  {
+    $rs = $this->ms->select('CardCode, CardName')->where('DocNum', $po_code)->get('OPOR');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
 
 
 }

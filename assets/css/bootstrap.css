@@ -5432,11 +5432,11 @@ button.close {
   -webkit-appearance: none;
 }
 .modal-open {
-  overflow: hidden;
+  overflow: auto;
 }
 .modal {
   display: none;
-  overflow: hidden;
+  overflow: auto;
   position: fixed;
   top: 0;
   right: 0;

@@ -1,4 +1,17 @@
 <?php
+function setToken($token)
+{
+	$CI =& get_instance();
+	$cookie = array(
+		'name' => 'file_download_token',
+		'value' => $token,
+		'expire' => 3600,
+		'path' => '/'
+	);
+
+	return $CI->input->set_cookie($cookie);
+}
+
 
 //---	ตัดข้อความแล้วเติม ... ข้างหลัง
 function limitText($str, $length)
@@ -201,7 +214,7 @@ function set_message($message)
 function pagination_config( $base_url, $total_rows = 0, $perpage = 20, $segment = 3)
 {
     $rows = get_rows();
-    $input_rows  = '<p class="pull-right pagination">';
+    $input_rows  = '<p class="pull-right pagination hidden-xs">';
     $input_rows .= 'ทั้งหมด '.$total_rows.' รายการ | แสดง';
     $input_rows .= '<input type="number" name="set_rows" id="set_rows" class="input-mini text-center margin-left-15 margin-right-10" value="'.$rows.'" />';
     $input_rows .= 'ต่อหน้า ';

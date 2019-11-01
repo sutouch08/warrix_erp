@@ -395,8 +395,8 @@ class Zone_model extends CI_Model
     $this->ms->select('AbsEntry AS id, BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code');
     $this->ms->select('createDate, updateDate');
     $this->ms->where('SysBin', 'N');
-    $this->ms->where('createDate >', $last_add);
-    $this->ms->or_where('updateDate >', $last_upd);
+    $this->ms->where('createDate >', sap_date($last_add));
+    $this->ms->or_where('updateDate >', sap_date($last_upd));
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)
     {

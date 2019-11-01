@@ -8,6 +8,36 @@ class Products_model extends CI_Model
 
 
 
+  public function count_sap_update_list($date_add, $date_upd)
+  {
+    $rs = $this->ms->select('ItemCode')
+    ->where('CreateDate >', $date_add)
+    ->or_where('UpdateDate >', $date_upd)
+    ->get('OITM');
+
+    return $rs->num_rows();
+  }
+
+
+
+  public function get_sap_list($date_add, $date_upd, $limit, $offset)
+  {
+    $rs = $this->ms
+    ->where('CreateDate >', $date_add)
+    ->or_where('UpdateDate >', $date_upd)
+    ->limit($limit, $offset)
+    ->get('OITM');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
 
   public function add(array $ds = array())
   {
@@ -484,5 +514,17 @@ class Products_model extends CI_Model
     return FALSE;
   }
 
+
+  public function get_items_last_add()
+  {
+    $rs = $this->db->select_max('date_add')->get('products');
+    return $rs->row()->date_add;
+  }
+
+  public function get_items_last_update()
+  {
+    $rs = $this->db->select_max('date_upd')->get('products');
+    return $rs->row()->date_upd;
+  }
 }
 ?>

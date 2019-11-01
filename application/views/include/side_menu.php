@@ -103,7 +103,7 @@ $menu_group = $this->menu_group_code;
 		</a>
 		<ul class="submenu">
 			<?php echo side_menu($menu, 'ACPMCF',  'orders/order_payment', 'ตรวจสอบยอดชำระเงิน'); ?>
-			<?php echo side_menu($menu, 'ACCSOD',  'account/consign', 'ตัดยอดฝากขาย'); ?>
+			<?php echo side_menu($menu, 'ACCSOD',  'account/consign_order', 'ตัดยอดฝากขาย'); ?>
 		</ul>
 	</li>
 
@@ -147,6 +147,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'DBPDCL', 'masters/product_color','เพิ่ม/แก้ไข สี'); ?>
 					<?php echo side_menu($menu, 'DBPDSI', 'masters/product_size','เพิ่ม/แก้ไข ไซส์'); ?>
 					<?php echo side_menu($menu, 'DBPDBR', 'masters/product_brand','เพิ่ม/แก้ไข ยี่ห้อสินค้า'); ?>
+					<?php echo side_menu($menu, '', 'sync_items','Sync ข้อมูลสินค้า'); ?>
 				</ul>
 			</li>
 			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'CUSTOMER'); ?>">
@@ -172,7 +173,8 @@ $menu_group = $this->menu_group_code;
 			</li>
 
 			<?php echo side_menu($menu, 'DBCHAN', 'masters/channels','เพิ่ม/แก้ไข ช่องทางการขาย'); ?>
-			<?php echo side_menu($menu, 'DBPAYM', 'masters/payment_methods','เพิ่ม/แก้ไข ช่องทางการชำระเงิน'); ?>
+			<?php echo side_menu($menu, 'DBPAYM', 'masters/payment_methods','เพิ่ม/แก้ไข การชำระเงิน'); ?>
+			<?php echo side_menu($menu, 'DBSALE', 'masters/saleman','ข้อมูลพนักงานขาย'); ?>
 		</ul>
 	</li>
 </ul><!-- /.nav-list -->

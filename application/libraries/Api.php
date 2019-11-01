@@ -24,11 +24,12 @@ class Api
   public function update_web_stock($item, $qty)
   {
     $token = $this->token;
-    $url = $this->web_url."products/{$item}/stockItems/1";
+    //$url = $this->web_url."products/{$item}/stockItems/1";
+    $url = $this->web_url."mi/stockItems";
     $setHeaders = array("Content-Type:application/json","Authorization:Bearer {$token}");
     $apiUrl = str_replace(" ","%20",$url);
     $method = 'PUT';
-    $data = ["stockItem" => ["qty" => $qty]];
+    $data = ["inventory_list" => ["SKU" => $item, "qty" => intval($qty)]];
 
     $data_string = json_encode($data);
 

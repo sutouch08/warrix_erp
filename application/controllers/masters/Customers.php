@@ -173,16 +173,137 @@ class Customers extends PS_Controller
 
 
 
-  public function edit($code)
+  public function edit($code, $tab='infoTab')
   {
-    $this->title = 'แก้ไข ข้อมูลลูกค้า';
+    $this->load->model('address/customer_address_model');
+    $this->load->model('address/address_model');
     $rs = $this->customers_model->get($code);
+    $bill_to = $this->customer_address_model->get_customer_bill_to_address($code);
+    $ship_to = $this->address_model->get_shipping_address($code);
+
     $data['ds'] = $rs;
+    $data['tab'] = $tab;
+    $data['bill'] = $bill_to;
+    $data['addr'] = $ship_to;
 
     $this->load->view('masters/customers/customers_edit_view', $data);
   }
 
 
+  public function add_bill_to($code)
+  {
+    if($this->input->post('address'))
+    {
+      $this->load->model('address/customer_address_model');
+      $branch_code = $this->input->post('branch_code');
+      $branch_name = $this->input->post('branch_name');
+      $country = $this->input->post('country');
+      $ds = array(
+        'customer_code' => $code,
+        'branch_code' => empty($branch_code) ? '000' : $branch_code,
+        'branch_name' => empty($branch_name) ? 'สำนักงานใหญ่' : $branch_name,
+        'address' => $this->input->post('address'),
+        'sub_district' => $this->input->post('sub_district'),
+        'district' => $this->input->post('district'),
+        'province' => $this->input->post('province'),
+        'postcode' => $this->input->post('postcode'),
+        'country' => empty($country) ? 'TH' : $country,
+        'phone' => $this->input->post('phone')
+      );
+
+      $rs = $this->customer_address_model->add_bill_to($ds);
+      if($rs === TRUE)
+      {
+        set_message("เพิ่มที่อยู่เปิดบิลเรียบร้อยแล้ว");
+        $this->export_bill_to_address($code);
+      }
+      else
+      {
+        set_error("เพิ่มที่อยู่ไม่สำเร็จ");
+      }
+    }
+    else
+    {
+      set_error("ที่อยู่ต้องไม่ว่างเปล่า");
+    }
+
+    redirect($this->home.'/edit/'.$code.'/billTab');
+  }
+
+
+
+  public function update_bill_to($code)
+  {
+    if($this->input->post('address'))
+    {
+      $this->load->model('address/customer_address_model');
+      $branch_code = $this->input->post('branch_code');
+      $branch_name = $this->input->post('branch_name');
+      $country = $this->input->post('country');
+      $ds = array(
+        'branch_code' => empty($branch_code) ? '000' : $branch_code,
+        'branch_name' => empty($branch_name) ? 'สำนักงานใหญ่' : $branch_name,
+        'address' => $this->input->post('address'),
+        'sub_district' => $this->input->post('sub_district'),
+        'district' => $this->input->post('district'),
+        'province' => $this->input->post('province'),
+        'postcode' => $this->input->post('postcode'),
+        'country' => empty($country) ? 'TH' : $country,
+        'phone' => $this->input->post('phone')
+      );
+
+      $rs = $this->customer_address_model->update_bill_to($code, $ds);
+      if($rs === TRUE)
+      {
+        set_message("ปรับปรุงที่อยู่เปิดบิลเรียบร้อยแล้ว");
+      }
+      else
+      {
+        set_error("ปรับปรุงที่อยู่ไม่สำเร็จ");
+      }
+    }
+    else
+    {
+      set_error("ที่อยู่ต้องไม่ว่างเปล่า");
+    }
+
+    redirect($this->home.'/edit/'.$code.'/billTab');
+  }
+
+
+  public function export_bill_to_address($code)
+  {
+    $this->load->model('address/customer_address_model');
+    $addr = $this->customer_address_model->get_customer_bill_to_address($code);
+    if(!empty($addr))
+    {
+      $ex = $this->customer_address_model->is_sap_bill_to_exists($code);
+      $ds = array(
+        'Adress' => $addr->address_code,
+        'CardCode' => $addr->customer_code,
+        'Street' => $addr->address,
+        'Block' => $addr->sub_district,
+        'ZipCode' => $addr->postcode,
+        'City' => $addr->province,
+        'County' => $addr->district,
+        'LineNum' => ($this->customer_address_model->get_max_line_num($code) + 1),
+        'AdresType' => 'B',
+        'Address2' => $addr->branch_code,
+        'Address3' => $addr->branch_name,
+        'F_E_Commerce' => $ex ? 'U' : 'A',
+        'F_E_CommerceDate' => now()
+      );
+
+      if(! $ex)
+      {
+        $this->customer_address_model->add_sap_bill_to($ds);
+      }
+      else
+      {
+        $this->customer_address_model->update_sap_bill_to($code);
+      }
+    }
+  }
 
   public function update()
   {
@@ -258,13 +379,22 @@ class Customers extends PS_Controller
   {
     if($code != '')
     {
-      if($this->customers_model->delete($code))
+      $rs = $this->customers_model->delete($code);
+      if($rs === TRUE)
       {
         set_message('ลบข้อมูลเรียบร้อยแล้ว');
       }
       else
       {
-        set_error('ลบข้อมูลไม่สำเร็จ');
+        if($rs['code'] === '23000/1451')
+        {
+          $message = "Customer alrady has transection(s)";
+        }
+        else
+        {
+          $message = "ลบข้อมูลไม่สำเร็จ";
+        }
+        set_error($message);
       }
     }
     else

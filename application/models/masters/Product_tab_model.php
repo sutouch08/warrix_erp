@@ -7,78 +7,113 @@ class Product_tab_model extends CI_Model
 	public $id_parent;
 
 
-  public function __construct($id='')
+  public function __construct()
   {
     parent::__construct();
+  }
 
-    if( $id != "" )
-		{
-			$qs = $this->db->where('id', $id)->get('product_tab');
-      if($qs->num_rows() == 1)
-      {
-        $this->id = $qs->row()->id;
-        $this->name = $qs->row()->name;
-        $this->id_parent = $qs->row()->id_parent;
-      }
-		}
+  public function get($id)
+  {
+    $rs = $this->db->where('id', $id)->get('product_tab');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+  public function count_rows(array $ds = array())
+  {
+    $qr  = "SELECT COUNT(t.id) AS rows ";
+    $qr .= "FROM product_tab AS t ";
+    $qr .= "LEFT JOIN product_tab AS p ON t.id_parent = p.id ";
+    $qr .= "WHERE t.name IS NOT NULL ";
+
+    if(!empty($ds['name']))
+    {
+      $qr .= "AND t.name LIKE '%{$ds['name']}%' ";
+    }
+
+    if(!empty($ds['parent']))
+    {
+      $qr .= "AND p.name LIKE '%{$ds['parent']}%' ";
+    }
+
+    $rs = $this->db->query($qr);
+    return $rs->row()->rows;
   }
 
 
 
+  public function get_list(array $ds = array(), $perpage = NULL, $offset = NULL)
+  {
+    $qr  = "SELECT t.id, t.name, t.id_parent, p.name AS parent ";
+    $qr .= "FROM product_tab AS t ";
+    $qr .= "LEFT JOIN product_tab AS p ON t.id_parent = p.id ";
+    $qr .= "WHERE t.name IS NOT NULL ";
+
+    if(!empty($ds['tab_name']))
+    {
+      $qr .= "AND t.name LIKE '%{$ds['tab_name']}%' ";
+    }
+
+    if(!empty($ds['parent']))
+    {
+      $qr .= "AND p.name LIKE '%{$ds['parent']}%' ";
+    }
+
+    if(!empty($perpage))
+    {
+      $offset = empty($offset) ? 0 : $offset;
+      $qr .= "LIMIT {$offset}, {$perpage}";
+    }
+
+    $rs = $this->db->query($qr);
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
 	public function add(array $ds = array())
 	{
-		$sc = FALSE;
-		if( !empty($ds) )
-		{
-			$fields	= "";
-			$values	= "";
-			$i			= 1;
-			foreach( $ds as $field => $value )
-			{
-				$fields	.= $i == 1 ? $field : ", ".$field;
-				$values	.= $i == 1 ? "'". $value ."'" : ", '". $value ."'";
-				$i++;
-			}
+    if(!empty($ds))
+    {
+      return $this->db->insert('product_tab', $ds);
+    }
 
-			$sc = $this->db->query("INSERT INTO product_tab (".$fields.") VALUES (".$values.")");
-		}
-
-		return $sc;
+    return FALSE;
 	}
-
 
 
 	public function update($id, array $ds = array())
 	{
-		$sc = FALSE;
-		if( !empty( $ds ) )
-		{
-			$set 	= "";
-			$i		= 1;
-			foreach( $ds as $field => $value )
-			{
-				$set .= $i == 1 ? $field . " = '" . $value . "'" : ", ".$field . " = '" . $value . "'";
-				$i++;
-			}
-			$sc = $this->db->query("UPDATE product_tab SET " . $set . " WHERE id = '".$id."'");
-		}
-		return $sc;
+		if(!empty($ds))
+    {
+      return $this->db->where('id', $id)->update('product_tab', $ds);
+    }
+
+    return FALSE;
 	}
 
 
 
 	public function updateChild($id, $id_parent)
 	{
-		return $this->db->query("UPDATE product_tab SET id_parent = ".$id_parent." WHERE id_parent = ".$id);
+    return $this->db->set('id_parent', $id_parent)->where('id_parent', $id)->update('product_tab');
 	}
 
 
 
 	public function delete($id)
 	{
-		return $this->db->query("DELETE FROM product_tab WHERE id = '".$id."'");
+    return $this->db->where('id', $id)->delete('product_tab');
 	}
-
 
 
 	public function updateTabsProduct($style_code, array $ds = array())
@@ -91,16 +126,10 @@ class Product_tab_model extends CI_Model
       {
         $this->db->insert('product_tab_style', array('style_code' => $style_code, 'id_tab' => $id));
       }
+
 			$this->db->trans_complete();
 
-      if($this->db->trans_status() === FALSE)
-      {
-        return FALSE;
-      }
-      else
-      {
-        return TRUE;
-      }
+      return $this->db->trans_status();
 		}
 
 		return FALSE;
@@ -126,7 +155,6 @@ class Product_tab_model extends CI_Model
 
 	public function isExists($field, $val, $id='')
 	{
-		$sc = FALSE;
 		if( $id != '' )
 		{
 			$qs = $this->db->query("SELECT id FROM product_tab WHERE ".$field." = '".$val."' AND id != ".$id);
@@ -138,10 +166,10 @@ class Product_tab_model extends CI_Model
 
 		if( $qs->num_rows() > 0)
 		{
-			$sc = TRUE;
+			return TRUE;
 		}
 
-		return $sc;
+		return FALSE;
 	}
 
 
@@ -265,8 +293,7 @@ class Product_tab_model extends CI_Model
 
 	public function countMember($id)
 	{
-		$qs = $this->db->select('id_tab')->where('id_tab', $id)->get('product_tab_style');
-		return $qs->num_rows();
+    return $this->db->where('id_tab', $id)->count_all_results('product_tab_style');
 	}
 
 
@@ -314,6 +341,19 @@ class Product_tab_model extends CI_Model
 		return $this->db->query($qr);
 	}
 
+
+
+  public function is_has_child($id)
+  {
+    $this->db->where('id_parent', $id);
+    $rs = $this->db->count_all_results('product_tab');
+    if($rs > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
 
 
 

@@ -8,7 +8,7 @@
     <div class="col-sm-9">
     	<p class="pull-right" style="margin-bottom:1px;">
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-				<?php if($order->is_term == 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
+				<?php if($order->is_term == 0 && $order->status == 1 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
 				<button type="button" class="btn btn-sm btn-info" onclick="payOrder()"><i class="fa fa-credit-card"></i> แจ้งชำระเงิน</button>
 				<?php endif; ?>
 				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>

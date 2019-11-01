@@ -28,10 +28,10 @@ $tab3 = $tab == 'imageTab' ? 'active in' : '';
 <div class="col-sm-1 col-1-harf padding-right-0 padding-top-15">
 	<ul id="myTab1" class="setting-tabs width-100" style="margin-left:0px;">
 	  <li class="li-block <?php echo $tab1; ?>" onclick="changeURL('<?php echo $style->code; ?>','styleTab')" >
-			<a href="#styleTab" data-toggle="tab" style="text-decoration:none;">รุ่นสินค้า</a>
+			<a href="#styleTab" data-toggle="tab" style="text-decoration:none;">ข้อมูลสินค้า</a>
 		</li>
 		<li class="li-block <?php echo $tab2; ?>" onclick="changeURL('<?php echo $style->code; ?>','itemTab')" >
-			<a href="#itemTab" data-toggle="tab" style="text-decoration:none;">รายการสินค้า</a>
+			<a href="#itemTab" data-toggle="tab" style="text-decoration:none;">รายการ</a>
 		</li>
 		<li class="li-block <?php echo $tab3; ?>" onclick="changeURL('<?php echo $style->code; ?>','imageTab')" >
 			<a href="#imageTab" data-toggle="tab" style="text-decoration:none;" >รูปภาพ</a>

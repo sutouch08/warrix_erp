@@ -13,6 +13,15 @@ function getEdit(code){
   window.location.href = BASE_URL + 'masters/customers/edit/'+code;
 }
 
+function changeURL(style, tab)
+{
+
+	var url = BASE_URL + 'masters/customers/edit/' + style + '/' + tab;
+	var stObj = { stage: 'stage' };
+	window.history.pushState(stObj, 'customers', url);
+}
+
+
 
 function clearFilter(){
   var url = BASE_URL + 'masters/customers/clear_filter';

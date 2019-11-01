@@ -42,7 +42,6 @@ $("#customer").autocomplete({
 			var name = arr[1];
 			$("#customerCode").val(code);
 			$("#customer").val(name);
-      check_over_due(code);
 		}else{
 			$("#customerCode").val('');
 			$(this).val('');

@@ -430,8 +430,8 @@ class Delivery_order extends PS_Controller
       $ds = array(
         'DocType' => 'I', //--- I = item, S = Service
         'CANCELED' => 'N', //--- Y = Yes, N = No
-        'DocDate' => $order->date_add, //--- วันที่เอกสาร
-        'DocDueDate' => $order->date_add, //--- วันที่เอกสาร
+        'DocDate' => sap_date($order->date_add, TRUE), //--- วันที่เอกสาร
+        'DocDueDate' => sap_date($order->date_add,TRUE), //--- วันที่เอกสาร
         'CardCode' => $order->customer_code, //--- รหัสลูกค้า
         'CardName' => $cust->name, //--- ชื่อลูกค้า
         'DiscPrcnt' => $order->bDiscText,
@@ -449,7 +449,7 @@ class Delivery_order extends PS_Controller
         'U_ECOMNO' => $order->code,
         'U_BOOKCODE' => $order->bookcode,
         'F_E_Commerce' => 'A',
-        'F_E_CommerceDate' => now()
+        'F_E_CommerceDate' => sap_date(now(), TRUE)
       );
 
       $this->mc->trans_start();
@@ -504,7 +504,7 @@ class Delivery_order extends PS_Controller
               'VatSum' => get_vat_amount($rs->total_amount), //---- tool_helper
               'TaxType' => 'Y', //--- คิดภาษีหรือไม่
               'F_E_Commerce' => $update === TRUE ? 'U' : 'A', //--- A = Add , U = Update
-              'F_E_CommerceDate' => now()
+              'F_E_CommerceDate' => sap_date(now(), TRUE)
             );
 
             $this->delivery_order_model->add_delivery_row($arr);
@@ -559,8 +559,8 @@ class Delivery_order extends PS_Controller
             'U_ECOMNO' => $doc->code,
             'DocType' => 'I',
             'CANCELED' => 'N',
-            'DocDate' => $doc->date_add,
-            'DocDueDate' => $doc->date_add,
+            'DocDate' => sap_date($doc->date_add, TRUE),
+            'DocDueDate' => sap_date($doc->date_add, TRUE),
             'CardCode' => $cust->code,
             'CardName' => $cust->name,
             'VatPercent' => $vat_rate,
@@ -577,7 +577,7 @@ class Delivery_order extends PS_Controller
             'ToWhsCode' => $doc->warehouse_code,
             'Comments' => $doc->remark,
             'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-            'F_E_CommerceDate' => now(),
+            'F_E_CommerceDate' => sap_date(now(), TRUE),
             'U_BOOKCODE' => $doc->bookcode
           );
 
@@ -633,7 +633,7 @@ class Delivery_order extends PS_Controller
                   'VatSum' => round(get_vat_amount($rs->total_amount),6),
                   'TaxType' => 'Y',
                   'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-                  'F_E_CommerceDate' => now()
+                  'F_E_CommerceDate' => sap_date(now())
                 );
 
                 if( ! $this->transfer_model->add_sap_transfer_detail($arr))
@@ -709,8 +709,8 @@ private function export_transform($code)
           'U_ECOMNO' => $doc->code,
           'DocType' => 'I',
           'CANCELED' => 'N',
-          'DocDate' => $doc->date_add,
-          'DocDueDate' => $doc->date_add,
+          'DocDate' => sap_date($doc->date_add, TRUE),
+          'DocDueDate' => sap_date($doc->date_add,TRUE),
           'CardCode' => $cust->code,
           'CardName' => $cust->name,
           'VatPercent' => $vat_rate,
@@ -727,7 +727,7 @@ private function export_transform($code)
           'ToWhsCode' => getConfig('TRANSFORM_WAREHOUSE'),
           'Comments' => $doc->remark,
           'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-          'F_E_CommerceDate' => now(),
+          'F_E_CommerceDate' => sap_date(now(), TRUE),
           'U_BOOKCODE' => $doc->bookcode
         );
 
@@ -783,7 +783,7 @@ private function export_transform($code)
                 'VatSum' => get_vat_amount($rs->total_amount),
                 'TaxType' => 'Y',
                 'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-                'F_E_CommerceDate' => now()
+                'F_E_CommerceDate' => sap_date(now(), TRUE)
               );
 
               if( ! $this->transfer_model->add_sap_transfer_detail($arr))

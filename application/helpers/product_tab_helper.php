@@ -149,11 +149,14 @@ function getTabsTree($id = 0, $script = TRUE)
 	$uid = uniqid();
 	$cs =& get_instance();
 	$sc	= '<ul class="tree">';
-	$sc 	.= '<li>';
-	$sc 	.= '<i class="fa fa-minus-square-o" id="catbox-0" onClick="toggleTree(0)"></i>';
-	$sc 	.= '<label class="padding-10"><input type="radio" class="padding-10 margin-right-10" name="tabs" value="0" '. is_checked($id, 0) .' /> TOP LEVEL </label>';
-	$sc 	.= '<ul id="catchild-0">';
-	$qs = $cs->db->query("SELECT * FROM product_tab WHERE id_parent = 0");
+	$sc .= '<li>';
+	$sc .= '<i class="fa fa-minus-square-o" id="catbox-0" onClick="toggleTree(0)"></i>';
+	$sc .= '<label class="padding-10">';
+	$sc .= '<input type="radio" class="ace" name="tabs" value="0" '. is_checked($id, 0) .' />';
+	$sc .= '<span class="lbl">  TOP LEVEL</span>';
+	$sc .= '</label>';
+	$sc .= '<ul id="catchild-0">';
+	$qs  = $cs->db->query("SELECT * FROM product_tab WHERE id_parent = 0");
 	$i = 1;
 	foreach( $qs->result() as $rs )
 	{
@@ -164,14 +167,20 @@ function getTabsTree($id = 0, $script = TRUE)
 		if( hasChild($rs->id) === TRUE )
 		{
 			$sc .= '<i class="fa fa-plus-square-o" id="catbox-'.$rs->id.'" onClick="toggleTree('.$rs->id.')"></i>';
-			$sc .= '<label class="padding-10"><input type="radio" class="margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />'.$rs->name.'</label>';
+			$sc .= '<label class="padding-10">';
+			$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />';
+			$sc .= '<span class="lbl">  '.$rs->name.'</span>';
+			$sc .= '</label>';
 			$sc .= '<ul id="catchild-'.$rs->id.'" class="hide">';
 			$sc .= getChild($rs->id, $id) ;
 			$sc .= '</ul>';
 		}
 		else
 		{
-			$sc .= '<label class="padding-10"><input type="radio" class="margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />'.$rs->name.'</label>';
+			$sc .= '<label class="padding-10">';
+			$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />';
+			$sc .= '<span class="lbl">'.$rs->name.'</span>';
+			$sc .= '</label>';
 		}//---- has sub cate
 		$sc .= '</li>';
 	}
@@ -207,13 +216,16 @@ function getEditTabsTree($id, $script = TRUE)
 	$cs->load->model('masters/product_tab_model');
 	$id_parent = $cs->product_tab_model->getParentId($id);
 	$parent = $cs->product_tab_model->getAllParent($id);
-	$sc	= '<ul class="tree">';
-	$sc 	.= '<li>';
-	$sc 	.= '<i class="fa fa-minus-square-o" id="edit-catbox-0" onClick="toggleEditTree(0)"></i>';
-	$sc 	.= '<label class="padding-10"><input type="radio" class="padding-10 margin-right-10" name="tabs" value="0" '. is_checked($id_parent, 0) .' /> TOP LEVEL </label>';
-	$sc 	.= '<ul id="edit-catchild-0">';
-	$qs = $cs->db->query("SELECT * FROM product_tab WHERE id_parent = 0");
-	$i = 1;
+	$sc	 = '<ul class="tree">';
+	$sc .= '<li>';
+	$sc .= '<i class="fa fa-minus-square-o" id="edit-catbox-0" onClick="toggleEditTree(0)"></i>';
+	$sc .= '<label class="padding-10">';
+	$sc .= '<input type="radio" class="ace" name="tabs" value="0" '. is_checked($id_parent, 0) .' />';
+	$sc .= '<span class="lbl">TOP LEVEL</span>';
+	$sc .= '</label>';
+	$sc .= '<ul id="edit-catchild-0">';
+	$qs  = $cs->db->query("SELECT * FROM product_tab WHERE id_parent = 0");
+	$i   = 1;
 	foreach( $qs->result() as $rs )
 	{
 		if( $rs->id != $id )
@@ -226,14 +238,19 @@ function getEditTabsTree($id, $script = TRUE)
 			if( hasEditChild($rs->id, $id) === TRUE )
 			{
 				$sc .= '<i class="fa fa-'.$ep.'-square-o" id="edit-catbox-'.$rs->id.'" onClick="toggleEditTree('.$rs->id.')"></i>';
-				$sc .= '<label class="padding-10"><input type="radio" class="margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id_parent, $rs->id) .' />'.$rs->name.'</label>';
+				$sc .= '<label class="padding-10">';
+				$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id_parent, $rs->id) .' />';
+				$sc .= '<span class="lbl">'.$rs->name.'</label>';
 				$sc .= '<ul id="edit-catchild-'.$rs->id.'" class="'.$ex.'">';
 				$sc .= getEditChild($rs->id, $parent, $id_parent, $id) ;
 				$sc .= '</ul>';
 			}
 			else
 			{
-				$sc .= '<label class="padding-10"><input type="radio" class="margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id_parent, $rs->id) .' />'.$rs->name.'</label>';
+				$sc .= '<label class="padding-10">';
+				$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id_parent, $rs->id) .' />';
+				$sc .= '<span class="lbl">'.$rs->name.'</span>';
+				$sc .= '</label>';
 			}//---- has sub cate
 			$sc .= '</li>';
 		}
@@ -306,14 +323,20 @@ function getChild($id_parent, $id )
 			if( hasChild($rs->id) === TRUE )
 			{
 				$sc .= '<i class="fa fa-plus-square-o" id="catbox-'.$rs->id.'" onClick="toggleTree('.$rs->id.')"></i>';
-				$sc .= '<label class="padding-10"><input type="radio" class="margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />' .$rs->name. '</label>';
+				$sc .= '<label class="padding-10">';
+				$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />';
+				$sc .= '<span class="lbl">' .$rs->name. '</span>';
+				$sc .= '</label>';
 				$sc .= '<ul id="catchild-'.$rs->id.'" class="hide">';
 				$sc .= getChild($rs->id, $id) ;
 				$sc .= '</ul>';
 			}
 			else
 			{
-				$sc .= '<label class="padding-10"><input type="radio" class="margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />'.$rs->name. '</label>';
+				$sc .= '<label class="padding-10">';
+				$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />';
+				$sc .= '<span class="lbl">'.$rs->name.'</span>';
+				$sc .= '</label>';
 			}//---- has sub cate
 			$sc .= '</li>';
 		}
@@ -343,14 +366,20 @@ function getEditChild($id_parent, $parent, $id, $id_tab )
 				{
 
 					$sc .= '<i class="fa fa-'.$ep.'-square-o" id="edit-catbox-'.$rs->id.'" onClick="toggleEditTree('.$rs->id.')"></i>';
-					$sc .= '<label class="padding-10"><input type="radio" class=" ace margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />' .$rs->name. '</label>';
+					$sc .= '<label class="padding-10">';
+					$sc .= '<input type="radio" class=" ace margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />';
+					$sc .= '<span class="lbl">'.$rs->name. '</span>';
+					$sc .= '</label>';
 					$sc .= '<ul id="edit-catchild-'.$rs->id.'" class="'.$ex.'">';
 					$sc .= getEditChild($rs->id, $parent, $id, $id_tab) ;
 					$sc .= '</ul>';
 				}
 				else //-- if hasChild
 				{
-					$sc .= '<label class="padding-10"><input type="radio" class="ace margin-right-10" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />'.$rs->name. '</label>';
+					$sc .= '<label class="padding-10">';
+					$sc .= '<input type="radio" class="ace" name="tabs" value="'.$rs->id.'" '. is_checked($id, $rs->id) .' />';
+					$sc .= '<span class="lbl">'.$rs->name. '</span>';
+					$sc .= '</label>';
 				}//---- if has Child
 				$sc .= '</li>';
 			}

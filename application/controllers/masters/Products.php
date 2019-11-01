@@ -888,26 +888,6 @@ class Products extends PS_Controller
   }
 
 
-  public function syncData()
-  {
-    $ds = $this->products_model->get_updte_data();
-    if(!empty($ds))
-    {
-      foreach($ds as $rs)
-      {
-        $arr = array(
-          'code' => $rs->CardCode,
-          'name' => $rs->CardName
-        );
-
-        $this->products_model->add($arr);
-      }
-    }
-
-    set_message('Sync completed');
-  }
-
-
 
   public function do_export($code)
   {

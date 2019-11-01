@@ -1,180 +1,54 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
 	<div class="col-sm-6">
-    <h3 class="title"><?php echo $this->title; ?></h3>
+    <h4 class="title"><?php echo $this->title; ?></h4>
   </div>
 	<div class="col-sm-6">
-		<p class="pull-right">
+		<p class="pull-right top-p">
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> Back</button>
 			<button type="button" class="btn btn-sm btn-info" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
 		</p>
 	</div>
 </div><!-- End Row -->
-<hr class="title-block"/>
-<form class="form-horizontal" id="addForm" method="post" action="<?php echo $this->home."/update"; ?>">
+<hr style="margin-bottom:0px;"/>
+<?php
+$tab1 = $tab == 'infoTab' ? 'active in' : '';
+$tab2 = $tab == 'billTab' ? 'active in' : '';
+$tab3 = $tab == 'shipTab' ? 'active in' : '';
+?>
 
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">รหัส</label>
-    <div class="col-xs-12 col-sm-3">
-      <input type="text" name="code" id="code" class="width-100" value="<?php echo $ds->code; ?>" autofocus required />
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
-  </div>
+<div class="row">
+<div class="col-sm-1 col-1-harf padding-right-0 padding-top-15">
+	<ul id="myTab1" class="setting-tabs width-100" style="margin-left:0px;">
+	  <li class="li-block <?php echo $tab1; ?>" onclick="changeURL('<?php echo $ds->code; ?>','infoTab')" >
+			<a href="#infoTab" data-toggle="tab" style="text-decoration:none;">ข้อมูลลูกค้า</a>
+		</li>
+		<li class="li-block <?php echo $tab2; ?>" onclick="changeURL('<?php echo $ds->code; ?>','billTab')" >
+			<a href="#billTab" data-toggle="tab" style="text-decoration:none;">ที่อยู่เปิดบิล</a>
+		</li>
+		<li class="li-block <?php echo $tab3; ?>" onclick="changeURL('<?php echo $ds->code; ?>','shipTab')" >
+			<a href="#shipTab" data-toggle="tab" style="text-decoration:none;" >ที่อยู่จัดส่ง</a>
+		</li>
+	</ul>
+</div>
 
-
-
-  <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">ชื่อ</label>
-    <div class="col-xs-12 col-sm-3">
-			<input type="text" name="name" id="name" class="width-100" value="<?php echo $ds->name; ?>" required />
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
-  </div>
-
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">เลขประจำตัว/Tax ID</label>
-    <div class="col-xs-12 col-sm-3">
-			<input type="text" name="Tax_Id" id="Tax_Id" class="width-100" value="<?php echo $ds->Tax_Id; ?>" />
-    </div>
-  </div>
-
-	<div class="form-group">
- 	 <label class="col-sm-3 control-label no-padding-right">รหัสบัญชีลูกหนี้</label>
- 	 <div class="col-xs-12 col-sm-3">
- 		 <select name="DebPayAcct" id="DebPayAcct" class="form-control" required>
-			 <option value="">เลือกรายการ</option>
- 			 <?php echo select_DebPayAcct($ds->DebPayAcct); ?>
- 		 </select>
- 	 </div>
-  </div>
-
-
-
-	<div class="form-group">
- 	 <label class="col-sm-3 control-label no-padding-right">กลุ่มลูกหนี้</label>
- 	 <div class="col-xs-12 col-sm-3">
- 		 <select name="GroupCode" id="GroupCode" class="form-control" required>
- 			 <?php echo select_GroupCode($ds->GroupCode); ?>
- 		 </select>
- 	 </div>
-  </div>
-
-	<div class="form-group">
- 	 <label class="col-sm-3 control-label no-padding-right">รูปแบบ</label>
- 	 <div class="col-xs-12 col-sm-3">
- 		 <select name="cmpPrivate" id="cmpPrivate" class="form-control">
- 			<option value="C" <?php echo is_selected('C', $ds->cmpPrivate); ?>>บริษัท/ร้าน</option>
-			<option value="G" <?php echo is_selected('G', $ds->cmpPrivate); ?>>หน่วนงานรัฐ</option>
-			<option value="I" <?php echo is_selected('I', $ds->cmpPrivate); ?>>บุคคลทั่วไป</option>
- 		 </select>
- 	 </div>
-  </div>
-
-	<div class="form-group">
- 	 <label class="col-sm-3 control-label no-padding-right">รหัสกลุ่มเครดิต</label>
- 	 <div class="col-xs-12 col-sm-3">
- 		 <select name="GroupNum" id="GroupNum" class="form-control">
- 			 <?php echo select_GroupNum($ds->GroupNum); ?>
- 		 </select>
- 	 </div>
-  </div>
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">กลุ่มลูกค้า</label>
-    <div class="col-xs-12 col-sm-3">
-			<select name="group" id="group" class="form-control" required>
-				<option value="">เลือกรายการ</option>
-				<?php echo select_customer_group($ds->group_code); ?>
-			</select>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="group-error"></div>
-  </div>
-
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">ประเภทลูกค้า</label>
-    <div class="col-xs-12 col-sm-3">
-			<select name="kind" id="kind" class="form-control" required>
-				<option value="">เลือกรายการ</option>
-				<?php echo select_customer_kind($ds->kind_code); ?>
-			</select>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="kind-error"></div>
-  </div>
-
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">ชนิดลูกค้า</label>
-    <div class="col-xs-12 col-sm-3">
-			<select name="type" id="type" class="form-control" required>
-				<option value="">เลือกรายการ</option>
-				<?php echo select_customer_type($ds->type_code); ?>
-			</select>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="type-error"></div>
-  </div>
-
-
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">เกรดลูกค้า</label>
-    <div class="col-xs-12 col-sm-3">
-			<select name="class" id="class" class="form-control" required>
-				<option value="">เลือกรายการ</option>
-				<?php echo select_customer_class($ds->class_code); ?>
-			</select>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="class-error"></div>
-  </div>
-
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">พื้นที่ขาย</label>
-    <div class="col-xs-12 col-sm-3">
-			<select name="area" id="area" class="form-control" required>
-				<option value="">เลือกรายการ</option>
-				<?php echo select_customer_area($ds->area_code); ?>
-			</select>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline red" id="area-error"></div>
-  </div>
-
-
-	<div class="form-group">
-	 <label class="col-sm-3 control-label no-padding-right">พนักงานขาย</label>
-	 <div class="col-xs-12 col-sm-3">
-		 <select name="sale" id="sale" class="form-control">
-			 <?php echo select_sale($ds->sale_code); ?>
-		 </select>
-	 </div>
+<div class="col-sm-10" style="padding-top:15px; border-left:solid 1px #ccc; min-height:600px; ">
+<div class="tab-content" style="border:0">
+	<div class="tab-pane fade <?php echo $tab1; ?>" id="infoTab">
+		<?php $this->load->view('masters/customers/customers_info'); ?>
 	</div>
-
-	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">วงเงินเครดิต</label>
-    <div class="col-xs-12 col-sm-3">
-			<input type="number" name="CreditLine" id="CreditLine" class="width-100" value="<?php echo $ds->CreditLine; ?>" />
-    </div>
-  </div>
-
-
-	<div class="divider-hidden">
-
+	<div class="tab-pane fade <?php echo $tab2; ?>" id="billTab">
+		<?php $this->load->view('masters/customers/customers_bill_to'); ?>
 	</div>
-  <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right"></label>
-    <div class="col-xs-12 col-sm-3">
-      <p class="pull-right">
-        <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-save"></i> Save</button>
-      </p>
-    </div>
-    <div class="help-block col-xs-12 col-sm-reset inline">
-      &nbsp;
-    </div>
-  </div>
-	<input type="hidden" name="customers_code" id="customers_code" value="<?php echo $ds->code; ?>" />
-	<input type="hidden" name="customers_name" value="<?php echo $ds->name; ?>" />
-</form>
+	<div class="tab-pane fade <?php echo $tab3; ?>" id="shipTab">
+		<?php $this->load->view('masters/customers/customers_ship_to'); ?>
+	</div>
+</div>
+</div><!--/ col-sm-9  -->
+</div><!--/ row  -->
 
 <script src="<?php echo base_url(); ?>scripts/masters/customers.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/address.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/customer_address.js"></script>
+
 <?php $this->load->view('include/footer'); ?>

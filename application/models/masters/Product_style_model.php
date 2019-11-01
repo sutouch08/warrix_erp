@@ -42,6 +42,64 @@ class Product_style_model extends CI_Model
     return $this->db->_error_message();
   }
 
+  public function count_sap_list($date_add, $date_upd)
+  {
+    $qr  = "SELECT DISTINCT U_MODEL FROM OITM WHERE U_MODEL IS NOT NULL ";
+    $qr .= "AND (CreateDate >= '{$date_add}' OR UpdateDate >= '{$date_upd}') ";
+    $qr .= "GROUP BY U_MODEL ";
+
+    $rs = $this->ms->query($qr);
+    //
+    // $rs = $this->ms->distinct()
+    // ->select('U_MODEL')
+    // ->where('U_MODEL IS NOT NULL', NULL, FALSE)
+    // ->where('CreateDate >', $date_add)
+    // ->or_where('UpdateDate >', $date_upd)
+    // ->group_by('U_MODEL')
+    // ->get('OITM');
+    return $rs->num_rows();
+  }
+
+
+  public function get_sap_list($date_add, $date_upd, $limit, $offset)
+  {
+    $qr  = "SELECT DISTINCT U_MODEL FROM OITM WHERE U_MODEL IS NOT NULL ";
+    $qr .= "AND (CreateDate >= '{$date_add}' OR UpdateDate >= '{$date_upd}') ";
+    $qr .= "GROUP BY U_MODEL ";
+    $qr .= "ORDER BY U_MODEL ASC ";
+    $qr .= "OFFSET {$offset} FETCH NEXT {$limit} ROWS ONLY";
+
+    $rs = $this->ms->query($qr);
+    // $rs = $this->ms->distinct()
+    // ->select('U_MODEL')
+    // ->where('U_MODEL IS NOT NULL', NULL, FALSE)
+    // ->where('CreateDate >', $date_add)
+    // ->or_where('UpdateDate >', $date_upd)
+    // ->limit($limit, $offset)
+    // ->get('OITM');
+
+    if($rs->num_rows() > 0){
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+  public function get_sap_style($code)
+  {
+    $rs = $this->ms
+    ->select('U_MODEL, U_GROUP, U_MAJOR, U_CATE, U_TYPE, U_SUBTYPE, U_BRAND, U_YEAR, InvntryUom, InvntItem')
+    ->where('U_MODEL', $code)
+    ->limit(1)
+    ->get('OITM');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
 
   public function count_rows(array $ds = array())
   {
@@ -235,6 +293,18 @@ class Product_style_model extends CI_Model
     return $rs->num_rows();
   }
 
+
+  public function get_style_last_add()
+  {
+    $rs = $this->db->select_max('date_add')->get('product_style');
+    return $rs->row()->date_add;
+  }
+
+  public function get_style_last_update()
+  {
+    $rs = $this->db->select_max('date_upd')->get('product_style');
+    return $rs->row()->date_upd;
+  }
 
 }
 ?>

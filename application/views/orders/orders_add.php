@@ -44,7 +44,7 @@
 
 	<div class="col-sm-1 col-1-harf col-xs-12 padding-5 last">
     <label>การชำระเงิน</label>
-		<select class="form-control input-sm" name="payment" id="payment" onchange="get_credit_payment()" required>
+		<select class="form-control input-sm" name="payment" id="payment" required>
 			<option value="">ทั้งหมด</option>
 			<?php echo select_payment_method(); ?>
 		</select>

@@ -181,7 +181,7 @@ function get_download(token)
 {
 	load_in();
 	downloadTimer = window.setInterval(function(){
-		var cookie = $.cookie("file_download_token");
+		var cookie = getCookie("file_download_token");
 		if(cookie == token)
 		{
 			finished_download();
@@ -194,7 +194,7 @@ function get_download(token)
 function finished_download()
 {
 	window.clearInterval(downloadTimer);
-	$.removeCookie("file_down_load_token");
+	deleteCookie("file_down_load_token");
 	load_out();
 }
 
@@ -241,11 +241,53 @@ function getCookie(cname) {
   return "";
 }
 
+function deleteCookie( name ) {
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
 
 function parseDefault(value, def){
 	if(isNaN(value)){
-		return def; //--- return default value 
+		return def; //--- return default value
 	}
 
 	return value;
+}
+
+//--- return discount array
+function parseDiscount(discount_label, price)
+{
+	var discLabel = {
+		"discLabel1" : 0,
+		"discUnit1" : '',
+		"discLabel2" : 0,
+		"discUnit2" : '',
+		"discLabel3" : 0,
+		"discUnit3" : '',
+		"discountAmount" : 0
+	};
+
+	if(discount_label != '' && discount_label != 0)
+	{
+		var arr = discount_label.split('+');
+		arr.forEach(function(item, index){
+			var i = index + 1;
+			if(i < 4){
+				var disc = item.split('%');
+				var value = parseDefault(parseFloat(disc[0]), 0);
+				discLabel["discLabel"+i] = value;
+				if(disc.length == 2){
+					var amount = (value * 0.01) * price;
+					discLabel["discUnit"+i] = '%';
+					discLabel["discountAmount"] += amount;
+					price -= amount;
+				}else{
+					discLabel["discountAmount"] += value;
+					price -= value;
+				}
+			}
+		});
+	}
+
+	return discLabel;
 }

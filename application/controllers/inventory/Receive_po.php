@@ -272,8 +272,8 @@ class Receive_po extends PS_Controller
             'U_ECOMNO' => $doc->code,
             'DocType' => 'I',
             'CANCELED' => 'N',
-            'DocDate' => $doc->date_add,
-            'DocDueDate' => $doc->date_add,
+            'DocDate' => sap_date($doc->date_add, TRUE),
+            'DocDueDate' => sap_date($doc->date_add,TRUE),
             'CardCode' => $doc->vendor_code,
             'CardName' => $doc->vendor_name,
             'NumAtCard' => $doc->invoice_code,
@@ -290,7 +290,7 @@ class Receive_po extends PS_Controller
             'ToWhsCode' => $doc->warehouse_code,
             'Comments' => $doc->remark,
             'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
-            'F_E_CommerceDate' => now()
+            'F_E_CommerceDate' => sap_date(now(),TRUE)
           );
 
           $this->mc->trans_start();
@@ -327,7 +327,7 @@ class Receive_po extends PS_Controller
                   'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => remove_vat($rs->price),
                   'LineTotal' => remove_vat($rs->amount),
-                  'ShipDate' => $doc->date_add,
+                  'ShipDate' => sap_date($doc->date_add,TRUE),
                   'Currency' => $currency,
                   'Rate' => 1,
                   'Price' => remove_vat($rs->price),
@@ -342,7 +342,7 @@ class Receive_po extends PS_Controller
                   'VatSum' => get_vat_amount($rs->amount),
                   'TaxType' => 'Y',
                   'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
-                  'F_E_CommerceDate' => now()
+                  'F_E_CommerceDate' => sap_date(now(), TRUE)
                 );
 
                 if( ! $this->receive_po_model->add_sap_receive_po_detail($arr))
@@ -563,5 +563,25 @@ class Receive_po extends PS_Controller
     $filter = array('code','invoice','po','vendor','from_date','to_date');
     clear_filter($filter);
   }
+
+
+  public function get_vender_by_po($po_code)
+  {
+    $rs = $this->receive_po_model->get_vender_by_po($po_code);
+    if(!empty($rs))
+    {
+      $arr = array(
+        'code' => $rs->CardCode,
+        'name' => $rs->CardName
+      );
+
+      echo json_encode($arr);
+    }
+    else
+    {
+      echo 'Not found';
+    }
+  }
+
 
 } //--- end class

@@ -53,7 +53,7 @@
 				<div class="navbar-header pull-left">
 					<a href="<?php echo base_url(); ?>" class="navbar-brand">
 						<small>
-							FLEX
+							<?php echo getConfig('COMPANY_NAME'); ?>
 						</small>
 					</a>
 				</div>
@@ -109,8 +109,14 @@
 
 		<!-- /section:basics/navbar.layout -->
 		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
 			<!-- #section:basics/sidebar -->
-			<div id="sidebar" class="sidebar responsive <?php echo get_cookie('sidebar_layout'); ?>">
+			<div id="sidebar" class="sidebar responsive <?php echo get_cookie('sidebar_layout'); ?>" data-sidebar="true" data-sidebar-scoll="true" data-sidebar-hover="true">
+				<script type="text/javascript">
+					try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
+				</script>
 						<!--- side menu  ------>
 				<?php $this->load->view("include/side_menu"); ?>
 
@@ -130,8 +136,7 @@
                 	<input type="hidden" id="success" value="<?php echo $this->session->flashdata("success"); ?>">
                <?php endif; ?>
 					<div class="page-content">
-						<div class="row">
-							<div class="col-xs-12">
+
 								<!-- PAGE CONTENT BEGINS -->
 
 <?php

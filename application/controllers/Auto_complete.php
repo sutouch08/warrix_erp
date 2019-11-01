@@ -243,7 +243,7 @@ public function get_style_code()
     $sc = array();
     $txt = $_REQUEST['term'];
     $this->db->select('code, name');
-    
+
     if(!empty($warehouse))
     {
       $this->db->where('warehouse_code', $warehouse);
@@ -278,7 +278,7 @@ public function get_style_code()
     ->select('OBIN.BinCode')
     ->from('OBIN')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_WH_MAIN', 'Y')
+    ->where('OWHS.U_MAIN', 'Y')
     ->where('OBIN.SysBin', 'N');
     if($txt != '*')
     {

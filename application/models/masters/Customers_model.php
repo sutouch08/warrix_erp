@@ -88,7 +88,13 @@ class Customers_model extends CI_Model
 
   public function delete($code)
   {
-    return $this->db->where('code', $code)->delete('customers');
+    $rs = $this->db->where('code', $code)->delete('customers');
+    if(!$rs)
+    {
+      return $this->db->error();
+    }
+
+    return TRUE;
   }
 
 
@@ -276,7 +282,7 @@ class Customers_model extends CI_Model
   }
 
 
-  public function get_update_data()
+  public function get_update_data($date = "")
   {
     $rs = $this->ms
     ->select("CardCode AS code")
@@ -287,7 +293,7 @@ class Customers_model extends CI_Model
     ->select("GroupNum, SlpCode AS sale_code")
     ->select("CreditLine")
     ->where('CardType', 'C')
-    ->where("UpdateDate >=", date('Y-m-d 00:00:00'))
+    ->where("UpdateDate >=", sap_date($date,TRUE))
     ->get('OCRD');
 
     if($rs->num_rows() > 0)

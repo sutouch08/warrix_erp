@@ -81,6 +81,21 @@
     </div>
   </div>
 
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">พนักงานขาย</label>
+    <div class="col-xs-12 col-sm-3">
+			<span class="input-icon input-icon-right width-100">
+      <select class="form-control" name="sale_id" id="sale_id">
+        <option value="">พนักงานขาย(ถ้าเป็น)</option>
+        <?php echo select_saleman(); ?>
+      </select>
+			<i class="ace-icon fa fa-user"></i>
+		</span>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline">
+      &nbsp;
+    </div>
+  </div>
 
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">Status</label>
