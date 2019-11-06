@@ -1,4 +1,4 @@
 RewriteEngine On
-RewriteBase /flex/
+RewriteBase /warrix_sap/
 RewriteCond $1 !^(index\.php|asset|images|scripts)
 RewriteRule ^(.*)$ index.php

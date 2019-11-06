@@ -74,7 +74,7 @@ $active_group = 'default';
 $query_builder = TRUE;
 
 $db['default'] = array(
-	'dsn'	=> 'mysql:host=localhost;port=3306;dbname=flex',
+	'dsn'	=> 'mysql:host=localhost;port=3306;dbname=warrix_sap',
 	'hostname' => 'localhost',
 	'username' => 'root',
 	'password' => 'ZT20o15u21c3H808',

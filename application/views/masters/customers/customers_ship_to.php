@@ -106,7 +106,7 @@
             </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-success" onClick="saveAddress()" ><i class="fa fa-save"></i> บันทึก</button>
+                <button type="button" class="btn btn-sm btn-success" onClick="saveShipTo()" ><i class="fa fa-save"></i> บันทึก</button>
             </div>
         </div>
     </div>
@@ -126,7 +126,7 @@
 		<button type="button" class="btn btn-xs btn-address" id="btn-{{ id }}" onClick="setDefault({{ id }})"><i class="fa fa-check"></i></button>
 	{{/if}}
 		<button type="button" class="btn btn-xs btn-warning" onClick="editAddress({{ id }})"><i class="fa fa-pencil"></i></button>
-		<button type="button" class="btn btn-xs btn-danger" onClick="removeAddress({{ id }})"><i class="fa fa-trash"></i></button>
+		<button type="button" class="btn btn-xs btn-danger" onClick="removeShipTo({{ id }})"><i class="fa fa-trash"></i></button>
 	</td>
 </tr>
 </script>

@@ -107,47 +107,47 @@ class Product_style_model extends CI_Model
 
     if(!empty($ds))
     {
-      if($ds['code'] != '')
+      if(!empty($ds['code']))
       {
         $this->db->like('code', $ds['code']);
       }
 
-      if($ds['name'] != '')
+      if(!empty($ds['name']))
       {
         $this->db->like('name', $ds['name']);
       }
 
-      if($ds['group'] != '')
+      if(!empty($ds['group']))
       {
         $this->db->where('group_code', $ds['group']);
       }
 
-      if($ds['sub_group'] != '')
+      if(!empty($ds['sub_group']))
       {
         $this->db->where('sub_group_code', $ds['sub_group']);
       }
 
-      if($ds['category'] != '')
+      if(!empty($ds['category']))
       {
         $this->db->where('category_code', $ds['category']);
       }
 
-      if($ds['kind'] != '')
+      if(!empty($ds['kind']))
       {
         $this->db->where('kind_code', $ds['kind']);
       }
 
-      if($ds['type'] != '')
+      if(!empty($ds['type']))
       {
         $this->db->where('type_code', $ds['type']);
       }
 
-      if($ds['brand'] !='')
+      if(!empty($ds['brand']))
       {
         $this->db->where('brand_code', $ds['brand']);
       }
 
-      if($ds['year'] != '')
+      if(!empty($ds['year']))
       {
         $this->db->where('year', $ds['year']);
       }
@@ -187,47 +187,47 @@ class Product_style_model extends CI_Model
   {
     if(!empty($ds))
     {
-      if($ds['code'] != '')
+      if(!empty($ds['code']))
       {
         $this->db->like('code', $ds['code']);
       }
 
-      if($ds['name'] != '')
+      if(!empty($ds['name']))
       {
         $this->db->like('name', $ds['name']);
       }
 
-      if($ds['group'] != '')
+      if(!empty($ds['group']))
       {
         $this->db->where('group_code', $ds['group']);
       }
 
-      if($ds['sub_group'] != '')
+      if(!empty($ds['sub_group']))
       {
         $this->db->where('sub_group_code', $ds['sub_group']);
       }
 
-      if($ds['category'] != '')
+      if(!empty($ds['category']))
       {
         $this->db->where('category_code', $ds['category']);
       }
 
-      if($ds['kind'] != '')
+      if(!empty($ds['kind']))
       {
         $this->db->where('kind_code', $ds['kind']);
       }
 
-      if($ds['type'] != '')
+      if(!empty($ds['type']))
       {
         $this->db->where('type_code', $ds['type']);
       }
 
-      if($ds['brand'] !='')
+      if(!empty($ds['brand']))
       {
         $this->db->where('brand_code', $ds['brand']);
       }
 
-      if($ds['year'] != '')
+      if(!empty($ds['year']))
       {
         $this->db->where('year', $ds['year']);
       }
@@ -260,6 +260,42 @@ class Product_style_model extends CI_Model
     if($rs->num_rows() > 0)
     {
       return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('MODEL');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+
+  public function add_sap_model(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('MODEL', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_model($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      $this->mc->where('Code', $code);
+      return $this->mc->update('MODEL', $ds);
     }
 
     return FALSE;

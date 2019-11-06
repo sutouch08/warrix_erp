@@ -152,6 +152,39 @@ class Product_type_model extends CI_Model
     return $rs->num_rows();
   }
 
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('TYPE');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_type(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('TYPE', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_type($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('Code', $code)->update('TYPE', $ds);
+    }
+
+    return FALSE;
+  }
 
 }
 ?>

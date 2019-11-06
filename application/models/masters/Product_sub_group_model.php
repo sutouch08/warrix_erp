@@ -153,5 +153,39 @@ class Product_sub_group_model extends CI_Model
   }
 
 
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('MAJOR');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_major(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('MAJOR', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_major($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('Code', $code)->update('MAJOR', $ds);
+    }
+
+    return FALSE;
+  }
+
 }
 ?>

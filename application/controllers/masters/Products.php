@@ -26,7 +26,6 @@ class Products extends PS_Controller
     $this->load->model('masters/product_image_model');
 
     //---- load helper
-    $this->load->helper('product_tab');
     $this->load->helper('product_brand');
     $this->load->helper('product_tab');
     $this->load->helper('product_kind');
@@ -154,6 +153,10 @@ class Products extends PS_Controller
       {
         if($this->product_style_model->add($ds))
         {
+          //--- export tot sap
+          $this->export_style($code);
+
+          //---
           if(!empty($tabs))
           {
             $this->product_tab_model->updateTabsProduct($code, $tabs);
@@ -175,6 +178,33 @@ class Products extends PS_Controller
       redirect($this->home.'/add_new');
     }
 
+  }
+
+
+  public function export_style($style_code)
+  {
+    $style = $this->product_style_model->get($style_code);
+    if(!empty($style))
+    {
+      $ex = $this->product_style_model->is_sap_exists($style_code);
+      $arr = array(
+        'Code' => $style->code,
+        'Name' => $style->name,
+        'UpdateDate' => sap_date(now(), TRUE),
+        'Flag' => $ex === TRUE ? 'U' : 'A'
+      );
+
+      if($ex)
+      {
+        return $this->product_style_model->update_sap_model($style->code, $arr);
+      }
+      else
+      {
+        return $this->product_style_model->add_sap_model($arr);
+      }
+    }
+
+    return FALSE;
   }
 
 
@@ -289,6 +319,9 @@ class Products extends PS_Controller
 
       if($rs)
       {
+        //--- export tot sap
+        $this->export_style($code);
+
         if(!empty($tabs))
         {
           $this->product_tab_model->updateTabsProduct($code, $tabs);

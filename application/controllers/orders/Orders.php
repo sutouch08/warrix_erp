@@ -1167,36 +1167,66 @@ class Orders extends PS_Controller
   public function save_address()
   {
     $sc = TRUE;
-    if($this->input->post('customer_ref'))
+    if($this->input->post('customer_code'))
     {
       $this->load->model('address/address_model');
       $id = $this->input->post('id_address');
-      $arr = array(
-        'code' => trim($this->input->post('customer_ref')),
-        'name' => trim($this->input->post('name')),
-        'address' => trim($this->input->post('address')),
-        'sub_district' => trim($this->input->post('sub_district')),
-        'district' => trim($this->input->post('district')),
-        'province' => trim($this->input->post('province')),
-        'postcode' => trim($this->input->post('postcode')),
-        'phone' => trim($this->input->post('phone')),
-        'email' => trim($this->input->post('email')),
-        'alias' => trim($this->input->post('alias'))
-      );
+      $cus_ref = $this->input->post('customer_ref');
 
       if(!empty($id))
       {
-        $rs = $this->address_model->update_shipping_address($id, $arr);
+        $arr = array(
+          'code' => $cus_ref,
+          'customer_code' => trim($this->input->post('customer_code')),
+          'name' => trim($this->input->post('name')),
+          'address' => trim($this->input->post('address')),
+          'sub_district' => trim($this->input->post('sub_district')),
+          'district' => trim($this->input->post('district')),
+          'province' => trim($this->input->post('province')),
+          'postcode' => trim($this->input->post('postcode')),
+          'phone' => trim($this->input->post('phone')),
+          'email' => trim($this->input->post('email')),
+          'alias' => trim($this->input->post('alias'))
+        );
+
+        if(! $this->address_model->update_shipping_address($id, $arr))
+        {
+          $sc = FALSE;
+          $message = 'แก้ไขที่อยู่ไม่สำเร็จ';
+        }
+        else
+        {
+          $this->export_ship_to_address($id);
+        }
       }
       else
       {
-        $rs = $this->address_model->add_shipping_address($arr);
-      }
+        $arr = array(
+          'address_code' => $this->address_model->get_new_code($this->input->post('customer_code')),
+          'code' => $cus_ref,
+          'customer_code' => trim($this->input->post('customer_code')),
+          'name' => trim($this->input->post('name')),
+          'address' => trim($this->input->post('address')),
+          'sub_district' => trim($this->input->post('sub_district')),
+          'district' => trim($this->input->post('district')),
+          'province' => trim($this->input->post('province')),
+          'postcode' => trim($this->input->post('postcode')),
+          'phone' => trim($this->input->post('phone')),
+          'email' => trim($this->input->post('email')),
+          'alias' => trim($this->input->post('alias'))
+        );
 
-      if($rs === FALSE)
-      {
-        $sc = FALSE;
-        $message = 'เพิ่มที่อยู่ไม่สำเร็จ';
+        $rs = $this->address_model->add_shipping_address($arr);
+
+        if($rs === FALSE)
+        {
+          $sc = FALSE;
+          $message = 'เพิ่มที่อยู่ไม่สำเร็จ';
+        }
+        else
+        {
+          $this->export_ship_to_address($rs);
+        }
       }
     }
     else
@@ -1820,6 +1850,57 @@ class Orders extends PS_Controller
     );
 
     clear_filter($filter);
+  }
+
+
+
+  public function export_ship_to_address($id)
+  {
+    $this->load->model('address/customer_address_model');
+    $rs = $this->customer_address_model->get_customer_ship_to_address($id);
+    if(!empty($addr))
+    {
+      $ex = $this->customer_address_model->is_sap_address_exists($code, $rs->address_code, 'S');
+      if(! $ex)
+      {
+        $ds = array(
+          'Address' => $rs->address_code,
+          'CardCode' => $rs->customer_code,
+          'Street' => $rs->address,
+          'Block' => $rs->sub_district,
+          'ZipCode' => $rs->postcode,
+          'City' => $rs->province,
+          'County' => $rs->district,
+          'LineNum' => ($this->customer_address_model->get_max_line_num($code, 'S') + 1),
+          'AdresType' => 'S',
+          'Address2' => '0000',
+          'Address3' => 'สำนักงานใหญ่',
+          'F_E_Commerce' => $ex ? 'U' : 'A',
+          'F_E_CommerceDate' => sap_date(now(), TRUE)
+        );
+
+        $this->customer_address_model->add_sap_ship_to($ds);
+      }
+      else
+      {
+        $ds = array(
+          'Address' => $rs->address_code,
+          'CardCode' => $rs->customer_code,
+          'Street' => $rs->address,
+          'Block' => $rs->sub_district,
+          'ZipCode' => $rs->postcode,
+          'City' => $rs->province,
+          'County' => $rs->district,
+          'AdresType' => 'S',
+          'Address2' => '0000',
+          'Address3' => 'สำนักงานใหญ่',
+          'F_E_Commerce' => $ex ? 'U' : 'A',
+          'F_E_CommerceDate' => sap_date(now(), TRUE)
+        );
+
+        $this->customer_address_model->update_sap_ship_to($code, $rs->address_code, $ds);
+      }
+    }
   }
 }
 ?>

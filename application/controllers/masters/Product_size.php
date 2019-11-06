@@ -75,10 +75,10 @@ class Product_size extends PS_Controller
 
   public function add()
   {
-    if($this->input->post('code'))
+    $code = $this->input->post('code');
+    if($code !== '' && $code !== NULL)
     {
       $sc = TRUE;
-      $code = $this->input->post('code');
       $name = $this->input->post('name');
       $pos = $this->input->post('position') ? $this->input->post('position') : 1;
       $ds = array(
@@ -103,6 +103,9 @@ class Product_size extends PS_Controller
       {
         if($this->product_size_model->add($ds))
         {
+          //-- export to sap
+          $this->export_to_sap($code, $code);
+
           set_message('เพิ่มข้อมูลเรียบร้อยแล้ว');
         }
         else
@@ -148,12 +151,11 @@ class Product_size extends PS_Controller
   public function update()
   {
     $sc = TRUE;
-
-    if($this->input->post('code'))
+    $code = $this->input->post('code');
+    if($code !== '')
     {
       $old_code = $this->input->post('product_size_code');
       $old_name = $this->input->post('product_size_name');
-      $code = $this->input->post('code');
       $name = $this->input->post('name');
       $pos = $this->input->post('position');
 
@@ -179,6 +181,9 @@ class Product_size extends PS_Controller
       {
         if($this->product_size_model->update($old_code, $ds) === TRUE)
         {
+          //--- expor to sap
+          $this->export_to_sap($code, $old_code);
+
           set_message('ปรับปรุงข้อมูลเรียบร้อยแล้ว');
         }
         else
@@ -224,6 +229,42 @@ class Product_size extends PS_Controller
     }
 
     redirect($this->home);
+  }
+
+
+
+  public function export_to_sap($code, $old_code)
+  {
+    $rs = $this->product_size_model->get($code);
+    if(!empty($rs))
+    {
+      $ext = $this->product_size_model->is_sap_exists($old_code);
+
+      $arr = array(
+        'Code' => $rs->code,
+        'Name' => $rs->name,
+        'UpdateDate' => sap_date(now(), TRUE)
+      );
+
+      if($ext)
+      {
+        $arr['Flag'] = 'U';
+        if($code !== $old_code)
+        {
+          $arr['OLDCODE'] = $old_code;
+        }
+
+        return $this->product_size_model->update_sap_size($old_code, $arr);
+      }
+      else
+      {
+        $arr['Flag'] = 'A';
+
+        return $this->product_size_model->add_sap_size($arr);
+      }
+    }
+
+    return FALSE;
   }
 
 

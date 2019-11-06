@@ -23,8 +23,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$doc_folder = 'flex';
-$config['base_url'] = 'http://localhost/flex/';
+$doc_folder = 'warrix_sap';
+$config['base_url'] = 'http://localhost/warrix_sap/';
 $config['image_path'] = 'images/';
 $config['upload_path'] = 'upload/';
 $config['image_file_path'] = $_SERVER['DOCUMENT_ROOT'] ."/{$doc_folder}/images/";

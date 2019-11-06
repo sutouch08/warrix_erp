@@ -56,7 +56,10 @@ class Address_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->db->insert('address_ship_to', $ds);
+      if($this->db->insert('address_ship_to', $ds))
+      {
+        return $this->db->insert_id();
+      }
     }
 
     return FALSE;
@@ -119,7 +122,11 @@ class Address_model extends CI_Model
   }
 
 
-
+  public function get_new_code($code)
+  {
+    $rs = $this->db->select_max('address_code')->where('customer_code', $code)->order_by('address_code', 'DESC')->get('address_ship_to');
+    return $rs->row()->address_code + 1;
+  }
 
 } //--- end class
 

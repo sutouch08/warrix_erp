@@ -153,5 +153,39 @@ class Product_group_model extends CI_Model
   }
 
 
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('GROUP');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_product_group(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('GROUP', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_sap_product_group($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      $this->mc->where('Code', $code);
+      return $this->mc->update('GROUP', $ds);
+    }
+
+    return FALSE;
+  }
+
 }
 ?>

@@ -168,5 +168,40 @@ class Product_color_model extends CI_Model
   }
 
 
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('COLOR');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_color(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('COLOR', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_sap_color($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      $this->mc->where('Code', $code);
+      return $this->mc->update('COLOR', $ds);
+    }
+
+    return FALSE;
+  }
+
+
 }
 ?>

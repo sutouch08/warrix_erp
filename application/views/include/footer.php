@@ -38,9 +38,6 @@
 			</a>
 		</div><!-- /.main-container -->
 
-		<div id="loader" style="position:absolute; padding: 15px 25px 15px 25px; background-color:#fff; opacity:0.0; box-shadow: 0px 0px 25px #CCC; top:-20px; display:none;">
-        <center><i class="fa fa-spinner fa-5x fa-spin blue"></i></center><center>กำลังทำงาน....</center></div>
-
 		<!-- page specific plugin scripts -->
 
 		<!-- ace scripts -->

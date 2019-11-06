@@ -153,5 +153,39 @@ class Product_category_model extends CI_Model
   }
 
 
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('CATE');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_cate(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('CATE', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_cate($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('Code', $code)->update('CATE', $ds);
+    }
+
+    return FALSE;
+  }
+
 }
 ?>

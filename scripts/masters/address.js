@@ -126,6 +126,7 @@ function reloadAddressTable()
 function saveAddress()
 {
 	var code 			= $('#customers_code').val();
+	var cus_ref   = $('#cus_ref').val();
 	var name			= $("#Fname").val();
 	var addr			= $("#address1").val();
 	var subdistrict = $('#sub_district').val();
@@ -135,6 +136,11 @@ function saveAddress()
 	var alias 		= $("#alias").val();
 
 	if(code == ''){
+		swal('กรุณาระบุชื่อลูกค้า');
+		return false;
+	}
+
+	if(cus_ref == ''){
 		swal('กรุณาระบุชื่อลูกค้า[ออนไลน์]');
 		return false;
 	}
@@ -180,7 +186,8 @@ function saveAddress()
 	var ds = [];
 
 	ds.push( {"name" : "id_address", "value" : $("#id_address").val() } );
-	ds.push( {"name" : "customer_ref", "value" : code } );
+	ds.push( {"name" : "customer_ref", "value" : cus_ref } );
+	ds.push( {"name" : "customer_code", "value" : code});
 	ds.push( {"name" : "name", "value" : name } );
 	ds.push( {"name" : "address", "value" : $("#address1").val() } );
 	ds.push( {"name" : "sub_district", "value" : $("#sub_district").val() } );

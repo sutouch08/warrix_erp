@@ -156,5 +156,39 @@ class Product_size_model extends CI_Model
   }
 
 
+  public function is_sap_exists($code)
+  {
+    $rs = $this->mc->select('Code')->where('Code', $code)->get('SIZE');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function add_sap_size(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('SIZE', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_size($code, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('Code', $code)->update('SIZE', $ds);
+    }
+
+    return FALSE;
+  }
+
 }
 ?>

@@ -17,6 +17,31 @@ class Customer_address_model extends CI_Model
     return FALSE;
   }
 
+
+  public function get_customer_ship_to_address($id)
+  {
+    $rs = $this->db->where('id', $id)->get('address_ship_to');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_ship_to_address($code)
+  {
+    $rs = $this->db->where('customer_code', $code)->get('address_ship_to');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return array();
+  }
+
+
   public function add_bill_to(array $ds = array())
   {
     if(!empty($ds))
@@ -26,6 +51,18 @@ class Customer_address_model extends CI_Model
 
     return FALSE;
   }
+
+
+  public function add_sap_bill_to(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('CRD1', $ds);
+    }
+
+    return FALSE;
+  }
+
 
 
   public function update_bill_to($customer_code, array $ds = array())
@@ -40,23 +77,59 @@ class Customer_address_model extends CI_Model
 
 
 
-  public function get_max_line_num($code)
+  public function update_sap_bill_to($code, $address, array $ds = array())
   {
-    $rs = $this->ms->select_max('LineNum')->where('CardCode', $code)->get('CRD1');
-    if($rs->num_rows() === 1)
+    if(!empty($ds))
     {
-      return $rs->row()->LineNum;
+      return $this->mc->where('CardCode', $code)->where('Address', $address)->where('AdresType', 'B')->update('CRD1', $ds);
     }
 
-    return 0;
+    return FALSE;
   }
 
 
-  public function is_sap_bill_to_exists($code)
+
+
+
+
+  //----- Ship To
+  public function add_sap_ship_to(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('CRD1', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update_sap_ship_to($code, $address, array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->where('CardCode', $code)->where('Address', $address)->where('AdresType', 'S')->update('CRD1', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function get_max_line_num($code, $type = 'B')
+  {
+    $rs = $this->mc->select_max('LineNum')->where('CardCode', $code)->where('AdresType', $type)->get('CRD1');
+    return $rs->row()->LineNum;
+  }
+
+
+  public function is_sap_address_exists($code, $address, $type = 'B')
   {
     $rs = $this->mc
+    ->where('Address', $address)
     ->where('CardCode', $code)
-    ->where('AdresType', 'B')
+    ->where('AdresType', $type)
     ->get('CRD1');
     if($rs->num_rows() > 0)
     {
@@ -65,6 +138,15 @@ class Customer_address_model extends CI_Model
 
     return FALSE;
   }
+
+
+  public function get_max_code($code)
+  {
+    $qr = "SELECT MAX(address_code) AS code FROM address_ship_to WHERE code = '{$code}' ORDER BY address_code DESC";
+    $rs = $this->db->query($qr);
+    return $rs->row()->code;
+  }
+
 
 
 } //--- end class

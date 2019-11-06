@@ -18,22 +18,24 @@ class Product_style extends PS_Controller
 
   public function index()
   {
-		$code = get_filter('code', 'code', '');
-		$name = get_filter('name', 'name', '');
+    $filter = array(
+      'code'      => get_filter('code', 'code', ''),
+      'name'      => get_filter('name', 'name', '')
+    );
 
 		//--- แสดงผลกี่รายการต่อหน้า
-		$perpage = get_filter('set_rows', 'rows', 20);
+		$perpage = get_rows();
 		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
 		if($perpage > 300)
 		{
-			$perpage = get_filter('rows', 'rows', 300);
+			$perpage = 20;
 		}
 
-		$segment = 4; //-- url segment
-		$rows = $this->product_style_model->count_rows($code, $name);
+		$segment  = 4; //-- url segment
+		$rows     = $this->product_style_model->count_rows($filter);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-		$init	= pagination_config($this->home.'/index/', $rows, $perpage, $segment);
-		$style = $this->product_style_model->get_data($code, $name, $perpage, $this->uri->segment($segment));
+		$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
+		$style    = $this->product_style_model->get_data($filter, $perpage, $this->uri->segment($segment));
 
     $data = array();
 
@@ -51,14 +53,10 @@ class Product_style extends PS_Controller
     }
 
 
-    $ds = array(
-      'code' => $code,
-      'name' => $name,
-			'data' => $data
-    );
+    $filter['data'] = $data;
 
 		$this->pagination->initialize($init);
-    $this->load->view('masters/product_style/product_style_view', $ds);
+    $this->load->view('masters/product_style/product_style_view', $filter);
   }
 
 
@@ -215,6 +213,40 @@ class Product_style extends PS_Controller
     $this->session->unset_userdata('name');
 		echo 'done';
 	}
+
+
+  public function export_to_sap($code)
+  {
+    $rs = $this->product_style_model->get($code);
+    if(!empty($rs))
+    {
+      $ext = $this->product_style_model->is_sap_exists($code);
+
+      $arr = array(
+        'Code' => $rs->code,
+        'Name' => $rs->name,
+        'Flag' => $ext === TRUE ? 'U' : 'A',
+        'UpdateDate' => sap_date(now(), TRUE)
+      );
+
+      if($ext)
+      {
+        return $this->product_style_model->update_sap_model($rs->code, $arr);
+      }
+      else
+      {
+        return $this->product_style_model->add_sap_model($arr);
+      }
+    }
+
+    return FALSE;
+  }
+
+
+  public function style_init()
+  {
+    $this->load->view('export_products_attribute_view');
+  }
 
 }//--- end class
  ?>

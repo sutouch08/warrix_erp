@@ -179,7 +179,7 @@ class Customers extends PS_Controller
     $this->load->model('address/address_model');
     $rs = $this->customers_model->get($code);
     $bill_to = $this->customer_address_model->get_customer_bill_to_address($code);
-    $ship_to = $this->address_model->get_shipping_address($code);
+    $ship_to = $this->customer_address_model->get_ship_to_address($code);
 
     $data['ds'] = $rs;
     $data['tab'] = $tab;
@@ -253,8 +253,11 @@ class Customers extends PS_Controller
       );
 
       $rs = $this->customer_address_model->update_bill_to($code, $ds);
+
       if($rs === TRUE)
       {
+        $this->export_bill_to_address($code);
+
         set_message("ปรับปรุงที่อยู่เปิดบิลเรียบร้อยแล้ว");
       }
       else
@@ -277,33 +280,101 @@ class Customers extends PS_Controller
     $addr = $this->customer_address_model->get_customer_bill_to_address($code);
     if(!empty($addr))
     {
-      $ex = $this->customer_address_model->is_sap_bill_to_exists($code);
-      $ds = array(
-        'Adress' => $addr->address_code,
-        'CardCode' => $addr->customer_code,
-        'Street' => $addr->address,
-        'Block' => $addr->sub_district,
-        'ZipCode' => $addr->postcode,
-        'City' => $addr->province,
-        'County' => $addr->district,
-        'LineNum' => ($this->customer_address_model->get_max_line_num($code) + 1),
-        'AdresType' => 'B',
-        'Address2' => $addr->branch_code,
-        'Address3' => $addr->branch_name,
-        'F_E_Commerce' => $ex ? 'U' : 'A',
-        'F_E_CommerceDate' => now()
-      );
-
+      $ex = $this->customer_address_model->is_sap_address_exists($code, $addr->address_code);
       if(! $ex)
       {
+        $ds = array(
+          'Address' => $addr->address_code,
+          'CardCode' => $addr->customer_code,
+          'Street' => $addr->address,
+          'Block' => $addr->sub_district,
+          'ZipCode' => $addr->postcode,
+          'City' => $addr->province,
+          'County' => $addr->district,
+          'LineNum' => ($this->customer_address_model->get_max_line_num($code, 'B') + 1),
+          'AdresType' => 'B',
+          'Address2' => $addr->branch_code,
+          'Address3' => $addr->branch_name,
+          'F_E_Commerce' => $ex ? 'U' : 'A',
+          'F_E_CommerceDate' => now()
+        );
+
         $this->customer_address_model->add_sap_bill_to($ds);
       }
       else
       {
-        $this->customer_address_model->update_sap_bill_to($code);
+        $ds = array(
+          'Address' => $addr->address_code,
+          'CardCode' => $addr->customer_code,
+          'Street' => $addr->address,
+          'Block' => $addr->sub_district,
+          'ZipCode' => $addr->postcode,
+          'City' => $addr->province,
+          'County' => $addr->district,
+          'AdresType' => 'B',
+          'Address2' => $addr->branch_code,
+          'Address3' => $addr->branch_name,
+          'F_E_Commerce' => $ex ? 'U' : 'A',
+          'F_E_CommerceDate' => now()
+        );
+
+        $this->customer_address_model->update_sap_bill_to($code, $addr->address_code, $ds);
       }
     }
   }
+
+
+
+  public function export_ship_to_address($id)
+  {
+    $this->load->model('address/customer_address_model');
+    $addr = $this->customer_address_model->get_customer_ship_to_address($id);
+    if(!empty($addr))
+    {
+      $ex = $this->customer_address_model->is_sap_address_exists($code, $rs->address_code, 'S');
+      if(! $ex)
+      {
+        $ds = array(
+          'Address' => $rs->address_code,
+          'CardCode' => $rs->customer_code,
+          'Street' => $rs->address,
+          'Block' => $rs->sub_district,
+          'ZipCode' => $rs->postcode,
+          'City' => $rs->province,
+          'County' => $rs->district,
+          'LineNum' => ($this->customer_address_model->get_max_line_num($code, 'S') + 1),
+          'AdresType' => 'S',
+          'Address2' => '0000',
+          'Address3' => 'สำนักงานใหญ่',
+          'F_E_Commerce' => $ex ? 'U' : 'A',
+          'F_E_CommerceDate' => sap_date(now(), TRUE)
+        );
+
+        $this->customer_address_model->add_sap_ship_to($ds);
+      }
+      else
+      {
+        $ds = array(
+          'Address' => $rs->address_code,
+          'CardCode' => $rs->customer_code,
+          'Street' => $rs->address,
+          'Block' => $rs->sub_district,
+          'ZipCode' => $rs->postcode,
+          'City' => $rs->province,
+          'County' => $rs->district,
+          'AdresType' => 'S',
+          'Address2' => '0000',
+          'Address3' => 'สำนักงานใหญ่',
+          'F_E_Commerce' => $ex ? 'U' : 'A',
+          'F_E_CommerceDate' => sap_date(now(), TRUE)
+        );
+
+        $this->customer_address_model->update_sap_ship_to($code, $rs->address_code, $ds);
+      }
+    }
+  }
+
+
 
   public function update()
   {
@@ -429,7 +500,7 @@ class Customers extends PS_Controller
         'DebPayAcct' => $cs->DebPayAcct,
         'U_BPBACKLIST' => 'N',
         'F_E_Commerce' => 'A',
-        'F_E_CommerceDate' => $cs->date_upd
+        'F_E_CommerceDate' => sap_date($cs->date_upd, TRUE)
       );
 
       if($this->customers_model->sap_customer_exists($cs->code))
@@ -455,12 +526,14 @@ class Customers extends PS_Controller
     $rs = $this->do_export($code);
     if($rs === TRUE)
     {
+      $this->export_bill_to_address($code);
       echo 'success';
     }
     else
     {
       echo 'Export fail';
     }
+
   }
 
 
@@ -506,6 +579,66 @@ class Customers extends PS_Controller
     $filter = array( 'code', 'name','group','kind','type', 'class','area');
     clear_filter($filter);
 	}
-}
+
+
+  public function get_new_code($code)
+  {
+    $max = $this->customer_address_model->get_max_code($code);
+    $max++;
+    return $max;
+  }
+
+  public function get_ship_to_table()
+  {
+    $sc = TRUE;
+    if($this->input->post('customer_code'))
+    {
+      $code = $this->input->post('customer_code');
+      if(!empty($code))
+      {
+        $ds = array();
+        $this->load->model('address/customer_address_model');
+        $adrs = $this->customer_address_model->get_ship_to_address($code);
+        if(!empty($adrs))
+        {
+          foreach($adrs as $rs)
+          {
+            $arr = array(
+              'id' => $rs->id,
+              'name' => $rs->name,
+              'address' => $rs->address.' '.$rs->sub_district.' '.$rs->district.' '.$rs->province.' '.$rs->postcode,
+              'phone' => $rs->phone,
+              'email' => $rs->email,
+              'alias' => $rs->alias,
+              'default' => $rs->is_default == 1 ? 1 : ''
+            );
+            array_push($ds, $arr);
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+      }
+    }
+
+    echo $sc === TRUE ? json_encode($ds) : 'noaddress';
+  }
+
+
+
+  public function delete_shipping_address()
+  {
+    $this->load->model('address/address_model');
+    $id = $this->input->post('id_address');
+    $rs = $this->address_model->delete_shipping_address($id);
+    echo $rs === TRUE ? 'success' : 'fail';
+  }
+
+} //---
 
 ?>

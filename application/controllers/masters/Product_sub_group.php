@@ -99,6 +99,7 @@ class Product_sub_group extends PS_Controller
       {
         if($this->product_sub_group_model->add($ds))
         {
+          $this->export_to_sap($code, $code);
           set_message('เพิ่มข้อมูลเรียบร้อยแล้ว');
         }
         else
@@ -171,6 +172,7 @@ class Product_sub_group extends PS_Controller
       {
         if($this->product_sub_group_model->update($old_code, $ds) === TRUE)
         {
+          $this->export_to_sap($code, $old_code);
           set_message('ปรับปรุงข้อมูลเรียบร้อยแล้ว');
         }
         else
@@ -218,6 +220,40 @@ class Product_sub_group extends PS_Controller
     redirect($this->home);
   }
 
+
+  public function export_to_sap($code, $old_code)
+  {
+    $rs = $this->product_sub_group_model->get($code);
+    if(!empty($rs))
+    {
+      $ext = $this->product_sub_group_model->is_sap_exists($old_code);
+
+      $arr = array(
+        'Code' => $rs->code,
+        'Name' => $rs->name,
+        'UpdateDate' => sap_date(now(), TRUE)
+      );
+
+      if($ext)
+      {
+        $arr['Flag'] = 'U';
+        if($code !== $old_code)
+        {
+          $arr['OLDCODE'] = $old_code;
+        }
+
+        return $this->product_sub_group_model->update_sap_major($old_code, $arr);
+      }
+      else
+      {
+        $arr['Flag'] = 'A';
+
+        return $this->product_sub_group_model->add_sap_major($arr);
+      }
+    }
+
+    return FALSE;
+  }
 
 
   public function clear_filter()
