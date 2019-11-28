@@ -5,11 +5,11 @@ function get_image_path($id, $size = 'default')
   $CI->load->model('masters/product_image_model');
   $code = $CI->product_image_model->get_style_code($id);
   $path = $CI->config->item('image_path').'products/';
-  $no_image_path = base_url().$path.$size.'/no_image_'.$size.'.jpg';
+  $no_image_path = base_url().$path.'no_image_'.$size.'.jpg';
   if($code !== FALSE)
   {
-    $image_path = base_url().$path.$size.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
-    $file = $CI->config->item('image_file_path').'products/'.$size.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
+    $image_path = base_url().$path.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
+    $file = $CI->config->item('image_file_path').'products/'.$code.'/product_'.$size.'_'.$id.'.jpg';
     return file_exists($file) ? $image_path : $no_image_path;
   }
 
@@ -37,7 +37,7 @@ function delete_product_image($id, $code)
   $use_size = array('mini', 'default', 'medium', 'large');
   foreach($use_size as $size)
   {
-    $image_path = $path.$size.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
+    $image_path = $path.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
     unlink($image_path);
   }
 }
@@ -57,7 +57,7 @@ function no_image_path($size)
 {
   $CI =& get_instance();
   $path = $CI->config->item('image_path');
-  $no_image_path = base_url().$path.$size.'/no_image_'.$size.'.jpg';
+  $no_image_path = base_url().$path.'/no_image_'.$size.'.jpg';
   return $no_image_path;
 }
 ?>

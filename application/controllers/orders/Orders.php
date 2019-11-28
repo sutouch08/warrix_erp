@@ -760,7 +760,7 @@ class Orders extends PS_Controller
 				}
 				else
 				{
-					$sc .= '<td class="order-grid">Not Available</td>';
+					$sc .= '<td class="order-grid">N/A</td>';
 				}
 			} //--- End foreach $colors
 
@@ -1172,6 +1172,7 @@ class Orders extends PS_Controller
       $this->load->model('address/address_model');
       $id = $this->input->post('id_address');
       $cus_ref = $this->input->post('customer_ref');
+      $cus_ref = empty($cus_ref) ? trim($this->input->post('customer_code')) : $cus_ref;
 
       if(!empty($id))
       {
@@ -1858,9 +1859,9 @@ class Orders extends PS_Controller
   {
     $this->load->model('address/customer_address_model');
     $rs = $this->customer_address_model->get_customer_ship_to_address($id);
-    if(!empty($addr))
+    if(!empty($rs))
     {
-      $ex = $this->customer_address_model->is_sap_address_exists($code, $rs->address_code, 'S');
+      $ex = $this->customer_address_model->is_sap_address_exists($rs->code, $rs->address_code, 'S');
       if(! $ex)
       {
         $ds = array(
@@ -1871,7 +1872,7 @@ class Orders extends PS_Controller
           'ZipCode' => $rs->postcode,
           'City' => $rs->province,
           'County' => $rs->district,
-          'LineNum' => ($this->customer_address_model->get_max_line_num($code, 'S') + 1),
+          'LineNum' => ($this->customer_address_model->get_max_line_num($rs->code, 'S') + 1),
           'AdresType' => 'S',
           'Address2' => '0000',
           'Address3' => 'สำนักงานใหญ่',
@@ -1898,7 +1899,7 @@ class Orders extends PS_Controller
           'F_E_CommerceDate' => sap_date(now(), TRUE)
         );
 
-        $this->customer_address_model->update_sap_ship_to($code, $rs->address_code, $ds);
+        $this->customer_address_model->update_sap_ship_to($rs->code, $rs->address_code, $ds);
       }
     }
   }

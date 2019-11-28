@@ -62,7 +62,12 @@ class Product_size_model extends CI_Model
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('product_size');
-    return $rs->row();
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
   }
 
 
@@ -75,7 +80,12 @@ class Product_size_model extends CI_Model
     }
 
     $rs = $this->db->select('name')->where('code', $code)->get('product_size');
-    return $rs->row()->name;
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->name;
+    }
+
+    return NULL;
   }
 
 

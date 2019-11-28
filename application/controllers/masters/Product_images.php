@@ -63,7 +63,7 @@ class Product_images extends PS_Controller
     {
       foreach($use_size as $size)
       {
-        $imagePath = $image_path.$size.'/'.$code.'/'; //--- แต่ละ folder
+        $imagePath = $image_path.'/'.$code.'/'; //--- แต่ละ folder
         $img	= $this->getImageSizeProperties($size); //--- ได้ $img['prefix'] , $img['size'] กลับมา
         $image->file_new_name_body = $img['prefix'] . $img_name; 		//--- เปลี่ยนชือ่ไฟล์ตาม prefix + id_image
         $image->image_resize			 = TRUE;		//--- อนุญาติให้ปรับขนาด

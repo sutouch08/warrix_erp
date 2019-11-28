@@ -175,7 +175,7 @@ class Payment_methods_model extends CI_Model
       return $rs->row()->name;
     }
 
-    return FALSE;
+    return NULL;
   }
 
 

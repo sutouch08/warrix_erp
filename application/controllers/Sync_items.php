@@ -7,7 +7,7 @@ class Sync_items extends CI_Controller
 	public $menu_code = '';
 	public $menu_group_code = '';
 	public $pm;
-  public $limit = 10;
+  public $limit = 100;
   public $date;
 
   public function __construct()
@@ -44,16 +44,16 @@ class Sync_items extends CI_Controller
 
   public function count_update_style()
   {
-    $date_add = $this->input->get('date_add');
-    $date_upd = $this->input->get('date_upd');
+    $date_add = $this->input->get('last_sync');
+    $date_upd = $this->input->get('last_sync');
     $count = $this->product_style_model->count_sap_list($date_add, $date_upd);
     echo $count;
   }
 
   public function get_update_style($offset)
   {
-    $date_add = $this->input->get('date_add');
-    $date_upd = $this->input->get('date_upd');
+    $date_add = $this->input->get('last_sync');
+    $date_upd = $this->input->get('last_sync');
     $list = $this->product_style_model->get_sap_list($date_add, $date_upd, $this->limit, $offset);
     $count = 0;
 
@@ -72,20 +72,23 @@ class Sync_items extends CI_Controller
           'type_code' => $rs->U_TYPE,
           'brand_code' => $rs->U_BRAND,
           'year' => $rs->U_YEAR,
-          'cost' => 0,
-          'price' => 0,
+          'cost' => is_null($rs->cost) ? 0 : $rs->cost,
+          'price' => is_null($rs->price) ? 0 : $rs->price,
           'unit_code' => $rs->InvntryUom === NULL ? 'PCS' : $rs->InvntryUom,
-          'count_stock' => $rs->InvntItem === 'Y' ? 1 :0
+          'count_stock' => $rs->InvntItem === 'Y' ? 1 :0,
+          'last_sync' => sap_date(now(), TRUE)
         );
 
-        if($this->product_style_model->is_exists($rs->U_MODEL))
-        {
-          $this->product_style_model->update($rs->U_MODEL, $arr);
-        }
-        else
-        {
-          $this->product_style_model->add($arr);
-        }
+        $this->product_style_model->add($arr);
+        //
+        // if($this->product_style_model->is_exists($rs->U_MODEL))
+        // {
+        //   $this->product_style_model->update($rs->U_MODEL, $arr);
+        // }
+        // else
+        // {
+        //   $this->product_style_model->add($arr);
+        // }
 
         $count++;
       }
@@ -97,8 +100,8 @@ class Sync_items extends CI_Controller
 
   public function count_update_items()
   {
-    $date_add = $this->input->get('date_add');
-    $date_upd = $this->input->get('date_upd');
+    $date_add = $this->input->get('last_sync');
+    $date_upd = $this->input->get('last_sync');
     $count = $this->products_model->count_sap_update_list($date_add, $date_upd);
     echo $count;
   }
@@ -106,8 +109,8 @@ class Sync_items extends CI_Controller
 
   public function get_update_items($offset)
   {
-    $date_add = $this->input->get('date_add');
-    $date_upd = $this->input->get('date_upd');
+    $date_add = $this->input->get('last_sync');
+    $date_upd = $this->input->get('last_sync');
     $list = $this->products_model->get_sap_list($date_add, $date_upd, $this->limit, $offset);
     $count = 0;
     if(!empty($list))
@@ -128,21 +131,25 @@ class Sync_items extends CI_Controller
           'type_code' => $rs->U_TYPE,
           'brand_code' => $rs->U_BRAND,
           'year' => $rs->U_YEAR,
-          'cost' => 0,
-          'price' => 0,
+          'cost' => is_null($rs->cost) ? 0 : $rs->cost,
+          'price' => is_null($rs->price) ? 0 : $rs->price,
           'unit_code' => $rs->InvntryUom === NULL ? 'PCS' : $rs->InvntryUom,
           'count_stock' => $rs->InvntItem === 'Y' ? 1 : 0,
-          'update_user' => get_cookie('uname')
+          'update_user' => get_cookie('uname'),
+          'old_code' => $rs->U_OLDCODE,
+          'last_sync' => sap_date(now(), TRUE)
         );
 
-        if($this->products_model->is_exists($rs->ItemCode))
-        {
-          $this->products_model->update($rs->ItemCode, $arr);
-        }
-        else
-        {
-          $this->products_model->add($arr);
-        }
+        $this->products_model->add($arr);
+        //
+        // if($this->products_model->is_exists($rs->ItemCode))
+        // {
+        //   $this->products_model->update($rs->ItemCode, $arr);
+        // }
+        // else
+        // {
+        //   $this->products_model->add($arr);
+        // }
 
         $count++;
       }
@@ -154,21 +161,13 @@ class Sync_items extends CI_Controller
 
   public function get_style_last_date()
   {
-    $arr = array(
-      'date_add' => sap_date($this->product_style_model->get_style_last_add()),
-      'date_upd' => sap_date($this->product_style_model->get_style_last_update())
-    );
-    echo json_encode($arr);
+    echo sap_date($this->product_style_model->get_style_last_sync());
   }
 
 
   public function get_item_last_date()
   {
-    $arr = array(
-      'date_add' => sap_date($this->products_model->get_items_last_add()),
-      'date_upd' => sap_date($this->products_model->get_items_last_update())
-    );
-    echo json_encode($arr);
+    echo sap_date($this->products_model->get_items_last_sync());
   }
 
 } //--- end class

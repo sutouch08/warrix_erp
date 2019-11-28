@@ -33,6 +33,26 @@ class Auto_complete extends CI_Controller
   //   echo json_encode($sc);
   // }
 
+  public function get_sender()
+  {
+    $txt = $_REQUEST['term'];
+    $sc = array();
+    $rs = $this->db
+    ->select('id, name')
+    ->like('name', $txt)
+    ->limit(20)
+    ->get('address_sender');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $rd)
+      {
+        $sc[] = $rd->id.' | '.$rd->name;
+      }
+    }
+
+    echo json_encode($sc);
+  }
 
   public function get_customer_code_and_name()
   {
@@ -120,12 +140,13 @@ public function get_style_code()
 
   public function get_vendor_code_and_name()
   {
+    $txt = convert($_REQUEST['term']);
     $sc = array();
     $vendor = $this->ms
     ->select('CardCode, CardName')
     ->where('CardType', 'S')
-    ->like('CardCode', $_REQUEST['term'])
-    ->or_like('CardName', $_REQUEST['term'])
+    ->like('CardCode', $txt)
+    ->or_like('CardName', $txt)
     ->limit(20)
     ->get('OCRD');
 
@@ -182,7 +203,7 @@ public function get_style_code()
   public function get_po_code($vendor = FALSE)
   {
     $sc = array();
-    $txt = $_REQUEST['term'];
+    $txt = convert($_REQUEST['term']);
     $this->ms->select('DocNum')->where('DocStatus', 'O');
     if($vendor !== FALSE)
     {
@@ -273,7 +294,7 @@ public function get_style_code()
   public function get_zone_code()
   {
     $sc = array();
-    $txt = $_REQUEST['term'];
+    $txt = convert($_REQUEST['term']);
     $this->ms
     ->select('OBIN.BinCode')
     ->from('OBIN')
@@ -390,7 +411,7 @@ public function get_style_code()
   public function get_sponsor()
   {
     $sc = array();
-    $txt = $_REQUEST['term'];
+    $txt = convert($_REQUEST['term']);
     $this->ms->select('BpCode, BpName');
 
     if($txt != '*')
@@ -422,7 +443,7 @@ public function get_style_code()
   public function get_support()
   {
     $sc = array();
-    $txt = $_REQUEST['term'];
+    $txt = convert($_REQUEST['term']);
     $this->ms->select('CardCode, CardName')->where('CardType', 'C');
     if($txt != '*')
     {
@@ -453,7 +474,7 @@ public function get_style_code()
   public function get_employee()
   {
     $sc = array();
-    $txt = $_REQUEST['term'];
+    $txt = convert($_REQUEST['term']);
     $this->ms->select('CardCode, CardName')->where('CardType', 'C');
     if($txt != '*')
     {
@@ -581,7 +602,7 @@ public function get_style_code()
 
   public function get_warehouse_code_and_name()
   {
-    $txt = $_REQUEST['term'];
+    $txt = convert($_REQUEST['term']);
     $sc  = array();
     $this->ms->select('WhsCode, WhsName');
     if($txt != '*')

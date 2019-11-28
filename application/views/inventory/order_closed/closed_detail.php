@@ -35,11 +35,14 @@
       <label class="font-size-12 blod">ลูกค้า : <?php echo empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?></label>
     </div>
     <?php else : ?>
-      <div class="col-sm-6 padding-5">
+      <div class="col-sm-4 padding-5">
         <label class="font-size-14 blod">ลูกค้า : <?php echo empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?></label>
       </div>
     <?php endif; ?>
 
+    <div class="col-sm-2 padding-5">
+      <label class="font-size-2 blod">SAP No : <?php echo $order->inv_code; ?></label>
+    </div>
     <?php if($order->role == 'C' OR $order->role == 'N') : ?>
       <div class="col-sm-4 padding-5">
         <label class="font-size-2 blod">โซน : <?php echo $order->zone_name; ?></label>

@@ -805,8 +805,8 @@ class Transfer extends PS_Controller
     {
       foreach($details as $rs)
       {
-        $rs->from_zone_name = $this->zone_model->get_name($rs->from_zone);
-        $rs->to_zone_name = $this->zone_model->get_name($rs->to_zone);
+        // $rs->from_zone_name = $this->zone_model->get_name($rs->from_zone);
+        // $rs->to_zone_name = $this->zone_model->get_name($rs->to_zone);
         $rs->temp_qty = $this->transfer_model->get_temp_qty($code, $rs->product_code, $rs->from_zone);
       }
     }

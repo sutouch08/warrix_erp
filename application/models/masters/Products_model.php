@@ -11,8 +11,10 @@ class Products_model extends CI_Model
   public function count_sap_update_list($date_add, $date_upd)
   {
     $rs = $this->ms->select('ItemCode')
+    ->group_start()
     ->where('CreateDate >', $date_add)
     ->or_where('UpdateDate >', $date_upd)
+    ->group_end()
     ->get('OITM');
 
     return $rs->num_rows();
@@ -23,10 +25,18 @@ class Products_model extends CI_Model
   public function get_sap_list($date_add, $date_upd, $limit, $offset)
   {
     $rs = $this->ms
-    ->where('CreateDate >', $date_add)
-    ->or_where('UpdateDate >', $date_upd)
+    ->select('OITM.ItemCode, OITM.ItemName, OITM.CodeBars, OITM.U_MODEL, OITM.U_COLOR, OITM.U_SIZE, OITM.U_GROUP, OITM.U_MAJOR')
+    ->select('OITM.U_CATE, OITM.U_SUBTYPE, OITM.U_TYPE, OITM.U_BRAND, OITM.U_YEAR')
+    ->select('OITM.InvntItem, OITM.InvntryUom, OITM.U_OLDCODE, ITM1.Price AS cost, ITM2.Price AS price')
+    ->from('OITM')
+    ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)')
+    ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)')
+    ->group_start()
+    ->where('OITM.CreateDate >', $date_add)
+    ->or_where('OITM.UpdateDate >', $date_upd)
+    ->group_end()
     ->limit($limit, $offset)
-    ->get('OITM');
+    ->get();
 
     if($rs->num_rows() > 0)
     {
@@ -171,7 +181,7 @@ class Products_model extends CI_Model
 
       foreach($ds as $field => $val)
       {
-        if($val != '')
+        if(!empty($val))
         {
           $this->db->like($field, $val);
         }
@@ -232,12 +242,12 @@ class Products_model extends CI_Model
     {
       foreach($ds as $field => $val)
       {
-        if($val != '')
+        if(!empty($val))
         {
           $this->db->like($field, $val);
         }
       }
-
+      
       if($perpage != '')
       {
         $offset = $offset === NULL ? 0 : $offset;
@@ -515,16 +525,12 @@ class Products_model extends CI_Model
   }
 
 
-  public function get_items_last_add()
+  public function get_items_last_sync()
   {
-    $rs = $this->db->select_max('date_add')->get('products');
-    return $rs->row()->date_add;
+    $rs = $this->db->select_max('last_sync')->get('products');
+    return $rs->row()->last_sync;
   }
 
-  public function get_items_last_update()
-  {
-    $rs = $this->db->select_max('date_upd')->get('products');
-    return $rs->row()->date_upd;
-  }
+
 }
 ?>

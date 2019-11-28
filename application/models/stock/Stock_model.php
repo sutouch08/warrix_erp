@@ -16,7 +16,7 @@ class stock_model extends CI_Model
     ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OITM', 'OIBQ.ItemCode = OITM.ItemCode', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_WH_MAIN', 'Y')
+    ->where('OWHS.U_MAIN', 'Y')
     ->where('OITM.U_MODEL', $style_code);
     $rs = $this->ms->get();
     if($rs->num_rows() == 1)
@@ -55,7 +55,7 @@ class stock_model extends CI_Model
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
     ->where('OIBQ.ItemCode', $item)
-    ->where('OWHS.U_WH_MAIN', 'Y')
+    ->where('OWHS.U_MAIN', 'Y')
     ->get();
     return intval($rs->row()->qty);
   }
@@ -77,7 +77,7 @@ class stock_model extends CI_Model
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_WH_MAIN', 'Y')
+    ->where('OWHS.U_MAIN', 'Y')
     ->where('ItemCode', $item)
     ->get();
 

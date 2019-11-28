@@ -172,7 +172,16 @@ $menu_group = $this->menu_group_code;
 				</ul>
 			</li>
 
-			<?php echo side_menu($menu, 'DBCHAN', 'masters/channels','เพิ่ม/แก้ไข ช่องทางการขาย'); ?>
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'TRANSPORT'); ?>">
+				<a href="#" class="dropdown-toggle"><i class="menu-icon fa fa-caret-right"></i> ฐานข้อมูลขนส่ง <b class="arrow fa fa-angle-down"></b></a>
+				<b class="arrow"></b>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'DBSEND', 'masters/sender','เพิ่ม/แก้ไข ขนส่ง'); ?>
+					<?php echo side_menu($menu, 'DBTRSP', 'masters/transport','เชื่อมโยงขนส่ง'); ?>
+				</ul>
+			</li>
+
+			<?php echo side_menu($menu, 'DBCHAN', 'masters/channels','เพิ่ม/แก้ไข ช่องทางขาย'); ?>
 			<?php echo side_menu($menu, 'DBPAYM', 'masters/payment_methods','เพิ่ม/แก้ไข การชำระเงิน'); ?>
 			<?php echo side_menu($menu, 'DBSALE', 'masters/saleman','ข้อมูลพนักงานขาย'); ?>
 		</ul>

@@ -44,39 +44,68 @@ class Product_style_model extends CI_Model
 
   public function count_sap_list($date_add, $date_upd)
   {
-    $qr  = "SELECT DISTINCT U_MODEL FROM OITM WHERE U_MODEL IS NOT NULL ";
-    $qr .= "AND (CreateDate >= '{$date_add}' OR UpdateDate >= '{$date_upd}') ";
-    $qr .= "GROUP BY U_MODEL ";
-
-    $rs = $this->ms->query($qr);
-    //
     // $rs = $this->ms->distinct()
-    // ->select('U_MODEL')
-    // ->where('U_MODEL IS NOT NULL', NULL, FALSE)
-    // ->where('CreateDate >', $date_add)
+    // ->select('OITM.U_MODEL')
+    // ->from('OITM')
+    // ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)','left')
+    // ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)', 'left')
+    // ->where('OITM.U_MODEL IS NOT NULL', NULL, FALSE)
+    // ->where('OITM.U_MODEL !=', '')
+    // ->where('OITM.U_MODEL !=','0')
+    // ->group_start()
+    // ->where('OITM.CreateDate >', $date_add)
     // ->or_where('UpdateDate >', $date_upd)
-    // ->group_by('U_MODEL')
-    // ->get('OITM');
+    // ->group_end()
+    // ->get();
+
+    $rs = $this->ms
+    ->select('U_MODEL')
+    ->where('U_MODEL IS NOT NULL', NULL, FALSE)
+    ->where('U_MODEL !=', '')
+    ->where('U_MODEL !=', '0')
+    ->group_start()
+    ->where('CreateDate >', $date_add)
+    ->or_where('UpdateDate >', $date_upd)
+    ->group_end()
+    ->group_by('U_MODEL')
+    ->get('OITM');
+
     return $rs->num_rows();
   }
 
 
   public function get_sap_list($date_add, $date_upd, $limit, $offset)
   {
-    $qr  = "SELECT DISTINCT U_MODEL FROM OITM WHERE U_MODEL IS NOT NULL ";
-    $qr .= "AND (CreateDate >= '{$date_add}' OR UpdateDate >= '{$date_upd}') ";
-    $qr .= "GROUP BY U_MODEL ";
-    $qr .= "ORDER BY U_MODEL ASC ";
-    $qr .= "OFFSET {$offset} FETCH NEXT {$limit} ROWS ONLY";
-
-    $rs = $this->ms->query($qr);
     // $rs = $this->ms->distinct()
-    // ->select('U_MODEL')
-    // ->where('U_MODEL IS NOT NULL', NULL, FALSE)
-    // ->where('CreateDate >', $date_add)
+    // ->select('OITM.U_MODEL, OITM.U_GROUP, OITM.U_MAJOR')
+    // ->select('OITM.U_CATE, OITM.U_SUBTYPE, OITM.U_TYPE')
+    // ->select('OITM.U_BRAND, OITM.U_YEAR, OITM.InvntItem, OITM.InvntryUom')
+    // ->select('ITM1.Price AS cost, ITM2.Price AS price')
+    // ->from('OITM')
+    // ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)','left')
+    // ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)', 'left')
+    // ->where('OITM.U_MODEL IS NOT NULL', NULL, FALSE)
+    // ->where('OITM.U_MODEL !=', '')
+    // ->where('OITM.U_MODEL !=','0')
+    // ->group_start()
+    // ->where('OITM.CreateDate >', $date_add)
     // ->or_where('UpdateDate >', $date_upd)
+    // ->group_end()
     // ->limit($limit, $offset)
-    // ->get('OITM');
+    // ->get();
+
+    $rs = $this->ms
+    ->select('U_MODEL')
+    ->where('U_MODEL IS NOT NULL', NULL, FALSE)
+    ->where('U_MODEL !=', '')
+    ->where('U_MODEL !=', '0')
+    ->group_start()
+    ->where('CreateDate >=', $date_add)
+    ->or_where('UpdateDate >=', $date_upd)
+    ->group_end()
+    ->group_by('U_MODEL')
+    ->limit($limit, $offset)
+     ->get('OITM');
 
     if($rs->num_rows() > 0){
       return $rs->result();
@@ -87,11 +116,25 @@ class Product_style_model extends CI_Model
 
   public function get_sap_style($code)
   {
-    $rs = $this->ms
-    ->select('U_MODEL, U_GROUP, U_MAJOR, U_CATE, U_TYPE, U_SUBTYPE, U_BRAND, U_YEAR, InvntryUom, InvntItem')
-    ->where('U_MODEL', $code)
+    $rs = $this->ms->distinct()
+    ->select('OITM.U_MODEL, OITM.U_GROUP, OITM.U_MAJOR')
+    ->select('OITM.U_CATE, OITM.U_SUBTYPE, OITM.U_TYPE')
+    ->select('OITM.U_BRAND, OITM.U_YEAR, OITM.InvntItem, OITM.InvntryUom')
+    ->select('ITM1.Price AS cost, ITM2.Price AS price')
+    ->from('OITM')
+    ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)','left')
+    ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)', 'left')
+    ->where('OITM.U_MODEL', $code)
+    ->where('OITM.U_MODEL !=', '')
+    ->where('OITM.U_MODEL !=','0')
     ->limit(1)
-    ->get('OITM');
+    ->get();
+
+    // $rs = $this->ms
+    // ->select('U_MODEL, U_GROUP, U_MAJOR, U_CATE, U_TYPE, U_SUBTYPE, U_BRAND, U_YEAR, InvntryUom, InvntItem')
+    // ->where('U_MODEL', $code)
+    // ->limit(1)
+    // ->get('OITM');
 
     if($rs->num_rows() > 0)
     {
@@ -116,41 +159,6 @@ class Product_style_model extends CI_Model
       {
         $this->db->like('name', $ds['name']);
       }
-
-      if(!empty($ds['group']))
-      {
-        $this->db->where('group_code', $ds['group']);
-      }
-
-      if(!empty($ds['sub_group']))
-      {
-        $this->db->where('sub_group_code', $ds['sub_group']);
-      }
-
-      if(!empty($ds['category']))
-      {
-        $this->db->where('category_code', $ds['category']);
-      }
-
-      if(!empty($ds['kind']))
-      {
-        $this->db->where('kind_code', $ds['kind']);
-      }
-
-      if(!empty($ds['type']))
-      {
-        $this->db->where('type_code', $ds['type']);
-      }
-
-      if(!empty($ds['brand']))
-      {
-        $this->db->where('brand_code', $ds['brand']);
-      }
-
-      if(!empty($ds['year']))
-      {
-        $this->db->where('year', $ds['year']);
-      }
     }
 
     $rs = $this->db->get('product_style');
@@ -164,7 +172,12 @@ class Product_style_model extends CI_Model
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('product_style');
-    return $rs->row();
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
   }
 
 
@@ -177,7 +190,12 @@ class Product_style_model extends CI_Model
     }
 
     $rs = $this->db->select('name')->where('code', $code)->get('product_style');
-    return $rs->row()->name;
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->name;
+    }
+
+    return NULL;
   }
 
 
@@ -196,44 +214,10 @@ class Product_style_model extends CI_Model
       {
         $this->db->like('name', $ds['name']);
       }
-
-      if(!empty($ds['group']))
-      {
-        $this->db->where('group_code', $ds['group']);
-      }
-
-      if(!empty($ds['sub_group']))
-      {
-        $this->db->where('sub_group_code', $ds['sub_group']);
-      }
-
-      if(!empty($ds['category']))
-      {
-        $this->db->where('category_code', $ds['category']);
-      }
-
-      if(!empty($ds['kind']))
-      {
-        $this->db->where('kind_code', $ds['kind']);
-      }
-
-      if(!empty($ds['type']))
-      {
-        $this->db->where('type_code', $ds['type']);
-      }
-
-      if(!empty($ds['brand']))
-      {
-        $this->db->where('brand_code', $ds['brand']);
-      }
-
-      if(!empty($ds['year']))
-      {
-        $this->db->where('year', $ds['year']);
-      }
     }
 
-
+    $this->db->order_by('date_upd', 'DESC');
+    
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;
@@ -330,16 +314,10 @@ class Product_style_model extends CI_Model
   }
 
 
-  public function get_style_last_add()
+  public function get_style_last_sync()
   {
-    $rs = $this->db->select_max('date_add')->get('product_style');
-    return $rs->row()->date_add;
-  }
-
-  public function get_style_last_update()
-  {
-    $rs = $this->db->select_max('date_upd')->get('product_style');
-    return $rs->row()->date_upd;
+    $rs = $this->db->select_max('last_sync')->get('product_style');
+    return $rs->row()->last_sync;
   }
 
 }

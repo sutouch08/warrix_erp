@@ -260,7 +260,7 @@ class Receive_po extends PS_Controller
 
     if(!empty($doc))
     {
-      if(empty($sap) OR $tr->DocStatus == 'O')
+      if(empty($sap) OR $sap->DocStatus == 'O')
       {
         if($doc->status == 1)
         {
@@ -399,19 +399,31 @@ class Receive_po extends PS_Controller
     {
       $this->load->model('inventory/movement_model');
       $code = $this->input->post('receive_code');
-      $this->db->trans_start();
-      $this->receive_po_model->cancle_details($code);
-      $this->receive_po_model->set_status($code, 2); //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
-      $this->movement_model->drop_movement($code);
-      $this->db->trans_complete();
 
-      if($this->db->trans_status() === FALSE)
+      //---- check doc status is open or close
+      //---- if closed user cannot cancle document
+      $status = $this->receive_po_model->get_doc_status($code);
+      if($status === 'O')
       {
-        echo 'ยกเลิกรายการไม่สำเร็จ';
+        $this->db->trans_start();
+        $this->receive_po_model->cancle_details($code);
+        $this->receive_po_model->set_status($code, 2); //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
+        $this->movement_model->drop_movement($code);
+        $this->db->trans_complete();
+
+        if($this->db->trans_status() === FALSE)
+        {
+          echo 'ยกเลิกรายการไม่สำเร็จ';
+        }
+        else
+        {
+          $this->receive_po_model->drop_sap_received($code);
+          echo 'success';
+        }
       }
       else
       {
-        echo 'success';
+        echo 'เอกสารถูกปิดไปแล้วไม่สามารถดำเนินการใดๆได้';
       }
     }
     else

@@ -514,7 +514,7 @@ $("#dateAdd").datepicker({ dateFormat: 'dd-mm-yy'});
 
 
 function checkBarcode(){
-	barcode = $('#barcode').val();
+	barcode = $.trim($('#barcode').val());
 
 	if($('#'+barcode).length == 1){
 		pdCode = $('#'+barcode).val();

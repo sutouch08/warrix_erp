@@ -93,8 +93,8 @@
               $n,
 							inputRow($rs->product_code),
 							inputRow($rs->product_name),
-              inputRow($rs->from_zone_name),
-              inputRow($rs->to_zone_name),
+              inputRow($rs->from_zone),
+              inputRow($rs->to_zone),
 							number($rs->qty)
 						);
             $total_qty += $rs->qty;

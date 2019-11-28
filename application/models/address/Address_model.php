@@ -118,7 +118,7 @@ class Address_model extends CI_Model
 
   public function count_address($code)
   {
-    return $this->db->where('code', $code)->count_all_results('address_ship_to');
+    return $this->db->where('customer_code', $code)->count_all_results('address_ship_to');
   }
 
 

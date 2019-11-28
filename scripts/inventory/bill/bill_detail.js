@@ -13,7 +13,7 @@ function checkState(){
     },
     success: function(rs){
       var rs = $.trim(rs);
-      if( rs == 'state changed'){
+      if( rs == '8'){
         $("#btn-confirm-order").remove();
         clearInterval(chk);
       }

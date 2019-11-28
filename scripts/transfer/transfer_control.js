@@ -384,6 +384,7 @@ function getMoveOut(){
 
 	$('#barcode-hr').removeClass('hide');
 	$(".moveOut-zone").removeClass('hide');
+	$("#zone-table").removeClass('hide');
 	$("#fromZone-barcode").focus();
 }
 

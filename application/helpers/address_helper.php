@@ -94,7 +94,7 @@ function get_address_form($adds, $sds, $ds, $dd)
             $dds .= '<tr>';
             $dds .=   '<td colspan="2">';
             $dds .=     '<label>';
-            $dds .=       '<input type="radio" class="ace" name="id_sender" value="'.$dd->hird_sender.'" />';
+            $dds .=       '<input type="radio" class="ace" name="id_sender" value="'.$dd->third_sender.'" />';
             $dds .=       '<span class="lbl">&nbsp;&nbsp; '.$dd->third_sender.'</span>'; //---  transport_helper
             $dds .=     '</label>';
             $dds .=   '</td>';

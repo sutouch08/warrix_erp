@@ -262,14 +262,14 @@ class Zone extends PS_Controller
 
 
 
-  public function get_warhouse_zone()
+  public function get_warehouse_zone()
   {
     $sc = TRUE;
-    if($this->input->get('barcode'))
+    $code = trim($this->input->get('barcode'));
+    $warehouse_code = trim($this->input->get('warehouse_code'));
+    if(!empty($code) && !empty($warehouse_code))
     {
-      $code = trim($this->input->get('barcode'));
-      $zone = $this->input->get('zone_code');
-      $zone = $this->zone_model->get_zone_detail_in_warehouse($code, $zone);
+      $zone = $this->zone_model->get_zone_detail_in_warehouse($code, $warehouse_code);
       if($zone === FALSE)
       {
         $sc = FALSE;
@@ -280,6 +280,7 @@ class Zone extends PS_Controller
   }
 
 
+  
 
   public function clear_filter()
   {

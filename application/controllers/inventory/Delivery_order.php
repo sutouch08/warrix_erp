@@ -860,7 +860,7 @@ private function export_transform($code)
 
         case 'P' : //--- Sponsor
           $sc = $this->export_order($code);
-          brea;
+          break;
 
         case 'Q' : //--- Transform for stock
           $sc = $this->export_transform($code);

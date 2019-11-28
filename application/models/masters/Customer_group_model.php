@@ -62,7 +62,12 @@ class Customer_group_model extends CI_Model
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('customer_group');
-    return $rs->row();
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
   }
 
 
@@ -73,9 +78,14 @@ class Customer_group_model extends CI_Model
     {
       return $code;
     }
-    
+
     $rs = $this->db->select('name')->where('code', $code)->get('customer_group');
-    return $rs->row()->name;
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->name;
+    }
+
+    return NULL;
   }
 
 

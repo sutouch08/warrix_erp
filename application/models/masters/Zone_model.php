@@ -343,13 +343,13 @@ class Zone_model extends CI_Model
 
   public function get_zone_detail_in_warehouse($code, $warehouse)
   {
-    $rs = $this->ms
-    ->select('BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code')
-    ->where('WhsCode', $warehouse)
-    ->where('BinCode', $code)
-    ->get('OBIN');
+    // $rs = $this->ms
+    // ->select('BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code')
+    // ->where('WhsCode', $warehouse)
+    // ->where('BinCode', $code)
+    // ->get('OBIN');
 
-    //$rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
+    $rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -363,10 +363,11 @@ class Zone_model extends CI_Model
   {
     if($warehouse_code != '')
     {
-      $this->ms->where('WhsCode', $warehouse_code);
+      $this->db->where('warehouse_code', $warehouse_code);
     }
 
-    $rs = $this->ms->like('BinCode', $txt)->get('OBIN');
+    $rs = $this->db->like('code', $txt)->or_like('name', $txt)->get('zone');
+
     if($rs->num_rows() > 0)
     {
       return $rs->result();
@@ -394,7 +395,7 @@ class Zone_model extends CI_Model
   {
     $this->ms->select('AbsEntry AS id, BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code');
     $this->ms->select('createDate, updateDate');
-    $this->ms->where('SysBin', 'N');
+    //$this->ms->where('SysBin', 'N');
     $this->ms->where('createDate >', sap_date($last_add));
     $this->ms->or_where('updateDate >', sap_date($last_upd));
     $rs = $this->ms->get('OBIN');
@@ -411,7 +412,7 @@ class Zone_model extends CI_Model
   {
     $this->ms->select('AbsEntry AS id, BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code');
     $this->ms->select('createDate, updateDate');
-    $this->ms->where('SysBin', 'N');
+    //$this->ms->where('SysBin', 'N');
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)
     {

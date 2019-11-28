@@ -199,6 +199,7 @@ class Customers extends PS_Controller
       $branch_name = $this->input->post('branch_name');
       $country = $this->input->post('country');
       $ds = array(
+        //'code' => $code,
         'customer_code' => $code,
         'branch_code' => empty($branch_code) ? '000' : $branch_code,
         'branch_name' => empty($branch_name) ? 'สำนักงานใหญ่' : $branch_name,
@@ -296,7 +297,7 @@ class Customers extends PS_Controller
           'Address2' => $addr->branch_code,
           'Address3' => $addr->branch_name,
           'F_E_Commerce' => $ex ? 'U' : 'A',
-          'F_E_CommerceDate' => now()
+          'F_E_CommerceDate' => sap_date(now(), TRUE)
         );
 
         $this->customer_address_model->add_sap_bill_to($ds);
@@ -315,7 +316,7 @@ class Customers extends PS_Controller
           'Address2' => $addr->branch_code,
           'Address3' => $addr->branch_name,
           'F_E_Commerce' => $ex ? 'U' : 'A',
-          'F_E_CommerceDate' => now()
+          'F_E_CommerceDate' => sap_date(now(),TRUE)
         );
 
         $this->customer_address_model->update_sap_bill_to($code, $addr->address_code, $ds);
@@ -527,6 +528,7 @@ class Customers extends PS_Controller
     if($rs === TRUE)
     {
       $this->export_bill_to_address($code);
+      $this->export_ship_to_address($code);
       echo 'success';
     }
     else
@@ -556,7 +558,8 @@ class Customers extends PS_Controller
           'cmpPrivate' => $rs->CmpPrivate,
           'GroupNum' => $rs->GroupNum,
           'sale_code' => $rs->sale_code,
-          'CreditLine' => $rs->CreditLine
+          'CreditLine' => $rs->CreditLine,
+          'old_code' => $rs->old_code
         );
 
         if($this->customers_model->is_exists($rs->code) === TRUE)

@@ -292,6 +292,7 @@ class Customers_model extends CI_Model
     ->select("GroupCode, CmpPrivate")
     ->select("GroupNum, SlpCode AS sale_code")
     ->select("CreditLine")
+    ->select("U_WRX_BPOLDCODE AS old_code")
     ->where('CardType', 'C')
     ->where("UpdateDate >=", sap_date($date,TRUE))
     ->get('OCRD');

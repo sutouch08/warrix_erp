@@ -142,6 +142,28 @@ class Receive_po_model extends CI_Model
   }
 
 
+  public function drop_sap_received($code)
+  {
+    $rs = $this->mc->where('U_ECOMNO', $code)->delete('PDN1');
+    if($rs)
+    {
+      return $this->mc->where('U_ECOMNO', $code)->delete('OPDN');
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_doc_status($code)
+  {
+    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OPDN');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->DocStatus;
+    }
+
+    return 'O';
+  }
 
 
   public function get_sum_qty($code)

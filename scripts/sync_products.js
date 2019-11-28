@@ -6,10 +6,17 @@ var updated_style = 0;
 var count_items = 0;
 var updated_items = 0;
 var label = $('#txt-label');
-var style_date_add;
-var style_date_upd;
-var item_date_add;
-var item_date_upd;
+
+var style_last_sync;
+var item_last_sync;
+var group_last_sync;
+var sub_group_last_sync;
+var cate_last_sync;
+var kind_last_sync;
+var type_last_sync;
+var color_last_sync;
+var size_last_sync;
+
 var allow_sync = true;
 var state;
 
@@ -18,15 +25,14 @@ $(document).ready(function(){
   get_item_last_date();
 });
 
+
 function get_style_last_date(){
   $.ajax({
     url:BASE_URL + 'sync_items/get_style_last_date',
     type:'GET',
     cache:false,
     success:function(rs){
-      var ds = $.parseJSON(rs);
-      style_date_add = ds.date_add;
-      style_date_upd = ds.date_upd;
+      style_last_sync = rs;
     }
   });
 }
@@ -38,9 +44,7 @@ function get_item_last_date(){
     type:'GET',
     cache:false,
     success:function(rs){
-      var ds = $.parseJSON(rs);
-      item_date_add = ds.date_add;
-      item_date_upd = ds.date_upd;
+      item_last_sync = rs;
     }
   });
 }
@@ -71,14 +75,25 @@ function stopSync(){
   allow_sync = false;
 }
 
-function finish_sync(){
+function finish_sync(end){
   $('#btn-stop').addClass('hide');
   $("#btn-sync").removeClass('hide');
   $('#txt-percent').removeClass('active');
-  // count_style = 0;
-  // updated_style = 0;
-  // count_items = 0;
-  // updated_itmes = 0;
+  if(end !== undefined){
+
+    swal({
+      title:'Sync Completed',
+      text:'Style : '+ updated_style+'<br/>Items : '+ updated_items,
+      type:'success',
+      html:true
+    });
+
+    count_style = 0;
+    updated_style = 0;
+    count_items = 0;
+    updated_itmes = 0;
+  }
+
 }
 
 
@@ -95,8 +110,7 @@ function count_update_style(){
     type:'GET',
     cache:false,
     data:{
-      'date_add' : style_date_add,
-      'date_upd' : style_date_upd
+      'last_sync' : style_last_sync
     },
     success:function(rs){
       if(rs == 0){
@@ -125,8 +139,7 @@ function get_update_style(){
       type:'GET',
       cache:false,
       data:{
-        'date_add' : style_date_add,
-        'date_upd' : style_date_upd
+        'last_sync' : style_last_sync
       },
       success:function(rs){
         updated_style += parseInt(rs);
@@ -156,8 +169,7 @@ function count_update_items(){
     type:'GET',
     cache:false,
     data:{
-      'date_add' : item_date_add,
-      'date_upd' : item_date_upd
+      'last_sync' : item_last_sync
     },
     success:function(rs){
       if(rs == 0){
@@ -188,8 +200,7 @@ function get_update_items(){
       type:'GET',
       cache:false,
       data:{
-        'date_add' : item_date_add,
-        'date_upd' : item_date_upd
+        'last_sync' : item_last_sync
       },
       success:function(rs){
         if(!isNaN(parseInt(rs))){
@@ -203,7 +214,7 @@ function get_update_items(){
               timer:1000
             });
 
-            finish_sync();
+            finish_sync('end');
 
           }else{
             get_update_items();
@@ -215,13 +226,13 @@ function get_update_items(){
             type:'error'
           });
 
-          finish_sync();
+          finish_sync('end');
         }
 
       }
     })
   }else{
-    finish_sync();
+    finish_sync('end');
   }
 }
 
