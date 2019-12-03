@@ -414,6 +414,7 @@ class Delivery_order extends PS_Controller
   {
     $this->load->model('masters/customers_model');
     $this->load->model('masters/products_model');
+    $this->load->model('discount/discount_policy_model');
     $this->load->helper('discount');
 
     $order = $this->orders_model->get($code);
@@ -488,23 +489,25 @@ class Delivery_order extends PS_Controller
               'Dscription' => $rs->product_name,
               'Quantity' => $rs->qty,
               'UnitMsr' => $this->products_model->get_unit_code($rs->product_code),
-              'PriceBefDi' => remove_vat($rs->price),  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
-              'LineTotal' => remove_vat($rs->price) * $rs->qty,
+              'PriceBefDi' => $rs->price,  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
+              'LineTotal' => $rs->total_amount,
               'Currency' => $currency,
               'Rate' => 1.000000,
               'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
               'Price' => remove_vat($rs->price), //--- ราคา
-              'TotalFrgn' => remove_vat($rs->price) * $rs->qty, //--- จำนวนเงินรวม By Line (Currency)
+              'TotalFrgn' => $rs->total_amount, //--- จำนวนเงินรวม By Line (Currency)
               'WhsCode' => $rs->warehouse_code,
               'BinCode' => $rs->zone_code,
               'TaxStatus' => 'Y',
               'VatPrcnt' => $vat_rate,
               'VatGroup' => $vat_code,
-              'PriceAfVat' => $rs->price,
+              'PriceAfVat' => $rs->sell,
+              'GTotal' => round($rs->total_amount, 2),
               'VatSum' => get_vat_amount($rs->total_amount), //---- tool_helper
               'TaxType' => 'Y', //--- คิดภาษีหรือไม่
               'F_E_Commerce' => $update === TRUE ? 'U' : 'A', //--- A = Add , U = Update
-              'F_E_CommerceDate' => sap_date(now(), TRUE)
+              'F_E_CommerceDate' => sap_date(now(), TRUE),
+              'U_PROMOTION' => $this->discount_policy_model->get_code($rs->id_policy)
             );
 
             $this->delivery_order_model->add_delivery_row($arr);
@@ -613,15 +616,15 @@ class Delivery_order extends PS_Controller
                   'Dscription' => $rs->product_name,
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
-                  'PriceBefDi' => round(remove_vat($rs->price),6),
-                  'LineTotal' => round(remove_vat($rs->total_amount),6),
+                  'PriceBefDi' => round($rs->price,2),
+                  'LineTotal' => round($rs->total_amount,2),
                   'ShipDate' => $doc->date_add,
                   'Currency' => $currency,
                   'Rate' => 1,
                   //--- คำนวณส่วนลดจากยอดเงินกลับมาเป็น % (เพราะบางทีมีส่วนลดหลายชั้น)
                   'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
-                  'Price' => round(remove_vat($rs->price),6),
-                  'TotalFrgn' => round(remove_vat($rs->total_amount),6),
+                  'Price' => round(remove_vat($rs->price),2),
+                  'TotalFrgn' => round($rs->total_amount,2),
                   'FromWhsCod' => $rs->warehouse_code,
                   'WhsCode' => $doc->warehouse_code,
                   'FisrtBin' => $doc->zone_code, //-- โซนปลายทาง
@@ -629,8 +632,9 @@ class Delivery_order extends PS_Controller
                   'TaxStatus' => 'Y',
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,
-                  'PriceAfVAT' => $rs->price,
-                  'VatSum' => round(get_vat_amount($rs->total_amount),6),
+                  'PriceAfVAT' => round($rs->sell,2),
+                  'VatSum' => round(get_vat_amount($rs->total_amount),2),
+                  'GTotal' => round($rs->total_amount, 2),
                   'TaxType' => 'Y',
                   'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
                   'F_E_CommerceDate' => sap_date(now())
@@ -763,15 +767,15 @@ private function export_transform($code)
                 'Dscription' => $rs->product_name,
                 'Quantity' => $rs->qty,
                 'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
-                'PriceBefDi' => remove_vat($rs->price),
-                'LineTotal' => remove_vat($rs->total_amount),
+                'PriceBefDi' => round($rs->price,2),
+                'LineTotal' => round($rs->total_amount,2),
                 'ShipDate' => $doc->date_add,
                 'Currency' => $currency,
                 'Rate' => 1,
                 //--- คำนวณส่วนลดจากยอดเงินกลับมาเป็น % (เพราะบางทีมีส่วนลดหลายชั้น)
                 'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
-                'Price' => remove_vat($rs->price),
-                'TotalFrgn' => remove_vat($rs->total_amount),
+                'Price' => round(remove_vat($rs->price),2),
+                'TotalFrgn' => round($rs->total_amount,2),
                 'FromWhsCod' => $rs->warehouse_code,
                 'WhsCode' => $doc->warehouse_code,
                 'FisrtBin' => $doc->zone_code, //--- zone ปลายทาง
@@ -779,8 +783,9 @@ private function export_transform($code)
                 'TaxStatus' => 'Y',
                 'VatPrcnt' => $vat_rate,
                 'VatGroup' => $vat_code,
-                'PriceAfVAT' => $rs->price,
-                'VatSum' => get_vat_amount($rs->total_amount),
+                'PriceAfVAT' => round($rs->sell, 2),
+                'VatSum' => round(get_vat_amount($rs->total_amount),2),
+                'GTotal' => round($rs->total_amount, 2),
                 'TaxType' => 'Y',
                 'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
                 'F_E_CommerceDate' => sap_date(now(), TRUE)

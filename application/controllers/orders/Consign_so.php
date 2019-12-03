@@ -8,6 +8,7 @@ class Consign_so extends PS_Controller
   public $menu_sub_group_code = 'ORDER';
 	public $title = 'ฝากขาย(ใบกำกับ)';
   public $filter;
+  public $role = 'C';
   public function __construct()
   {
     parent::__construct();
@@ -92,7 +93,15 @@ class Consign_so extends PS_Controller
     {
       $book_code = getConfig('BOOK_CODE_CONSIGN_SO');
       $date_add = db_date($this->input->post('date'));
-      $code = $this->get_new_code($date_add);
+      if($this->input->post('code'))
+      {
+        $code = $this->input->post('code');
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
+
       $role = 'C'; //--- C = ฝากขายเปิดใบกำกับ
       $zone = $this->zone_model->get($this->input->post('zone_code'));
       if(!empty($zone))

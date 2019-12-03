@@ -79,16 +79,16 @@ class Sync_items extends CI_Controller
           'last_sync' => sap_date(now(), TRUE)
         );
 
-        $this->product_style_model->add($arr);
-        //
-        // if($this->product_style_model->is_exists($rs->U_MODEL))
-        // {
-        //   $this->product_style_model->update($rs->U_MODEL, $arr);
-        // }
-        // else
-        // {
-        //   $this->product_style_model->add($arr);
-        // }
+        //$this->product_style_model->add($arr);
+
+        if($this->product_style_model->is_exists($rs->U_MODEL))
+        {
+          $this->product_style_model->update($rs->U_MODEL, $arr);
+        }
+        else
+        {
+          $this->product_style_model->add($arr);
+        }
 
         $count++;
       }
@@ -140,16 +140,16 @@ class Sync_items extends CI_Controller
           'last_sync' => sap_date(now(), TRUE)
         );
 
-        $this->products_model->add($arr);
-        //
-        // if($this->products_model->is_exists($rs->ItemCode))
-        // {
-        //   $this->products_model->update($rs->ItemCode, $arr);
-        // }
-        // else
-        // {
-        //   $this->products_model->add($arr);
-        // }
+        //$this->products_model->add($arr);
+
+        if($this->products_model->is_exists($rs->ItemCode))
+        {
+          $this->products_model->update($rs->ItemCode, $arr);
+        }
+        else
+        {
+          $this->products_model->add($arr);
+        }
 
         $count++;
       }

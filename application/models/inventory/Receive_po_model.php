@@ -276,11 +276,12 @@ class Receive_po_model extends CI_Model
     return $rs->result();
   }
 
-
+    
   public function get_max_code($code)
   {
     $rs = $this->db
-    ->like('code', $code, 'after')
+    ->select_max('code')
+    ->like('code', $code)
     ->order_by('code', 'DESC')
     ->get('receive_product');
 

@@ -217,7 +217,7 @@ class Zone extends PS_Controller
         {
           $ds = array(
             'code' => $rs->code,
-            'name' => $rs->name,
+            'name' => is_null($rs->name) ? '' : $rs->name,
             'sap_updateDate' => $rs->updateDate,
           );
 
@@ -228,7 +228,7 @@ class Zone extends PS_Controller
           $ds = array(
             'id' => $rs->id,
             'code' => $rs->code,
-            'name' => $rs->name,
+            'name' => is_null($rs->name) ? '' : $rs->name,
             'warehouse_code' => $rs->warehouse_code,
             'sap_createDate' => $rs->createDate,
             'sap_updateDate' => $rs->updateDate
@@ -280,7 +280,7 @@ class Zone extends PS_Controller
   }
 
 
-  
+
 
   public function clear_filter()
   {

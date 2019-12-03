@@ -80,18 +80,13 @@
 
 							<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
 								<li>
-									<a href="#">
-										<i class="ace-icon fa fa-cog"></i>
-										ตั้งค่า
+									<a href="JavaScript:void(0)" onclick="changeUserPwd('<?php echo get_cookie('uname'); ?>')">
+										<i class="ace-icon fa fa-keys"></i>
+										เปลี่ยนรหัสผ่าน
 									</a>
 								</li>
 
-								<li>
-									<a href="<?php echo base_url()."admin/profile"; ?>">
-										<i class="ace-icon fa fa-user"></i>
-										โปรไฟล์
-									</a>
-								</li>
+
 
 								<li class="divider"></li>
 

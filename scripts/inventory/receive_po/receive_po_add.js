@@ -496,8 +496,9 @@ $("#zoneName").autocomplete({
 			$('#zone_code').val('');
 			$('#zoneName').val('');
 		}else{
-			$('#zone_code').val(rs);
-			$('#zoneName').val(rs);
+			arr = rs.split(' | ');
+			$('#zone_code').val(arr[0]);
+			$('#zoneName').val(arr[1]);
 		}
 	}
 });

@@ -429,7 +429,7 @@ class Receive_transform extends PS_Controller
 
     if(!empty($doc))
     {
-      if(empty($sap) OR $tr->DocStatus == 'O')
+      if(empty($sap) OR $sap->DocStatus == 'O')
       {
         if($doc->status == 1)
         {
@@ -483,13 +483,13 @@ class Receive_transform extends PS_Controller
                   'Dscription' => $rs->product_name,
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
-                  'PriceBefDi' => remove_vat($rs->price),
-                  'LineTotal' => remove_vat($rs->amount),
+                  'PriceBefDi' => round($rs->price,2),
+                  'LineTotal' => round($rs->amount, 2),
                   'ShipDate' => $doc->date_add,
                   'Currency' => $currency,
                   'Rate' => 1,
-                  'Price' => remove_vat($rs->price),
-                  'TotalFrgn' => remove_vat($rs->amount),
+                  'Price' => round(remove_vat($rs->price), 2),
+                  'TotalFrgn' => round($rs->amount, 2),
                   'WhsCode' => $doc->warehouse_code,
                   'FisrtBin' => $doc->zone_code,
                   'BaseRef' => $doc->order_code,
@@ -497,7 +497,8 @@ class Receive_transform extends PS_Controller
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,
                   'PriceAfVAT' => $rs->price,
-                  'VatSum' => get_vat_amount($rs->amount),
+                  'VatSum' => round(get_vat_amount($rs->amount), 2),
+                  'GTotal' => round($rs->amount, 2),
                   'TaxType' => 'Y',
                   'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
                   'F_E_CommerceDate' => now()

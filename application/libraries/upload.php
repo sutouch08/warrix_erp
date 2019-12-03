@@ -603,7 +603,7 @@
  * @package   cmf
  * @subpackage external
  */
-class upload {
+class Upload {
 
 
     /**
@@ -2247,7 +2247,6 @@ class upload {
      *
      * @access private
      */
-
 
 
     function init() {

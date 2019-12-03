@@ -20,7 +20,7 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">ทุน</label>
 		<div class="col-xs-12 col-sm-3">
-			<input type="number" name="cost" id="cost" class="width-100" value="<?php echo $style->cost; ?>" required />
+			<input type="number" name="cost" id="cost" class="width-100" value="<?php echo $style->cost; ?>" />
 		</div>
 		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
 	</div>
@@ -28,7 +28,7 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">ราคา</label>
 		<div class="col-xs-12 col-sm-3">
-			<input type="number" name="price" id="price" class="width-100" value="<?php echo $style->price; ?>" required />
+			<input type="number" name="price" id="price" class="width-100" value="<?php echo $style->price; ?>" />
 		</div>
 		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
 	</div>

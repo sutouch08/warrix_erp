@@ -1,4 +1,10 @@
 <?php $this->load->view('include/header'); ?>
+<?php $manual_code = getConfig('MANUAL_DOC_CODE');  ?>
+<?php if($manual_code == 1) :?>
+	<input type="hidden" id="manualCode" value="<?php echo $manual_code; ?>">
+	<input type="hidden" id="prefix" value="<?php echo getConfig('PREFIX_ORDER'); ?>">
+	<input type="hidden" id="runNo" value="<?php echo getConfig('RUN_DIGIT_ORDER'); ?>">
+<?php endif; ?>
 <div class="row">
 	<div class="col-sm-6">
     <h3 class="title">
@@ -16,7 +22,11 @@
 <div class="row">
   <div class="col-sm-1 col-1-harf padding-5 first">
     <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm" value="" disabled />
+		<?php if($manual_code == 1) : ?>
+	    <input type="text" class="form-control input-sm" name="code" id="code" value="" />
+		<?php else : ?>
+			<input type="text" class="form-control input-sm" value="" disabled />
+		<?php endif; ?>
   </div>
 
   <div class="col-sm-1 col-1-harf padding-5">

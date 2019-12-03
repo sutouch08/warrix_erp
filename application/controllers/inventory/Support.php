@@ -102,7 +102,16 @@ class Support extends PS_Controller
     {
       $book_code = getConfig('BOOK_CODE_SUPPORT');
       $date_add = db_date($this->input->post('date'));
-      $code = $this->get_new_code($date_add);
+
+      if($this->input->post('code'))
+      {
+        $code = $this->input->post('code');
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
+      
       $role = 'U'; //--- U = เบิกอภินันท์
       $has_term = 1; //--- ถือว่าเป็นเครดิต
 

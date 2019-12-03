@@ -26,6 +26,12 @@ class Tools extends CI_Controller
 
     echo 'done';
   }
+
+
+  public function get_change_pwd($uname)
+  {
+
+  }
 }
 
  ?>

@@ -68,7 +68,7 @@ function zoneInit(){
   let customerCode = $('#customerCode').val();
   $('#zone_code').val('');
   $('#zone').val('');
-  
+
   $('#zone').autocomplete({
     source:BASE_URL + 'auto_complete/get_lend_zone/'+customerCode,
     autoFocus: true,
@@ -92,9 +92,21 @@ function zoneInit(){
 
 $(document).ready(function() {
   zoneInit();
-})
+});
+
 
 function add(){
+  var manualCode = $('#manualCode').val();
+  if(manualCode == 1){
+    validateOrder();
+  }else{
+    addOrder();
+  }
+}
+
+
+
+function addOrder(){
   var customer_code = $('#customerCode').val();
   var customer_name = $('#customer').val();
   var date_add = $('#date').val();
@@ -121,6 +133,50 @@ function add(){
   $('#addForm').submit();
 }
 
+
+
+function validateOrder(){
+  var prefix = $('#prefix').val();
+  var runNo = parseInt($('#runNo').val());
+  let code = $('#code').val();
+  if(code.length == 0){
+    swal("เลขที่เอกสารไม่ถูกต้อง");
+    return false;
+  }
+
+  let arr = code.split('-');
+
+  if(arr.length == 2){
+    if(arr[0] !== prefix){
+      swal('Prefix ต้องเป็น '+prefix);
+      return false;
+    }else if(arr[1].length != (4 + runNo)){
+      swal('Run Number ไม่ถูกต้อง');
+      return false;
+    }else{
+      $.ajax({
+        url: BASE_URL + 'orders/orders/is_exists_order/'+code,
+        type:'GET',
+        cache:false,
+        success:function(rs){
+          if(rs == 'not_exists'){
+            addOrder();
+          }else{
+            swal({
+              title:'Error!!',
+              text: rs,
+              type: 'error'
+            });
+          }
+        }
+      })
+    }
+
+  }else{
+    swal('เลขที่เอกสารไม่ถูกต้อง');
+    return false;
+  }
+}
 
 var customer;
 var channels;

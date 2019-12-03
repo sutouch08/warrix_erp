@@ -1,4 +1,11 @@
 <?php $this->load->view('include/header'); ?>
+<?php $manual_code = getConfig('MANUAL_DOC_CODE');  ?>
+<?php if($manual_code == 1) :?>
+	<input type="hidden" id="manualCode" value="<?php echo $manual_code; ?>">
+	<input type="hidden" id="prefix" value="<?php echo getConfig('PREFIX_ORDER'); ?>">
+	<input type="hidden" id="runNo" value="<?php echo getConfig('RUN_DIGIT_ORDER'); ?>">
+<?php endif; ?>
+
 <div class="row">
 	<div class="col-sm-6">
     <h3 class="title">
@@ -16,7 +23,11 @@
 <div class="row">
   <div class="col-sm-1 col-1-harf hidden-xs padding-5 first">
     <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm" value="" disabled />
+	<?php if($manual_code == 1) : ?>
+    <input type="text" class="form-control input-sm" name="code" id="code" value="" />
+	<?php else : ?>
+		<input type="text" class="form-control input-sm" value="" disabled />
+	<?php endif; ?>
   </div>
 
   <div class="col-sm-1 col-1-harf col-xs-12 padding-5">
@@ -61,7 +72,12 @@
   </div>
   <div class="col-sm-2 padding-5 col-xs-12 last">
     <label class="display-block not-show">Submit</label>
-    <button type="submit" class="btn btn-xs btn-success btn-block"><i class="fa fa-plus"></i> เพิ่ม</button>
+	<?php if($manual_code == 1) : ?>
+    <button type="Button" class="btn btn-xs btn-success btn-block" onclick="validateOrder()"><i class="fa fa-plus"></i> เพิ่ม</button>
+		<button type="submit" class="btn btn-xs btn-success btn-block hidden" id="btn-submit">เพิ่ม</button>
+	<?php else : ?>
+		<button type="submit" class="btn btn-xs btn-success btn-block" id="btn-submit"><i class="fa fa-plus"></i> เพิ่ม</button>
+	<?php endif; ?>
   </div>
 </div>
 <hr class="margin-top-15">

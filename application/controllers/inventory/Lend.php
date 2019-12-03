@@ -87,7 +87,16 @@ class Lend extends PS_Controller
     {
       $book_code = getConfig('BOOK_CODE_LEND');
       $date_add = db_date($this->input->post('date'));
-      $code = $this->get_new_code($date_add);
+      
+      if($this->input->post('code'))
+      {
+        $code = $this->input->post('code');
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
+
       $role = 'L'; //--- L = ยืมสินค้า
       $has_term = 1; //--- ถือว่าเป็นเครดิต
       $zone = $this->zone_model->get($this->input->post('zone_code'));

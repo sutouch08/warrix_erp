@@ -91,7 +91,14 @@ class Transform_stock extends PS_Controller
 
       $book_code = getConfig('BOOK_CODE_TRANSFORM_STOCK');
       $date_add = db_date($this->input->post('date'));
-      $code = $this->get_new_code($date_add);
+      if($this->input->post('code'))
+      {
+        $code = $this->input->post('code');
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
       $role = 'Q'; //--- T = เบิกแปรสภาพ
       $zone_code = $this->input->post('zoneCode');
       $warehouse_code = $this->zone_model->get_warehouse_code($zone_code);

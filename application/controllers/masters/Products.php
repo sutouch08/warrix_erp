@@ -935,9 +935,10 @@ class Products extends PS_Controller
       'VATLiable' => 'Y', //--- มี vat หรือไม่
       'PrchseItem' => 'Y', //--- สินค้าสำหรับซื้อหรือไม่
       'SellItem' => 'Y', //--- สินค้าสำหรับขายหรือไม่
-      'InvntItem' => $item->count_stock, //--- นับสต้อกหรือไม่
+      'InvntItem' => $item->count_stock == 1 ? 'Y' : 'N', //--- นับสต้อกหรือไม่
       'SalUnitMsr' => $item->unit_code, //--- หน่วยขาย
       'BuyUnitMsr' => $item->unit_code, //--- หน่วยซื้อ
+      'CntUnitMsr' => $item->unit_code,
       'VatGroupPu' => getConfig('PURCHASE_VAT_CODE'), //---- รหัสกลุ่มภาษีซื้อ (ต้องตรงกับ SAP)
       'ItemType' => 'I', //--- ประเภทของรายการ F=Fixed Assets, I=Items, L=Labor, T=Travel
       'InvntryUom' => $item->unit_code, //--- หน่วยในการนับสต็อก

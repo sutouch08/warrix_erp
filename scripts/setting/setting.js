@@ -44,6 +44,57 @@ function closeSystem()
 
 
 
+function toggleManualCode(option)
+{
+	$('#manual-doc-code').val(option);
+	if(option == 1){
+		$('#btn-manual-yes').addClass('btn-success');
+		$('#btn-manual-no').removeClass('btn-danger');
+		return;
+	}
+	if(option == 0){
+		$('#btn-manual-yes').removeClass('btn-success');
+		$('#btn-manual-no').addClass('btn-danger');
+		return;
+	}
+}
+
+
+//---- ไม่ขายสินค้าให้ลูกค้าที่มียอดค้างเกินกำหนด
+function toggleStrictDue(option)
+{
+	$('#strict-over-due').val(option);
+	if(option == 1){
+		$('#btn-strict-yes').addClass('btn-success');
+		$('#btn-strict-no').removeClass('btn-danger');
+		return;
+	}
+	if(option == 0){
+		$('#btn-strict-yes').removeClass('btn-success');
+		$('#btn-strict-no').addClass('btn-danger');
+		return;
+	}
+}
+
+
+
+function toggleReceiveDue(option)
+{
+	$('#receive-over-due').val(option);
+	if(option == 1){
+		$('#btn-receive-yes').addClass('btn-success');
+		$('#btn-receive-no').removeClass('btn-danger');
+		return;
+	}
+	if(option == 0){
+		$('#btn-receive-yes').removeClass('btn-success');
+		$('#btn-receive-no').addClass('btn-danger');
+		return;
+	}
+}
+
+
+
 function toggleEditDiscount(option)
 {
 	$('#allow-edit-discount').val(option);

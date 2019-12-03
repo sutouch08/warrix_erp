@@ -58,19 +58,27 @@ class Invoice_model extends CI_Model
 
   public function is_over_due($customer_code)
   {
-    $control_day = getConfig('OVER_DUE_DATE');
-    $rs = $this->ms
-    ->select('DocEntry', FALSE)
-    ->where('CardCode', $customer_code)
-    ->where('DocTotal >', 'PaidToDate', FALSE)
-    ->where("DATEADD(day,{$control_day}, DocDueDate) < ", "GETDATE()", FALSE)
-    ->get('OINV');
-
-    if($rs->num_rows() > 0)
+    $is_strict = getConfig('STRICT_OVER_DUE');
+    if($is_strict == 0)
     {
-      return TRUE;
+      return FALSE;
     }
+    else
+    {
+      $control_day = getConfig('OVER_DUE_DATE');
+      $rs = $this->ms
+      ->select('DocEntry', FALSE)
+      ->where('CardCode', $customer_code)
+      ->where('DocTotal >', 'PaidToDate', FALSE)
+      ->where("DATEADD(day,{$control_day}, DocDueDate) < ", "GETDATE()", FALSE)
+      ->get('OINV');
 
+      if($rs->num_rows() > 0)
+      {
+        return TRUE;
+      }
+    }
+    
     return FALSE;
   }
 

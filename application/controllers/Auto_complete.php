@@ -11,27 +11,6 @@ class Auto_complete extends CI_Controller
   }
 
 
-  // public function get_customer_code_and_name()
-  // {
-  //   $txt = $_REQUEST['term'];
-  //   $sc = array();
-  //   $rs = $this->ms
-  //   ->select('CardCode, CardName')
-  //   ->where('CardType', 'C')
-  //   ->like('CardCode', $txt)
-  //   ->or_like('CardName', $txt)
-  //   ->get('OCRD');
-  //
-  //   if($rs->num_rows() > 0)
-  //   {
-  //     foreach($rs->result() as $rd)
-  //     {
-  //       $sc[] = $rd->CardCode.' | '.$rd->CardName;
-  //     }
-  //   }
-  //
-  //   echo json_encode($sc);
-  // }
 
   public function get_sender()
   {
@@ -53,6 +32,8 @@ class Auto_complete extends CI_Controller
 
     echo json_encode($sc);
   }
+
+
 
   public function get_customer_code_and_name()
   {
@@ -83,10 +64,17 @@ class Auto_complete extends CI_Controller
 public function get_style_code()
 {
   $sc = array();
-
-	$qr  = "SELECT code FROM product_style WHERE code LIKE '%".$_REQUEST['term']."%' ";
-	$qr .= "AND active = 1 AND can_sell = 1 AND is_deleted = 0 ORDER BY code ASC";
-  $qs = $this->db->query($qr);
+  $this->db
+  ->select('code, old_code')
+  ->where('active', 1)
+  ->where('can_sell', 1)
+  ->where('is_deleted', 0)
+  ->group_start()
+  ->like('code', $_REQUEST['term'])
+  ->or_like('old_code', $_REQUEST['term'])
+  ->group_end()
+  ->order_by('code', 'ASC');
+  $qs = $this->db->get('product_style');
 
   if($qs->num_rows() > 0)
   {
@@ -204,6 +192,10 @@ public function get_style_code()
   {
     $sc = array();
     $txt = convert($_REQUEST['term']);
+
+    //---- receive product if over due date or not
+    $receive_due = getConfig('RECEIVE_OVER_DUE'); //--- 1 = receive , 0 = not receive
+
     $this->ms->select('DocNum')->where('DocStatus', 'O');
     if($vendor !== FALSE)
     {
@@ -215,6 +207,14 @@ public function get_style_code()
       $this->ms->like('DocNum', $txt);
     }
 
+    if($receive_due == 0)
+    {
+      //--- not receive
+      $days = getConfig('PO_VALID_DAYS');
+      $date = date('Y-m-d',strtotime("-{$days} day")); //--- ย้อนไป $days วัน
+      $this->ms->where('DocDueDate >=', sap_date($date));
+    }
+    //echo $this->ms->get_compiled_select('OPOR');
     $po = $this->ms->get('OPOR');
 
     if(!empty($po))
@@ -294,28 +294,47 @@ public function get_style_code()
   public function get_zone_code()
   {
     $sc = array();
-    $txt = convert($_REQUEST['term']);
-    $this->ms
-    ->select('OBIN.BinCode')
-    ->from('OBIN')
-    ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_MAIN', 'Y')
-    ->where('OBIN.SysBin', 'N');
+    $txt = $_REQUEST['term'];
+    //$txt = convert($_REQUEST['term']);
+    // $this->ms
+    // ->select('OBIN.BinCode, OBIN.Descr')
+    // ->from('OBIN')
+    // ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
+    // ->where('OWHS.U_MAIN', 'Y')
+    // ->where('OBIN.SysBin', 'N');
+    // if($txt != '*')
+    // {
+    //   $this->ms->group_start();
+    //   $this->ms->like('OBIN.BinCode', $txt);
+    //   $this->ms->or_like('OBIN.Descr', $txt);
+    //   $this->ms->group_end();
+    // }
+    //
+    // $this->ms->limit(20);
+    // $zone = $this->ms->get();
+    // if(!empty($zone))
+    // {
+    //   foreach($zone->result() as $rs)
+    //   {
+    //     $sc[] = $rs->BinCode.' | '.$rs->Descr;
+    //   }
+    // }
+
+    $this->db->select('code, name');
     if($txt != '*')
     {
-      $this->ms->like('OBIN.BinCode', $txt);
+      $this->db->like('code', $txt)->or_like('name', $txt);
     }
 
-    $this->ms->limit(20);
-    $zone = $this->ms->get();
-    if(!empty($zone))
+    $rs = $this->db->limit(20)->get('zone');
+
+    if($rs->num_rows() > 0)
     {
-      foreach($zone->result() as $rs)
+      foreach($rs->result() as $cs)
       {
-        $sc[] = $rs->BinCode;
+        $sc[] = $cs->code.' | '.$cs->name;
       }
     }
-
 
     echo json_encode($sc);
   }

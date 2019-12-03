@@ -15,5 +15,5 @@ function goEdit(id){
 
 
 function viewDetail(id){
-  window.location.href = HOME + 'view_detail/'+id;
+  window.location.href = HOME + 'view_rule_detail/'+id;
 }

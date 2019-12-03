@@ -156,11 +156,11 @@ function get_vat_amount($amount)
 	$vat = getConfig('SALE_VAT_RATE');
 	if($vat != 0)
 	{
-		$re_vat = $vat * 0.01;
-		return $amount * $re_vat;
+		$re_vat = ($amount * $vat) / (100+$vat);
+		return round($re_vat,2);
 	}
 
-	return $amount;
+	return round($amount, 2);
 }
 
 
@@ -171,10 +171,10 @@ function remove_vat($amount)
 	if( $vat != 0 )
 	{
 		$re_vat	= ($vat + 100) / 100;
-		return $amount/$re_vat;
+		return round($amount/$re_vat, 2);
 	}
 
-	return $amount;
+	return round($amount, 2);
 }
 
 
@@ -188,10 +188,10 @@ function add_vat($amount)
 	if( $vat != 0 )
 	{
 		$re_vat = $vat * 0.01;
-		return ($amount * $re_vat) + $amount;
+		return round(($amount * $re_vat) + $amount, 2);
 	}
 
-	return $amount;
+	return round($amount, 2);
 }
 
 

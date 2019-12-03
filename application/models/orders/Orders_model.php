@@ -91,6 +91,24 @@ class Orders_model extends CI_Model
 
 
 
+  public function is_exists_order($code, $old_code = NULL)
+  {
+    if($old_code !== NULL)
+    {
+      $this->db->where('code !=', $old_code);
+    }
+
+    $rs = $this->db->where('code', $code)->get('orders');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+
 
   public function get_order_detail($order_code, $item_code)
   {

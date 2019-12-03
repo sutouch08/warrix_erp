@@ -18,7 +18,7 @@ function goEdit(code){
 
 
 function viewDetail(code){
-  window.location.href = BASE_URL + 'discount/discount_policy/view_detail/'+code;
+  window.location.href = BASE_URL + 'discount/discount_policy/view_policy_detail/'+code;
 }
 
 

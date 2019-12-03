@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
     	<label>เลขที่เอกสาร</label>
-        <input type="text" class="form-control input-sm text-center" value="<?php echo $order->code; ?>" disabled />
+      <input type="text" class="form-control input-sm text-center" value="<?php echo $order->code; ?>" disabled />
     </div>
     <div class="col-sm-1 col-xs-6 padding-5">
     	<label>วันที่</label>
@@ -49,7 +49,7 @@
 			<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-update" onclick="validUpdate()"><i class="fa fa-save"></i> บันทึก</i></button>
 		</div>
 		<?php endif; ?>
-    <input type="hidden" name="order_code" id="order_code" value="<?php echo $order->code; ?>" />
     <input type="hidden" name="customerCode" id="customerCode" value="<?php echo $order->customer_code; ?>" />
+		<input type="hidden" name="order_code" id="order_code" value="<?php echo $order->code; ?>" />
 </div>
 <hr class="margin-bottom-15"/>

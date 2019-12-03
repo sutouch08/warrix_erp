@@ -17,9 +17,9 @@ $currency = getConfig('CURRENTCY');
       </tr>
       <tr>
         <td class="middle text-right"><strong>รหัสนโยบาย</strong></td>
-        <td class="middle"><?php echo $policy->code; ?></td>
+        <td class="middle"><?php echo empty($policy) ? '' : $policy->code; ?></td>
         <td class="middle text-right"><strong>ชื่อนโยบาย</strong></td>
-        <td class="middle" ><?php echo $policy->name; ?></td>
+        <td class="middle" ><?php echo empty($policy) ? '' : $policy->name; ?></td>
       </tr>
       <tr class="">
         <td class="middle text-right"><strong>วันที่เพิ่ม</strong></td>

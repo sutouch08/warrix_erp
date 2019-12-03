@@ -60,6 +60,7 @@ function getEdit(){
   $('.edit').removeAttr('disabled');
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
+  
   customer = $("#customerCode").val();
 	channels = $("#channels").val();
 	payment  = $("#payment").val();
@@ -205,7 +206,6 @@ function countInput(){
 }
 
 
-
 function validUpdate(){
 	var date_add = $("#date").val();
 	var customer_code = $("#customerCode").val();
@@ -213,6 +213,8 @@ function validUpdate(){
 	var channels_code = $("#channels").val();
 	var payment_code = $("#payment").val();
   var recal = 0;
+
+
 	//---- ตรวจสอบวันที่
 	if( ! isDate(date_add) ){
 		swal("วันที่ไม่ถูกต้อง");
@@ -259,6 +261,18 @@ function updateOrder(recal){
 	var payment_code = $("#payment").val();
 	var reference = $('#reference').val();
 	var remark = $("#remark").val();
+
+  var data = {
+    "order_code" : order_code,
+    "date_add"	: date_add,
+    "customer_code" : customer_code,
+    "customer_ref" : customer_ref,
+    "channels_code" : channels_code,
+    "payment_code" : payment_code,
+    "reference" : reference,
+    "remark" : remark,
+    "recal" : recal
+  }
 
 	load_in();
 
@@ -408,4 +422,49 @@ function unExpired(){
       }
     }
   });
+}
+
+
+function validateOrder(){
+  var prefix = $('#prefix').val();
+  var runNo = parseInt($('#runNo').val());
+  let code = $('#code').val();
+  if(code.length == 0){
+    swal("เลขที่เอกสารไม่ถูกต้อง");
+    return false;
+  }
+
+  let arr = code.split('-');
+
+  if(arr.length == 2){
+    if(arr[0] !== prefix){
+      swal('Prefix ต้องเป็น '+prefix);
+      return false;
+    }else if(arr[1].length != (4 + runNo)){
+      swal('Run Number ไม่ถูกต้อง');
+      return false;
+    }else{
+      $.ajax({
+        url: BASE_URL + 'orders/orders/is_exists_order/'+code,
+        type:'GET',
+        cache:false,
+        success:function(rs){
+          if(rs == 'not_exists'){
+            $('#btn-submit').click();
+          }else{
+            swal({
+              title:'Error!!',
+              text: rs,
+              type: 'error'
+            });
+          }
+        }
+      })
+    }
+
+  }else{
+    swal('เลขที่เอกสารไม่ถูกต้อง');
+    return false;
+  }
+
 }

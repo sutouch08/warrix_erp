@@ -58,7 +58,7 @@ class Product_images extends PS_Controller
 		$img_name 	= $id_image; //-- ตั้งชื่อรูปตาม id_image
 		$image_path = $this->config->item('image_path').'products/';
 		$use_size 	= array('mini', 'default', 'medium', 'large'); //---- ใช้ทั้งหมด 4 ขนาด
-    $image 	= new upload($file);
+    $image 	= new Upload($file);
     if( $image->uploaded )
     {
       foreach($use_size as $size)

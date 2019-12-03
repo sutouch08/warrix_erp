@@ -87,10 +87,22 @@ class Orders extends PS_Controller
 
   public function add_new()
   {
-
     $this->load->view('orders/orders_add');
   }
 
+
+  public function is_exists_order($code, $old_code = NULL)
+  {
+    $exists = $this->orders_model->is_exists_order($code, $old_code);
+    if($exists)
+    {
+      echo 'เลขที่เอกสารซ้ำ';
+    }
+    else
+    {
+      echo 'not_exists';
+    }
+  }
 
 
   public function add()
@@ -101,7 +113,15 @@ class Orders extends PS_Controller
 
       $book_code = getConfig('BOOK_CODE_ORDER');
       $date_add = db_date($this->input->post('date'));
-      $code = $this->get_new_code($date_add);
+      if($this->input->post('code'))
+      {
+        $code = $this->input->post('code');
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
+
       $role = 'S'; //--- S = ขาย
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment'));
       $sale_code = $this->customers_model->get_sale_code($this->input->post('customerCode'));
@@ -164,6 +184,7 @@ class Orders extends PS_Controller
 
   public function add_detail($order_code)
   {
+    $auz = getConfig('ALLOW_UNDER_ZERO');
     $result = TRUE;
     $err = "";
     $err_qty = 0;
@@ -186,7 +207,7 @@ class Orders extends PS_Controller
 
 
           //--- ถ้ามีสต็อกมากว่าที่สั่ง หรือ เป็นสินค้าไม่นับสต็อก
-          if( $sumStock >= $qty OR $item->count_stock == 0 )
+          if( $sumStock >= $qty OR $item->count_stock == 0 OR $auz == 1)
           {
 
             //---- ถ้ายังไม่มีรายการในออเดอร์
@@ -525,12 +546,18 @@ class Orders extends PS_Controller
       //--- credit balance from sap
       $credit_balance = $this->customers_model->get_credit($order->customer_code);
 
-      if($credit_used > $credit_balance)
+      $skip = getConfig('SKIP_CREDIT_CHECK');
+
+      if($skip == 0)
       {
-        $diff = $credit_used - $credit_balance;
-        $sc = FALSE;
-        $message = 'เครดิตคงเหลือไม่พอ (ขาด : '.number($diff, 2).')';
+        if($credit_used > $credit_balance)
+        {
+          $diff = $credit_used - $credit_balance;
+          $sc = FALSE;
+          $message = 'เครดิตคงเหลือไม่พอ (ขาด : '.number($diff, 2).')';
+        }
       }
+
     }
 
 
@@ -647,6 +674,11 @@ class Orders extends PS_Controller
 
   public function orderGridOneAttribute($style, $attr, $isVisual, $view, $id_branch = 0)
 	{
+    $auz = getConfig('ALLOW_UNDER_ZERO');
+    if($auz == 1)
+    {
+      $isVisual = TRUE;
+    }
 		$sc 		= '';
 		$data 	= $attr == 'color' ? $this->getAllColors($style->code) : $this->getAllSizes($style->code);
 		$items	= $this->products_model->get_style_items($style->code);
@@ -714,6 +746,11 @@ class Orders extends PS_Controller
 
   public function orderGridTwoAttribute($style, $isVisual, $view)
 	{
+    $auz = getConfig('ALLOW_UNDER_ZERO');
+    if($auz == 1)
+    {
+      $isVisual = TRUE;
+    }
 
 		$colors	= $this->getAllColors($style->code);
 		$sizes 	= $this->getAllSizes($style->code);
@@ -1070,7 +1107,7 @@ class Orders extends PS_Controller
         if($rs !== TRUE)
         {
           $sc = FALSE;
-          $message = $sc;
+          $message = $rs;
         }
       }
     }
@@ -1084,9 +1121,8 @@ class Orders extends PS_Controller
 	{
     $this->load->library('upload');
     $sc = TRUE;
-
 		$image_path = $this->config->item('image_path').'payments/';
-    $image 	= new upload($file);
+    $image 	= new Upload($file);
     if( $image->uploaded )
     {
       $image->file_new_name_body = $code; 		//--- เปลี่ยนชือ่ไฟล์ตาม order_code
@@ -1112,8 +1148,6 @@ class Orders extends PS_Controller
 
 		return $sc;
 	}
-
-
 
 
   public function view_payment_detail()

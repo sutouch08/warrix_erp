@@ -35,7 +35,8 @@
     </div>
 </div><!-- End Row -->
 <hr/>
-<input type="hidden" id="order_code" value="<?php echo $order->code; ?>" />
+<input type="hidden" id="order_code" name="order_code" value="<?php echo $order->code; ?>" />
+
 <?php $this->load->view('orders/order_edit_header'); ?>
 <?php $this->load->view('orders/order_panel'); ?>
 <?php $this->load->view('orders/order_discount_bar'); ?>
