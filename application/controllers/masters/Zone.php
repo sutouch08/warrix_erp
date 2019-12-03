@@ -218,6 +218,7 @@ class Zone extends PS_Controller
           $ds = array(
             'code' => $rs->code,
             'name' => is_null($rs->name) ? '' : $rs->name,
+            'old_code' => $rs->old_code,
             'sap_updateDate' => $rs->updateDate,
           );
 
@@ -231,7 +232,8 @@ class Zone extends PS_Controller
             'name' => is_null($rs->name) ? '' : $rs->name,
             'warehouse_code' => $rs->warehouse_code,
             'sap_createDate' => $rs->createDate,
-            'sap_updateDate' => $rs->updateDate
+            'sap_updateDate' => $rs->updateDate,
+            'old_code' => $rs->old_code
           );
 
           $this->zone_model->add($ds);
@@ -250,8 +252,10 @@ class Zone extends PS_Controller
     $sc = TRUE;
     if($this->input->get('barcode'))
     {
-      $code = trim($this->input->get('barcode'));
-      if($this->zone_model->is_exists($code) === FALSE)
+      $barcode = trim($this->input->get('barcode'));
+      $code = $this->zone_model->get_zone_code($barcode);
+
+      if($code === FALSE)
       {
         $sc = FALSE;
       }

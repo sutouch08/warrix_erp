@@ -61,7 +61,8 @@
 					<th class="width-15 middle">รหัสโซน</th>
 					<th class="width-35 middle">ชื่อโซน</th>
 					<th class="width-20 middle">คลังสินค้า</th>
-					<th class="width-10 middle text-center">ลูกค้า(จำนวน)</th>
+					<th class="width-5 middle text-center">ลูกค้า</th>
+					<th class="width-10 middle text-center">รหัสเก่า</th>
 					<th class=""></th>
 				</tr>
 			</thead>
@@ -75,6 +76,7 @@
 						<td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle"><?php echo $rs->warehouse_name; ?></td>
 						<td class="middle text-center"><?php echo number($rs->customer_count); ?></td>
+						<td class="middle text-center"><?php echo $rs->old_code; ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">
@@ -92,7 +94,7 @@
 				<?php endforeach; ?>
 			<?php else : ?>
 				<tr>
-					<td colspan="6" class="text-center">--- No zone ---</td>
+					<td colspan="7" class="text-center">--- No zone ---</td>
 				</tr>
 			<?php endif; ?>
 			</tbody>

@@ -177,7 +177,7 @@ class Zone_model extends CI_Model
     }
 
     $this->db
-    ->select('zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name')
+    ->select('zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name, zone.old_code')
     ->from('zone')
     ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left');
 
@@ -410,7 +410,7 @@ class Zone_model extends CI_Model
 
   public function get_all_zone()
   {
-    $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, WhsCode AS warehouse_code');
+    $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, SL1Code AS old_code, WhsCode AS warehouse_code');
     $this->ms->select('createDate, updateDate');
     $this->ms->where('SysBin', 'N');
     $rs = $this->ms->get('OBIN');
@@ -422,6 +422,18 @@ class Zone_model extends CI_Model
     return FALSE;
   }
 
+
+  //--- ใช้จัดสินค้า
+  public function get_zone_code($barcode)
+  {
+    $rs = $this->db->select('code')->where('old_code', $barcode)->or_where('code', $barcode)->get('zone');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->code;
+    }
+
+    return FALSE;
+  }
 } //--- end class
 
  ?>

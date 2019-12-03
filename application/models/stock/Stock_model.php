@@ -73,7 +73,7 @@ class stock_model extends CI_Model
   public function get_stock_in_zone($item)
   {
     $rs = $this->ms
-    ->select('OBIN.BinCode AS code, OIBQ.OnHandQty AS qty')
+    ->select('OBIN.BinCode AS code, OBIN.Descr AS name, OIBQ.OnHandQty AS qty')
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
@@ -89,7 +89,7 @@ class stock_model extends CI_Model
       {
         $ds = new stdClass();
         $ds->code = $stock->code;
-        $ds->name = $stock->code;
+        $ds->name = $stock->name;
         $ds->qty  = $stock->qty;
         $result[] = $ds;
       }

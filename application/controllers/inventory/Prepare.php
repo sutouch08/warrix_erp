@@ -312,6 +312,17 @@ class Prepare extends PS_Controller
   public function get_stock_zone($zone_code, $item_code)
   {
     $this->load->model('stock/stock_model');
+    $this->load->model('masters/warehouse_model');
+    $this->load->model('masters/zone_model');
+
+    $zone = $this->zone_model->get($zone_code);
+    $wh = $this->warehouse_model->get($zone->warehouse_code);
+    $auz = $wh->auz == 1 ? TRUE : FALSE;
+
+    if($auz === TRUE)
+    {
+      return 1000000;
+    }
 
     //---- สินค้าคงเหลือในโซน
     $stock = $this->stock_model->get_stock_zone($zone_code, $item_code);
