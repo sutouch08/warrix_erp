@@ -34,11 +34,20 @@
 			<label>อ้างอิง</label>
 		  <input type="text" class="form-control input-sm text-center edit" name="reference" id="reference" value="<?php echo $order->reference; ?>" disabled />
 		</div>
+		<div class="col-sm-2 col-2-harf col-xs-12 padding-5">
+			<label>คลัง</label>
+	    <select class="form-control input-sm edit" name="warehouse" id="warehouse" disabled>
+				<option value="">เลือกคลัง</option>
+				<?php echo select_warehouse($order->warehouse_code); ?>
+			</select>
+	  </div>
+		<!--
 		<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
 			<label>เลขที่จัดส่ง</label>
-		  <input type="text" class="form-control input-sm text-center edit" name="shipping_code" id="shipping_code" value="<?php echo $order->shipping_code; ?>" disabled />
+		  <input type="text" class="form-control input-sm text-center edit" name="shipping_code" id="shipping_code" value="<?php //echo $order->shipping_code; ?>" disabled />
 		</div>
-		<div class="col-sm-8 col-xs-12 padding-5">
+	-->
+		<div class="col-sm-7 col-xs-12 padding-5">
 		 	<label>หมายเหตุ</label>
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
 		</div>

@@ -6,6 +6,8 @@ class Products_model extends CI_Model
     parent::__construct();
   }
 
+
+
   public function count_sap_update_list($date_add, $date_upd)
   {
     $rs = $this->ms->select('ItemCode')
@@ -46,182 +48,6 @@ class Products_model extends CI_Model
 
 
 
-  public function sap_item_exists($code)
-  {
-    $rs = $this->mc->select('ItemCode')->where('ItemCode', $code)->get('OITM');
-    if($rs->num_rows() === 1)
-    {
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-
-  public function get_sap_price($code)
-  {
-    $rs = $this->ms
-    ->select('OITM.ItemCode, ITM1.Price AS cost, ITM2.Price AS price')
-    ->from('OITM')
-    ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)')
-    ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)')
-    ->where('OITM.ItemCode', $code)
-    ->get();
-
-    if($rs->num_rows() == 1)
-    {
-      return $rs->row();
-    }
-
-    return FALSE;
-  }
-
-
-  public function count_rows(array $ds = array())
-  {
-    $this->db->select('active');
-
-    if(!empty($ds))
-    {
-      if(!empty($ds['code']))
-      {
-        $this->db->like('code', $ds['code']);
-      }
-
-      if(!empty($ds['name']))
-      {
-        $this->db->like('name', $ds['name']);
-      }
-
-      if(!empty($ds['group']))
-      {
-        $this->db->where('group_code', $ds['group']);
-      }
-
-      if(!empty($ds['sub_group']))
-      {
-        $this->db->where('sub_group_code', $ds['sub_group']);
-      }
-
-      if(!empty($ds['category']))
-      {
-        $this->db->where('category_code', $ds['category']);
-      }
-
-      if(!empty($ds['kind']))
-      {
-        $this->db->where('kind_code', $ds['kind']);
-      }
-
-      if(!empty($ds['type']))
-      {
-        $this->db->where('type_code', $ds['type']);
-      }
-
-      if(!empty($ds['brand']))
-      {
-        $this->db->where('brand_code', $ds['brand']);
-      }
-
-      if(!empty($ds['year']))
-      {
-        $this->db->where('year', $ds['year']);
-      }
-    }
-
-    $rs = $this->db->get('products');
-
-    return $rs->num_rows();
-  }
-
-
-
-  public function get_list(array $ds = array(), $perpage = '', $offset = '')
-  {
-    $this->db
-    ->select('products.*')
-    ->from('products')
-    ->join('product_color', 'products.color_code = product_color.code', 'left')
-    ->join('product_size', 'products.size_code = product_size.code', 'left');
-
-    if(!empty($ds))
-    {
-      if(!empty($ds['code']))
-      {
-        $this->db->like('products.code', $ds['code']);
-      }
-
-      if(!empty($ds['name']))
-      {
-        $this->db->like('products.name', $ds['name']);
-      }
-
-      if(!empty($ds['color']))
-      {
-        $this->db->group_start();
-        $this->db->like('product_color.code', $ds['color'])->or_like('product_color.name', $ds['color']);
-        $this->db->group_end();
-      }
-
-      if(!empty($ds['size']))
-      {
-        $this->db->group_start();
-        $this->db->like('product_size.code', $ds['size'])->or_like('product_size.name', $ds['size']);
-        $this->db->group_end();
-      }
-
-      if(!empty($ds['group']))
-      {
-        $this->db->where('group_code', $ds['group']);
-      }
-
-      if(!empty($ds['sub_group']))
-      {
-        $this->db->where('sub_group_code', $ds['sub_group']);
-      }
-
-      if(!empty($ds['category']))
-      {
-        $this->db->where('category_code', $ds['category']);
-      }
-
-      if(!empty($ds['kind']))
-      {
-        $this->db->where('kind_code', $ds['kind']);
-      }
-
-      if(!empty($ds['type']))
-      {
-        $this->db->where('type_code', $ds['type']);
-      }
-
-      if(!empty($ds['brand']))
-      {
-        $this->db->where('brand_code', $ds['brand']);
-      }
-
-      if(!empty($ds['year']))
-      {
-        $this->db->where('year', $ds['year']);
-      }
-    }
-
-    $this->db->order_by('style_code', 'ASC');
-    $this->db->order_by('color_code', 'ASC');
-    $this->db->order_by('product_size.position', 'ASC');
-
-
-    if($perpage != '')
-    {
-      $offset = $offset === NULL ? 0 : $offset;
-      $this->db->limit($perpage, $offset);
-    }
-    //echo $this->db->get_compiled_select();
-    $rs = $this->db->get();
-
-    return $rs->result();
-  }
-
 
   public function add(array $ds = array())
   {
@@ -232,6 +58,7 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
+
 
 
   //--- Export item to SAP
@@ -246,6 +73,7 @@ class Products_model extends CI_Model
   }
 
 
+
   //--- Export item tot SAP
   public function update_item($code, array $ds = array())
   {
@@ -256,6 +84,21 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
+
+
+
+  public function sap_item_exists($code)
+  {
+    $rs = $this->mc->select('ItemCode')->where('ItemCode', $code)->get('OITM');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
 
 
   public function update($code, array $ds = array())
@@ -330,6 +173,29 @@ class Products_model extends CI_Model
   }
 
 
+  public function count_rows(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      $this->db->select('code');
+
+      foreach($ds as $field => $val)
+      {
+        if(!empty($val))
+        {
+          $this->db->like($field, $val);
+        }
+      }
+      $rs = $this->db->get('products');
+
+      return $rs->num_rows();
+    }
+
+    return 0;
+  }
+
+
+
 
   public function get($code)
   {
@@ -376,7 +242,7 @@ class Products_model extends CI_Model
     {
       foreach($ds as $field => $val)
       {
-        if($val != '')
+        if(!empty($val))
         {
           $this->db->like($field, $val);
         }
@@ -550,6 +416,15 @@ class Products_model extends CI_Model
   }
 
 
+  public function get_updte_data()
+  {
+    $this->ms->select("CardCode, CardName");
+    $this->ms->where("UpdateDate >=", from_date());
+    $rs = $this->ms->get('OCRD');
+    return $rs->result();
+  }
+
+
 
 
   public function count_color($style_code)
@@ -644,6 +519,50 @@ class Products_model extends CI_Model
     if($all > 0)
     {
       return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_items_last_sync()
+  {
+    $rs = $this->db->select_max('last_sync')->get('products');
+    return $rs->row()->last_sync;
+  }
+
+
+  public function count_all()
+  {
+    return $this->db->count_all('products');
+  }
+
+
+  public function get_items_code_list($limit, $offset)
+  {
+    $rs = $this->db->select('code')->limit($limit, $offset)->get('products');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_sap_price($code)
+  {
+    $rs = $this->ms
+    ->select('OITM.ItemCode, ITM1.Price AS cost, ITM2.Price AS price')
+    ->from('OITM')
+    ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)')
+    ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)')
+    ->where('OITM.ItemCode', $code)
+    ->get();
+
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
     }
 
     return FALSE;

@@ -265,23 +265,34 @@ function clear_progress(){
 
 
 
-function importData(step, index){
-  var ds = step[index];
-
-  $.ajax({
-    url: ds.url,
-    type:'GET',
-    cache:'false',
-    success:function(rs){
-      var rs = $.trim(rs);
-      $('body').append('import : ['+index+']' + ds.name+' => '+rs+'<br/>');
-      if(index == (step.length)){
-        setTimeout(function(){
-          window.close();}, 30000);
-      }else{
-        importData(step, index);
-      }
-    }
+function get_count_items(){
+  $.get(BASE_URL + 'sync_items/count_items', function(rs){
+    count_items = rs;
   });
-index++;
+}
+
+
+function update_items_price(){
+  state = 'update_items';
+  label.text('Price Updating '+ updated_items+' of '+ count_items);
+  if(allow_sync == false){
+    finish_sync();
+    return false;
+  }
+  if(updated_items < count_items){
+    $.ajax({
+      url:BASE_URL + 'sync_items/get_update_price/'+ updated_items,
+      type:'GET',
+      cache:false,
+      success:function(rs){
+        updated_items += parseInt(rs);
+        update_progress('items');
+        if(updated_items == count_items){
+          swal("Price Updated", "", "success");
+        }else{
+          update_items_price();
+        }
+      }
+    })
+  }
 }

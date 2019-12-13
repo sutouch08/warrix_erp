@@ -66,11 +66,19 @@
 		<input type="text" class="form-control input-sm" name="reference" value="" />
   </div>
 
-  <div class="col-sm-8 col-8-harf col-xs-12 padding-5">
+	<div class="col-sm-2 col-2-harf col-xs-12 padding-5">
+		<label>คลัง</label>
+    <select class="form-control input-sm" name="warehouse" id="warehouse" required>
+			<option value="">เลือกคลัง</option>
+			<?php echo select_warehouse(); ?>
+		</select>
+  </div>
+
+  <div class="col-sm-7 col-xs-12 padding-5">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="">
   </div>
-  <div class="col-sm-2 padding-5 col-xs-12 last">
+  <div class="col-sm-1 padding-5 col-xs-12 last">
     <label class="display-block not-show">Submit</label>
 	<?php if($manual_code == 1) : ?>
     <button type="Button" class="btn btn-xs btn-success btn-block" onclick="validateOrder()"><i class="fa fa-plus"></i> เพิ่ม</button>

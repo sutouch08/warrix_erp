@@ -60,7 +60,7 @@ function getEdit(){
   $('.edit').removeAttr('disabled');
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
-  
+
   customer = $("#customerCode").val();
 	channels = $("#channels").val();
 	payment  = $("#payment").val();
@@ -260,19 +260,8 @@ function updateOrder(recal){
 	var channels_code = $("#channels").val();
 	var payment_code = $("#payment").val();
 	var reference = $('#reference').val();
+  var warehouse_code = $('#warehouse').val();
 	var remark = $("#remark").val();
-
-  var data = {
-    "order_code" : order_code,
-    "date_add"	: date_add,
-    "customer_code" : customer_code,
-    "customer_ref" : customer_ref,
-    "channels_code" : channels_code,
-    "payment_code" : payment_code,
-    "reference" : reference,
-    "remark" : remark,
-    "recal" : recal
-  }
 
 	load_in();
 
@@ -288,6 +277,7 @@ function updateOrder(recal){
   		"channels_code" : channels_code,
   		"payment_code" : payment_code,
   		"reference" : reference,
+      "warehouse_code" : warehouse_code,
   		"remark" : remark,
       "recal" : recal
     },

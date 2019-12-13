@@ -93,7 +93,7 @@ function zoneInit(customer_code, edit)
 function add(){
   var manualCode = $('#manualCode').val();
   if(manualCode == 1){
-    validUpdate();
+    validateOrder();
   }
   else{
     addOrder();

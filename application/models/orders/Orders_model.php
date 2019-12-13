@@ -537,14 +537,21 @@ class Orders_model extends CI_Model
 
 
 
-  public function get_reserv_stock($item_code)
+  public function get_reserv_stock($item_code, $warehouse = NULL)
   {
-    $rs = $this->db->select_sum('qty')
-    ->where('product_code', $item_code)
-    ->where('is_complete', 0)
-    ->where('is_expired', 0)
-    ->where('is_count', 1)
-    ->get('order_details');
+    $this->db
+    ->select_sum('order_details.qty', 'qty')
+    ->from('order_details')
+    ->join('orders', 'order_details.order_code = orders.code', 'left')
+    ->where('order_details.product_code', $item_code)
+    ->where('order_details.is_complete', 0)
+    ->where('order_details.is_expired', 0)
+    ->where('order_details.is_count', 1);
+    if($warehouse !== NULL)
+    {
+      $this->db->where('orders.warehouse_code', $warehouse);
+    }
+    $rs = $this->db->get();
 
     if($rs->num_rows() == 1)
     {
@@ -556,14 +563,21 @@ class Orders_model extends CI_Model
 
 
 
-  public function get_reserv_stock_by_style($style_code)
+  public function get_reserv_stock_by_style($style_code, $warehouse = NULL)
   {
-    $rs = $this->db->select_sum('qty')
-    ->where('style_code', $style_code)
-    ->where('is_complete', 0)
-    ->where('is_expired', 0)
-    ->where('is_count', 1)
-    ->get('order_details');
+    $this->db
+    ->select_sum('order_details.qty', 'qty')
+    ->from('order_details')
+    ->join('orders', 'order_details.order_code = orders.code', 'left')
+    ->where('order_details.style_code', $style_code)
+    ->where('order_details.is_complete', 0)
+    ->where('order_details.is_expired', 0)
+    ->where('order_details.is_count', 1);
+    if($warehouse !== NULL)
+    {
+      $this->db->where('warehouse_code', $warehouse);
+    }
+    $rs = $this->db->get();
     if($rs->num_rows() == 1)
     {
       return $rs->row()->qty;

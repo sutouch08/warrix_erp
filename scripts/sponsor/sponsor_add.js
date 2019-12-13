@@ -154,6 +154,7 @@ function validateOrder(){
     swal('เลขที่เอกสารไม่ถูกต้อง');
     return false;
   }
+}
 
 
 var customer;
@@ -269,7 +270,7 @@ function removeDetail(id, name){
 					}
 				}
 			});
-	});
+  });
 }
 
 
@@ -293,7 +294,6 @@ $('#pd-box').keyup(function(event) {
 
 		}
 	}
-
 });
 
 
@@ -306,7 +306,7 @@ function countInput(){
         if( $(this).val() != '' ){
 			qty++;
 		}
-    });
+  });
 	return qty;
 }
 
@@ -477,7 +477,8 @@ function unExpired(){
     success:function(rs){
       load_out();
       var rs = $.trim(rs);
-      if(rs == 'success'){
+      if(rs == 'success')
+      {
         swal({
           title:'Success',
           type:'success',
@@ -487,9 +488,11 @@ function unExpired(){
         setTimeout(function(){
           window.location.reload();
         },1500);
-      }else{
+      }
+      else
+      {
         swal('Error', rs, 'error');
       }
     }
-  });
+  })
 }

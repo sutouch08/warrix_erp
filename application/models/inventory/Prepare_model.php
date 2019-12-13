@@ -216,6 +216,11 @@ class Prepare_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
+    if($ds['is_term'] != '2')
+    {
+      $this->db->where('orders.is_term', $ds['is_term']);
+    }
+
     if($ds['from_date'] != '' && $ds['to_date'] != '')
     {
       $this->db->where('orders.date_add >=', from_date($ds['from_date']));
@@ -258,6 +263,11 @@ class Prepare_model extends CI_Model
     if(!empty($ds['channels']))
     {
       $this->db->where('orders.channels_code', $ds['channels']);
+    }
+
+    if($ds['is_term'] != '2')
+    {
+      $this->db->where('orders.is_term', $ds['is_term']);
     }
 
     if($ds['from_date'] != '' && $ds['to_date'] != '')

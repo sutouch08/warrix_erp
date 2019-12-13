@@ -26,6 +26,7 @@ class Prepare extends PS_Controller
       'customer'      => get_filter('customer', 'customer', ''),
       'user'          => get_filter('user', 'user', ''),
       'channels'      => get_filter('channels', 'channels', ''),
+      'is_term'       => get_filter('is_term', 'is_term', '2'),
       'from_date'     => get_filter('from_date', 'from_date', ''),
       'to_date'       => get_filter('to_date', 'to_date', '')
     );
@@ -62,6 +63,7 @@ class Prepare extends PS_Controller
       'customer'      => get_filter('customer', 'customer', ''),
       'user'          => get_filter('user', 'user', ''),
       'channels'      => get_filter('channels', 'channels', ''),
+      'is_term'       => get_filter('is_term', 'is_term', '2'),
       'from_date'     => get_filter('from_date', 'from_date', ''),
       'to_date'       => get_filter('to_date', 'to_date', '')
     );
@@ -119,7 +121,7 @@ class Prepare extends PS_Controller
       {
         $rs->barcode = $this->get_barcode($rs->product_code);
         $rs->prepared = $this->get_prepared($rs->order_code, $rs->product_code);
-        $rs->stock_in_zone = $this->get_stock_in_zone($rs->product_code);
+        $rs->stock_in_zone = $this->get_stock_in_zone($rs->product_code, get_null($order->warehouse_code));
       }
     }
 
@@ -289,11 +291,11 @@ class Prepare extends PS_Controller
 
 
 
-  public function get_stock_in_zone($item_code)
+  public function get_stock_in_zone($item_code, $warehouse = NULL)
   {
     $sc = "ไม่มีสินค้า";
     $this->load->model('stock/stock_model');
-    $stock = $this->stock_model->get_stock_in_zone($item_code);
+    $stock = $this->stock_model->get_stock_in_zone($item_code, $warehouse);
     if(!empty($stock))
     {
       $sc = "";
@@ -417,7 +419,7 @@ class Prepare extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'customer', 'user', 'channels', 'from_date', 'to_date');
+    $filter = array('code', 'customer', 'user', 'channels', 'is_term','from_date', 'to_date');
     clear_filter($filter);
   }
 } //--- end class

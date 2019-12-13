@@ -646,5 +646,61 @@ public function get_style_code()
     echo json_encode($sc);
   }
 
+
+  public function get_color_code_and_name()
+  {
+    $txt = $_REQUEST['term'];
+    $sc = array();
+    $this->db->select('code, name');
+    if($txt != '*')
+    {
+      $this->db->like('code', $txt);
+      $this->db->or_like('name', $txt);
+    }
+    $rs = $this->db->order_by('code', 'ASC')->limit(20)->get('product_color');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $co)
+      {
+        $sc[] = $co->code.' | '.$co->name;
+      }
+    }
+    else
+    {
+      $sc[] = "not_fount";
+    }
+
+    echo json_encode($sc);
+  }
+
+
+  public function get_size_code_and_name()
+  {
+    $txt = $_REQUEST['term'];
+    $sc = array();
+    $this->db->select('code, name');
+    if($txt != '*')
+    {
+      $this->db->like('code', $txt, 'after');
+      $this->db->or_like('name', $txt, 'after');
+    }
+    $rs = $this->db->order_by('position', 'ASC')->limit(20)->get('product_size');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $co)
+      {
+        $sc[] = $co->code.' | '.$co->name;
+      }
+    }
+    else
+    {
+      $sc[] = "not_fount";
+    }
+
+    echo json_encode($sc);
+  }
+
 } //-- end class
 ?>

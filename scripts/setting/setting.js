@@ -78,6 +78,40 @@ function toggleStrictDue(option)
 
 
 
+//---- ไม่ขายสินค้าให้ลูกค้าที่มียอดค้างเกินกำหนด
+function toggleAuz(option)
+{
+	$('#allow-under-zero').val(option);
+	if(option == 1){
+		$('#btn-auz-yes').addClass('btn-danger');
+		$('#btn-auz-no').removeClass('btn-success');
+		return;
+	}
+	if(option == 0){
+		$('#btn-auz-yes').removeClass('btn-danger');
+		$('#btn-auz-no').addClass('btn-success');
+		return;
+	}
+}
+
+
+function toggleControlCredit(option)
+{
+	$('#control-credit').val(option);
+	if(option == 1){
+		$('#btn-credit-yes').addClass('btn-success');
+		$('#btn-credit-no').removeClass('btn-danger');
+		return;
+	}
+	if(option == 0){
+		$('#btn-credit-yes').removeClass('btn-success');
+		$('#btn-credit-no').addClass('btn-danger');
+		return;
+	}
+}
+
+
+
 function toggleReceiveDue(option)
 {
 	$('#receive-over-due').val(option);

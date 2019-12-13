@@ -73,6 +73,7 @@ class Products extends PS_Controller
       {
         $product = new stdClass();
         $product->code    = $rs->code;
+        $product->old_code = $rs->old_code;
         $product->name    = $rs->name;
         $product->price   = $rs->price;
         $product->group   = $this->product_group_model->get_name($rs->group_code);
@@ -114,6 +115,7 @@ class Products extends PS_Controller
       $category = $this->input->post('category_code');
       $kind     = $this->input->post('kind_code');
       $type     = $this->input->post('type_code');
+      $old_code = get_null($this->input->post('old_style'));
       $brand    = $this->input->post('brand_code');
       $year     = $this->input->post('year');
       $cost     = $this->input->post('cost');
@@ -142,7 +144,8 @@ class Products extends PS_Controller
         'can_sell' => $can_sell,
         'active' => $active,
         'is_api' => $is_api,
-        'update_user' => get_cookie('uname')
+        'update_user' => get_cookie('uname'),
+        'old_code' => $old_code
       );
 
       if($this->product_style_model->is_exists($code))
@@ -276,6 +279,7 @@ class Products extends PS_Controller
     {
       $code = $this->input->post('code'); //--- style code
       $name = $this->input->post('name'); //--- style name
+      $old_code = get_null($this->input->post('old_style'));
       $cost = $this->input->post('cost'); //--- style cost
       $price = $this->input->post('price'); //--- style price
       $unit = $this->input->post('unit_code');
@@ -296,12 +300,12 @@ class Products extends PS_Controller
 
       $ds = array(
         'name' => addslashes(trim($name)),
-        'group_code' => $group,
-        'sub_group_code' => $sub_group,
-        'category_code' => $category,
-        'kind_code' => $kind,
-        'type_code' => $type,
-        'brand_code' => $brand,
+        'group_code' => get_null($group),
+        'sub_group_code' => get_null($sub_group),
+        'category_code' => get_null($category),
+        'kind_code' => get_null($kind),
+        'type_code' => get_null($type),
+        'brand_code' => get_null($brand),
         'year' => $year,
         'cost' => ($cost === NULL ? 0.00 : $cost),
         'price' => ($price === NULL ? 0.00 : $price),
@@ -310,7 +314,8 @@ class Products extends PS_Controller
         'can_sell' => ($sell === NULL ? 0 : 1),
         'active' => ($active === NULL ? 0 : 1),
         'is_api' => ($api === NULL ? 0 : 1),
-        'update_user' => get_cookie('uname')
+        'update_user' => get_cookie('uname'),
+        'old_code' => $old_code
       );
 
 
@@ -332,12 +337,12 @@ class Products extends PS_Controller
         if(!empty($items))
         {
           $ds = array(
-            'group_code' => $group,
-            'sub_group_code' => $sub_group,
-            'category_code' => $category,
-            'kind_code' => $kind,
-            'type_code' => $type,
-            'brand_code' => $brand,
+            'group_code' => get_null($group),
+            'sub_group_code' => get_null($sub_group),
+            'category_code' => get_null($category),
+            'kind_code' => get_null($kind),
+            'type_code' => get_null($type),
+            'brand_code' => get_null($brand),
             'year' => $year,
             'cost' => ($cost === NULL ? 0.00 : $cost),
             'price' => ($price === NULL ? 0.00 : $price),
@@ -925,6 +930,7 @@ class Products extends PS_Controller
   public function do_export($code)
   {
     $item = $this->products_model->get($code);
+    $exst = $this->products_model->sap_item_exists($item->code);
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
       'ItemName' => $item->name, //--- ชื่อสินค้า
@@ -953,10 +959,13 @@ class Products extends PS_Controller
       'U_BRAND' => $item->brand_code,
       'U_YEAR' => $item->year,
       'U_COST' => $item->cost,
-      'U_PRICE' => $item->price
+      'U_PRICE' => $item->price,
+      'U_OLDCODE' => $item->old_code,
+      'F_E_Commerce' => $exst === TRUE ? 'U' : 'A',
+      'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 
-    if($this->products_model->sap_item_exists($item->code))
+    if($exst)
     {
       return $this->products_model->update_item($item->code, $ds);
     }

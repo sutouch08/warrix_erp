@@ -152,12 +152,50 @@ class Product_style_model extends CI_Model
     {
       if(!empty($ds['code']))
       {
+        $this->db->group_start();
         $this->db->like('code', $ds['code']);
+        $this->db->or_like('old_code', $ds['code']);
+        $this->db->group_end();
       }
 
       if(!empty($ds['name']))
       {
         $this->db->like('name', $ds['name']);
+      }
+
+      if(!empty($ds['group']))
+      {
+        $this->db->where('group_code', $ds['group']);
+      }
+
+      if(!empty($ds['sub_group']))
+      {
+        $this->db->where('sub_group_code', $ds['sub_group']);
+      }
+
+      if(!empty($ds['category']))
+      {
+        $this->db->where('category_code', $ds['category']);
+      }
+
+      if(!empty($ds['kind']))
+      {
+        $this->db->where('kind_code', $ds['kind']);
+      }
+
+      if(!empty($ds['type']))
+      {
+        $this->db->where('type_code', $ds['type']);
+      }
+
+      if(!empty($ds['brand']))
+      {
+        $this->db->where('brand_code', $ds['brand']);
+      }
+
+      if(!empty($ds['year']))
+      {
+        $this->db->where('year', $ds['year']);
       }
     }
 
@@ -207,17 +245,55 @@ class Product_style_model extends CI_Model
     {
       if(!empty($ds['code']))
       {
+        $this->db->group_start();
         $this->db->like('code', $ds['code']);
+        $this->db->or_like('old_code', $ds['code']);
+        $this->db->group_end();
       }
 
       if(!empty($ds['name']))
       {
         $this->db->like('name', $ds['name']);
       }
+
+      if(!empty($ds['group']))
+      {
+        $this->db->where('group_code', $ds['group']);
+      }
+
+      if(!empty($ds['sub_group']))
+      {
+        $this->db->where('sub_group_code', $ds['sub_group']);
+      }
+
+      if(!empty($ds['category']))
+      {
+        $this->db->where('category_code', $ds['category']);
+      }
+
+      if(!empty($ds['kind']))
+      {
+        $this->db->where('kind_code', $ds['kind']);
+      }
+
+      if(!empty($ds['type']))
+      {
+        $this->db->where('type_code', $ds['type']);
+      }
+
+      if(!empty($ds['brand']))
+      {
+        $this->db->where('brand_code', $ds['brand']);
+      }
+
+      if(!empty($ds['year']))
+      {
+        $this->db->where('year', $ds['year']);
+      }
     }
 
     $this->db->order_by('date_upd', 'DESC');
-    
+
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;

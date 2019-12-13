@@ -1,8 +1,23 @@
 <?php $receive_due_yes = $RECEIVE_OVER_DUE == 1 ? 'btn-success' : ''; ?>
 <?php $receive_due_no  = $RECEIVE_OVER_DUE == 0 ? 'btn-danger' : ''; ?>
+<?php $auz_no = $ALLOW_UNDER_ZERO == 0 ? 'btn-success' : ''; ?>
+<?php $auz_yes = $ALLOW_UNDER_ZERO == 1 ? 'btn-danger' : ''; ?>
 <div class="tab-pane fade" id="inventory">
 	<form id="inventoryForm" method="post" action="<?php echo $this->home; ?>/update_config">
   	<div class="row">
+			<div class="col-sm-3">
+        <span class="form-control left-label">สต็อกติดลบได้</span>
+      </div>
+      <div class="col-sm-9">
+				<div class="btn-group input-medium">
+        	<button type="button" class="btn btn-sm <?php echo $auz_no; ?>" style="width:50%;" id="btn-auz-no" onClick="toggleAuz(0)">ไม่ได้</button>
+          <button type="button" class="btn btn-sm <?php echo $auz_yes; ?>" style="width:50%;" id="btn-auz-yes" onClick="toggleAuz(1)">ได้</button>
+        </div>
+        <span class="help-block">อนุญาติให้สต็อกติดลบได้</span>
+        <input type="hidden" name="ALLOW_UNDER_ZERO" id="allow-under-zero" value="<?php echo $ALLOW_UNDER_ZERO; ?>" />
+      </div>
+      <div class="divider-hidden"></div>
+
     	<div class="col-sm-3">
         <span class="form-control left-label">รับสินค้าเกินไปสั่งซื้อ(%)</span>
       </div>

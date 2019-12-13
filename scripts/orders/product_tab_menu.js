@@ -59,7 +59,7 @@ function getViewTabs(id) {
 //--------------------------------  โหลดรายการสินค้าสำหรับจิ้มสั่งสินค้า  -----------------------------//
 function getOrderTabs(id) {
 	var output = $("#cat-" + id);
-
+	var whCode = $('#warehouse').val();
 	$(".tab-pane").removeClass("active");
 	$(".menu").removeClass("active");
 	if (output.html() == "") {
@@ -69,7 +69,8 @@ function getOrderTabs(id) {
 			type: "POST",
 			cache: "false",
 			data: {
-				"id": id
+				"id": id,
+				"warehouse_code" : whCode
 			},
 			success: function(rs) {
 				load_out();

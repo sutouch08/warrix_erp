@@ -9,15 +9,19 @@ class stock_model extends CI_Model
   }
 
 
-  public function get_style_sell_stock($style_code)
+  public function get_style_sell_stock($style_code, $warehouse = NULL)
   {
     $this->ms->select_sum('OIBQ.OnHandQty', 'qty')
     ->from('OBIN')
     ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OITM', 'OIBQ.ItemCode = OITM.ItemCode', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_MAIN', 'Y')
-    ->where('OITM.U_MODEL', $style_code);
+    ->where('OWHS.U_MAIN', 'Y');
+    if($warehouse !== NULL)
+    {
+      $this->ms->where('OWHS.WhsCode', $warehouse);
+    }
+    $this->ms->where('OITM.U_MODEL', $style_code);
     $rs = $this->ms->get();
     if($rs->num_rows() == 1)
     {
@@ -47,16 +51,20 @@ class stock_model extends CI_Model
 
 
   //---- ยอดรวมสินค้าในคลังที่สั่งได้ ยอดในโซน
-  public function get_sell_stock($item)
+  public function get_sell_stock($item, $warehouse = NULL)
   {
-    $rs = $this->ms
+    $this->ms
     ->select_sum('OnHandQty', 'qty')
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
     ->where('OIBQ.ItemCode', $item)
-    ->where('OWHS.U_MAIN', 'Y')
-    ->get();
+    ->where('OWHS.U_MAIN', 'Y');
+    if($warehouse !== NULL)
+    {
+      $this->ms->where('OWHS.WhsCode', $warehouse);
+    }
+    $rs = $this->ms->get();
     return intval($rs->row()->qty);
   }
 
@@ -70,16 +78,20 @@ class stock_model extends CI_Model
 
 
   //---- ยอดสินค้าคงเหลือในแต่ละโซน
-  public function get_stock_in_zone($item)
+  public function get_stock_in_zone($item, $warehouse = NULL)
   {
-    $rs = $this->ms
+    $this->ms
     ->select('OBIN.BinCode AS code, OBIN.Descr AS name, OIBQ.OnHandQty AS qty')
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
     ->where('OWHS.U_MAIN', 'Y')
-    ->where('ItemCode', $item)
-    ->get();
+    ->where('ItemCode', $item);
+    if($warehouse !== NULL)
+    {
+      $this->ms->where('OWHS.WhsCode', $warehouse);
+    }
+    $rs = $this->ms->get();
 
     $result = array();
 

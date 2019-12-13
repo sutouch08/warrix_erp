@@ -112,12 +112,12 @@ function to_date($date = '')
 }
 
 
-function select_years($se="0000")
+function select_years($se='')
 {
 	$sc 		= '';
 	$length	= 5;
 	$startYear = getConfig('START_YEAR');
-	//$se 		= ($se == '' OR $se == '0000') ? $startYear : $se;
+	//$se 		= ($se == '') ? $startYear : $se;
 	$year = ($se - $length) < $startYear ? $startYear : $se - $length;
 	$lastYear = date('Y') + $length;
 	while( $year <= $lastYear )

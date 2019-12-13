@@ -50,6 +50,13 @@ class Sync_items extends CI_Controller
     echo $count;
   }
 
+
+  public function count_items()
+  {
+    $count = $this->products_model->count_all();
+    echo $count;
+  }
+
   public function get_update_style($offset)
   {
     $date_add = $this->input->get('last_sync');
@@ -168,6 +175,31 @@ class Sync_items extends CI_Controller
   public function get_item_last_date()
   {
     echo sap_date($this->products_model->get_items_last_sync());
+  }
+
+
+
+  public function get_update_price($offset)
+  {
+    $list = $this->products_model->get_items_code_list($this->limit, $offset);
+    $count = 0;
+
+    if(!empty($list))
+    {
+      foreach($list as $rs)
+      {
+        $ds = $this->products_model->get_sap_price($rs->code);
+        $arr = array(
+          'cost' => is_null($ds->cost) ? 0 : $ds->cost,
+          'price' => is_null($ds->price) ? 0 : $ds->price,
+        );
+
+        $this->products_model->update($rs->code, $arr);
+        $count++;
+      }
+    }
+
+    echo $count;
   }
 
 } //--- end class

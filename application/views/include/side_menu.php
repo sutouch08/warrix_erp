@@ -136,8 +136,9 @@ $menu_group = $this->menu_group_code;
 			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'PRODUCT'); ?>">
 				<a href="#" class="dropdown-toggle"><i class="menu-icon fa fa-caret-right"></i> ฐานข้อมูลสินค้า <b class="arrow fa fa-angle-down"></b></a>
 				<ul class="submenu">
-					<?php echo side_menu($menu, 'DBPROD', 'masters/products','เพิ่ม/แก้ไข รายการสินค้า'); ?>
-					<?php echo side_menu($menu, 'DBPDST', 'masters/product_style','เพิ่ม/แก้ไข รุ่นสินค้า'); ?>
+					<?php echo side_menu($menu, 'DBPROD', 'masters/products','เพิ่ม/แก้ไข สินค้า'); ?>
+					<?php echo side_menu($menu, 'DBITEM', 'masters/items','เพิ่ม/แก้ไข รายการสินค้า'); ?>
+					<?php //echo side_menu($menu, 'DBPDST', 'masters/product_style','เพิ่ม/แก้ไข รุ่นสินค้า'); ?>
 					<?php echo side_menu($menu, 'DBPDGP', 'masters/product_group','เพิ่ม/แก้ไข กลุ่มสินค้า'); ?>
 					<?php echo side_menu($menu, 'DBPDSG', 'masters/product_sub_group','เพิ่ม/แก้ไข กลุ่มย่อยสินค้า'); ?>
 					<?php echo side_menu($menu, 'DBPDCR', 'masters/product_category','เพิ่ม/แก้ไข หมวดหมู่สินค้า'); ?>

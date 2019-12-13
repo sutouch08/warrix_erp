@@ -294,7 +294,10 @@ class Customers_model extends CI_Model
     ->select("CreditLine")
     ->select("U_WRX_BPOLDCODE AS old_code")
     ->where('CardType', 'C')
-    ->where("UpdateDate >=", sap_date($date,TRUE))
+    ->group_start()
+    ->where("UpdateDate >=", sap_date($date))
+    ->or_where('CreateDate >=', sap_date($date))
+    ->group_end()
     ->get('OCRD');
 
     if($rs->num_rows() > 0)

@@ -17,9 +17,17 @@
 	</div>
 
 	<div class="form-group">
+		<label class="col-sm-3 control-label no-padding-right">รหัสรุ่นเก่า</label>
+		<div class="col-xs-12 col-sm-3">
+			<input type="text" name="old_style" id="old_style" class="width-100" value="" placeholder="รหัสรุ่นเก่า (ไม่บังคับ)" />
+		</div>
+		<div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
+	</div>
+
+	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">ทุน</label>
 		<div class="col-xs-12 col-sm-3">
-			<input type="number" name="cost" id="cost" class="width-100" value="" required />
+			<input type="number" step="any" name="cost" id="cost" class="width-100" value="" required />
 		</div>
 		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
 	</div>
@@ -27,7 +35,7 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">ราคา</label>
 		<div class="col-xs-12 col-sm-3">
-			<input type="number" name="price" id="price" class="width-100" value="" required />
+			<input type="number" step="any" name="price" id="price" class="width-100" value="" required />
 		</div>
 		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
 	</div>
@@ -68,7 +76,7 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">กลุ่มย่อยสินค้า</label>
 		<div class="col-xs-12 col-sm-3">
-			<select name="sub_group_code" id="subGroup" class="form-control" required>
+			<select name="sub_group_code" id="subGroup" class="form-control">
 				<option value="">กรุณาเลือก</option>
 			<?php echo select_product_sub_group(); ?>
 			</select>
