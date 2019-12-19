@@ -37,9 +37,12 @@
           title="">
           จากโซน
         </button>
-        <span class="zoneLabel <?php echo $showZone; ?>">
+        <span class="zoneLabel <?php echo $showZone; ?>" style="display:inline-block;">
             <?php echo $rs->from_zone; ?>
         </span>
+        <button type="button" class="btn btn-minier btn-danger" onclick="removeBuffer('<?php echo $order->code; ?>', '<?php echo $rs->product_code; ?>')">
+          <i class="fa fa-trash"></i>
+        </button>
       </td>
     </tr>
 <?php endforeach; ?>

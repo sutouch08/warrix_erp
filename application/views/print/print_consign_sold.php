@@ -3,7 +3,8 @@
 
   $page = '';
   $page .= $this->printer->doc_header();
-	$this->printer->add_title("ตัดยอดขาย");
+  $title = $doc->role == 'M' ? 'ตัดยอดขาย (Shop)' : 'ตัดยอดขาย (ห้าง)';
+	$this->printer->add_title($title);
 	$header	= array(
     'เลขที่' => $doc->code,
     'วันที่'  => thai_date($doc->date_add, FALSE, '/'),
@@ -13,19 +14,21 @@
     'คลัง' => $doc->warehouse_name,
     'พนักงาน' => $this->user_model->get_name($doc->user)
 	);
+  /*
   if($doc->remark != '')
   {
     $header['หมายเหตุ'] = $doc->remark;
   }
-
+  */
 	$this->printer->add_header($header);
 
 	$total_row 	= empty($details) ? 0 : count($details);
+  $subtotal_row = 4;
 	$config = array(
     'total_row' => $total_row,
     'font_size' => 10,
-    'sub_total_row' => 1,
-    'footer' => FALSE
+    'sub_total_row' => $subtotal_row,
+    'footer' => TRUE
   );
 
 	$this->printer->config($config);
@@ -64,7 +67,7 @@
 
 	//*******************************  กำหนดช่องเซ็นของ footer *******************************//
 	$footer	= array(
-						array("ผู้รับ", "", "วันที่ ............................."),
+						array("ผู้จัดทำ", "", "วันที่ ............................."),
 						array("ผู้ตรวจสอบ", "","วันที่ ............................."),
 						array("ผู้อนุมัติ", "","วันที่ .............................")
 						);
@@ -122,25 +125,62 @@
 				if($this->printer->current_page == $this->printer->total_page)
 				{
 					$qty = number($total_qty);
+          $amount = number($total_price, 2);
+          $discount = number($total_discount, 2);
+          $net_amount = number($total_amount, 2);
 				}else{
 					$qty = "";
+          $amount = '';
+          $discount = "";
+          $net_amount = "";
 				}
 
-				$sub_total = array(
-          array(
-          "<td style='height:".$this->printer->row_height."mm; border: solid 1px #ccc;
-          border-bottom:0px; border-left:0px; text-align:right;
-          width:75.2%;'>
-          <strong>รวม</strong>
-          </td>
-          <td style='height:".$this->printer->row_height."mm; border: solid 1px #ccc;
-          border-right:0px; border-bottom:0px; width:10%; text-align:right;'>
-          ".number($total_qty)."</td>
-          <td style='height:".$this->printer->row_height."mm; border: solid 1px #ccc;
-          border-right:0px; border-bottom:0px; border-bottom-right-radius:10px;
-          text-align:right;'>".number($total_amount)."</td>")
 
-			);
+
+        //--- จำนวนรวม   ตัว
+        $sub_qty  = '<td class="width-60 subtotal-first text-center" style="height:'.$this->printer->row_height.'mm;">';
+        $sub_qty .= '</td>';
+        $sub_qty .= '<td class="width-25 subtotal">';
+        $sub_qty .=  '<strong>จำนวนรวม</strong>';
+        $sub_qty .= '</td>';
+        $sub_qty .= '<td class="width-15 subtotal text-right">';
+        $sub_qty .=  $qty;
+        $sub_qty .= '</td>';
+
+        //--- ราคารวม
+        $sub_price  = '<td rowspan="'.($subtotal_row).'" class="subtotal-first font-size-10" style="height:'.$this->printer->row_height.'mm;">';
+        $sub_price .=  '<strong>หมายเหตุ : </strong> '.$doc->remark;
+        $sub_price .= '</td>';
+        $sub_price .= '<td class="subtotal">';
+        $sub_price .=  '<strong>มูลค่ารวม</strong>';
+        $sub_price .= '</td>';
+        $sub_price .= '<td class="subtotal text-right">';
+        $sub_price .= $amount;
+        $sub_price .= '</td>';
+
+        //--- ส่วนลดรวม
+        $sub_disc  = '<td class="subtotal" style="height:'.$this->printer->row_height.'mm;">';
+        $sub_disc .=  '<strong>ส่วนลดรวม</strong>';
+        $sub_disc .= '</td>';
+        $sub_disc .= '<td class="subtotal text-right">';
+        $sub_disc .=  $discount;
+        $sub_disc .= '</td>';
+
+        //--- ยอดสุทธิ
+        $sub_net  = '<td class="subtotal" style="height:'.$this->printer->row_height.'mm;">';
+        $sub_net .=  '<strong>ยอดเงินสุทธิ</strong>';
+        $sub_net .= '</td>';
+        $sub_net .= '<td class="subtotal text-right">';
+        $sub_net .=  $net_amount;
+        $sub_net .= '</td>';
+
+        $sub_total = array(
+          array($sub_qty),
+          array($sub_price),
+          array($sub_disc),
+          array($sub_net)
+        );
+
 
 			$page .= $this->printer->print_sub_total($sub_total);
 			$page .= $this->printer->content_end();

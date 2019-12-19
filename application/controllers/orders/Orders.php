@@ -637,9 +637,10 @@ class Orders extends PS_Controller
     //----- Attribute Grid By Clicking image
     $style_code = $this->input->get('style_code');
     $warehouse = get_null($this->input->get('warehouse_code'));
+    $zone = get_null($this->input->get('zone_code'));
   	$sc = 'not exists';
     $view = FALSE;
-  	$sc = $this->getOrderGrid($style_code, $view, $warehouse);
+  	$sc = $this->getOrderGrid($style_code, $view, $warehouse, $zone);
   	$tableWidth	= $this->products_model->countAttribute($style_code) == 1 ? 600 : $this->getOrderTableWidth($style_code);
   	$sc .= ' | '.$tableWidth;
   	$sc .= ' | ' . $style_code;
@@ -649,7 +650,7 @@ class Orders extends PS_Controller
 
 
 
-  public function getOrderGrid($style_code, $view = FALSE, $warehouse = NULL)
+  public function getOrderGrid($style_code, $view = FALSE, $warehouse = NULL, $zone = NULL)
 	{
 		$sc = '';
     $style = $this->product_style_model->get($style_code);
@@ -660,11 +661,11 @@ class Orders extends PS_Controller
 
   		if( count($attrs) == 1  )
   		{
-  			$sc .= $this->orderGridOneAttribute($style, $attrs[0], $isVisual, $view, $warehouse);
+  			$sc .= $this->orderGridOneAttribute($style, $attrs[0], $isVisual, $view, $warehouse, $zone);
   		}
   		else if( count( $attrs ) == 2 )
   		{
-  			$sc .= $this->orderGridTwoAttribute($style, $isVisual, $view, $warehouse);
+  			$sc .= $this->orderGridTwoAttribute($style, $isVisual, $view, $warehouse, $zone);
   		}
     }
     else
@@ -684,7 +685,7 @@ class Orders extends PS_Controller
 
 
 
-  public function orderGridOneAttribute($style, $attr, $isVisual, $view, $warehouse = NULL)
+  public function orderGridOneAttribute($style, $attr, $isVisual, $view, $warehouse = NULL, $zone = NULL)
 	{
     $auz = getConfig('ALLOW_UNDER_ZERO');
     if($auz == 1)
@@ -703,7 +704,7 @@ class Orders extends PS_Controller
       $sc 	.= $i%2 == 0 ? '<tr>' : '';
       $active	= $item->active == 0 ? 'Disactive' : ( $item->can_sell == 0 ? 'Not for sell' : ( $item->is_deleted == 1 ? 'Deleted' : TRUE ) );
       $stock	= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_stock($item->code) )  : 0 ) : 0; //---- สต็อกทั้งหมดทุกคลัง
-			$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
+			$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse, $zone) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
 			$disabled  = $isVisual === TRUE  && $active == TRUE ? '' : ( ($active !== TRUE OR $qty < 1 ) ? 'disabled' : '');
 
       if( $qty < 1 && $active === TRUE )
@@ -756,7 +757,7 @@ class Orders extends PS_Controller
 
 
 
-  public function orderGridTwoAttribute($style, $isVisual, $view, $warehouse = NULL)
+  public function orderGridTwoAttribute($style, $isVisual, $view, $warehouse = NULL, $zone = NULL)
 	{
     $auz = getConfig('ALLOW_UNDER_ZERO');
     if($auz == 1)
@@ -783,7 +784,7 @@ class Orders extends PS_Controller
 				{
 					$active	= $item->active == 0 ? 'Disactive' : ( $item->can_sell == 0 ? 'Not for sell' : ( $item->is_deleted == 1 ? 'Deleted' : TRUE ) );
 					$stock	= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_stock($item->code) )  : 0 ) : 0; //---- สต็อกทั้งหมดทุกคลัง
-					$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
+					$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse, $zone) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
 					$disabled  = $isVisual === TRUE  && $active == TRUE ? '' : ( ($active !== TRUE OR $qty < 1 ) ? 'disabled' : '');
 					if( $qty < 1 && $active === TRUE )
 					{
@@ -957,10 +958,10 @@ class Orders extends PS_Controller
     $this->load->view('print/print_order_sheet', $ds);
   }
 
-  public function get_sell_stock($item_code, $warehouse = NULL)
+  public function get_sell_stock($item_code, $warehouse = NULL, $zone = NULL)
   {
-    $sell_stock = $this->stock_model->get_sell_stock($item_code, $warehouse);
-    $reserv_stock = $this->orders_model->get_reserv_stock($item_code, $warehouse);
+    $sell_stock = $this->stock_model->get_sell_stock($item_code, $warehouse, $zone);
+    $reserv_stock = $this->orders_model->get_reserv_stock($item_code, $warehouse, $zone);
     $availableStock = $sell_stock - $reserv_stock;
 		return $availableStock < 0 ? 0 : $availableStock;
   }

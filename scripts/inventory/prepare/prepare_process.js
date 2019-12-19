@@ -265,3 +265,19 @@ var intv = setInterval(function(){
     }
   })
 }, 10000);
+
+
+function removeBuffer(orderCode, pdCode){
+  $.ajax({
+    url:BASE_URL + 'inventory/prepare/remove_buffer/'+orderCode+'/'+pdCode,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      if(rs === 'success'){
+        window.location.reload();
+      }else{
+        swal(rs);
+      }
+    }
+  })
+}

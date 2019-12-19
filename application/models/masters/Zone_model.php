@@ -220,7 +220,7 @@ class Zone_model extends CI_Model
   private function get_list_customer(array $ds = array(), $perpage = NULL, $offset = NULL)
   {
     $this->db
-    ->select('zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name')
+    ->select('zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name, zone.old_code')
     ->select('customers.code AS customer_code, customers.name AS customer_name')
     ->from('zone_customer')
     ->join('zone', 'zone.code = zone_customer.zone_code')

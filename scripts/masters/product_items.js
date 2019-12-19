@@ -86,12 +86,11 @@ function checkBarcode(barcode, item)
     success:function(rs){
       if(rs === 'exists'){
       el.addClass('has-error');
-      el.prop('title', 'บาร์โค้ดซ้ำ');
+      el.attr('data-original-title', 'บาร์โค้ดซ้ำ');
       el.tooltip();
       }else{
         el.removeClass('has-error');
-        el.prop('title', '');
-        el.prototype.func = null;
+        el.attr('data-original-title', '');
       }
     }
   })

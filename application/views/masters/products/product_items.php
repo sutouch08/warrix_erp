@@ -57,7 +57,7 @@
 						class="form-control input-sm text-center cost edit hide"
 						name="cost[<?php echo $item->code; ?>]"
 						id="cost-<?php echo $item->code; ?>"
-						value="<?php echo number($item->cost, 2); ?>"
+						value="<?php echo $item->cost; ?>"
 						/>
 					</td>
 					<td class="middle text-right">
@@ -68,7 +68,7 @@
 						class="form-control input-sm text-center price edit hide"
 						name="price[<?php echo $item->code; ?>]"
 						id="price-<?php echo $item->code; ?>"
-						value="<?php echo number($item->price, 2); ?>"
+						value="<?php echo $item->price; ?>"
 						 />
 					</td>
 

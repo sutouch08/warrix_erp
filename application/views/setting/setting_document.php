@@ -22,10 +22,16 @@
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_CONSIGN_SO" required value="<?php echo $RUN_DIGIT_CONSIGN_SO; ?>" /></div>
       <div class="divider-hidden"></div>
 
-      <div class="col-sm-3"><span class="form-control left-label">ตัดยอดฝากขาย</span></div>
+      <div class="col-sm-3"><span class="form-control left-label">ตัดยอดฝากขาย(Shop)</span></div>
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_CONSIGN_SOLD" required value="<?php echo $PREFIX_CONSIGN_SOLD; ?>" /></div>
       <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_CONSIGN_SOLD" required value="<?php echo $RUN_DIGIT_CONSIGN_SOLD; ?>" /></div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3"><span class="form-control left-label">ตัดยอดฝากขาย(ห้าง)</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_CONSIGNMENT_SOLD" required value="<?php echo $PREFIX_CONSIGNMENT_SOLD; ?>" /></div>
+      <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_CONSIGNMENT_SOLD" required value="<?php echo $RUN_DIGIT_CONSIGNMENT_SOLD; ?>" /></div>
       <div class="divider-hidden"></div>
 
       <div class="col-sm-3"><span class="form-control left-label">รับสินคาเข้าจากการซื้อ</span></div>

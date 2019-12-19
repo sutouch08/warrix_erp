@@ -51,19 +51,29 @@ class stock_model extends CI_Model
 
 
   //---- ยอดรวมสินค้าในคลังที่สั่งได้ ยอดในโซน
-  public function get_sell_stock($item, $warehouse = NULL)
+  public function get_sell_stock($item, $warehouse = NULL, $zone = NULL)
   {
     $this->ms
     ->select_sum('OnHandQty', 'qty')
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OIBQ.ItemCode', $item)
-    ->where('OWHS.U_MAIN', 'Y');
+    ->where('OIBQ.ItemCode', $item);
+    if($zone === NULL)
+    {
+      $this->ms->where('OWHS.U_MAIN', 'Y');
+    }
+
     if($warehouse !== NULL)
     {
       $this->ms->where('OWHS.WhsCode', $warehouse);
     }
+
+    if($zone !== NULL)
+    {
+      $this->ms->where('OBIN.BinCode', $zone);
+    }
+
     $rs = $this->ms->get();
     return intval($rs->row()->qty);
   }

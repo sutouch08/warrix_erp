@@ -2,8 +2,8 @@
 <?php $manual_code = getConfig('MANUAL_DOC_CODE');  ?>
 <?php if($manual_code == 1) :?>
 	<input type="hidden" id="manualCode" value="<?php echo $manual_code; ?>">
-	<input type="hidden" id="prefix" value="<?php echo getConfig('PREFIX_CONSIGN_SOLD'); ?>">
-	<input type="hidden" id="runNo" value="<?php echo getConfig('RUN_DIGIT_CONSIGN_SOLD'); ?>">
+	<input type="hidden" id="prefix" value="<?php echo getConfig('PREFIX_CONSIGNMENT_SOLD'); ?>">
+	<input type="hidden" id="runNo" value="<?php echo getConfig('RUN_DIGIT_CONSIGNMENT_SOLD'); ?>">
 <?php endif; ?>
 <div class="row">
 	<div class="col-sm-6 col-xs-6">
@@ -62,8 +62,8 @@
 <input type="hidden" name="zone_code" id="zone_code" value="" />
 </form>
 
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_add.js"></script>
 
 
 <?php $this->load->view('include/footer'); ?>

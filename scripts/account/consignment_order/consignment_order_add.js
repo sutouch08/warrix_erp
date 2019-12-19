@@ -114,7 +114,6 @@ $("#customer").autocomplete({
 	}
 });
 
-
 $('#pd-box').autocomplete({
   source: BASE_URL + 'auto_complete/get_style_code',
   autoFocus:true
@@ -561,6 +560,7 @@ function uploadfile(){
 		}
 	});
 }
+
 
 function validateOrder(){
   var prefix = $('#prefix').val();

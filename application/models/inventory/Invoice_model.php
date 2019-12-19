@@ -55,6 +55,12 @@ class Invoice_model extends CI_Model
   }
 
 
+  public function drop_all_sold($code)
+  {
+    return $this->db->where('reference', $code)->delete('order_sold');
+  }
+
+
 
   public function is_over_due($customer_code)
   {
@@ -78,7 +84,7 @@ class Invoice_model extends CI_Model
         return TRUE;
       }
     }
-    
+
     return FALSE;
   }
 

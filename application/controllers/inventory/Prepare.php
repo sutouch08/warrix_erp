@@ -319,7 +319,9 @@ class Prepare extends PS_Controller
 
     $zone = $this->zone_model->get($zone_code);
     $wh = $this->warehouse_model->get($zone->warehouse_code);
-    $auz = $wh->auz == 1 ? TRUE : FALSE;
+    $gb_auz = getConfig('ALLOW_UNDER_ZERO');
+    $wh_auz = $wh->auz == 1 ? TRUE : FALSE;
+    $auz = $gb_auz == 1 ? TRUE : $wh_auz;
 
     if($auz === TRUE)
     {
@@ -415,6 +417,21 @@ class Prepare extends PS_Controller
     echo 'success';
   }
 
+
+  function remove_buffer($order_code, $item_code)
+  {
+    $this->load->model('inventory/buffer_model');
+    $rs = $this->buffer_model->remove_buffer($order_code, $item_code);
+    if($rs === TRUE)
+    {
+      $this->orders_model->unvalid_detail($order_code, $item_code);
+      echo 'success';
+    }
+    else
+    {
+      echo 'delete fail';
+    }
+  }
 
 
   public function clear_filter()

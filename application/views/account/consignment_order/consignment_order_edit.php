@@ -34,7 +34,7 @@
 <div class="row">
   <div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
     <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm" value="<?php echo $doc->code; ?>" disabled />
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->code; ?>" disabled />
   </div>
 
   <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
@@ -94,8 +94,8 @@
 <input type="hidden" name="auz" id="auz" value="<?php echo $auz; ?>">
 </form>
 
-<?php $this->load->view('account/consign_order/consign_order_control'); ?>
-<?php $this->load->view('account/consign_order/consign_order_detail'); ?>
+<?php $this->load->view('account/consignment_order/consignment_order_control'); ?>
+<?php $this->load->view('account/consignment_order/consignment_order_detail'); ?>
 
 
 <div class="modal fade" id="check-list-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -177,8 +177,8 @@
 </div>
 </script>
 
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_control.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_control.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

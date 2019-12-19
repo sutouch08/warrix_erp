@@ -60,11 +60,11 @@
 <input type="hidden" name="zone_code" id="zone_code" value="<?php echo $doc->zone_code; ?>" >
 </form>
 
-<?php $this->load->view('account/consign_order/consign_order_detail'); ?>
+<?php $this->load->view('account/consignment_order/consignment_order_detail'); ?>
 
 
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_control.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_control.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

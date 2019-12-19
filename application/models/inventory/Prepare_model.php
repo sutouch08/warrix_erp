@@ -191,7 +191,8 @@ class Prepare_model extends CI_Model
     ->from('orders')
     ->join('channels', 'channels.code = orders.channels_code','left')
     ->join('customers', 'customers.code = orders.customer_code', 'left')
-    ->where('orders.state', $state);
+    ->where('orders.state', $state)
+    ->where('orders.status', 1);
 
     if(!empty($ds['code']))
     {
@@ -240,7 +241,8 @@ class Prepare_model extends CI_Model
     ->from('orders')
     ->join('channels', 'channels.code = orders.channels_code','left')
     ->join('customers', 'customers.code = orders.customer_code', 'left')
-    ->where('orders.state', $state);
+    ->where('orders.state', $state)
+    ->where('orders.status', 1);
 
     if(!empty($ds['code']))
     {

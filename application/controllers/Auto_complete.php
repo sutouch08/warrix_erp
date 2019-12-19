@@ -73,7 +73,8 @@ public function get_style_code()
   ->like('code', $_REQUEST['term'])
   ->or_like('old_code', $_REQUEST['term'])
   ->group_end()
-  ->order_by('code', 'ASC');
+  ->order_by('code', 'ASC')
+  ->limit(20);
   $qs = $this->db->get('product_style');
 
   if($qs->num_rows() > 0)

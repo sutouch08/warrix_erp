@@ -4,8 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Sync_items extends CI_Controller
 {
   public $title = 'Sync Items';
-	public $menu_code = '';
-	public $menu_group_code = '';
+	public $menu_code = 'PDSYNC';
+	public $menu_group_code = 'DB';
+  public $menu_sub_group_code = 'PRODUCT';
 	public $pm;
   public $limit = 100;
   public $date;

@@ -32,6 +32,7 @@
     <select class="form-control input-sm filter" name="group" id="customer_group">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_group($group); ?>
+			<option value="NULL" <?php echo is_selected('NULL', $group); ?>>ไม่มี</option>
 		</select>
   </div>
 
@@ -40,6 +41,7 @@
     <select class="form-control input-sm filter" name="kind" id="customer_kind">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_kind($kind); ?>
+			<option value="NULL" <?php echo is_selected('NULL', $kind); ?>>ไม่มี</option>
 		</select>
   </div>
 
@@ -48,6 +50,7 @@
     <select class="form-control input-sm filter" name="type" id="customer_type">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_type($type); ?>
+			<option value="NULL" <?php echo is_selected('NULL', $type); ?>>ไม่มี</option>
 		</select>
   </div>
 
@@ -56,6 +59,7 @@
     <select class="form-control input-sm filter" name="class" id="customer_class">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_class($class); ?>
+			<option value="NULL" <?php echo is_selected('NULL', $class); ?>>ไม่มี</option>
 		</select>
   </div>
 
@@ -64,6 +68,7 @@
     <select class="form-control input-sm filter" name="area" id="customer_area">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_customer_area($area); ?>
+			<option value="NULL" <?php echo is_selected('NULL', $area); ?>>ไม่มี</option>
 		</select>
   </div>
 

@@ -113,30 +113,69 @@ class Customers_model extends CI_Model
     }
 
 
-    if($group != '')
+    if(!empty($group))
     {
-      $this->db->where('group_code', $group);
+      if($group === "NULL")
+      {
+        $this->db->where('group_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('group_code', $group);
+      }
+
     }
 
 
-    if($kind != '')
+    if(!empty($kind))
     {
-      $this->db->where('kind_code', $kind);
+      if($kind === "NULL")
+      {
+        $this->db->where('kind_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('kind_code', $kind);
+      }
     }
 
-    if($type != '')
+    if(!empty($type))
     {
-      $this->db->where('type_code', $type);
+      if($type === "NULL")
+      {
+        $this->db->where('type_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('type_code', $type);
+      }
+
     }
 
-    if($class != '')
+    if(!empty($class))
     {
-      $this->db->where('class_code', $class);
+      if($class === 'NULL')
+      {
+        $this->db->where('class_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('class_code', $class);
+      }
+
     }
 
-    if($area != '')
+    if(! empty($area))
     {
-      $this->db->where('area_code', $area);
+      if($area === "NULL")
+      {
+        $this->db->where('area_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('area_code', $area);
+      }
+
     }
 
 
@@ -187,30 +226,69 @@ class Customers_model extends CI_Model
     }
 
 
-    if($group != '')
+    if(!empty($group))
     {
-      $this->db->where('group_code', $group);
+      if($group === "NULL")
+      {
+        $this->db->where('group_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('group_code', $group);
+      }
+
     }
 
 
-    if($kind != '')
+    if(!empty($kind))
     {
-      $this->db->where('kind_code', $kind);
+      if($kind === "NULL")
+      {
+        $this->db->where('kind_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('kind_code', $kind);
+      }
     }
 
-    if($type != '')
+    if(!empty($type))
     {
-      $this->db->where('type_code', $type);
+      if($type === "NULL")
+      {
+        $this->db->where('type_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('type_code', $type);
+      }
+
     }
 
-    if($class != '')
+    if(!empty($class))
     {
-      $this->db->where('class_code', $class);
+      if($class === 'NULL')
+      {
+        $this->db->where('class_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('class_code', $class);
+      }
+
     }
 
-    if($area != '')
+    if(! empty($area))
     {
-      $this->db->where('area_code', $area);
+      if($area === "NULL")
+      {
+        $this->db->where('area_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('area_code', $area);
+      }
+
     }
 
     if($perpage != '')

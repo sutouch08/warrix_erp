@@ -218,6 +218,11 @@ class Orders_model extends CI_Model
     return $this->db->set('valid', 1)->where('id', $id)->update('order_details');
   }
 
+  public function unvalid_detail($order_code, $item_code)
+  {
+    return $this->db->set('valid', 0)->where('order_code', $order_code)->where('product_code', $item_code)->update('order_details');
+  }
+
 
 
   public function valid_all_details($code)
@@ -537,7 +542,7 @@ class Orders_model extends CI_Model
 
 
 
-  public function get_reserv_stock($item_code, $warehouse = NULL)
+  public function get_reserv_stock($item_code, $warehouse = NULL, $zone = NULL)
   {
     $this->db
     ->select_sum('order_details.qty', 'qty')
@@ -551,6 +556,12 @@ class Orders_model extends CI_Model
     {
       $this->db->where('orders.warehouse_code', $warehouse);
     }
+
+    if($zone !== NULL)
+    {
+      $this->db->where('orders.zone_code', $zone);
+    }
+    
     $rs = $this->db->get();
 
     if($rs->num_rows() == 1)

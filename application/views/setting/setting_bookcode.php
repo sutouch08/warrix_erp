@@ -58,10 +58,17 @@
       </div>
       <div class="divider-hidden"></div>
 
-      <div class="col-sm-3"><span class="form-control left-label">ตัดยอดฝากขาย</span></div>
+      <div class="col-sm-3"><span class="form-control left-label">ตัดยอดฝากขาย(Shop)</span></div>
       <div class="col-sm-8">
         <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_CONSIGN_SOLD" value="<?php echo $BOOK_CODE_CONSIGN_SOLD; ?>" />
-        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบสั่งขาย"</span>
+        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ตัดยอดฝากขาย(Shop)"</span>
+      </div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3"><span class="form-control left-label">ตัดยอดฝากขาย(ห้าง)</span></div>
+      <div class="col-sm-8">
+        <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_CONSIGNMENT_SOLD" value="<?php echo $BOOK_CODE_CONSIGNMENT_SOLD; ?>" />
+        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ตัดยอดฝากขาย(ห้าง)"</span>
       </div>
       <div class="divider-hidden"></div>
 

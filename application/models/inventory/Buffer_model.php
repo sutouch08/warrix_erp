@@ -105,5 +105,11 @@ class Buffer_model extends CI_Model
   {
     return $this->db->where('order_code', $code)->where('qty', 0)->delete('buffer');
   }
+
+
+  public function remove_buffer($order_code, $item_code)
+  {
+    return $this->db->where('order_code', $order_code)->where('product_code', $item_code)->delete('buffer');
+  }
 }
  ?>

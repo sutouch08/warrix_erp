@@ -605,7 +605,15 @@ class Products extends PS_Controller
           'update_user' => get_cookie('uname')
         );
 
-        $rs = $this->products_model->add($data);
+        if($this->products_model->is_exists($code))
+        {
+          $rs = $this->products_model->update($code, $data);
+        }
+        else
+        {
+          $rs = $this->products_model->add($data);
+        }
+
         if($rs === FALSE)
         {
           $this->error .= 'Insert fail : '.$code.' /n' ;

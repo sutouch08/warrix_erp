@@ -1,4 +1,4 @@
-var HOME = BASE_URL + 'account/consign_order/';
+var HOME = BASE_URL + 'account/consignment_order/';
 
 function goBack(){
   window.location.href = HOME;

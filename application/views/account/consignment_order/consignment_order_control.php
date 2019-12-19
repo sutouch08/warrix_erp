@@ -52,7 +52,7 @@
 
   <?php if($this->pm->can_add OR $this->pm->can_edit OR $this->pm->can_delete) : ?>
   <div class="col-sm-1 col-1-harf col-sm-offset-6 padding-5 last">
-    <button type="button" class="btn btn-xs btn-danger btn-clock" onclick="clearAll()"><i class="fa fa-trash"></i> ลบทั้งหมด</button>
+    <button type="button" class="btn btn-xs btn-danger btn-block" onclick="clearAll()"><i class="fa fa-trash"></i> ลบทั้งหมด</button>
   </div>
   <?php endif; ?>
 </div>
