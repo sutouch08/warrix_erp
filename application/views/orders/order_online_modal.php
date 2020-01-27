@@ -124,7 +124,7 @@
 	<input type="file" name="image" id="image" accept="image/*" style="display:none;" />
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="max-width:400px;">
-    <div class="modal-content">
+    <div class="modal-content" style="position:relative; max-height:600px; overflow-y:scroll;">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       </div>

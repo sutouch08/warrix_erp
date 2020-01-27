@@ -42,8 +42,11 @@ class Auto_complete extends CI_Controller
     $rs = $this->db
     ->select('code, name')
     ->where('CardType', 'C')
+    ->group_start()
     ->like('code', $txt)
     ->or_like('name', $txt)
+    ->or_like('old_code', $txt)
+    ->group_end()
     ->limit(20)
     ->get('customers');
 
@@ -129,15 +132,13 @@ public function get_style_code()
 
   public function get_vendor_code_and_name()
   {
-    $txt = convert($_REQUEST['term']);
+    $txt = $_REQUEST['term'];
     $sc = array();
-    $vendor = $this->ms
-    ->select('CardCode, CardName')
-    ->where('CardType', 'S')
-    ->like('CardCode', $txt)
-    ->or_like('CardName', $txt)
-    ->limit(20)
-    ->get('OCRD');
+    $qr = "SELECT CardCode, CardName FROM ";
+    $qr .= "OCRD WHERE CardType = 'S' ";
+    $qr .= "AND (CardCode LIKE N'%{$txt}%' OR CardName LIKE N'%{$txt}%') ";
+    $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
+    $vendor = $this->ms->query($qr);
 
     if($vendor->num_rows() > 0)
     {
@@ -296,31 +297,6 @@ public function get_style_code()
   {
     $sc = array();
     $txt = $_REQUEST['term'];
-    //$txt = convert($_REQUEST['term']);
-    // $this->ms
-    // ->select('OBIN.BinCode, OBIN.Descr')
-    // ->from('OBIN')
-    // ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    // ->where('OWHS.U_MAIN', 'Y')
-    // ->where('OBIN.SysBin', 'N');
-    // if($txt != '*')
-    // {
-    //   $this->ms->group_start();
-    //   $this->ms->like('OBIN.BinCode', $txt);
-    //   $this->ms->or_like('OBIN.Descr', $txt);
-    //   $this->ms->group_end();
-    // }
-    //
-    // $this->ms->limit(20);
-    // $zone = $this->ms->get();
-    // if(!empty($zone))
-    // {
-    //   foreach($zone->result() as $rs)
-    //   {
-    //     $sc[] = $rs->BinCode.' | '.$rs->Descr;
-    //   }
-    // }
-
     $this->db->select('code, name');
     if($txt != '*')
     {
@@ -432,16 +408,17 @@ public function get_style_code()
   {
     $sc = array();
     $txt = convert($_REQUEST['term']);
+    $qr = "SELECT BpCode, BpName FROM OOAT ";
     $this->ms->select('BpCode, BpName');
 
     if($txt != '*')
     {
-      $this->ms->like('BpCode', $txt)->or_like('BpName', $txt);
+      $qr .= "WHERE BpCode LIKE N'%{$txt}%' OR BpName LIKE N'%{$txt}%' ";
     }
 
-    $this->ms->limit(20);
+    $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
 
-    $sponsor = $this->ms->get('OOAT');
+    $sponsor = $this->ms->query($qr);
 
     if($sponsor->num_rows() > 0)
     {
@@ -459,19 +436,20 @@ public function get_style_code()
   }
 
 
-
   public function get_support()
   {
     $sc = array();
-    $txt = convert($_REQUEST['term']);
-    $this->ms->select('CardCode, CardName')->where('CardType', 'C');
+    $txt = $_REQUEST['term'];
+    $qr  = "SELECT CardCode, CardName FROM OCRD ";
+    $qr .= "WHERE CardType = 'C' ";
     if($txt != '*')
     {
-      $this->ms->like('CardCode', $txt)->or_like('CardName', $txt);
+      $qr .= "AND (CardCode LIKE N'%{$txt}%' OR CardName LIKE N'%{$txt}%') ";
     }
-    $this->ms->limit(20);
 
-    $sponsor = $this->ms->get('OCRD');
+    $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
+
+    $sponsor = $this->ms->query($qr);
 
     if($sponsor->num_rows() > 0)
     {
@@ -490,25 +468,25 @@ public function get_style_code()
 
 
 
-
   public function get_employee()
   {
     $sc = array();
-    $txt = convert($_REQUEST['term']);
-    $this->ms->select('CardCode, CardName')->where('CardType', 'C');
+    $txt = $_REQUEST['term'];
+    $qr  = "SELECT firstName, lastName, empID FROM OHEM ";
     if($txt != '*')
     {
-      $this->ms->like('CardCode', $txt)->or_like('CardName', $txt);
+      $qr .= "WHERE firstName LIKE N'%{$txt}%' OR lastName LIKE N'%{$txt}%' ";
     }
-    $this->ms->limit(20);
 
-    $sponsor = $this->ms->get('OCRD');
+    $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
 
-    if($sponsor->num_rows() > 0)
+    $emp = $this->ms->query($qr);
+
+    if($emp->num_rows() > 0)
     {
-      foreach($sponsor->result() as $rs)
+      foreach($emp->result() as $rs)
       {
-        $sc[] = $rs->CardCode.' | '.$rs->CardName;
+        $sc[] = $rs->firstName.' '.$rs->lastName.' | '.$rs->empID;
       }
     }
     else
@@ -622,15 +600,18 @@ public function get_style_code()
 
   public function get_warehouse_code_and_name()
   {
-    $txt = convert($_REQUEST['term']);
+    $txt = $_REQUEST['term'];
     $sc  = array();
-    $this->ms->select('WhsCode, WhsName');
+    $qr  = "SELECT WhsCode, WhsName FROM OWHS ";
+
     if($txt != '*')
     {
-      $this->ms->like('WhsCode', $txt);
-      $this->ms->or_like('WhsName', $txt);
+      $qr .= "WHERE WhsCode LIKE N'%{$txt}%' OR WhsName LIKE N'%{$txt}%' ";
     }
-    $rs = $this->ms->limit(20)->get('OWHS');
+
+    $qr .= "ORDER BY WhsCode ASC OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
+
+    $rs = $this->ms->query($qr);
 
     if($rs->num_rows() > 0)
     {

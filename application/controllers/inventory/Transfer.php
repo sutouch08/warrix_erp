@@ -904,6 +904,8 @@ class Transfer extends PS_Controller
                   'FromWhsCod' => $doc->from_warehouse,
                   'WhsCode' => $doc->to_warehouse,
                   'FisrtBin' => $rs->from_zone,
+                  'F_FROM_BIN' => $rs->from_zone,
+                  'F_TO_BIN' => $rs->to_zone,
                   'AllocBinC' => $rs->to_zone,
                   'TaxStatus' => 'Y',
                   'VatPrcnt' => 0.000000,

@@ -320,7 +320,7 @@ class Consign_tr extends PS_Controller
       'code',
       'customer',
       'user',
-      'zone_code',
+      'zone',
       'fromDate',
       'toDate'
     );

@@ -271,6 +271,17 @@ class Receive_transform_model extends CI_Model
   }
 
 
+  public function is_exists($code)
+  {
+    $rs = $this->db->select('status')->where('code', $code)->get('receive_transform');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 
 }
 

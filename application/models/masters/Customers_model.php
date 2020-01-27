@@ -100,11 +100,12 @@ class Customers_model extends CI_Model
 
   public function count_rows($code = '', $name = '', $group = '', $kind = '', $type = '', $class = '', $area = '')
   {
-    $this->db->select('code');
-
     if($code != '')
     {
+      $this->db->group_start();
       $this->db->like('code', $code);
+      $this->db->or_like('old_code', $code);
+      $this->db->group_end();
     }
 
     if($name != '')
@@ -178,10 +179,7 @@ class Customers_model extends CI_Model
 
     }
 
-
-    $rs = $this->db->get('customers');
-
-    return $rs->num_rows();
+    return $this->db->count_all_results('customers');
   }
 
 
@@ -217,7 +215,10 @@ class Customers_model extends CI_Model
   {
     if($code != '')
     {
+      $this->db->group_start();
       $this->db->like('code', $code);
+      $this->db->or_like('old_code', $code);
+      $this->db->group_end();
     }
 
     if($name != '')

@@ -553,3 +553,54 @@ function sumReceive(){
     });
 	$("#total-receive").text( addCommas(qty) );
 }
+
+
+
+function validateOrder(){
+  var prefix = $('#prefix').val();
+  var runNo = parseInt($('#runNo').val());
+  let code = $('#code').val();
+  if(code.length == 0){
+    swal("เลขที่เอกสารไม่ถูกต้อง");
+    return false;
+  }
+
+  let arr = code.split('-');
+
+  if(arr.length == 2){
+    if(arr[0] !== prefix){
+      swal('Prefix ต้องเป็น '+prefix);
+      return false;
+    }else if(arr[1].length != (4 + runNo)){
+      swal('Run Number ไม่ถูกต้อง');
+      return false;
+    }else{
+      $.ajax({
+        url: HOME + 'is_exists/'+code,
+        type:'GET',
+        cache:false,
+        success:function(rs){
+          if(rs == 'not_exists'){
+            $('#addForm').submit();
+          }else{
+            swal({
+              title:'Error!!',
+              text: rs,
+              type: 'error'
+            });
+          }
+        }
+      })
+    }
+
+  }else{
+    swal('เลขที่เอกสารไม่ถูกต้อง');
+    return false;
+  }
+}
+
+$('#code').keyup(function(e){
+	if(e.keyCode == 13){
+		validateOrder();
+	}
+});

@@ -141,6 +141,19 @@ class Warehouse_model extends CI_Model
 
 
 
+  //--- เอาเฉพาะคลังซื้อขาย
+  public function get_sell_warehouse_list()
+  {
+    $rs = $this->db->where('role', 1)->where('active', 1)->where('sell', 1)->get('warehouse');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
   public function count_zone($code)
   {
     return $this->db->where('warehouse_code', $code)->count_all_results('zone');

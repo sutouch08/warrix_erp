@@ -318,7 +318,7 @@ class Consign_so extends PS_Controller
       'code',
       'customer',
       'user',
-      'zone_code',
+      'zone',
       'fromDate',
       'toDate'
     );

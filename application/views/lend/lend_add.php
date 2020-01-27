@@ -38,17 +38,12 @@
 
   <div class="col-sm-3 padding-5">
     <label>ผู้ยืม[พนักงาน]</label>
-    <input type="text" class="form-control input-sm" name="customer" id="customer" value="" required />
+    <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
 
 	<div class="col-sm-3 padding-5">
     <label>โซน[คลังยืม]</label>
 		<input type="text" class="form-control input-sm" name="zone" id="zone" value="" />
-  </div>
-
-	<div class="col-sm-3 padding-5 last">
-    <label>ผู้เบิก[คนสั่ง]</label>
-    <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
 
   <div class="col-sm-11 padding-5 first">
@@ -61,7 +56,7 @@
   </div>
 </div>
 <hr class="margin-top-15">
-<input type="hidden" name="customerCode" id="customerCode" value="" />
+<input type="hidden" name="empID" id="empID" value="" />
 <input type="hidden" name="zone_code" id="zone_code" value="" />
 </form>
 

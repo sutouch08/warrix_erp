@@ -124,7 +124,6 @@ class Receive_po extends PS_Controller
 
 
 
-
   public function save()
   {
     $sc = TRUE;
@@ -179,40 +178,48 @@ class Receive_po extends PS_Controller
             if($qty != 0)
             {
               $pd = $this->products_model->get($item);
-              $bf = $backlogs[$item]; ///--- ยอดค้ารับ ก่อนรับ
-              $af = ($bf - $qty) > 0 ? ($bf - $qty) : 0;  //--- ยอดค้างรับหลังรับแล้ว
-              $ds = array(
-                'receive_code' => $code,
-                'style_code' => $pd->style_code,
-                'product_code' => $item,
-                'product_name' => $pd->name,
-                'price' => $prices[$item],
-                'qty' => $qty,
-                'amount' => $qty * $prices[$item],
-                'before_backlogs' => $bf,
-                'after_backlogs' => $af
-              );
-
-              if($this->receive_po_model->add_detail($ds) === FALSE)
+              if(!empty($pd))
               {
-                $sc = FALSE;
-                $message = 'Add Receive Row Fail';
-                break;
+                $bf = $backlogs[$item]; ///--- ยอดค้ารับ ก่อนรับ
+                $af = ($bf - $qty) > 0 ? ($bf - $qty) : 0;  //--- ยอดค้างรับหลังรับแล้ว
+                $ds = array(
+                  'receive_code' => $code,
+                  'style_code' => $pd->style_code,
+                  'product_code' => $item,
+                  'product_name' => $pd->name,
+                  'price' => $prices[$item],
+                  'qty' => $qty,
+                  'amount' => $qty * $prices[$item],
+                  'before_backlogs' => $bf,
+                  'after_backlogs' => $af
+                );
+
+                if($this->receive_po_model->add_detail($ds) === FALSE)
+                {
+                  $sc = FALSE;
+                  $message = 'Add Receive Row Fail';
+                  break;
+                }
+                else
+                {
+                  //--- insert Movement in
+                  $arr = array(
+                    'reference' => $code,
+                    'warehouse_code' => $warehouse_code,
+                    'zone_code' => $zone_code,
+                    'product_code' => $item,
+                    'move_in' => $qty,
+                    'move_out' => 0,
+                    'date_add' => $doc->date_add
+                  );
+
+                  $this->movement_model->add($arr);
+                }
               }
               else
               {
-                //--- insert Movement in
-                $arr = array(
-                  'reference' => $code,
-                  'warehouse_code' => $warehouse_code,
-                  'zone_code' => $zone_code,
-                  'product_code' => $item,
-                  'move_in' => $qty,
-                  'move_out' => 0,
-                  'date_add' => $doc->date_add
-                );
-
-                $this->movement_model->add($arr);
+                $sc = FALSE;
+                $message = 'ไม่พบรหัสสินค้า : '.$item.' ในระบบ';
               }
             }
           }
@@ -502,45 +509,62 @@ class Receive_po extends PS_Controller
   }
 
 
+
+  //--- check exists document code
+  public function is_exists($code)
+  {
+    $ext = $this->receive_po_model->is_exists($code);
+    if($ext)
+    {
+      echo 'เลขที่เอกสารซ้ำ';
+    }
+    else
+    {
+      echo 'not_exists';
+    }
+  }
+
+
+
+
   public function add()
   {
     $sc = array();
 
     if($this->input->post('date_add'))
     {
-      $date_add = $this->input->post('date_add');
-      $Y = date('Y', strtotime($date_add));
-      $date = db_date($date_add, TRUE);
-      if($Y > '2500')
+      $date_add = db_date($this->input->post('date_add'), TRUE);
+      if($this->input->post('code'))
       {
-        set_error('วันที่ไม่ถูกต้อง');
-        redirect($this->home.'/add_new');
+        $code = $this->input->post('code');
       }
       else
       {
-        $code = $this->get_new_code($date);
-        $arr = array(
-          'code' => $code,
-          'bookcode' => getConfig('BOOK_CODE_RECEIVE_PO'),
-          'vendor_code' => NULL,
-          'vendor_name' => NULL,
-          'po_code' => NULL,
-          'invoice_code' => NULL,
-          'remark' => $this->input->post('remark'),
-          'date_add' => $date,
-          'user' => get_cookie('uname')
-        );
+        $code = $this->get_new_code($date_add);
+      }
 
-        $rs = $this->receive_po_model->add($arr);
-        if($rs)
-        {
-          redirect($this->home.'/edit/'.$code);
-        }
-        else
-        {
-          set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-          redirect($this->home.'/add_new');
-        }
+
+      $arr = array(
+        'code' => $code,
+        'bookcode' => getConfig('BOOK_CODE_RECEIVE_PO'),
+        'vendor_code' => NULL,
+        'vendor_name' => NULL,
+        'po_code' => NULL,
+        'invoice_code' => NULL,
+        'remark' => $this->input->post('remark'),
+        'date_add' => $date_add,
+        'user' => get_cookie('uname')
+      );
+
+      $rs = $this->receive_po_model->add($arr);
+      if($rs)
+      {
+        redirect($this->home.'/edit/'.$code);
+      }
+      else
+      {
+        set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        redirect($this->home.'/add_new');
       }
     }
   }

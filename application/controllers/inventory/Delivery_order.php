@@ -324,7 +324,7 @@ class Delivery_order extends PS_Controller
                     'discount_label'  => discountLabel($rs->discount1, $rs->discount2, $rs->discount3),
                     'discount_amount' => ($rs->discount_amount * $rs->qty),
                     'total_amount'   => $rs->final_price * $rs->qty,
-                    'total_cost'   => $rs->cost * $buffer_qty,
+                    'total_cost'   => $rs->cost * $rs->qty,
                     'margin'  => ($rs->final_price * $rs->qty) - ($rs->cost * $rs->qty),
                     'id_policy'   => $rs->id_policy,
                     'id_rule'     => $rs->id_rule,
@@ -421,6 +421,8 @@ class Delivery_order extends PS_Controller
     $cust = $this->customers_model->get($order->customer_code);
     $total_amount = $this->orders_model->get_bill_total_amount($code);
 
+    $service_wh = getConfig('SERVICE_WAREHOUSE');
+
     $do = $this->delivery_order_model->get_sap_delivery_order($code);
     if(empty($do) OR $do->DocStatus == 'O')
     {
@@ -482,6 +484,7 @@ class Delivery_order extends PS_Controller
 
           foreach($details as $rs)
           {
+
             $arr = array(
               'U_ECOMNO' => $rs->reference,
               'LineNum' => $line,
@@ -496,7 +499,7 @@ class Delivery_order extends PS_Controller
               'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
               'Price' => remove_vat($rs->price), //--- ราคา
               'TotalFrgn' => $rs->total_amount, //--- จำนวนเงินรวม By Line (Currency)
-              'WhsCode' => $rs->warehouse_code,
+              'WhsCode' => ($rs->is_count == 1 ? $rs->warehouse_code : $service_wh),
               'BinCode' => $rs->zone_code,
               'TaxStatus' => 'Y',
               'VatPrcnt' => $vat_rate,
@@ -628,7 +631,8 @@ class Delivery_order extends PS_Controller
                   'FromWhsCod' => $rs->warehouse_code,
                   'WhsCode' => $doc->warehouse_code,
                   'FisrtBin' => $doc->zone_code, //-- โซนปลายทาง
-                  //'AllocBinC' => $doc->zone_code, //--- โซนต้นทาง
+                  'F_FROM_BIN' => $rs->zone_code, //--- โซนต้นทาง
+                  'F_TO_BIN' => $doc->zone_code, //--- โซนปลายทาง
                   'TaxStatus' => 'Y',
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,

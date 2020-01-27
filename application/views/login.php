@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 		<meta charset="utf-8" />
-		<title>Login Page - Cash Flow</title>
+		<title>Login Page - <?php echo getConfig('COMPANY_NAME'); ?></title>
 		<meta name="description" content="User login page" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 
@@ -41,10 +41,10 @@
 						<div class="login-container">
 							<div class="center">
 								<h1>
-									<span class="red">PS</span>
+									<span class="orange"><?php echo getConfig('COMPANY_NAME'); ?></span>
 									<span class="white" id="id-text2">Application</span>
 								</h1>
-								<h4 class="blue" id="id-company-text">&copy; Programsport</h4>
+								<h4 class="blue" id="id-company-text">&copy; <?php echo getConfig('COMPANY_FULL_NAME');?></h4>
 							</div>
 
 							<div class="space-6"></div>

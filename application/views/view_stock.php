@@ -1,40 +1,30 @@
-<?php $this->load->view('include/header'); ?>
-<?php
-$add = $this->pm->can_add;
-$edit = $this->pm->can_edit;
-$delete = $this->pm->can_delete;
-$hide = $order->status == 1 ? 'hide' : '';
- ?>
+<?php $this->load->view('include/header');  ?>
+
 <div class="row">
 	<div class="col-sm-6">
     	<h4 class="title"><?php echo $this->title; ?></h4>
     </div>
     <div class="col-sm-6">
     	<p class="pull-right top-p">
-        	<button type="button" class="btn btn-sm btn-warning" onClick="editOrder('<?php echo $order->code; ?>')"><i class="fa fa-arrow-left"></i> กลับ</button>
-      <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
-          <button type="button" class="btn btn-sm btn-success <?php echo $hide; ?>" id="btn-save-order" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
-      <?php endif; ?>
-        </p>
+      </p>
     </div>
 </div>
 <hr class="margin-bottom-15" />
-<?php $this->load->view('orders/order_edit_header'); ?>
-
 <!--  Search Product -->
 <div class="row">
-	<div class="col-sm-3 padding-5 first">
+  <div class="col-sm-2 padding-5 first">
+    <select class="form-control input-sm" name="warehouse" id="warehouse">
+      <option value="">เลือกคลัง</option>
+      <?php echo select_sell_warehouse(); ?>
+    </select>
+  </div>
+	<div class="col-sm-3 padding-5">
     <input type="text" class="form-control input-sm text-center" id="pd-box" placeholder="ค้นรหัสสินค้า" />
   </div>
+
   <div class="col-sm-2 padding-5">
   	<button type="button" class="btn btn-xs btn-primary btn-block" onclick="getProductGrid()"><i class="fa fa-tags"></i> แสดงสินค้า</button>
   </div>
-    <div class="col-sm-5"></div>
-    <div class="col-sm-2">
-    	<button type="button" class="btn btn-xs btn-info btn-block" onclick="recalDiscount()">
-        	<i class="fa fa-calculator"></i> คำนวณส่วนลดใหม่</button>
-        </button>
-    </div>
 </div>
 <hr class="margin-top-15 margin-bottom-0" />
 <!--- Category Menu ---------------------------------->
@@ -55,9 +45,6 @@ $hide = $order->status == 1 ? 'hide' : '';
 </div>
 <!-- End Category Menu ------------------------------------>
 
-<?php $this->load->view('orders/order_detail'); //include 'include/order/order_detail.php'; ?>
-
-
 <form id="orderForm">
 <div class="modal fade" id="orderGrid" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog" id="modal">
@@ -77,9 +64,11 @@ $hide = $order->status == 1 ? 'hide' : '';
 </div>
 </form>
 
+
+<input type="hidden" name="view" id="view" value="1">
+
 <script src="<?php echo base_url(); ?>scripts/orders/orders.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_add.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/product_tab_menu.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_grid.js"></script>
-
 <?php $this->load->view('include/footer'); ?>

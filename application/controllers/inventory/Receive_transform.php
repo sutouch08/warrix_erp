@@ -347,7 +347,7 @@ class Receive_transform extends PS_Controller
     }
     else
     {
-      $sc = 'ใบสินค้าไม่ถูกต้องหรือถูกปิดไปแล้ว';
+      $sc = 'ใบเบิกสินค้าไม่ถูกต้องหรือถูกปิดไปแล้ว';
     }
 
     echo $sc;
@@ -364,6 +364,21 @@ class Receive_transform extends PS_Controller
 
 
 
+  //--- check exists document code
+  public function is_exists($code)
+  {
+    $ext = $this->receive_transform_model->is_exists($code);
+    if($ext)
+    {
+      echo 'เลขที่เอกสารซ้ำ';
+    }
+    else
+    {
+      echo 'not_exists';
+    }
+  }
+
+
 
   public function add_new()
   {
@@ -377,38 +392,31 @@ class Receive_transform extends PS_Controller
 
     if($this->input->post('date_add'))
     {
-      $date_add = $this->input->post('date_add');
-      $Y = date('Y', strtotime($date_add));
-      $date = db_date($date_add, TRUE);
-      if($Y > '2500')
+      $date_add = db_date($this->input->post('date_add'), TRUE);
+      $code = $this->input->post('code') ? $this->input->post('code') : $this->get_new_code($date_add);
+
+      $arr = array(
+        'code' => $code,
+        'bookcode' => getConfig('BOOK_CODE_RECEIVE_TRANSFORM'),
+        'order_code' => NULL,
+        'invoice_code' => NULL,
+        'remark' => $this->input->post('remark'),
+        'date_add' => $date_add,
+        'user' => get_cookie('uname')
+      );
+
+      $rs = $this->receive_transform_model->add($arr);
+
+      if($rs)
       {
-        set_error('วันที่ไม่ถูกต้อง');
-        redirect($this->home.'/add_new');
+        redirect($this->home.'/edit/'.$code);
       }
       else
       {
-        $code = $this->get_new_code($date);
-        $arr = array(
-          'code' => $code,
-          'bookcode' => getConfig('BOOK_CODE_RECEIVE_TRANSFORM'),
-          'order_code' => NULL,
-          'invoice_code' => NULL,
-          'remark' => $this->input->post('remark'),
-          'date_add' => $date,
-          'user' => get_cookie('uname')
-        );
-
-        $rs = $this->receive_transform_model->add($arr);
-        if($rs)
-        {
-          redirect($this->home.'/edit/'.$code);
-        }
-        else
-        {
-          set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-          redirect($this->home.'/add_new');
-        }
+        set_error('เพิ่มเอกสารไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        redirect($this->home.'/add_new');
       }
+
     }
   }
 

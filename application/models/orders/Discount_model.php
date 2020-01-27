@@ -157,7 +157,7 @@ class Discount_model extends CI_Model
 
 				$totalDiscAmount = 0; //--- ผลรวมของส่วนลดทั้ง 3 สเต็ป
 
-				$dis_rule = 0;
+				$dis_rule = NULL;
 
 
 				//---- วนรอบจนหมดเงื่อนไข
@@ -400,7 +400,7 @@ class Discount_model extends CI_Model
 
 				$totalDiscAmount = 0; //--- ผลรวมของส่วนลดทั้ง 3 สเต็ป
 
-				$dis_rule = 0;
+				$dis_rule = NULL;
 
 				foreach($qs->result() as $rs)
 				{

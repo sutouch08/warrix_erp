@@ -49,8 +49,8 @@ $menu_group = $this->menu_group_code;
 				<ul class="submenu">
 					<?php echo side_menu($menu, 'ICODPR',  'inventory/prepare', 'จัดสินค้า'); ?>
 					<?php echo side_menu($menu, 'ICODQC',  'inventory/qc', 'ตรวจสินค้า'); ?>
-					<?php echo side_menu($menu, 'ICODDO',  'inventory/delivery_order', 'ออเดอร์รอการจัดส่ง'); ?>
-					<?php echo side_menu($menu, 'ICODIV',  'inventory/invoice', 'ออเดอร์จัดส่งแล้ว'); ?>
+					<?php echo side_menu($menu, 'ICODDO',  'inventory/delivery_order', 'ออเดอร์รอเปิดบิล'); ?>
+					<?php echo side_menu($menu, 'ICODIV',  'inventory/invoice', 'ออเดอร์เปิดบิลแล้ว'); ?>
 				</ul>
 			</li>
 
@@ -64,7 +64,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICTRZN',  'inventory/move', 'ย้าย สินค้า'); ?>
 				</ul>
 			</li>
-
+<!--
 			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'CHECK'); ?>">
 				<a href="#" class="dropdown-toggle">
 					<i class="menu-icon fa fa-caret-right"></i> ตรวจสอบ
@@ -76,6 +76,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICCKMV',  'inventory/movement', 'ตรวจสอบ MOVEMENT'); ?>
 				</ul>
 			</li>
+			-->
 			<?php echo side_menu($menu, 'ICCSRC',  'inventory/consign_check', 'กระทบยอดสินค้า'); ?>
 		</ul>
 	</li>
@@ -92,6 +93,7 @@ $menu_group = $this->menu_group_code;
 			<?php echo side_menu($menu, 'SOODSP',  'orders/sponsor', 'สปอนเซอร์'); ?>
 			<?php echo side_menu($menu, 'SOCCSO',  'orders/consign_so', 'ฝากขาย(ใบกำกับ)'); ?>
 			<?php echo side_menu($menu, 'SOCCTR',  'orders/consign_tr', 'ฝากขาย(โอนคลัง)'); ?>
+			<?php echo side_menu($menu, 'view_stock',  'view_stock', 'เช็คสต็อก'); ?>
 		</ul>
 	</li>
 

@@ -33,19 +33,19 @@ function saveOrder(){
 
 
 
-$("#customer").autocomplete({
+$("#empName").autocomplete({
 	source: BASE_URL + 'auto_complete/get_employee',
 	autoFocus: true,
 	close: function(){
 		var rs = $.trim($(this).val());
 		var arr = rs.split(' | ');
 		if( arr.length == 2 ){
-			var code = arr[0];
-			var name = arr[1];
-			$("#customerCode").val(code);
-			$("#customer").val(name);
+			var empName = arr[0];
+			var empID = arr[1];
+			$("#empName").val(empName);
+			$("#empID").val(empID);
 		}else{
-			$("#customerCode").val('');
+			$("#empID").val('');
 			$(this).val('');
 		}
     zoneInit();
@@ -65,12 +65,12 @@ $('#customer').focusout(function(){
 
 
 function zoneInit(){
-  let customerCode = $('#customerCode').val();
+  let empID = $('#empID').val();
   $('#zone_code').val('');
   $('#zone').val('');
 
   $('#zone').autocomplete({
-    source:BASE_URL + 'auto_complete/get_lend_zone/'+customerCode,
+    source:BASE_URL + 'auto_complete/get_lend_zone/'+empID,
     autoFocus: true,
     close:function(){
       var rs = $.trim($(this).val());

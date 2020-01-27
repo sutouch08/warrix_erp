@@ -276,7 +276,7 @@ class Receive_po_model extends CI_Model
     return $rs->result();
   }
 
-    
+
   public function get_max_code($code)
   {
     $rs = $this->db
@@ -300,6 +300,18 @@ class Receive_po_model extends CI_Model
     if($rs->num_rows() === 1)
     {
       return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function is_exists($code)
+  {
+    $rs = $this->db->select('status')->where('code', $code)->get('receive_product');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
     }
 
     return FALSE;

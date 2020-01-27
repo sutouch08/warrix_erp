@@ -201,9 +201,9 @@ function select_order_role($role = '')
 	$rs = $CI->db->query("SELECT * FROM order_role");
 	if($rs->num_rows() > 0)
 	{
-		foreach($rs->result() as $role)
+		foreach($rs->result() as $rd)
 		{
-			$sc .= '<option value="'.$role->code.'" '.is_selected($role, $role->code).'>'.$role->name.'</option>';
+			$sc .= '<option value="'.$rd->code.'" '.is_selected($role, $rd->code).'>'.$rd->name.'</option>';
 		}
 	}
 

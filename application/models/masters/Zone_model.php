@@ -291,11 +291,19 @@ class Zone_model extends CI_Model
 
   public function get($code)
   {
-    $rs = $this->ms
-    ->select('OBIN.BinCode AS code, OBIN.Descr AS name, OWHS.WhsCode AS warehouse_code, OWHS.WhsName AS warehouse_name')
-    ->from('OBIN')
-    ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OBIN.BinCode', $code)
+    // $rs = $this->ms
+    // ->select('OBIN.BinCode AS code, OBIN.Descr AS name, OWHS.WhsCode AS warehouse_code, OWHS.WhsName AS warehouse_name')
+    // ->from('OBIN')
+    // ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
+    // ->where('OBIN.BinCode', $code)
+    // ->get();
+
+    $rs = $this->db
+    ->select('zone.code, zone.name, zone.warehouse_code')
+    ->select('warehouse.name AS warehouse_name')
+    ->from('zone')
+    ->join('warehouse', 'zone.warehouse_code = warehouse.code', 'left')
+    ->where('zone.code', $code)
     ->get();
 
     if($rs->num_rows() === 1)
@@ -313,10 +321,11 @@ class Zone_model extends CI_Model
 
   public function get_warehouse_code($zone_code)
   {
-    $rs = $this->ms->select('WhsCode')->where('BinCode', $zone_code)->get('OBIN');
+    $rs = $this->db->select('warehouse_code')->where('code', $zone_code)->get('zone');
+    //$rs = $this->ms->select('WhsCode AS warehouse_code')->where('BinCode', $zone_code)->get('OBIN');
     if($rs->num_rows() == 1)
     {
-      return $rs->row()->WhsCode;
+      return $rs->row()->warehouse_code;
     }
 
     return FALSE;
@@ -329,8 +338,8 @@ class Zone_model extends CI_Model
 
   public function get_name($code)
   {
-    $rs = $this->ms->select('Descr AS name')->where('BinCode', $code)->get('OBIN');
-    //$rs = $this->db->select('name')->where('code', $code)->get('zone');
+    //$rs = $this->ms->select('Descr AS name')->where('BinCode', $code)->get('OBIN');
+    $rs = $this->db->select('name')->where('code', $code)->get('zone');
     if($rs->num_rows() === 1)
     {
       return $rs->row()->name;
@@ -359,9 +368,9 @@ class Zone_model extends CI_Model
   }
 
 
-  public function search($txt, $warehouse_code)
+  public function search($txt, $warehouse_code = NULL)
   {
-    if($warehouse_code != '')
+    if(!empty($warehouse_code))
     {
       $this->db->where('warehouse_code', $warehouse_code);
     }
@@ -396,8 +405,10 @@ class Zone_model extends CI_Model
     $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, WhsCode AS warehouse_code');
     $this->ms->select('createDate, updateDate');
     $this->ms->where('SysBin', 'N');
+    $this->ms->group_start();
     $this->ms->where('createDate >', sap_date($last_add));
     $this->ms->or_where('updateDate >', sap_date($last_upd));
+    $this->ms->group_end();
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)
     {

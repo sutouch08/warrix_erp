@@ -24,13 +24,13 @@ class Invoice extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'role'          => get_filter('role', 'role', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'from_date'     => get_filter('from_date', 'from_date', ''),
-      'to_date'       => get_filter('to_date', 'to_date', '')
+      'code'          => get_filter('code', 'inv_code', ''),
+      'customer'      => get_filter('customer', 'inv_customer', ''),
+      'user'          => get_filter('user', 'inv_user', ''),
+      'role'          => get_filter('role', 'inv_role', ''),
+      'channels'      => get_filter('channels', 'inv_channels', ''),
+      'from_date'     => get_filter('from_date', 'inv_from_date', ''),
+      'to_date'       => get_filter('to_date', 'inv_to_date', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -100,6 +100,22 @@ class Invoice extends PS_Controller
     $ds['details'] = $details;
     $ds['is_barcode'] = $barcode != '' ? TRUE : FALSE;
     $this->load->view('print/print_invoice', $ds);
+  }
+
+
+
+  public function clear_filter()
+  {
+    $filter = array(
+      'inv_code',
+      'inv_customer',
+      'inv_user',
+      'inv_role',
+      'inv_channels',
+      'inv_from_date',
+      'inv_to_date'
+    );
+    clear_filter($filter);
   }
 
 

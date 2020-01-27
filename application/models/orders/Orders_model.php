@@ -276,6 +276,13 @@ class Orders_model extends CI_Model
   }
 
 
+  //---- เปิดบิลใน SAP เรียบร้อยแล้ว
+  public function set_complete($code)
+  {
+    return $this->db->set('is_complete', 1)->where('order_code', $code)->update('order_details');
+  }
+
+
 
   public function un_complete($code)
   {
@@ -293,76 +300,84 @@ class Orders_model extends CI_Model
 
   public function count_rows(array $ds = array(), $role = 'S')
   {
-    $this->db->select('status');
-    $this->db->where('role', $role);
+    $this->db
+    ->select('orders.*')
+    ->from('orders')
+    ->join('customers', 'orders.customer_code = customers.code', 'left')
+    ->join('zone', 'orders.zone_code = zone.code', 'left')
+    ->join('user', 'orders.user = user.uname', 'left')
+    ->where('role', $role);
 
     //---- เลขที่เอกสาร
     if( ! empty($ds['code']))
     {
-      $this->db->like('code', $ds['code']);
+      $this->db->like('orders.code', $ds['code']);
     }
 
     //--- รหัส/ชื่อ ลูกค้า
     if( ! empty($ds['customer']))
     {
-      $customers = customer_in($ds['customer']);
-      $this->db->where_in('customer_code', $customers);
+      $this->db->group_start();
+      $this->db->like('customers.code', $ds['customer']);
+      $this->db->or_like('customers.name', $ds['customer']);
+      $this->db->group_end();
     }
 
     //---- user name / display name
     if( ! empty($ds['user']))
     {
-      $users = user_in($ds['user']);
-      $this->db->where_in('user', $users);
+      $this->db->group_start();
+      $this->db->like('user.uname', $ds['user']);
+      $this->db->or_like('user.name', $ds['user']);
+      $this->db->group_end();
     }
 
     //---- เลขที่อ้างอิงออเดอร์ภายนอก
     if( ! empty($ds['reference']))
     {
-      $this->db->like('reference', $ds['reference']);
+      $this->db->like('orders.reference', $ds['reference']);
     }
 
     //---เลขที่จัดส่ง
     if( ! empty($ds['ship_code']))
     {
-      $this->db->like('shipping_code', $ds['ship_code']);
+      $this->db->like('orders.shipping_code', $ds['ship_code']);
     }
 
     //--- ช่องทางการขาย
     if( ! empty($ds['channels']))
     {
-      $this->db->where('channels_code', $ds['channels']);
+      $this->db->where('orders.channels_code', $ds['channels']);
     }
 
     //--- ช่องทางการชำระเงิน
     if( ! empty($ds['payment']))
     {
-      $this->db->where('payment_code', $ds['payment']);
+      $this->db->where('orders.payment_code', $ds['payment']);
     }
 
 
     if( ! empty($ds['zone_code']))
     {
-      $zone_in = get_zone_in($ds['zone_code']);
-      $this->db->where_in('zone_code', $zone_in);
+      $this->db->group_start();
+      $this->db->like('zone.code', $ds['zone_code']);
+      $this->db->or_like('zone.name', $ds['zone_code']);
+      $this->db->group_end();
     }
 
     if( !empty($ds['user_ref']))
     {
-      $this->db->like('user_ref', $ds['user_ref']);
+      $this->db->like('orders.user_ref', $ds['user_ref']);
     }
 
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
-      $this->db->where('date_add >=', from_date($ds['from_date']));
-      $this->db->where('date_add <=', to_date($ds['to_date']));
+      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
     }
 
-    $rs = $this->db->get('orders');
-
-
-    return $rs->num_rows();
+    return $this->db->count_all_results();
   }
 
 
@@ -371,71 +386,84 @@ class Orders_model extends CI_Model
 
   public function get_data(array $ds = array(), $perpage = '', $offset = '', $role = 'S')
   {
-      $this->db->where('role', $role);
+    $this->db
+    ->select('orders.*')
+    ->from('orders')
+    ->join('customers', 'orders.customer_code = customers.code', 'left')
+    ->join('zone', 'orders.zone_code = zone.code', 'left')
+    ->join('user', 'orders.user = user.uname', 'left')
+    ->where('role', $role);
 
-      //---- เลขที่เอกสาร
-      if( ! empty($ds['code']))
-      {
-        $this->db->like('code', $ds['code']);
-      }
+    //---- เลขที่เอกสาร
+    if( ! empty($ds['code']))
+    {
+      $this->db->like('orders.code', $ds['code']);
+    }
 
-      //--- รหัส/ชื่อ ลูกค้า
-      if( ! empty($ds['customer']))
-      {
-        $customers = customer_in($ds['customer']);
-        $this->db->where_in('customer_code', $customers);
-      }
+    //--- รหัส/ชื่อ ลูกค้า
+    if( ! empty($ds['customer']))
+    {
+      $this->db->group_start();
+      $this->db->like('customers.code', $ds['customer']);
+      $this->db->or_like('customers.name', $ds['customer']);
+      $this->db->group_end();
+    }
 
-      //---- user name / display name
-      if( ! empty($ds['user']))
-      {
-        $users = user_in($ds['user']);
-        $this->db->where_in('user', $users);
-      }
+    //---- user name / display name
+    if( ! empty($ds['user']))
+    {
+      $this->db->group_start();
+      $this->db->like('user.uname', $ds['user']);
+      $this->db->or_like('user.name', $ds['user']);
+      $this->db->group_end();
+    }
 
-      //---- เลขที่อ้างอิงออเดอร์ภายนอก
-      if( ! empty($ds['reference']))
-      {
-        $this->db->like('reference', $ds['reference']);
-      }
+    //---- เลขที่อ้างอิงออเดอร์ภายนอก
+    if( ! empty($ds['reference']))
+    {
+      $this->db->like('orders.reference', $ds['reference']);
+    }
 
-      //---เลขที่จัดส่ง
-      if( ! empty($ds['ship_code']))
-      {
-        $this->db->like('shipping_code', $ds['ship_code']);
-      }
+    //---เลขที่จัดส่ง
+    if( ! empty($ds['ship_code']))
+    {
+      $this->db->like('orders.shipping_code', $ds['ship_code']);
+    }
 
-      //--- ช่องทางการขาย
-      if( ! empty($ds['channels']))
-      {
-        $this->db->where('channels_code', $ds['channels']);
-      }
+    //--- ช่องทางการขาย
+    if( ! empty($ds['channels']))
+    {
+      $this->db->where('orders.channels_code', $ds['channels']);
+    }
 
-      //--- ช่องทางการชำระเงิน
-      if( ! empty($ds['payment']))
-      {
-        $this->db->where('payment_code', $ds['payment']);
-      }
+    //--- ช่องทางการชำระเงิน
+    if( ! empty($ds['payment']))
+    {
+      $this->db->where('orders.payment_code', $ds['payment']);
+    }
 
 
-      if( ! empty($ds['zone_code']))
-      {
-        $zone_in = get_zone_in($ds['zone_code']);
-        $this->db->where_in('zone_code', $zone_in);
-      }
+    if( ! empty($ds['zone_code']))
+    {
+      $this->db->group_start();
+      $this->db->like('zone.code', $ds['zone_code']);
+      $this->db->or_like('zone.name', $ds['zone_code']);
+      $this->db->group_end();
+    }
 
-      if( !empty($ds['user_ref']))
-      {
-        $this->db->like('user_ref', $ds['user_ref']);
-      }
+    if( !empty($ds['user_ref']))
+    {
+      $this->db->like('orders.user_ref', $ds['user_ref']);
+    }
 
-      if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
-      {
-        $this->db->where('date_add >=', from_date($ds['from_date']));
-        $this->db->where('date_add <=', to_date($ds['to_date']));
-      }
 
-      $this->db->order_by('code', 'DESC');
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
+    {
+      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+    }
+
+      $this->db->order_by('orders.code', 'DESC');
 
       if($perpage != '')
       {
@@ -443,9 +471,14 @@ class Orders_model extends CI_Model
         $this->db->limit($perpage, $offset);
       }
 
-      $rs = $this->db->get('orders');
+      $rs = $this->db->get();
       //echo $this->db->get_compiled_select('orders');
-      return $rs->result();
+      if($rs->num_rows() > 0)
+      {
+        return $rs->result();
+      }
+
+      return FALSE;
   }
 
 
@@ -561,7 +594,7 @@ class Orders_model extends CI_Model
     {
       $this->db->where('orders.zone_code', $zone);
     }
-    
+
     $rs = $this->db->get();
 
     if($rs->num_rows() == 1)

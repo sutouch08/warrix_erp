@@ -73,7 +73,7 @@ class Delivery_order_model extends CI_Model
 
 
 
-  public function get_data(array $ds = array(), $perpage = '', $offset = '', $state = 3)
+  public function get_data(array $ds = array(), $perpage = '', $offset = '', $state = 7)
   {
     $total_query = "(SELECT SUM(total_amount) FROM order_details WHERE order_code = orders.code) AS total_amount";
     $this->db->select("orders.*, channels.name AS channels_name, customers.name AS customer_name, {$total_query}")
@@ -103,7 +103,7 @@ class Delivery_order_model extends CI_Model
 
     if(!empty($ds['role']))
     {
-      $this->db->where('role', $ds['role']);
+      $this->db->where('orders.role', $ds['role']);
     }
 
     if(!empty($ds['channels']))

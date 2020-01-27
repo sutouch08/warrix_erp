@@ -128,7 +128,8 @@ class Orders extends PS_Controller
       $sale_code = $this->customers_model->get_sale_code($this->input->post('customerCode'));
 
       //--- check over due
-      $overDue = $this->invoice_model->is_over_due($this->input->post('customerCode'));
+      $is_strict = getConfig('STRICT_OVER_DUE') == 1 ? TRUE : FALSE;
+      $overDue = $is_strict ? $this->invoice_model->is_over_due($this->input->post('customerCode')) : FALSE;
 
       //--- ถ้ามียอดค้างชำระ และ เป็นออเดอร์แบบเครดิต
       //--- ไม่ให้เพิ่มออเดอร์
@@ -145,7 +146,7 @@ class Orders extends PS_Controller
           'bookcode' => $book_code,
           'reference' => $this->input->post('reference'),
           'customer_code' => $this->input->post('customerCode'),
-          'customer_ref' => $this->input->post('customer_ref'),
+          'customer_ref' => $this->input->post('cust_ref'),
           'channels_code' => $this->input->post('channels'),
           'payment_code' => $this->input->post('payment'),
           'warehouse_code' => get_null($this->input->post('warehouse')),
@@ -274,7 +275,7 @@ class Orders extends PS_Controller
                       "discount3" => $discount['discLabel3'],
                       "discount_amount" => $discount['amount'],
                       "total_amount"	=> ($item->price * $qty) - $discount['amount'],
-                      "id_rule"	=> $discount['id_rule'],
+                      "id_rule"	=> get_null($discount['id_rule']),
                       "is_count" => $item->count_stock
                     );
 
@@ -320,7 +321,7 @@ class Orders extends PS_Controller
                         "discount3" => $discount['discLabel3'],
                         "discount_amount" => $discount['amount'],
                         "total_amount"	=> ($item->price * $qty) - $discount['amount'],
-                        "id_rule"	=> $discount['id_rule'],
+                        "id_rule"	=> get_null($discount['id_rule']),
                         "valid" => 0
                         );
 
@@ -639,7 +640,7 @@ class Orders extends PS_Controller
     $warehouse = get_null($this->input->get('warehouse_code'));
     $zone = get_null($this->input->get('zone_code'));
   	$sc = 'not exists';
-    $view = FALSE;
+    $view = $this->input->get('isView') == '0' ? FALSE : TRUE;
   	$sc = $this->getOrderGrid($style_code, $view, $warehouse, $zone);
   	$tableWidth	= $this->products_model->countAttribute($style_code) == 1 ? 600 : $this->getOrderTableWidth($style_code);
   	$sc .= ' | '.$tableWidth;
@@ -762,7 +763,7 @@ class Orders extends PS_Controller
     $auz = getConfig('ALLOW_UNDER_ZERO');
     if($auz == 1)
     {
-      $isVisual = TRUE;
+      $isVisual = $view === TRUE ? $isVisual : TRUE;
     }
 
 		$colors	= $this->getAllColors($style->code);
@@ -773,8 +774,10 @@ class Orders extends PS_Controller
 
 		foreach( $sizes as $size_code => $size )
 		{
-			$sc 	.= '<tr style="font-size:12px;">';
-			$sc 	.= '<td class="text-center middle" style="width:70px;"><strong>'.$size_code.'</strong></td>';
+      //$bg_color = $this->getSizeColor($size_code);
+      $bg_color = ''; //empty($bg_color) ? '' : 'background-color:'.$bg_color.';';
+			$sc 	.= '<tr style="font-size:12px; '.$bg_color.'">';
+			$sc 	.= '<td class="text-center middle" style="width:80px;"><strong>'.$size_code.'</strong></td>';
 
 			foreach( $colors as $color_code => $color )
 			{
@@ -849,10 +852,10 @@ class Orders extends PS_Controller
 
   public function gridHeader(array $colors)
   {
-    $sc = '<tr class="font-size-12"><td>&nbsp;</td>';
+    $sc = '<tr class="font-size-12"><td style="width:70px;">&nbsp;</td>';
     foreach( $colors as $code => $name )
     {
-      $sc .= '<td class="text-center middle"><strong>'.$code . '<br/>'. $name.'</strong></td>';
+      $sc .= '<td class="text-center middle" style="width:70px; white-space:normal;">'.$code . '<br/>'. $name.'</td>';
     }
     $sc .= '</tr>';
     return $sc;
@@ -896,11 +899,34 @@ class Orders extends PS_Controller
 
 
 
+  public function getSizeColor($size_code)
+  {
+    $colors = array(
+      'XS' => '#DFAAA9',
+      'S' => '#DFC5A9',
+      'M' => '#DEDFA9',
+      'L' => '#C3DFA9',
+      'XL' => '#A9DFAA',
+      '2L' => '#A9DFC5',
+      '3L' => '#A9DDDF',
+      '5L' => '#A9C2DF',
+      '7L' => '#ABA9DF'
+    );
+
+    if(isset($colors[$size_code]))
+    {
+      return $colors[$size_code];
+    }
+
+    return FALSE;
+  }
+
+
   public function getOrderTableWidth($style_code)
   {
     $sc = 800; //--- ชั้นต่ำ
     $tdWidth = 70;  //----- แต่ละช่อง
-    $padding = 100; //----- สำหรับช่องแสดงไซส์
+    $padding = 70; //----- สำหรับช่องแสดงไซส์
     $color = $this->products_model->count_color($style_code);
     if($color > 0)
     {

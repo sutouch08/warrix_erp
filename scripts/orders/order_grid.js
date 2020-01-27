@@ -2,6 +2,7 @@
 function getProductGrid(){
 	var pdCode 	= $("#pd-box").val();
 	var whCode = $('#warehouse').val();
+	var isView = $('#view').length;
 	if( pdCode.length > 0  ){
 		load_in();
 		$.ajax({
@@ -10,7 +11,8 @@ function getProductGrid(){
 			cache:"false",
 			data:{
 				"style_code" : pdCode,
-				"warehouse_code" : whCode
+				"warehouse_code" : whCode,
+				"isView" : isView
 			},
 			success: function(rs){
 				load_out();
@@ -40,15 +42,17 @@ function getProductGrid(){
 
 
 function getOrderGrid(styleCode){
-	load_in();
 	var whCode = $('#warehouse').val();
+	var isView = $('#view').length;
+	load_in();
 	$.ajax({
 		url: BASE_URL + 'orders/orders/get_order_grid',
 		type:"GET",
 		cache:"false",
 		data:{
 			"style_code" : styleCode,
-			"warehouse_code" : whCode
+			"warehouse_code" : whCode,
+			"isView" : isView
 		},
 		success: function(rs){
 			load_out();
@@ -74,8 +78,6 @@ function getOrderGrid(styleCode){
 		}
 	});
 }
-
-
 
 
 function valid_qty(el, qty){

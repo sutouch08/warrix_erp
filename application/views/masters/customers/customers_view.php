@@ -93,9 +93,9 @@
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-10 middle">รหัส</th>
 					<th class="width-35 middle">ชื่อ</th>
-					<th class="width-10 middle">กลุ่มลูกค้า</th>
-					<th class="width-10 middle">ประเภทลูกค้า</th>
-					<th class="width-10 middle">ชนิดลูกค้า</th>
+					<th class="width-10 middle">กลุ่ม</th>
+					<th class="width-10 middle">ประเภท</th>
+					<th class="width-10 middle">ชนิด</th>
 					<th class="width-10 middle">เกรด</th>
 					<th class="width-10"></th>
 				</tr>
@@ -106,7 +106,12 @@
 				<?php foreach($data as $rs) : ?>
 					<tr style="font-size:11px;">
 						<td class="middle text-center"><?php echo $no; ?></td>
-						<td class="middle"><?php echo $rs->code; ?></td>
+						<td class="middle">
+							<?php echo $rs->code; ?>
+							<?php if(!empty($rs->old_code)) : ?>
+							<?php echo ' | '.$rs->old_code; ?>
+							<?php endif; ?>
+						</td>
 						<td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle"><?php echo $rs->group; ?></td>
 						<td class="middle"><?php echo $rs->kind; ?></td>

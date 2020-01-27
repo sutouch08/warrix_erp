@@ -254,8 +254,8 @@ function pagination_config( $base_url, $total_rows = 0, $perpage = 20, $segment 
 
 function convert($txt)
 {
-	return iconv('UTF-8', 'CP850//IGNORE', $txt);
-	//return $txt;
+	//return iconv('UTF-8', 'CP850', $txt);
+	return $txt;
 }
 
 
