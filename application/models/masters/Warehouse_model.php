@@ -172,26 +172,24 @@ class Warehouse_model extends CI_Model
   }
 
 
-  public function get_last_create_date()
+
+  public function get_last_sync_date()
   {
-    $rs = $this->db->select_max('sap_createDate', 'create_date')->get('warehouse');
-    return $rs->row()->create_date;
+    $rs = $this->db->select_max('last_sync')->get('warehouse');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : $rs->row()->last_sync;
+    }
+
+    return date('2019-01-01 00:00:00');
   }
 
 
-  public function get_last_update_date()
-  {
-    $rs = $this->db->select_max('sap_updateDate', 'update_date')->get('warehouse');
-    return $rs->row()->update_date;
-  }
-
-
-  public function get_new_data($last_add, $last_upd)
+  public function get_new_data($last_sync)
   {
     $this->ms->select('WhsCode AS code, WhsName AS name');
-    $this->ms->select('createDate, updateDate');
-    $this->ms->where('createDate >', sap_date($last_add));
-    $this->ms->or_where('updateDate >', sap_date($last_upd));
+    $this->ms->where('createDate >', sap_date($last_sync));
+    $this->ms->or_where('updateDate >', sap_date($last_sync));
     $rs = $this->ms->get('OWHS');
     if($rs->num_rows() > 0)
     {

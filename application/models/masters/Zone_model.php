@@ -386,28 +386,26 @@ class Zone_model extends CI_Model
   }
 
 
-  public function get_last_create_date()
+
+  public function get_last_sync_date()
   {
-    $rs = $this->db->select_max('sap_createDate', 'create_date')->get('zone');
-    return $rs->row()->create_date;
+    $rs = $this->db->select_max('last_sync')->get('zone');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : $rs->row()->last_sync;
+    }
+
+    return date('2019-01-01 00:00:00');
   }
 
 
-  public function get_last_update_date()
+  public function get_new_data($last_sync)
   {
-    $rs = $this->db->select_max('sap_updateDate', 'update_date')->get('zone');
-    return $rs->row()->update_date;
-  }
-
-
-  public function get_new_data($last_add, $last_upd)
-  {
-    $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, WhsCode AS warehouse_code');
-    $this->ms->select('createDate, updateDate');
+    $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, WhsCode AS warehouse_code, SL1Code AS old_code');
     $this->ms->where('SysBin', 'N');
     $this->ms->group_start();
-    $this->ms->where('createDate >', sap_date($last_add));
-    $this->ms->or_where('updateDate >', sap_date($last_upd));
+    $this->ms->where('createDate >', sap_date($last_sync));
+    $this->ms->or_where('updateDate >', sap_date($last_sync));
     $this->ms->group_end();
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)

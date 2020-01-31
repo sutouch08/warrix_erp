@@ -36,6 +36,19 @@ class Qc_model extends CI_Model
   }
 
 
+  public function get($id)
+  {
+    $rs = $this->db->where('id', $id)->get('qc');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
 
   public function get_data(array $ds = array(), $state = 5)
   {
@@ -249,6 +262,12 @@ class Qc_model extends CI_Model
 
 
 
+  public function update_qty($id, $qty)
+  {
+    return $this->db->set("qty", "qty + {$qty}", FALSE)->where('id', $id)->update('qc');
+  }
+
+
   public function drop_zero_qc($order_code)
   {
     return $this->db->where('order_code', $order_code)->where('qty <=', 0)->delete('qc');
@@ -287,6 +306,28 @@ class Qc_model extends CI_Model
   }
 
 
+
+  public function get_checked_table($order_code, $product_code)
+  {
+    $this->db
+    ->select('qc.*')
+    ->select('qc_box.code AS barcode, qc_box.box_no')
+    ->from('qc')
+    ->join('qc_box', 'qc.box_id = qc_box.id', 'left')
+    ->where('qc.order_code', $order_code)
+    ->where('qc.product_code',$product_code)
+    ->order_by('qc_box.box_no');
+
+    $rs = $this->db->get();
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
   public function count_box($code)
   {
     $rs = $this->db->select('box_id')
@@ -295,6 +336,12 @@ class Qc_model extends CI_Model
     ->get('qc');
 
     return intval($rs->num_rows());
+  }
+
+
+  public function delete_qc($id)
+  {
+    return $this->db->where('id', $id)->delete('qc');
   }
 
 

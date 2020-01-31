@@ -266,6 +266,8 @@ class Receive_po_model extends CI_Model
       $this->db->where('date_add <=', to_date($ds['to_date']));
     }
 
+    $this->db->order_by('date_add', 'DESC');
+
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;

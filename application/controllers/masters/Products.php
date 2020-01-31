@@ -1014,6 +1014,44 @@ class Products extends PS_Controller
 
 
 
+  public function export_barcode($code, $token)
+  {
+    $products = $this->products_model->get_style_items($code);
+
+    //--- load excel library
+    $this->load->library('excel');
+
+    $this->excel->setActiveSheetIndex(0);
+    $this->excel->getActiveSheet()->setTitle('Stock Balance Report');
+
+    //--- set report title header
+    $this->excel->getActiveSheet()->setCellValue('A1', 'Barcode');
+    $this->excel->getActiveSheet()->setCellValue('B1', 'Item Code');
+
+
+    $row = 2;
+    if(!empty($products))
+    {
+      foreach($products as $rs)
+      {
+        $this->excel->getActiveSheet()->setCellValue('A'.$row, $rs->barcode);
+        $this->excel->getActiveSheet()->setCellValue('B'.$row, $rs->code);
+        $row++;
+      }
+
+      $this->excel->getActiveSheet()->getStyle('A2:A'.$row)->getNumberFormat()->setFormatCode('0');
+    }
+
+    setToken($token);
+
+    $file_name = "{$code}_barcode.xlsx";
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
+    header('Content-Disposition: attachment;filename="'.$file_name.'"');
+    $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
+    $writer->save('php://output');
+
+  }
+
 
   public function clear_filter()
 	{

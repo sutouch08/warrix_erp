@@ -6,7 +6,8 @@ function ean_checkdigit($code){
   for($i=(strlen($code)-1);$i>=0;$i--){
     $sum += (($i % 2) * 2 + 1 ) * $code[$i];
   }
-  return (10 - ($sum % 10));
+  $rs = (10 - ($sum % 10));
+  return $rs == 10 ? 0 : $rs;
 }
 
 function generateEAN($ean){

@@ -275,3 +275,10 @@ function deleteItem(item){
     })
   })
 }
+
+function downloadBarcode(code)
+{
+	var token	= new Date().getTime();
+	get_download(token);
+	window.location.href = BASE_URL + 'masters/products/export_barcode/'+code+'/'+token;
+}

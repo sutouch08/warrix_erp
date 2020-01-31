@@ -192,22 +192,8 @@ class Zone extends PS_Controller
 
   public function syncData()
   {
-    $count = $this->zone_model->count_rows();
-    if($count > 0 )
-    {
-      $last_add = $this->zone_model->get_last_create_date();
-      $last_upd = $this->zone_model->get_last_update_date();
-
-      $last_add = empty($last_add) ? now() : $last_add;
-      $last_upd = empty($last_upd) ? now() : $last_upd;
-
-      $newData = $this->zone_model->get_new_data($last_add, $last_upd);
-    }
-    else
-    {
-      $last_add = date('1970-01-01 00:00:00');
-      $newData = $this->zone_model->get_all_zone();
-    }
+    $last_sync = $this->zone_model->get_last_sync_date();
+    $newData = $this->zone_model->get_new_data($last_sync);
 
     if(!empty($newData))
     {
@@ -219,7 +205,7 @@ class Zone extends PS_Controller
             'code' => $rs->code,
             'name' => is_null($rs->name) ? '' : $rs->name,
             'old_code' => $rs->old_code,
-            'sap_updateDate' => $rs->updateDate,
+            'last_sync' => date('Y-m-d H:i:s'),
           );
 
           $this->zone_model->update($rs->id, $ds);
@@ -231,8 +217,7 @@ class Zone extends PS_Controller
             'code' => $rs->code,
             'name' => is_null($rs->name) ? '' : $rs->name,
             'warehouse_code' => $rs->warehouse_code,
-            'sap_createDate' => $rs->createDate,
-            'sap_updateDate' => $rs->updateDate,
+            'last_sync' => date('Y-m-d H:i:s'),
             'old_code' => $rs->old_code
           );
 

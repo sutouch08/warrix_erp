@@ -24,7 +24,7 @@
         <td class="middle text-center" id="qc-<?php echo $rs->id; ?>"><?php echo number($rs->qc); ?></td>
         <td class="middle text-right">
           <?php if(($rs->qc > $rs->prepared OR $rs->qc > $rs->order_qty) && $this->pm->can_delete) : ?>
-            <button type="button" class="btn btn-xs btn-warning" onclick="showEditOption('<?php echo $order->code; ?>', '<?php echo $rs->id; ?>', '<?php echo $rs->product_code; ?>')">
+            <button type="button" class="btn btn-xs btn-warning must-edit" onclick="showEditOption('<?php echo $order->code; ?>', '<?php echo $rs->product_code; ?>')">
               <i class="fa fa-pencil"></i> แก้ไข
             </button>
           <?php endif; ?>

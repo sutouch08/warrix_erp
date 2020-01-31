@@ -2,7 +2,22 @@
 function closeOrder(){
   var order_code = $("#order_code").val();
 
+  //--- รายการที่ต้องแก้ไข
+  var must_edit = $('.must-edit').length;
+
   var notsave = 0;
+
+  //-- ตรวจสอบว่ามีรายการที่ต้องแก้ไขให้ถูกต้องหรือเปล่า
+  if(must_edit > 0){
+    swal({
+      title:'ข้อผิดพลาด',
+      text:'พบรายการที่ต้องแก้ไข กรุณาแก้ไขให้ถูกต้อง',
+      type:'error'
+    });
+
+    return false;
+  }
+
   //--- ตรวจสอบก่อนว่ามีรายการที่ยังไม่บันทึกค้างอยู่หรือไม่
   $(".hidden-qc").each(function(index, element){
     if( $(this).val() > 0){
@@ -370,12 +385,13 @@ function updateQty(id_qc){
   if(limit >= remove_qty){
     load_in();
     $.ajax({
-      url:'controller/qcController.php?decreaseCheckedQty',
+      url:HOME + 'remove_check_qty',
+      //url:'controller/qcController.php?decreaseCheckedQty',
       type:'POST',
       cache:'false',
       data:{
-        'id_qc' : id_qc,
-        'remove_qty' : remove_qty
+        'id' : id_qc,
+        'qty' : remove_qty
       },
       success:function(rs){
         load_out();
@@ -392,11 +408,12 @@ function updateQty(id_qc){
 
 
 
-function showEditOption(order_code, product_code, pdCode){
-  $('#edit-title').text(pdCode);
+function showEditOption(order_code, product_code){
+  $('#edit-title').text(product_code);
   load_in();
   $.ajax({
-    url:'controller/qcController.php?getCheckedTable',
+    url:HOME + 'get_checked_table',
+    //url:'controller/qcController.php?getCheckedTable',
     type:'GET',
     cache:'false',
     data:{

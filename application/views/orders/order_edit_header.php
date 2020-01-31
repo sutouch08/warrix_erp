@@ -47,11 +47,18 @@
 		  <input type="text" class="form-control input-sm text-center edit" name="shipping_code" id="shipping_code" value="<?php //echo $order->shipping_code; ?>" disabled />
 		</div>
 	-->
+	<?php if($order->state < 4) : ?>
 		<div class="col-sm-7 col-xs-12 padding-5">
 		 	<label>หมายเหตุ</label>
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
 		</div>
-		<?php if($this->pm->can_add OR $this->pm->can_edit): ?>
+	<?php else : ?>
+		<div class="col-sm-8 col-xs-12 padding-5 last">
+		 	<label>หมายเหตุ</label>
+		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
+		</div>
+	<?php endif; ?>
+		<?php if($order->state < 4 && ($this->pm->can_add OR $this->pm->can_edit)): ?>
 		<div class="col-sm-1 col-xs-12 padding-5 last">
 			<label class="display-block not-show">แก้ไข</label>
 			<button type="button" class="btn btn-xs btn-warning btn-block" id="btn-edit" onclick="getEdit()"><i class="fa fa-pencil"></i> แก้ไข</i></button>

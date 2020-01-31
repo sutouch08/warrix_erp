@@ -543,7 +543,8 @@ class Customers extends PS_Controller
 
   public function syncData()
   {
-    $ds = $this->customers_model->get_update_data();
+    $last_sync = $this->customers_model->get_last_sync_date();
+    $ds = $this->customers_model->get_update_data($last_sync);
     if(!empty($ds))
     {
       foreach($ds as $rs)

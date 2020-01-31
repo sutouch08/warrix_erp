@@ -361,7 +361,7 @@ class Customers_model extends CI_Model
   }
 
 
-  public function get_update_data($date = "")
+  public function get_update_data($last_sync)
   {
     $rs = $this->ms
     ->select("CardCode AS code")
@@ -374,8 +374,8 @@ class Customers_model extends CI_Model
     ->select("U_WRX_BPOLDCODE AS old_code")
     ->where('CardType', 'C')
     ->group_start()
-    ->where("UpdateDate >=", sap_date($date))
-    ->or_where('CreateDate >=', sap_date($date))
+    ->where("UpdateDate >=", sap_date($last_sync))
+    ->or_where('CreateDate >=', sap_date($last_sync))
     ->group_end()
     ->get('OCRD');
 
@@ -471,6 +471,18 @@ class Customers_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function get_last_sync_date()
+  {
+    $rs = $this->db->select_max('last_sync')->get('customers');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : $rs->row()->last_sync;
+    }
+
+    return date('2019-01-01 00:00:00');
   }
 
 }

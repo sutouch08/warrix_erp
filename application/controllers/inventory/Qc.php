@@ -329,6 +329,73 @@ class Qc extends PS_Controller
 
 
 
+  public function get_checked_table()
+  {
+    $sc = TRUE;
+    $code = $this->input->get('order_code');
+    $item_code = $this->input->get('product_code');
+    $list = $this->qc_model->get_checked_table($code, $item_code);
+    if(!empty($list))
+    {
+      $ds = array();
+      foreach($list as $rs)
+      {
+        $arr = array(
+          'id_qc' => $rs->id,
+          'barcode' => $rs->barcode,
+          'box_no' => $rs->box_no,
+          'qty' => $rs->qty
+        );
+
+        array_push($ds, $arr);
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรายการตรวจสินค้า";
+    }
+
+    echo $sc === TRUE ? json_encode($ds) : $this->error;
+  }
+
+
+
+  public function remove_check_qty()
+  {
+    $sc = TRUE;
+    $id = $this->input->post('id'); //--- id qc
+    $qty = $this->input->post('qty'); //--- remove qty
+
+    $qc = $this->qc_model->get($id);
+    if(!empty($qc))
+    {
+      if($qty == $qc->qty)
+      {
+        if(! $this->qc_model->delete_qc($id))
+        {
+          $sc = FALSE;
+          $this->error = "ลบรายการไม่สำเร็จ";
+        }
+      }
+      else
+      {
+        if(! $this->qc_model->update_qty($id, (-1) * $qty))
+        {
+          $sc = FALSE;
+          $this->error = "ปรับปรุงยอดตรวจนับไม่สำเร็จ";
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรายการตรวจนับ";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
   public function print_box($code, $box_id)
   {
     $this->load->library('printer');
