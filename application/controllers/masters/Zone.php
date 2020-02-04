@@ -59,8 +59,15 @@ class Zone extends PS_Controller
   {
     if($this->pm->can_edit)
     {
-      $ds['ds'] = $this->zone_model->get($code);
+      $zone = $this->zone_model->get($code);
+      $ds['ds'] = $zone;
       $ds['customers'] = $this->zone_model->get_customers($code);
+      $ds['employees'] = NULL;
+      if($zone->role == 8)
+      {
+        $ds['employees'] = $this->zone_model->get_employee($code);
+      }
+
       $this->load->view('masters/zone/zone_edit', $ds);
     }
     else
@@ -175,6 +182,98 @@ class Zone extends PS_Controller
     if($this->pm->can_edit)
     {
       if( ! $this->zone_model->delete_customer($id))
+      {
+        $sc = FALSE;
+        $this->error = "ลบรายการไม่สำเร็จ";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "คุณไม่มีสิทธิ์ลบข้อมูล";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
+  public function add_employee()
+  {
+    $sc = TRUE;
+    if($this->pm->can_edit)
+    {
+      if($this->input->post('zone_code') && $this->input->post('empID'))
+      {
+        $this->load->model('masters/employee_model');
+        $code = $this->input->post('zone_code');
+        $empName = $this->input->post('empName');
+        $empID = $this->input->post('empID');
+        $emp = $this->employee_model->get($empID);
+        $zone = $this->zone_model->get($code);
+
+        if($zone->role != 8)
+        {
+          $sc = FALSE;
+          $this->error = "โซนนี้ไม่อยู่ในประเภทคลังยืมสินค้า";
+        }
+
+        if($sc === TRUE)
+        {
+          if(!empty($emp))
+          {
+            if($this->zone_model->is_exists_employee($code, $empID))
+            {
+              $sc = FALSE;
+              $this->error = "มีพนักงานนี้ในโซนอยู่แล้ว";
+            }
+            else
+            {
+              $arr = array(
+                'zone_code' => $code,
+                'empID' => $empID,
+                'empName' => $empName
+              );
+
+              if( ! $this->zone_model->add_employee($arr))
+              {
+                $sc = FALSE;
+                $this->error = "เพิ่มพนักงานไม่สำเร็จ";
+              }
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "ชื่อพนักงานไม่ถูกต้อง";
+          }
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบข้อมูล";
+      }
+
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "คุณไม่มีสิทธิ์ในการเพิ่มข้อมูล";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
+  public function delete_employee($id)
+  {
+    $sc = TRUE;
+
+    if($this->pm->can_edit)
+    {
+      if( ! $this->zone_model->delete_employee($id))
       {
         $sc = FALSE;
         $this->error = "ลบรายการไม่สำเร็จ";

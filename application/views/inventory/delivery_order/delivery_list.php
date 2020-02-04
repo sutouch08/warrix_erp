@@ -20,12 +20,12 @@
   </div>
 
   <div class="col-sm-1 col-1-harf padding-5">
-    <label>ลูกค้า</label>
+    <label>ลูกค้า/ผู้เบิก</label>
     <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
   </div>
 
 	<div class="col-sm-1 col-1-harf padding-5">
-    <label>พนักงาน</label>
+    <label>พนักงาน/ผู้สั่งงาน</label>
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
@@ -100,7 +100,11 @@
           </td>
 
           <td class="pointer hide-text" onclick="goDetail('<?php echo $rs->code; ?>')">
-            <?php echo $rs->customer_name; ?>
+						<?php if($rs->role == 'L' OR $rs->role == 'U' OR $rs->role == 'R') : ?>
+							<?php echo $rs->empName; ?>
+						<?php else: ?>
+            	<?php echo $rs->customer_name; ?>
+						<?php endif; ?>
           </td>
 
           <td class="pointer text-center" onclick="goDetail('<?php echo $rs->code; ?>')">

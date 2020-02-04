@@ -370,6 +370,11 @@ class Orders_model extends CI_Model
       $this->db->like('orders.user_ref', $ds['user_ref']);
     }
 
+    if(!empty($ds['empName']))
+    {
+      $this->db->like('orders.emp_name', $ds['empName']);
+    }
+
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
@@ -456,6 +461,10 @@ class Orders_model extends CI_Model
       $this->db->like('orders.user_ref', $ds['user_ref']);
     }
 
+    if(!empty($ds['empName']))
+    {
+      $this->db->like('orders.emp_name', $ds['empName']);
+    }
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
@@ -636,6 +645,14 @@ class Orders_model extends CI_Model
     return $this->db->set('status', $status)->where('code', $code)->update('orders');
   }
 
+
+
+  public function update_approver($code, $user)
+  {
+    return $this->db->set('approver', $user)->where('code', $code)->update('orders');
+  }
+
+  
 
   public function clear_order_detail($code)
   {

@@ -59,8 +59,29 @@ $("#toDate").datepicker({
 });
 
 
+function approve()
+{
+  var order_code = $('#order_code').val();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/do_approve/'+order_code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      if(rs === 'success'){
+        change_state();
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
 
-function approve(){
+
+function change_state(){
   var order_code = $('#order_code').val();
   load_in();
   $.ajax({

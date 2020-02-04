@@ -20,7 +20,16 @@
   </div>
   <?php else : ?>
     <div class="col-sm-6 padding-5">
-      <label class="font-size-14 blod">ลูกค้า : <?php echo empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?></label>
+      <label class="font-size-14 blod">
+        <?php if($order->role == 'L' OR $order->role == 'U' OR $order->role == 'R') : ?>
+          ผู้เบิก : <?php echo $order->empName; ?>
+          <?php if(!empty($order->user_ref)) : ?>
+            &nbsp;&nbsp;[ผู้สั่งงาน : <?php echo $order->user_ref; ?>]
+          <?php endif; ?>
+        <?php else: ?>
+        ลูกค้า : <?php echo empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?>
+      <?php endif; ?>
+      </label>
     </div>
   <?php endif; ?>
 

@@ -14,7 +14,6 @@ class Lend extends PS_Controller
     $this->home = base_url().'inventory/lend';
     $this->load->model('orders/orders_model');
     $this->load->model('inventory/lend_model');
-    $this->load->model('masters/customers_model');
     $this->load->model('orders/order_state_model');
     $this->load->model('masters/product_tab_model');
     $this->load->model('stock/stock_model');
@@ -27,18 +26,19 @@ class Lend extends PS_Controller
     $this->load->helper('users');
     $this->load->helper('state');
     $this->load->helper('product_images');
+    $this->load->helper('warehouse');
   }
 
 
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'customer'  => get_filter('customer', 'customer', ''),
-      'user'      => get_filter('user', 'user', ''),
-      'user_ref'  => get_filter('user_ref', 'user_ref', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date'   => get_filter('toDate', 'toDate', '')
+      'code'      => get_filter('code', 'lens_code', ''),
+      'empName'  => get_filter('empName', 'lend_emp', ''),
+      'user'      => get_filter('user', 'lend_user', ''),
+      'user_ref'  => get_filter('user_ref', 'lend_user_ref', ''),
+      'from_date' => get_filter('fromDate', 'lend_fromDate', ''),
+      'to_date'   => get_filter('toDate', 'lend_toDate', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -60,7 +60,6 @@ class Lend extends PS_Controller
     {
       foreach($orders as $rs)
       {
-        $rs->customer_name = $this->customers_model->get_name($rs->customer_code);
         $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
         $rs->state_name    = get_state_name($rs->state);
         $ds[] = $rs;
@@ -83,11 +82,11 @@ class Lend extends PS_Controller
 
   public function add()
   {
-    if($this->input->post('customerCode'))
+    if($this->input->post('empID'))
     {
       $book_code = getConfig('BOOK_CODE_LEND');
       $date_add = db_date($this->input->post('date'));
-      
+
       if($this->input->post('code'))
       {
         $code = $this->input->post('code');
@@ -102,15 +101,18 @@ class Lend extends PS_Controller
       $zone = $this->zone_model->get($this->input->post('zone_code'));
 
       $ds = array(
+        'date_add' => $date_add,
         'code' => $code,
         'role' => $role,
         'bookcode' => $book_code,
-        'customer_code' => $this->input->post('customerCode'),
+        'customer_code' => NULL,
         'user' => get_cookie('uname'),
+        'user_ref' => $this->input->post('user_ref'),
         'remark' => $this->input->post('remark'),
-        'user_ref' => $this->input->post('empName'),
-        'zone_code' => $zone->code,
-        'warehouse' => $zone->warehouse_code
+        'empID' => $this->input->post('empID'),
+        'empName' => $this->input->post('empName'),
+        'zone_code' => $zone->code, //---- zone ที่จะโอนสินค้าไปเก็บ
+        'warehouse_code' => $this->input->post('warehouse') //--- คลังที่จะจัดสินค้าออก
       );
 
       if($this->orders_model->add($ds) === TRUE)
@@ -146,7 +148,6 @@ class Lend extends PS_Controller
     $rs = $this->orders_model->get($code);
     if(!empty($rs))
     {
-      $rs->customer_name = $this->customers_model->get_name($rs->customer_code);
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
@@ -180,7 +181,8 @@ class Lend extends PS_Controller
     {
       $code = $this->input->post('order_code');
       $ds = array(
-        'customer_code' => $this->input->post('customer_code'),
+        'empID' => $this->input->post('empID'),
+        'empName' => $this->input->post('empName'),
         'date_add' => db_date($this->input->post('date_add')),
         'user_ref' => $this->input->post('user_ref'),
         'zone_code' => $this->input->post('zone_code'),
@@ -214,7 +216,6 @@ class Lend extends PS_Controller
     $rs = $this->orders_model->get($code);
     if($rs->state <= 3)
     {
-      $rs->customer_name = $this->customers_model->get_name($rs->customer_code);
       $rs->zone_name = $this->zone_model->get_name($rs->zone_code);
       $details = $this->orders_model->get_order_details($code);
       $ds['order'] = $rs;
@@ -288,12 +289,12 @@ class Lend extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'code',
-      'customer',
-      'user',
-      'user_ref',
-      'fromDate',
-      'toDate'
+      'lend_code',
+      'lend_emp',
+      'lend_user',
+      'lend_user_ref',
+      'lend_fromDate',
+      'lend_toDate'
     );
 
     clear_filter($filter);

@@ -43,10 +43,30 @@ class Zone_model extends CI_Model
 
 
 
+  //--- add new customer to zone
+  public function add_employee(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->db->insert('zone_employee', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
   //--- remove customer from connected zone
   public function delete_customer($id)
   {
     return $this->db->where('id', $id)->delete('zone_customer');
+  }
+
+
+  //--- remove customer from connected zone
+  public function delete_employee($id)
+  {
+    return $this->db->where('id', $id)->delete('zone_employee');
   }
 
 
@@ -87,6 +107,23 @@ class Zone_model extends CI_Model
     ->where('zone_code', $zone_code)
     ->where('customer_code', $customer_code)
     ->count_all_results('zone_customer');
+
+    if($rs > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  //--- check customer exists in zone or not
+  public function is_exists_employee($zone_code, $empID)
+  {
+    $rs = $this->db
+    ->where('zone_code', $zone_code)
+    ->where('empID', $empID)
+    ->count_all_results('zone_employee');
 
     if($rs > 0)
     {
@@ -288,21 +325,30 @@ class Zone_model extends CI_Model
 
 
 
+  public function get_employee($zone_code)
+  {
+
+    $rs = $this->db->where('zone_code', $zone_code)->get('zone_employee');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
 
   public function get($code)
   {
-    // $rs = $this->ms
-    // ->select('OBIN.BinCode AS code, OBIN.Descr AS name, OWHS.WhsCode AS warehouse_code, OWHS.WhsName AS warehouse_name')
-    // ->from('OBIN')
-    // ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    // ->where('OBIN.BinCode', $code)
-    // ->get();
-
     $rs = $this->db
     ->select('zone.code, zone.name, zone.warehouse_code')
-    ->select('warehouse.name AS warehouse_name')
+    ->select('warehouse.name AS warehouse_name, warehouse.role, warehouse_role.name AS role_name')
     ->from('zone')
     ->join('warehouse', 'zone.warehouse_code = warehouse.code', 'left')
+    ->join('warehouse_role', 'warehouse.role = warehouse_role.id', 'left')
     ->where('zone.code', $code)
     ->get();
 
@@ -338,7 +384,6 @@ class Zone_model extends CI_Model
 
   public function get_name($code)
   {
-    //$rs = $this->ms->select('Descr AS name')->where('BinCode', $code)->get('OBIN');
     $rs = $this->db->select('name')->where('code', $code)->get('zone');
     if($rs->num_rows() === 1)
     {
@@ -352,12 +397,6 @@ class Zone_model extends CI_Model
 
   public function get_zone_detail_in_warehouse($code, $warehouse)
   {
-    // $rs = $this->ms
-    // ->select('BinCode AS code, SL1Code AS name, WhsCode AS warehouse_code')
-    // ->where('WhsCode', $warehouse)
-    // ->where('BinCode', $code)
-    // ->get('OBIN');
-
     $rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
     if($rs->num_rows() === 1)
     {

@@ -117,6 +117,7 @@ class Sponsor extends PS_Controller
       $role = 'P'; //--- P = Sponsor
 
       $ds = array(
+        'date_add' => $date_add,
         'code' => $code,
         'role' => $role,
         'bookcode' => $book_code,

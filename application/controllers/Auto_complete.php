@@ -356,19 +356,19 @@ public function get_style_code()
 
 
 
-  public function get_lend_zone($customer_code = '')
+  public function get_lend_zone($empID)
   {
     $sc = array();
-    if(!empty($customer_code))
+    if(!empty($empID))
     {
       $txt = $_REQUEST['term'];
       $this->db
       ->select('zone.code AS code, zone.name AS name')
       ->from('zone')
       ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left')
-      ->join('zone_customer', 'zone_customer.zone_code = zone.code')
+      ->join('zone_employee', 'zone_employee.zone_code = zone.code')
       ->where('warehouse.role', 8) //--- 8 =  คลังยืมสินค้า ดู table warehouse_role
-      ->where('zone_customer.customer_code', $customer_code);
+      ->where('zone_employee.empID', $empID);
 
       if($txt != '*')
       {

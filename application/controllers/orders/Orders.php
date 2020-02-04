@@ -141,6 +141,7 @@ class Orders extends PS_Controller
       else
       {
         $ds = array(
+          'date_add' => $date_add,
           'code' => $code,
           'role' => $role,
           'bookcode' => $book_code,
@@ -1431,6 +1432,21 @@ class Orders extends PS_Controller
   }
 
 
+  public function do_approve($code)
+  {
+    $sc = TRUE;
+    $user = get_cookie('uname');
+    $rs = $this->orders_model->update_approver($code, $user);
+    if(! $rs)
+    {
+      $sc = FALSE;
+      $this->error = "อนุมัติไม่สำเร็จ";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+  
 
   public function order_state_change()
   {

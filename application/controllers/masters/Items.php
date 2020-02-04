@@ -399,7 +399,8 @@ class Items extends PS_Controller
   public function do_export($code)
   {
     $item = $this->products_model->get($code);
-    $exst = $this->products_model->sap_item_exists($item->code);
+    $exst = $this->products_model->is_sap_exists($item->code);
+    $middle = $this->products_model->is_middle_exists($item->code);
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
       'ItemName' => $item->name, //--- ชื่อสินค้า
@@ -434,7 +435,7 @@ class Items extends PS_Controller
       'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 
-    if($exst)
+    if($middle)
     {
       return $this->products_model->update_item($item->code, $ds);
     }

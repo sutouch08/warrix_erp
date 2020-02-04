@@ -9,13 +9,25 @@ class Receive_transform_model extends CI_Model
 
   public function get_sap_receive_transform($code)
   {
-    $rs = $this->mc
+    $rs = $this->ms
     ->select('CANCELED, DocStatus')
     ->where('U_ECOMNO', $code)
     ->get('OIGN');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function is_middle_exists($code)
+  {
+    $rs = $this->mc->select('U_ECOMNO')->where('U_ECOMNO', $code)->get('OIGN');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
     }
 
     return FALSE;

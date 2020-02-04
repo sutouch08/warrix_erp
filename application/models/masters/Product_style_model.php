@@ -327,7 +327,7 @@ class Product_style_model extends CI_Model
 
 
 
-  public function is_sap_exists($code)
+  public function is_middle_exists($code)
   {
     $rs = $this->mc->select('Code')->where('Code', $code)->get('MODEL');
     if($rs->num_rows() === 1)
@@ -337,6 +337,18 @@ class Product_style_model extends CI_Model
     return FALSE;
   }
 
+
+  public function is_sap_exists($code)
+  {
+    $rs = $this->ms->select('Code')->where('Code', $code)->get('MODEL');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+  
 
   public function add_sap_model(array $ds = array())
   {

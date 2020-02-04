@@ -54,20 +54,14 @@ $("#empName").autocomplete({
 
 
 
-$('#customer').focusout(function(){
-  var code = $(this).val();
-  if(code.length == 0)
-  {
-    $('#customerCode').val('');
-    zoneInit();
-  }
-});
 
 
 function zoneInit(){
   let empID = $('#empID').val();
-  $('#zone_code').val('');
-  $('#zone').val('');
+  if(empID == ""){
+    $('#zone_code').val('');
+    $('#zone').val('');
+  }
 
   $('#zone').autocomplete({
     source:BASE_URL + 'auto_complete/get_lend_zone/'+empID,
@@ -107,28 +101,45 @@ function add(){
 
 
 function addOrder(){
-  var customer_code = $('#customerCode').val();
-  var customer_name = $('#customer').val();
-  var date_add = $('#date').val();
+  var empID = $('#empID').val();
   var empName = $('#empName').val();
-
-  if(customer_code.length == 0 || customer_name.length == 0){
-    swal('ชื่อผู้รับไม่ถูกต้อง');
-    return false;
-  }
+  var date_add = $('#date').val();
+  var zone_code = $('#zone_code').val();
+  var zone_name = $('#zone').val();
+  var warehouse = $('#warehouse').val();
+  var user_ref = $('#user_ref').val();
 
   if(!isDate(date_add))
   {
     swal('วันที่ไม่ถูกต้อง');
-    console.log('date error');
     return false;
   }
+
+
+  if(empID == "" || empName.length == 0){
+    swal('ชื่อผู้รับไม่ถูกต้อง');
+    return false;
+  }
+
+  if(zone_code.length == 0 || zone_name.length == 0)
+  {
+    swal("โซนไม่ถูกต้อง");
+    return false;
+  }
+
 
   if(empName.length == 0)
   {
     swal('ชื่อผู้เบิกไม่ถูกต้อง');
     return false;
   }
+
+
+  if(warehouse == ""){
+    swal('กรุณาระบุคลัง');
+    return false;
+  }
+
 
   $('#addForm').submit();
 }
@@ -188,10 +199,6 @@ function getEdit(){
   $('.edit').removeAttr('disabled');
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
-  customer = $("#customerCode").val();
-	channels = $("#channels").val();
-	payment  = $("#payment").val();
-	date = $("#date").val();
 }
 
 
@@ -336,8 +343,8 @@ function countInput(){
 
 function validUpdate(){
 	var date_add = $("#date").val();
-	var customer_code = $("#customerCode").val();
-  var customer_name = $('#customer').val();
+	var empID = $("#empID").val();
+  var empName = $('#empName').val();
 	var user_ref = $("#user_ref").val();
   var zone_code = $('#zone_code').val();
   var zone_name = $('#zone').val();
@@ -349,8 +356,8 @@ function validUpdate(){
 	}
 
 	//--- ตรวจสอบลูกค้า
-	if( customer_code.length == 0 || customer_name == "" ){
-		swal("ชื่อลูกค้าไม่ถูกต้อง");
+	if( empName.length == 0 || empID == "" ){
+		swal("ชื่อผู้เบิกไม่ถูกต้อง");
 		return false;
 	}
 
@@ -375,8 +382,8 @@ function validUpdate(){
 function updateOrder(){
 	var order_code = $("#order_code").val();
 	var date_add = $("#date").val();
-	var customer_code = $("#customerCode").val();
-  var customer_name = $("#customer").val();
+	var empID = $("#empID").val();
+  var empName = $("#empName").val();
 	var user_ref = $('#user_ref').val();
 	var remark = $("#remark").val();
   var zone_code = $('#zone_code').val();
@@ -390,7 +397,8 @@ function updateOrder(){
 		data:{
       "order_code" : order_code,
   		"date_add"	: date_add,
-  		"customer_code" : customer_code,
+  		"empID" : empID,
+      "empName" : empName,
       "user_ref" : user_ref,
   		"remark" : remark,
       "zone_code" : zone_code

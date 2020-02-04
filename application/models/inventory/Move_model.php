@@ -10,10 +10,22 @@ class Move_model extends CI_Model
 
   public function get_sap_move_doc($code)
   {
-    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    $rs = $this->ms->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  public function is_temp_exists($code)
+  {
+    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
     }
 
     return FALSE;

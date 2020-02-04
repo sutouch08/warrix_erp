@@ -37,16 +37,29 @@
   </div>
 
   <div class="col-sm-3 padding-5">
-    <label>ผู้ยืม[พนักงาน]</label>
+    <label>ผู้ยืม</label>
     <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
 
-	<div class="col-sm-3 padding-5">
-    <label>โซน[คลังยืม]</label>
+	<div class="col-sm-4 padding-5">
+    <label>พื้นที่จัดเก็บ[คลังยืม]</label>
 		<input type="text" class="form-control input-sm" name="zone" id="zone" value="" />
   </div>
 
-  <div class="col-sm-11 padding-5 first">
+	<div class="col-sm-2 padding-5 last">
+		<label>ผู้รับ[คนสั่งงาน]</label>
+		<input type="text" class="form-control input-sm" name="user_ref" id="user_ref" value="" />
+	</div>
+
+	<div class="col-sm-2 col-xs-12 padding-5 first">
+		<label>คลัง</label>
+    <select class="form-control input-sm" name="warehouse" id="warehouse" required>
+			<option value="">เลือกคลัง</option>
+			<?php echo select_sell_warehouse(); ?>
+		</select>
+  </div>
+
+  <div class="col-sm-9 padding-5">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="">
   </div>

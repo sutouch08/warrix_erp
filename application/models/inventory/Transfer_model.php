@@ -10,7 +10,7 @@ class Transfer_model extends CI_Model
 
   public function get_sap_transfer_doc($code)
   {
-    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    $rs = $this->ms->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -19,6 +19,17 @@ class Transfer_model extends CI_Model
     return FALSE;
   }
 
+
+  public function is_middle_exists($code)
+  {
+    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
 
 
   public function add_sap_transfer_doc(array $ds = array())

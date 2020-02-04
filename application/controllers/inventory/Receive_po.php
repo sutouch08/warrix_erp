@@ -264,6 +264,7 @@ class Receive_po extends PS_Controller
     $this->load->model('masters/products_model');
     $doc = $this->receive_po_model->get($code);
     $sap = $this->receive_po_model->get_sap_receive_doc($code);
+    $middle = $this->receive_po_model->is_middle_exists($code);
 
     if(!empty($doc))
     {
@@ -302,7 +303,7 @@ class Receive_po extends PS_Controller
 
           $this->mc->trans_start();
 
-          if(!empty($sap))
+          if(!empty($middle))
           {
             $sc = $this->receive_po_model->update_sap_receive_po($code, $ds);
           }
@@ -313,7 +314,7 @@ class Receive_po extends PS_Controller
 
           if($sc)
           {
-            if(!empty($sap))
+            if(!empty($middle))
             {
               $this->receive_po_model->drop_sap_exists_details($code);
             }

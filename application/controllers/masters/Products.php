@@ -42,15 +42,15 @@ class Products extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'name'      => get_filter('name', 'name', ''),
-      'group'     => get_filter('group', 'group', ''),
-      'sub_group' => get_filter('sub_group', 'sub_group', ''),
-      'category'  => get_filter('category', 'category', ''),
-      'kind'      => get_filter('kind', 'kind', ''),
-      'type'      => get_filter('type', 'type', ''),
-      'brand'     => get_filter('brand', 'brand', ''),
-      'year'      => get_filter('year', 'year', '')
+      'code'      => get_filter('code', 'pd_code', ''),
+      'name'      => get_filter('name', 'pd_name', ''),
+      'group'     => get_filter('group', 'pd_group', ''),
+      'sub_group' => get_filter('sub_group', 'pd_sub_group', ''),
+      'category'  => get_filter('category', 'pd_category', ''),
+      'kind'      => get_filter('kind', 'pd_kind', ''),
+      'type'      => get_filter('type', 'pd_type', ''),
+      'brand'     => get_filter('brand', 'pd_brand', ''),
+      'year'      => get_filter('year', 'pd_year', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -189,15 +189,17 @@ class Products extends PS_Controller
     $style = $this->product_style_model->get($style_code);
     if(!empty($style))
     {
-      $ex = $this->product_style_model->is_sap_exists($style_code);
+      $ext = $this->product_style_model->is_sap_exists($style_code);
+      $exs = $this->product_style_model->is_middle_exists($style_code);
+      $flag = $ext === TRUE ? 'U' : 'A';
       $arr = array(
         'Code' => $style->code,
         'Name' => $style->name,
         'UpdateDate' => sap_date(now(), TRUE),
-        'Flag' => $ex === TRUE ? 'U' : 'A'
+        'Flag' => $flag
       );
 
-      if($ex)
+      if($exs)
       {
         return $this->product_style_model->update_sap_model($style->code, $arr);
       }
@@ -938,7 +940,12 @@ class Products extends PS_Controller
   public function do_export($code)
   {
     $item = $this->products_model->get($code);
-    $exst = $this->products_model->sap_item_exists($item->code);
+    //--- เช็คข้อมูลในฐานข้อมูลจริง
+    $exst = $this->products_model->is_sap_exists($item->code);
+
+    //--- เช็คข้อมูลในถังกลาง
+    $middle = $this->products_model->is_middle_exists($item->code);
+
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
       'ItemName' => $item->name, //--- ชื่อสินค้า
@@ -973,7 +980,7 @@ class Products extends PS_Controller
       'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 
-    if($exst)
+    if($middle)
     {
       return $this->products_model->update_item($item->code, $ds);
     }
@@ -1055,7 +1062,7 @@ class Products extends PS_Controller
 
   public function clear_filter()
 	{
-    $filter = array('code','name','group','sub_group','category','kind','type','brand','year');
+    $filter = array('pd_code','pd_name','pd_group','pd_sub_group','pd_category','pd_kind','pd_type','pd_brand','pd_year');
     clear_filter($filter);
 	}
 }

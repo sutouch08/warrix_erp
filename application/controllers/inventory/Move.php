@@ -825,6 +825,7 @@ class Move extends PS_Controller
   {
     $doc = $this->move_model->get($code);
     $tr = $this->move_model->get_sap_move_doc($code);
+    $temp = $this->move_model->is_temp_exists($code);
     if(!empty($doc))
     {
       if(empty($tr) OR $tr->DocStatus == 'O')
@@ -863,7 +864,7 @@ class Move extends PS_Controller
 
           $this->mc->trans_start();
 
-          if(!empty($tr))
+          if(!empty($temp))
           {
             $sc = $this->move_model->update_sap_move_doc($code, $ds);
           }
@@ -874,7 +875,7 @@ class Move extends PS_Controller
 
           if($sc)
           {
-            if(!empty($tr))
+            if(!empty($temp))
             {
               $this->move_model->drop_sap_exists_details($code);
             }

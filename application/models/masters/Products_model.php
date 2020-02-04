@@ -46,9 +46,21 @@ class Products_model extends CI_Model
 
 
 
-  public function sap_item_exists($code)
+  public function is_middle_exists($code)
   {
     $rs = $this->mc->select('ItemCode')->where('ItemCode', $code)->get('OITM');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function is_sap_exists($code)
+  {
+    $rs = $this->ms->select('ItemCode')->where('ItemCode', $code)->get('OITM');
     if($rs->num_rows() === 1)
     {
       return TRUE;

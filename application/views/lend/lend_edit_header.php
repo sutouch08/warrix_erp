@@ -9,7 +9,7 @@
     </div>
     <div class="col-sm-3 padding-5">
     	<label>ผู้เบิก</label>
-			<input type="text" class="form-control input-sm edit" id="customer" name="customer" value="<?php echo $order->customer_name; ?>" required disabled />
+			<input type="text" class="form-control input-sm edit" id="empName" name="empName" value="<?php echo $order->empName; ?>" required disabled />
     </div>
 		<div class="col-sm-3 padding-5">
 	    <label>โซน[คลังยืม]</label>
@@ -36,7 +36,7 @@
 		</div>
 		<?php endif; ?>
     <input type="hidden" name="order_code" id="order_code" value="<?php echo $order->code; ?>" />
-    <input type="hidden" name="customerCode" id="customerCode" value="<?php echo $order->customer_code; ?>" />
+    <input type="hidden" name="empID" id="empID" value="<?php echo $order->empID; ?>" />
 		<input type="hidden" name="zone_code" id="zone_code" value="<?php echo $order->zone_code; ?>" />
 </div>
 <hr class="margin-bottom-15"/>

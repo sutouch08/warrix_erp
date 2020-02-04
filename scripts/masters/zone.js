@@ -23,6 +23,84 @@ function getEdit(code){
 }
 
 
+$("#empName").autocomplete({
+	source: BASE_URL + 'auto_complete/get_employee',
+	autoFocus: true,
+	close: function(){
+		var rs = $.trim($(this).val());
+		var arr = rs.split(' | ');
+		if( arr.length == 2 ){
+			var empName = arr[0];
+			var empID = arr[1];
+			$("#empName").val(empName);
+			$("#empID").val(empID);
+		}else{
+			$("#empID").val('');
+			$(this).val('');
+		}
+	}
+});
+
+
+$('#empName').keyup(function(e){
+  if(e.keyCode == 13){
+    addEmployee();
+  }
+});
+
+
+
+function addEmployee(){
+  let code = $('#zone_code').val();
+  let empName = $('#empName').val();
+  let empID = $('#empID').val();
+  if(code === undefined){
+    swal('ไม่พบรหัสโซน');
+    return false;
+  }
+
+  if(empID == '' || empName.length == 0){
+    swal('ชื่อพนักงานไม่ถูกต้อง');
+    return false;
+  }
+
+  load_in();
+
+  $.ajax({
+    url:HOME + '/add_employee',
+    type:'POST',
+    cache:false,
+    data:{
+      'zone_code' : code,
+      'empID' : empID,
+      'empName' : empName
+    },
+    success:function(rs){
+      load_out();
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          text:'เพิ่มพนักงานเรียบร้อยแล้ว',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1200);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
+
+
 $('#search-box').autocomplete({
   source:BASE_URL + 'auto_complete/get_customer_code_and_name',
   autoFocus:true,
@@ -162,6 +240,46 @@ function deleteCustomer(id,code){
             timer:1000
           });
           $('#row-'+id).remove();
+          reIndex();
+          $('#search-box').focus();
+        }else{
+          swal({
+            title:'Error!',
+            text:rs,
+            type:'error'
+          });
+        }
+      }
+    })
+
+  })
+}
+
+
+function deleteEmployee(id,name){
+  swal({
+    title:'Are sure ?',
+    text:'ต้องการลบ ' + name + ' หรือไม่ ?',
+    type:'warning',
+    showCancelButton: true,
+		confirmButtonColor: '#FA5858',
+		confirmButtonText: 'ใช่, ฉันต้องการลบ',
+		cancelButtonText: 'ยกเลิก',
+		closeOnConfirm: false
+  },function(){
+    $.ajax({
+      url: HOME + '/delete_employee/' + id,
+      type:'GET',
+      cache:false,
+      success:function(rs){
+        if(rs === 'success'){
+          swal({
+            title:'Deleted',
+            text:'ลบ '+name+' เรียบร้อยแล้ว',
+            type:'success',
+            timer:1000
+          });
+          $('#emp-'+id).remove();
           reIndex();
           $('#search-box').focus();
         }else{

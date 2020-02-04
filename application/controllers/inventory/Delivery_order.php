@@ -25,13 +25,13 @@ class Delivery_order extends PS_Controller
     $this->load->helper('channels');
     $this->load->helper('order');
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'role'          => get_filter('role', 'role', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'from_date'     => get_filter('from_date', 'from_date', ''),
-      'to_date'       => get_filter('to_date', 'to_date', '')
+      'code'          => get_filter('code', 'do_code', ''),
+      'customer'      => get_filter('customer', 'do_customer', ''),
+      'user'          => get_filter('user', 'do_user', ''),
+      'role'          => get_filter('role', 'do_role', ''),
+      'channels'      => get_filter('channels', 'do_channels', ''),
+      'from_date'     => get_filter('from_date', 'do_from_date', ''),
+      'to_date'       => get_filter('to_date', 'do_to_date', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -67,7 +67,7 @@ class Delivery_order extends PS_Controller
     if($code)
     {
       $order = $this->orders_model->get($code);
-      if($order->role == 'T')
+      if($order->role == 'T' OR $order->role == 'Q')
       {
         $this->load->model('inventory/transform_model');
       }
@@ -185,7 +185,10 @@ class Delivery_order extends PS_Controller
                           'zone_code' => $rm->zone_code,
                           'warehouse_code'  => $rm->warehouse_code,
                           'update_user' => get_cookie('uname'),
-                          'budget_code' => $order->budget_code
+                          'budget_code' => $order->budget_code,
+                          'empID' => $order->empID,
+                          'empName' => $order->empName,
+                          'approver' => $order->approver
                   );
 
                   //--- 3. บันทึกยอดขาย
@@ -202,7 +205,7 @@ class Delivery_order extends PS_Controller
 
             //------ ส่วนนี้สำหรับโอนเข้าคลังระหว่างทำ
             //------ หากเป็นออเดอร์เบิกแปรสภาพ
-            if($order->role == 'T')
+            if($order->role == 'T' OR $order->role == 'Q')
             {
               //--- ตัวเลขที่มีการเปิดบิล
               $sold_qty = ($rs->order_qty >= $rs->qc) ? $rs->qc : $rs->order_qty;
@@ -250,7 +253,7 @@ class Delivery_order extends PS_Controller
                 'product_code' => $rs->product_code,
                 'product_name' => $rs->product_name,
                 'qty' => $sold_qty,
-                'customer_code' => $order->customer_code
+                'empID' => $order->empID
               );
 
               if($this->lend_model->add_detail($arr) === FALSE)
@@ -337,7 +340,10 @@ class Delivery_order extends PS_Controller
                     'warehouse_code'  => NULL,
                     'update_user' => get_cookie('uname'),
                     'budget_code' => $order->budget_code,
-                    'is_count' => 0
+                    'is_count' => 0,
+                    'empID' => $order->empID,
+                    'empName' => $order->empName,
+                    'approver' => $order->approver
             );
 
             //--- 3. บันทึกยอดขาย
@@ -424,6 +430,8 @@ class Delivery_order extends PS_Controller
     $service_wh = getConfig('SERVICE_WAREHOUSE');
 
     $do = $this->delivery_order_model->get_sap_delivery_order($code);
+    $middle = $this->delivery_order_model->is_doc_exists($code);
+
     if(empty($do) OR $do->DocStatus == 'O')
     {
       $currency = getConfig('CURRENCY');
@@ -456,9 +464,14 @@ class Delivery_order extends PS_Controller
       );
 
       $this->mc->trans_start();
+
       if(!empty($do))
       {
         $ds['F_E_Commerce'] = 'U';
+      }
+
+      if($middle)
+      {
         $sc = $this->delivery_order_model->update_sap_delivery_order($code, $ds);
       }
       else
@@ -549,7 +562,17 @@ class Delivery_order extends PS_Controller
 
     $doc = $this->orders_model->get($code);
     $tr = $this->transfer_model->get_sap_transfer_doc($code);
-    $cust = $this->customers_model->get($doc->customer_code);
+    $middle = $this->transfer_model->is_middle_exists($code);
+    if($doc->role == 'L' OR $doc->role == 'U' OR $doc->role == 'R')
+    {
+      $cust = new stdClass();
+      $cust->code = NULL;
+      $cust->name = NULL;
+    }
+    else
+    {
+      $cust = $this->customers_model->get($doc->customer_code);
+    }
 
     if(!empty($doc))
     {
@@ -584,12 +607,14 @@ class Delivery_order extends PS_Controller
             'Comments' => $doc->remark,
             'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
             'F_E_CommerceDate' => sap_date(now(), TRUE),
-            'U_BOOKCODE' => $doc->bookcode
+            'U_BOOKCODE' => $doc->bookcode,
+            'U_REQUESTER' => $doc->empName,
+            'U_APPROVER' => $doc->approver
           );
 
           $this->mc->trans_start();
 
-          if(!empty($tr))
+          if($middle)
           {
             $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
           }
@@ -600,7 +625,7 @@ class Delivery_order extends PS_Controller
 
           if($sc)
           {
-            if(!empty($tr))
+            if($middle)
             {
               $this->transfer_model->drop_sap_exists_details($code);
             }
@@ -736,7 +761,9 @@ private function export_transform($code)
           'Comments' => $doc->remark,
           'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
           'F_E_CommerceDate' => sap_date(now(), TRUE),
-          'U_BOOKCODE' => $doc->bookcode
+          'U_BOOKCODE' => $doc->bookcode,
+          'U_REQUESTER' => $doc->user,
+          'U_APPROVER' => $doc->approver
         );
 
         $this->mc->trans_start();
@@ -859,10 +886,6 @@ private function export_transform($code)
           $sc = $this->export_transfer($code);
           break;
 
-        case 'M' : //--- ตัดยอดฝากขาย
-          $sc = $this->export_consign_sold($code);
-          break;
-
         case 'N' : //--- Consign (TR)
           $sc = $this->export_transfer($code);
           break;
@@ -913,7 +936,7 @@ private function export_transform($code)
 
   public function clear_filter()
   {
-    $filter = array('code','customer','user','role','channels','from_date','to_date');
+    $filter = array('do_code','do_customer','do_user','do_role','do_channels','do_from_date','do_to_date');
     clear_filter($filter);
   }
 

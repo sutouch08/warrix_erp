@@ -253,7 +253,7 @@ class Delivery_order_model extends CI_Model
 
     public function get_sap_delivery_order($code)
     {
-      $rs = $this->mc
+      $rs = $this->ms
       ->select('U_ECOMNO, CANCELED, DocStatus')
       ->where('U_ECOMNO', $code)
       ->get('ODLN');
@@ -266,6 +266,7 @@ class Delivery_order_model extends CI_Model
     }
 
 
+    
     public function sap_exists_details($code)
     {
       $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('DLN1');

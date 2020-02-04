@@ -705,7 +705,7 @@ class Return_lend extends PS_Controller
 
     $doc = $this->return_lend_model->get($code);
     $tr = $this->transfer_model->get_sap_transfer_doc($code);
-
+    $temp = $this->transfer_model->is_middle_exists($code);
     if(!empty($doc))
     {
       if(empty($tr) OR $tr->DocStatus == 'O' OR $tr->CANCELED == 'N')
@@ -744,7 +744,7 @@ class Return_lend extends PS_Controller
 
           $this->mc->trans_start();
 
-          if(!empty($tr))
+          if(!empty($temp))
           {
             $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
           }
@@ -755,7 +755,7 @@ class Return_lend extends PS_Controller
 
           if($sc)
           {
-            if(!empty($tr))
+            if(!empty($temp))
             {
               $this->transfer_model->drop_sap_exists_details($code);
             }

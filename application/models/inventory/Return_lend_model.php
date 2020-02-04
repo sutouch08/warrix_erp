@@ -49,11 +49,11 @@ class Return_lend_model extends CI_Model
 
   public function get_details($code)
   {
-    $qr = "SELECT rld.*, old.qty AS lend_qty, old.receive AS receive
-           FROM return_lend_detail AS rld
-           LEFT JOIN order_lend_detail AS old ON old.order_code = rld.lend_code AND old.product_code = rld.product_code
-           WHERE rld.return_code = '{$code}'";
-    $rs = $this->db->query($qr);
+    // $qr = "SELECT rld.*, old.qty AS lend_qty, old.receive AS receive
+    //        FROM return_lend_detail AS rld
+    //        LEFT JOIN order_lend_detail AS old ON old.order_code = rld.lend_code AND old.product_code = rld.product_code
+    //        WHERE rld.return_code = '{$code}'";
+    // $rs = $this->db->query($qr);
     // $this->db
     // ->select('return_lend_detail.*, order_lend_detail.qty AS lend_qty, order_lend_detail.receive AS receive')
     // ->from('return_lend_detail')
@@ -61,6 +61,14 @@ class Return_lend_model extends CI_Model
     // ->join('order_lend_detail', 'order_lend_detail.order_code = return_lend.lend_code AND order_lend_detail.product_code = return_lend_detail.product_code', 'left')
     // ->where('return_lend_detail.return_code', $code);
     // $rs = $this->db->get();
+    $this->db
+    ->select('rld.*')
+    ->select('old.qty AS lend_qty, old.receive AS receive')
+    ->from('return_lend_detail AS rld')
+    ->join('order_lend_detail AS old', 'old.order_code = rld.lend_code', 'left')
+    ->join('order_lend_detail AS old', 'old.product_code = rld.product_code', 'left')
+    ->where('rdl.return_code', $code);
+    $rs = $this->db->get();
 
     if($rs->num_rows() > 0)
     {
@@ -84,7 +92,7 @@ class Return_lend_model extends CI_Model
   }
 
 
-  //--- delete received details 
+  //--- delete received details
   public function drop_details($code)
   {
     return $this->db->where('return_code', $code)->delete('return_lend_detail');
