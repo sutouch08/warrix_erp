@@ -109,6 +109,11 @@ class Products_model extends CI_Model
         $this->db->like('products.name', $ds['name']);
       }
 
+      if(!empty($ds['barcode']))
+      {
+        $this->db->like('products.barcode', $ds['barcode']);
+      }
+
       if(!empty($ds['color']))
       {
         if($ds['color'] === 'NULL')
@@ -197,6 +202,11 @@ class Products_model extends CI_Model
       if(!empty($ds['name']))
       {
         $this->db->like('products.name', $ds['name']);
+      }
+
+      if(!empty($ds['barcode']))
+      {
+        $this->db->like('products.barcode', $ds['barcode']);
       }
 
       if(!empty($ds['color']))

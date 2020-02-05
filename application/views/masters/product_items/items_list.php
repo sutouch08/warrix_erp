@@ -24,6 +24,11 @@
     <input type="text" class="width-100" name="name" id="name" value="<?php echo $name; ?>" />
   </div>
 
+	<div class="col-sm-2 padding-5">
+    <label>บาร์โค้ด</label>
+    <input type="text" class="width-100" name="barcode" id="barcode" value="<?php echo $barcode; ?>" />
+  </div>
+
 	<div class="col-sm-1 padding-5">
     <label>สี</label>
     <input type="text" class="width-100" name="color" id="color" value="<?php echo $color; ?>" />
@@ -43,7 +48,7 @@
 		</select>
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-2 padding-5 last">
     <label>กลุ่มย่อย</label>
 		<select class="form-control" name="sub_group" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
@@ -51,7 +56,7 @@
 		</select>
   </div>
 
-	<div class="col-sm-2 padding-5 last">
+	<div class="col-sm-2 padding-5 first">
     <label>หมวดหมู่</label>
 		<select class="form-control" name="category" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
@@ -59,7 +64,7 @@
 		</select>
   </div>
 
-	<div class="col-sm-2 padding-5 first">
+	<div class="col-sm-2 padding-5">
     <label>ประเภท</label>
 		<select class="form-control" name="kind" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
@@ -91,11 +96,11 @@
 		</select>
   </div>
 
-  <div class="col-sm-2 padding-5">
+  <div class="col-sm-1 padding-5">
     <label class="display-block not-show">buton</label>
     <button type="submit" class="btn btn-sm btn-primary btn-block"><i class="fa fa-search"></i> ค้นหา</button>
   </div>
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 padding-5">
     <label class="display-block not-show">buton</label>
     <button type="button" class="btn btn-sm btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>

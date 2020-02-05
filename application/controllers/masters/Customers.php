@@ -560,7 +560,8 @@ class Customers extends PS_Controller
           'GroupNum' => $rs->GroupNum,
           'sale_code' => $rs->sale_code,
           'CreditLine' => $rs->CreditLine,
-          'old_code' => $rs->old_code
+          'old_code' => $rs->old_code,
+          'last_sync' => now()
         );
 
         if($this->customers_model->is_exists($rs->code) === TRUE)

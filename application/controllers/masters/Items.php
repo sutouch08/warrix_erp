@@ -45,6 +45,7 @@ class Items extends PS_Controller
     $filter = array(
       'code'      => get_filter('code', 'item_code', ''),
       'name'      => get_filter('name', 'item_name', ''),
+      'barcode'   => get_filter('barcode', 'item_barcode', ''),
       'color'     => get_filter('color', 'color' ,''),
       'size'      => get_filter('size', 'size', ''),
       'group'     => get_filter('group', 'group', ''),
@@ -450,7 +451,7 @@ class Items extends PS_Controller
 
   public function clear_filter()
 	{
-    $filter = array('item_code','item_name','color', 'size','group','sub_group','category','kind','type','brand','year');
+    $filter = array('item_code','item_name','item_barcode','color', 'size','group','sub_group','category','kind','type','brand','year');
     clear_filter($filter);
 	}
 }
