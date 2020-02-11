@@ -22,32 +22,33 @@ class Prepare extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'is_term'       => get_filter('is_term', 'is_term', '2'),
-      'from_date'     => get_filter('from_date', 'from_date', ''),
-      'to_date'       => get_filter('to_date', 'to_date', '')
+      'code'          => get_filter('code', 'prepare_code', ''),
+      'customer'      => get_filter('customer', 'prepare_customer', ''),
+      'user'          => get_filter('user', 'prepare_user', ''),
+      'channels'      => get_filter('channels', 'prepare_channels', ''),
+      'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
+      'role'          => get_filter('role', 'prepare_role', 'all'),
+      'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
+      'to_date'       => get_filter('to_date', 'prepare_to_date', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
-		$perpage = ''; //get_rows();
+		$perpage = get_rows();
 		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
-		// if($perpage > 300)
-		// {
-		// 	$perpage = 20;
-		// }
+		if($perpage > 300)
+		{
+			$perpage = 20;
+		}
 
 		$segment  = 4; //-- url segment
-		//$rows     = $this->prepare_model->count_rows($filter, 3);
+		$rows     = $this->prepare_model->count_rows($filter, 3);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-		//$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
+		$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
 		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 3);
 
     $filter['orders'] = $orders;
 
-		//$this->pagination->initialize($init);
+		$this->pagination->initialize($init);
     $this->load->view('inventory/prepare/prepare_list', $filter);
   }
 
@@ -59,32 +60,33 @@ class Prepare extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'is_term'       => get_filter('is_term', 'is_term', '2'),
-      'from_date'     => get_filter('from_date', 'from_date', ''),
-      'to_date'       => get_filter('to_date', 'to_date', '')
+      'code'          => get_filter('code', 'prepare_code', ''),
+      'customer'      => get_filter('customer', 'prepare_customer', ''),
+      'user'          => get_filter('user', 'prepare_user', ''),
+      'channels'      => get_filter('channels', 'prepare_channels', ''),
+      'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
+      'role'          => get_filter('role', 'prepare_role', 'all'),
+      'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
+      'to_date'       => get_filter('to_date', 'prepare_to_date', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
-		$perpage = ''; //get_rows();
+		$perpage = get_rows();
 		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
-		// if($perpage > 300)
-		// {
-		// 	$perpage = 20;
-		// }
+		if($perpage > 300)
+		{
+			$perpage = 20;
+		}
 
 		$segment  = 4; //-- url segment
-		//$rows     = $this->prepare_model->count_rows($filter, 4);
+		$rows     = $this->prepare_model->count_rows($filter, 4);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-		//$init	    = pagination_config($this->home.'/view_process/', $rows, $perpage, $segment);
+		$init	    = pagination_config($this->home.'/view_process/', $rows, $perpage, $segment);
 		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 4);
 
     $filter['orders'] = $orders;
 
-		//$this->pagination->initialize($init);
+		$this->pagination->initialize($init);
     $this->load->view('inventory/prepare/prepare_view_process', $filter);
   }
 
@@ -436,8 +438,19 @@ class Prepare extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'customer', 'user', 'channels', 'is_term','from_date', 'to_date');
+    $filter = array(
+      'prepare_code',
+      'prepare_customer',
+      'prepare_user',
+      'prepare_channels',
+      'prepare_is_term',
+      'prepare_role',
+      'prepare_from_date',
+      'prepare_to_date');
+
     clear_filter($filter);
   }
+
+
 } //--- end class
 ?>

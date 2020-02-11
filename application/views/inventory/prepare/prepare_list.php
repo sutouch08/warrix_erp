@@ -7,6 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
+				<button type="button" class="btn btn-sm btn-warning" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
 				<button type="button" class="btn btn-sm btn-primary" onclick="goProcess()">กำลังจัด</button>
 			</p>
 		</div>
@@ -38,11 +39,26 @@
   </div>
 
 	<div class="col-sm-1 col-1-harf padding-5">
-    <label>ประเภท</label>
+    <label>การชำระเงิน</label>
 		<select class="form-control input-sm" name="is_term" onchange="getSearch()">
       <option value="2">ทั้งหมด</option>
       <option value="1" <?php echo is_selected($is_term, '1'); ?>>เครดิต</option>
 			<option value="0" <?php echo is_selected($is_term, '0'); ?>>เงินสด</option>
+    </select>
+  </div>
+
+	<div class="col-sm-1 col-1-harf padding-5">
+    <label>ประเภท</label>
+		<select class="form-control input-sm" name="role" onchange="getSearch()">
+      <option value="all">ทั้งหมด</option>
+      <option value="S" <?php echo is_selected($role, 'S'); ?>>ขาย</option>
+			<option value="C" <?php echo is_selected($role, 'C'); ?>>ฝากขาย(SO)</option>
+			<option value="N" <?php echo is_selected($role, 'N'); ?>>ฝากขาย(TR)</option>
+			<option value="P" <?php echo is_selected($role, 'P'); ?>>สปอนเซอร์</option>
+			<option value="U" <?php echo is_selected($role, 'U'); ?>>อภินันท์</option>
+			<option value="Q" <?php echo is_selected($role, 'Q'); ?>>แปรสภาพ(สต็อก)</option>
+			<option value="T" <?php echo is_selected($role, 'T'); ?>>แปรสภาพ(ขาย)</option>
+			<option value="L" <?php echo is_selected($role, 'L'); ?>>ยืม</option>
     </select>
   </div>
 
@@ -55,18 +71,15 @@
 
   </div>
 
-  <div class="col-sm-1 padding-5">
+  <div class="col-sm-1 padding-5 last">
     <label class="display-block not-show">buton</label>
     <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
   </div>
-	<div class="col-sm-1 padding-5 last">
-    <label class="display-block not-show">buton</label>
-    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
-  </div>
+
 </div>
 <hr class="margin-top-15">
 </form>
-<?php //echo $this->pagination->create_links(); ?>
+<?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-sm-12">
 		<table class="table table-striped table-hover border-1">
@@ -74,7 +87,7 @@
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-15 middle">เลขที่เอกสาร</th>
-					<th class="width-30 middle">ลูกค้า</th>
+					<th class="width-30 middle">ลูกค้า/พนักงาน</th>
           <th class="width-10 middle">ช่องทาง</th>
 					<th class="width-15 middle text-center">วันที่</th>
 					<th class="middle"></th>
@@ -88,7 +101,13 @@
             <tr id="row-<?php echo $rs->code; ?>">
               <td class="middle text-center no"><?php echo $no; ?></td>
               <td class="middle"><?php echo $rs->code; ?></td>
-              <td class="middle"><?php echo $customer_name; ?></td>
+              <td class="middle">
+								<?php if($rs->role == 'L' OR $rs->role == 'U' OR $rs->role == 'R') : ?>
+									<?php echo $rs->empName; ?>
+								<?php else : ?>
+									<?php echo $customer_name; ?>
+								<?php endif; ?>
+							</td>
               <td class="middle"><?php echo $rs->channels_name; ?></td>
               <td class="middle text-center"><?php echo thai_date($rs->date_add, FALSE,'/'); ?></td>
               <td class="middle text-right">

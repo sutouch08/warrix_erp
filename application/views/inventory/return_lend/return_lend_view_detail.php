@@ -31,7 +31,7 @@
     </div>
 		<div class="col-sm-4 padding-5">
 			<label>ผู้ยืม</label>
-			<input type="text" class="form-control input-sm" value="<?php echo $doc->customer_name; ?>" disabled/>
+			<input type="text" class="form-control input-sm" value="<?php echo $doc->empName; ?>" disabled/>
 		</div>
 
 		<div class="col-sm-3 col-3-harf padding-5">
@@ -122,7 +122,7 @@ if($doc->status == 2)
 		</table>
 	</div>
 </div>
-<input type="hidden" name="customer_code" id="customer_code" value="<?php echo $doc->customer_code; ?>">
+<input type="hidden" name="empID" id="empID" value="<?php echo $doc->empID; ?>">
 <input type="hidden" name="zone_code" id="zone_code" value="<?php echo $doc->to_zone; ?>">
 <input type="hidden" name="lend_code" id="return_code" value="<?php echo $doc->code; ?>">
 

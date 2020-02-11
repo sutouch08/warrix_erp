@@ -49,27 +49,13 @@ class Return_lend_model extends CI_Model
 
   public function get_details($code)
   {
-    // $qr = "SELECT rld.*, old.qty AS lend_qty, old.receive AS receive
-    //        FROM return_lend_detail AS rld
-    //        LEFT JOIN order_lend_detail AS old ON old.order_code = rld.lend_code AND old.product_code = rld.product_code
-    //        WHERE rld.return_code = '{$code}'";
-    // $rs = $this->db->query($qr);
-    // $this->db
-    // ->select('return_lend_detail.*, order_lend_detail.qty AS lend_qty, order_lend_detail.receive AS receive')
-    // ->from('return_lend_detail')
-    // ->join('return_lend', 'return_lend.code = return_lend_detail.return_code', 'left')
-    // ->join('order_lend_detail', 'order_lend_detail.order_code = return_lend.lend_code AND order_lend_detail.product_code = return_lend_detail.product_code', 'left')
-    // ->where('return_lend_detail.return_code', $code);
-    // $rs = $this->db->get();
-    $this->db
-    ->select('rld.*')
-    ->select('old.qty AS lend_qty, old.receive AS receive')
-    ->from('return_lend_detail AS rld')
-    ->join('order_lend_detail AS old', 'old.order_code = rld.lend_code', 'left')
-    ->join('order_lend_detail AS old', 'old.product_code = rld.product_code', 'left')
-    ->where('rdl.return_code', $code);
-    $rs = $this->db->get();
-
+    $qr  = "SELECT rld.*, old.qty AS lend_qty, old.receive AS receive ";
+    $qr .= "FROM return_lend_detail AS rld ";
+    $qr .= "LEFT JOIN order_lend_detail AS old ON old.order_code = rld.lend_code ";
+    $qr .= "AND old.product_code = rld.product_code ";
+    $qr .= "WHERE rld.return_code = '{$code}'";
+    $rs  = $this->db->query($qr);
+    
     if($rs->num_rows() > 0)
     {
       return $rs->result();
@@ -215,10 +201,11 @@ class Return_lend_model extends CI_Model
       $this->db->like('lend_code', $ds['lend_code']);
     }
 
-    //--- customer
-    if(!empty($ds['customer_code']))
+    //--- emp
+    if(!empty($ds['empName']))
     {
-      $this->db->where_in('customer_code', $this->customer_in($ds['customer_code']));
+      $emp_in = employee_in($ds['empName']); //--- employee_helper;
+      $this->db->where_in($emp_in);
     }
 
     if(!empty($ds['status']) && $ds['status'] != 'all')
@@ -256,10 +243,11 @@ class Return_lend_model extends CI_Model
       $this->db->like('lend_code', $ds['lend_code']);
     }
 
-    //--- customer
-    if(!empty($ds['customer_code']))
+    //--- emp
+    if(!empty($ds['empName']))
     {
-      $this->db->where_in('customer_code', $this->customer_in($ds['customer_code']));
+      $emp_in = employee_in($ds['empName']); //--- employee_helper;
+      $this->db->where_in($emp_in);
     }
 
     if($ds['status'] != 'all')
@@ -321,6 +309,26 @@ class Return_lend_model extends CI_Model
 
     return FALSE;
   }
+
+
+  public function is_exists($code, $old_code = NULL)
+  {
+    if(!empty($old_code))
+    {
+      $this->db->where('code !=', $old_code);
+    }
+
+    $rs = $this->db->where('code', $code)->get('return_lend');
+
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
 } //--- end class
 
  ?>

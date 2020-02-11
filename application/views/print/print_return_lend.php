@@ -7,7 +7,7 @@
 	$header	= array(
     'เลขที่' => $doc->code,
     'วันที่'  => thai_date($doc->date_add, FALSE, '/'),
-    'ผู้ยืม' => $doc->customer_code.' : '.$doc->customer_name,
+    'ผู้ยืม' => $doc->empName,
     'เลขที่อ้างอิง' => $doc->lend_code,
     'โซนต้นทาง' => $doc->from_zone_name,
     'โซนปลายทาง' => $doc->to_zone_name,

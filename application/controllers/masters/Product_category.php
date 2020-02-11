@@ -153,7 +153,8 @@ class Product_category extends PS_Controller
 
       $ds = array(
         'code' => $code,
-        'name' => $name
+        'name' => $name,
+        'old_code' => $old_code
       );
 
       if($sc === TRUE && $this->product_category_model->is_exists($code, $old_code) === TRUE)
@@ -244,14 +245,16 @@ class Product_category extends PS_Controller
           $arr['OLDCODE'] = $old_code;
         }
 
-        return $this->product_category_model->update_sap_cate($old_code, $arr);
+        //return $this->product_category_model->update_sap_cate($old_code, $arr);
       }
       else
       {
         $arr['Flag'] = 'A';
 
-        return $this->product_category_model->add_sap_cate($arr);
+        //return $this->product_category_model->add_sap_cate($arr);
       }
+
+      return $this->product_category_model->add_sap_cate($arr);
     }
 
     return FALSE;

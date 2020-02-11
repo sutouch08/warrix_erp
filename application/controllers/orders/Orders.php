@@ -651,6 +651,28 @@ class Orders extends PS_Controller
   }
 
 
+  public function get_item_grid()
+  {
+    $sc = "";
+    $item_code = $this->input->get('itemCode');
+    $warehouse_code = $this->input->get('warehouse_code');
+    $filter = getConfig('MAX_SHOW_STOCK');
+    $item = $this->products_model->get($item_code);
+    if(!empty($item))
+    {
+      $qty = $item->count_stock == 1 ? ($item->active == 1 ? $this->showStock($this->get_sell_stock($item->code, $warehouse_code)) : 0) : 1000000;
+      $sc = "success | {$item_code} | {$qty}";
+    }
+    else
+    {
+      $sc = "Error | ไม่พบสินค้า | {$item_code}";
+    }
+
+    echo $sc;
+  }
+
+
+
 
   public function getOrderGrid($style_code, $view = FALSE, $warehouse = NULL, $zone = NULL)
 	{
@@ -1446,7 +1468,7 @@ class Orders extends PS_Controller
     echo $sc === TRUE ? 'success' : $this->error;
   }
 
-  
+
 
   public function order_state_change()
   {

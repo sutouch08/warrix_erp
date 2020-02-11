@@ -108,7 +108,16 @@ class Move extends PS_Controller
       $to_warehouse = $this->input->post('to_warehouse_code');
       $remark = $this->input->post('remark');
       $bookcode = getConfig('BOOK_CODE_MOVE');
-      $code = $this->get_new_code($date_add);
+      $isManual = getConfig('MANUAL_DOC_CODE');
+
+      if($isManual == 1 && $this->input->post('code'))
+      {
+        $code = $this->input->post('code');
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
 
       $ds = array(
         'code' => $code,
@@ -543,6 +552,23 @@ class Move extends PS_Controller
 
     echo $sc === TRUE ? 'success' : $message;
   }
+
+
+
+
+  public function is_exists($code, $old_code = NULL)
+  {
+    $exists = $this->move_model->is_exists($code, $old_code);
+    if($exists)
+    {
+      echo 'เลขที่เอกสารซ้ำ';
+    }
+    else
+    {
+      echo 'not_exists';
+    }
+  }
+
 
 
 

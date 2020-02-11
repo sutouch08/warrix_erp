@@ -28,7 +28,7 @@
     </div>
 		<div class="col-sm-3 padding-5">
 			<label>ผู้ยืม</label>
-			<input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" placeholder="ชื่อผู้ยืม(พนักงาน)" required/>
+			<input type="text" class="form-control input-sm edit" name="empName" id="empName" value="<?php echo $doc->empName; ?>" placeholder="ชื่อผู้ยืม(พนักงาน)" disabled required/>
 		</div>
 		<div class="col-sm-6 padding-5 last">
     	<label>หมายเหตุ</label>
@@ -131,7 +131,7 @@
 		</table>
 	</div>
 </div>
-<input type="hidden" name="customer_code" id="customer_code" value="<?php echo $doc->customer_code; ?>">
+<input type="hidden" name="empID" id="empID" value="<?php echo $doc->empID; ?>">
 <input type="hidden" name="zone_code" id="zone_code" value="<?php echo $doc->to_zone; ?>">
 <input type="hidden" name="lendCode" id="lendCode" value="<?php echo $doc->lend_code; ?>">
 <input type="hidden" name="return_code" id="return_code" value="<?php echo $doc->code; ?>">

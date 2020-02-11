@@ -129,7 +129,7 @@ function save(){
 		}
 	});
 
-	if(ds.length < 9){
+	if(ds.length < 8){
 		swal('ไม่พบรายการรับเข้า');
 		return false;
 	}

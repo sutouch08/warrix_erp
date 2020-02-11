@@ -1,6 +1,59 @@
+function add(){
+  var isManual = $('#manualCode').length;
+  if(isManual === 1){
+    getValidate();
+  }else{
+    addMove();
+  }
+}
+
+
+function getValidate(){
+  var prefix = $('#prefix').val();
+  var runNo = parseInt($('#runNo').val());
+  let code = $('#code').val();
+  if(code.length == 0){
+    swal("เลขที่เอกสารไม่ถูกต้อง");
+    return false;
+  }
+
+  let arr = code.split('-');
+
+  if(arr.length == 2){
+    if(arr[0] !== prefix){
+      swal('Prefix ต้องเป็น '+prefix);
+      return false;
+    }else if(arr[1].length != (4 + runNo)){
+      swal('Run Number ไม่ถูกต้อง');
+      return false;
+    }else{
+      $.ajax({
+        url: BASE_URL + 'inventory/move/is_exists/'+code,
+        type:'GET',
+        cache:false,
+        success:function(rs){
+          if(rs == 'not_exists'){
+            addMove();
+          }else{
+            swal({
+              title:'Error!!',
+              text: rs,
+              type: 'error'
+            });
+          }
+        }
+      })
+    }
+
+  }else{
+    swal('เลขที่เอกสารไม่ถูกต้อง');
+    return false;
+  }
+}
+
 
 //--- เพิ่มเอกสารโอนคลังใหม่
-function add(){
+function addMove(){
 
   //--- วันที่เอกสาร
   var date_add = $('#date').val();

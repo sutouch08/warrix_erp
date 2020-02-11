@@ -118,7 +118,7 @@ class Transform_model extends CI_Model
   {
     $rs = $this->db
     ->where('order_code', $order_code)
-    ->where('valid', 0)
+    ->where('receiveqty < sold_qty')
     ->count_all_results('order_transform_detail');
     if($rs === 0)
     {
@@ -163,7 +163,7 @@ class Transform_model extends CI_Model
 
   public function valid_detail($id)
   {
-    return $this->db->set('valid', 1)->where('id', $id)->update('order_transform_detail');
+    return $this->db->set('valid', 1)->where('id', $id)->where('receive_qty >= sold_qty')->update('order_transform_detail');
   }
 
 

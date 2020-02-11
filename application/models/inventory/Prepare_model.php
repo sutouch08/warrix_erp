@@ -37,12 +37,7 @@ class Prepare_model extends CI_Model
     }
     else
     {
-      // return $this->db
-      // ->set('qty', "qty + {$qty}", FALSE)
-      // ->where('order_code', $order_code)
-      // ->where('product_code', $product_code)
-      // ->where('zone_code', $zone_code)
-      // ->update('buffer');
+
       $qr  = "UPDATE buffer SET qty = qty + {$qty} ";
       $qr .= "WHERE order_code = '{$order_code}' ";
       $qr .= "AND product_code = '{$product_code}' ";
@@ -201,15 +196,20 @@ class Prepare_model extends CI_Model
 
     if(!empty($ds['customer']))
     {
+      $this->db->group_start();
       $this->db->like('customers.name', $ds['customer']);
       $this->db->or_like('orders.customer_ref', $ds['customer']);
+      $this->db->group_end();
     }
 
     //---- user name / display name
     if(!empty($ds['user']))
     {
       $users = user_in($ds['user']);
+      $this->db->group_start();
       $this->db->where_in('user', $users);
+      $this->db->or_like('orders.empName', $ds['user']);
+      $this->db->group_end();
     }
 
     if(!empty($ds['channels']))
@@ -220,6 +220,11 @@ class Prepare_model extends CI_Model
     if($ds['is_term'] != '2')
     {
       $this->db->where('orders.is_term', $ds['is_term']);
+    }
+
+    if($ds['role'] != 'all')
+    {
+      $this->db->where('orders.role', $ds['role']);
     }
 
     if($ds['from_date'] != '' && $ds['to_date'] != '')
@@ -251,15 +256,20 @@ class Prepare_model extends CI_Model
 
     if(!empty($ds['customer']))
     {
+      $this->db->group_start();
       $this->db->like('customers.name', $ds['customer']);
       $this->db->or_like('orders.customer_ref', $ds['customer']);
+      $this->db->group_end();
     }
 
     //---- user name / display name
     if(!empty($ds['user']))
     {
       $users = user_in($ds['user']);
+      $this->db->group_start();
       $this->db->where_in('orders.user', $users);
+      $this->db->or_like('orders.empName', $ds['user']);
+      $this->db->group_end();
     }
 
     if(!empty($ds['channels']))
@@ -271,6 +281,13 @@ class Prepare_model extends CI_Model
     {
       $this->db->where('orders.is_term', $ds['is_term']);
     }
+
+    if($ds['role'] != 'all')
+    {
+      $this->db->where('orders.role', $ds['role']);
+    }
+
+
 
     if($ds['from_date'] != '' && $ds['to_date'] != '')
     {

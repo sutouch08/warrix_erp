@@ -15,20 +15,22 @@ class Return_lend extends PS_Controller
     $this->load->model('inventory/return_lend_model');
     $this->load->model('masters/warehouse_model');
     $this->load->model('masters/zone_model');
-    $this->load->model('masters/customers_model');
+    $this->load->model('masters/employee_model');
     $this->load->model('masters/products_model');
+
+    $this->load->helper('employee');
   }
 
 
   public function index()
   {
     $filter = array(
-      'code'    => get_filter('code', 'code', ''),
+      'code'    => get_filter('code', 'rl_code', ''),
       'lend_code' => get_filter('lend_code', 'lend_code', ''),
-      'customer_code' => get_filter('customer_code', 'customer_code', ''),
-      'from_date' => get_filter('from_date', 'from_date', ''),
-      'to_date' => get_filter('to_date', 'to_date', ''),
-      'status' => get_filter('status', 'status', 'all')
+      'empName' => get_filter('empName', 'empName', ''),
+      'from_date' => get_filter('from_date', 'rl_from_date', ''),
+      'to_date' => get_filter('to_date', 'rl_to_date', ''),
+      'status' => get_filter('status', 'rl_status', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -51,7 +53,7 @@ class Return_lend extends PS_Controller
       {
         $rs->qty = $this->return_lend_model->get_sum_qty($rs->code);
         $rs->amount = $this->return_lend_model->get_sum_amount($rs->code);
-        $rs->customer_name = $this->customers_model->get_name($rs->customer_code);
+        $rs->empName = $this->employee_model->get_name($rs->empID);
       }
     }
 
@@ -72,14 +74,14 @@ class Return_lend extends PS_Controller
   public function add()
   {
     $sc = TRUE;
+    
     if($this->input->post('date_add'))
     {
       $this->load->model('inventory/lend_model');
       $this->load->model('inventory/movement_model');
       //--- retrive data form
-      $date_add = db_date($this->input->post('date_add', TRUE));
-      $customer_code = $this->input->post('customer_code');
-      $customer_name = $this->input->post('customer');
+      $date_add = db_date($this->input->post('date_add'), TRUE);
+      $empID = $this->input->post('empID');
       $zone_code = $this->input->post('zone_code');
       $lend_code = $this->input->post('lendCode');
       $remark = $this->input->post('remark');
@@ -88,14 +90,19 @@ class Return_lend extends PS_Controller
 
       $lend = $this->lend_model->get($lend_code);
       $zone = $this->zone_model->get($zone_code);
-      $code = $this->get_new_code($date_add);
+      $isManual = getConfig('MANUAL_DOC_CODE');
+
+      if($isManual == 0 OR empty($code))
+      {
+        $code = $this->get_new_code($date_add);
+      }
+
 
       $arr = array(
         'code' => $code,
         'bookcode' => getConfig('BOOK_CODE_RETURN_LEND'),
         'lend_code' => $lend_code,
-        'customer_code' => $customer_code,
-        'customer_name' => $customer_name,
+        'empID' => $empID,
         'from_warehouse' => $lend->warehouse_code, //--- warehouse ต้นทาง ดึงจากเอกสารยืม
         'from_zone' => $lend->zone_code, //--- zone ต้นทาง ดึงจากเอกสารยืม
         'to_warehouse' => $zone->warehouse_code,
@@ -300,6 +307,7 @@ class Return_lend extends PS_Controller
     if(!empty($doc))
     {
       $doc->zone_name = $this->zone_model->get_name($doc->to_zone);
+      $doc->empName = $this->employee_model->get_name($doc->empID);
     }
 
     $details = $this->return_lend_model->get_details($code);
@@ -333,8 +341,7 @@ class Return_lend extends PS_Controller
 
       //--- retrive data form
       $date_add = db_date($this->input->post('date_add', TRUE));
-      $customer_code = $this->input->post('customer_code');
-      $customer_name = $this->input->post('customer');
+      $empID = $this->input->post('empID');
       $zone_code = $this->input->post('zone_code');
       $lend_code = $this->input->post('lendCode');
       $remark = $this->input->post('remark');
@@ -346,8 +353,7 @@ class Return_lend extends PS_Controller
 
       $arr = array(
         'lend_code' => $lend_code,
-        'customer_code' => $customer_code,
-        'customer_name' => $customer_name,
+        'empID' => $empID,
         'from_warehouse' => $lend->warehouse_code, //--- warehouse ต้นทาง ดึงจากเอกสารยืม
         'from_zone' => $lend->zone_code, //--- zone ต้นทาง ดึงจากเอกสารยืม
         'to_warehouse' => $zone->warehouse_code,
@@ -603,6 +609,7 @@ class Return_lend extends PS_Controller
     $doc = $this->return_lend_model->get($code);
     if(!empty($doc))
     {
+      $doc->empName = $this->employee_model->get_name($doc->empID);
       $doc->from_zone_name = $this->zone_model->get_name($doc->from_zone);
       $doc->to_zone_name = $this->zone_model->get_name($doc->to_zone);
       $doc->user_name = $this->user_model->get_name($doc->user);
@@ -635,8 +642,8 @@ class Return_lend extends PS_Controller
     if(!empty($doc))
     {
       $ds = array(
-        'customer_code' => $doc->customer_code,
-        'customer_name' => $this->customers_model->get_name($doc->customer_code)
+        'empID' => $doc->empID,
+        'empName' => $doc->empName
       );
 
       $details = $this->return_lend_model->get_backlogs($code);
@@ -702,6 +709,7 @@ class Return_lend extends PS_Controller
   {
     $this->load->model('inventory/transfer_model');
     $this->load->model('masters/products_model');
+    $this->load->model('masters/employee_model');
 
     $doc = $this->return_lend_model->get($code);
     $tr = $this->transfer_model->get_sap_transfer_doc($code);
@@ -722,8 +730,8 @@ class Return_lend extends PS_Controller
             'CANCELED' => 'N',
             'DocDate' => $doc->date_add,
             'DocDueDate' => $doc->date_add,
-            'CardCode' => $doc->customer_code,
-            'CardName' => $doc->customer_name,
+            'CardCode' => NULL,
+            'CardName' => NULL,
             'VatPercent' => $vat_rate,
             'VatSum' => round(get_vat_amount($total_amount), 6),
             'VatSumFc' => round(get_vat_amount($total_amount), 6),
@@ -739,7 +747,8 @@ class Return_lend extends PS_Controller
             'Comments' => $doc->remark,
             'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
             'F_E_CommerceDate' => now(),
-            'U_BOOKCODE' => $doc->bookcode
+            'U_BOOKCODE' => $doc->bookcode,
+            'U_REQUESTER' => $this->employee_model->get_name($doc->empID)
           );
 
           $this->mc->trans_start();
@@ -861,6 +870,7 @@ class Return_lend extends PS_Controller
     $doc->to_warehouse_name = $this->warehouse_model->get_name($doc->to_warehouse);
     $doc->from_zone_name = $this->zone_model->get_name($doc->from_zone);
     $doc->to_zone_name = $this->zone_model->get_name($doc->to_zone);
+    $doc->empName = $this->employee_model->get_name($doc->empID);
 
     $details = $this->lend_model->get_backlogs_list($doc->lend_code);
 
@@ -905,9 +915,25 @@ class Return_lend extends PS_Controller
   }
 
 
+
+  public function is_exists($code, $old_code = NULL)
+  {
+    $exists = $this->return_lend_model->is_exists($code, $old_code);
+    if($exists)
+    {
+      echo 'เลขที่เอกสารซ้ำ';
+    }
+    else
+    {
+      echo 'not_exists';
+    }
+  }
+
+
+
   public function clear_filter()
   {
-    $filter = array('code','lend_code','customer_code','from_date','to_date','status');
+    $filter = array('rl_code','lend_code','empName','rl_from_date','rl_to_date','rl_status');
     clear_filter($filter);
   }
 

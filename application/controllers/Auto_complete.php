@@ -232,7 +232,7 @@ public function get_style_code()
 
 
 
-  public function get_valid_lend_code($customer_code = '')
+  public function get_valid_lend_code($empID = NULL)
   {
     $sc = array();
     $txt = $_REQUEST['term'];
@@ -242,9 +242,9 @@ public function get_style_code()
       $this->db->like('order_code', $txt);
     }
 
-    if(!empty($customer_code))
+    if(!empty($empID))
     {
-      $this->db->where('customer_code', $customer_code);
+      $this->db->where('empID', $empID);
     }
 
     $this->db->where('valid' , 0)->group_by('order_code')->limit(20);

@@ -40,6 +40,54 @@ function unsave()
 }
 
 
+function getValidate(){
+	var isManual = $('#manualCode').length;
+	if(isManual === 1){
+		var prefix = $('#prefix').val();
+	  var runNo = parseInt($('#runNo').val());
+	  let code = $('#code').val();
+	  if(code.length == 0){
+	    swal("เลขที่เอกสารไม่ถูกต้อง");
+	    return false;
+	  }
+
+	  let arr = code.split('-');
+
+	  if(arr.length == 2){
+	    if(arr[0] !== prefix){
+	      swal('Prefix ต้องเป็น '+prefix);
+	      return false;
+	    }else if(arr[1].length != (4 + runNo)){
+	      swal('Run Number ไม่ถูกต้อง');
+	      return false;
+	    }else{
+	      $.ajax({
+	        url: HOME + 'is_exists/'+code,
+	        type:'GET',
+	        cache:false,
+	        success:function(rs){
+	          if(rs == 'not_exists'){
+	            save();
+	          }else{
+	            swal({
+	              title:'Error!!',
+	              text: rs,
+	              type: 'error'
+	            });
+	          }
+	        }
+	      })
+	    }
+
+	  }else{
+	    swal('เลขที่เอกสารไม่ถูกต้อง');
+	    return false;
+	  }
+	}
+
+}
+
+
 
 function save()
 {
@@ -47,9 +95,8 @@ function save()
 	var error = 0;
 	let zone = $('#zone_code').val();
 	let zoneName = $('#zone').val();
-	let customer = $('#customer_code').val();
-	let cusName = $('#customer').val();
-	//let code = $('#lend_code').val();
+	let empName = $('#empName').val();
+	let empID = $('#empID').val();
 	let code = $('#lendCode').val();
 	let date = $('#dateAdd').val();
 
@@ -63,7 +110,7 @@ function save()
 		return false;
 	}
 
-	if(customer.length == 0 || cusName.length == 0){
+	if(empName.length == 0 || empID == ''){
 		swal("กรุณาระบุผู้ยืม");
 		return false;
 	}
@@ -134,20 +181,25 @@ $('#dateAdd').datepicker({
 });
 
 
-$('#customer').autocomplete({
-	source:BASE_URL + 'auto_complete/get_customer_code_and_name',
-	autoFocus:true,
-	close:function(){
-		var arr = $(this).val().split(' | ');
-		if(arr.length == 2){
-			$('#customer_code').val(arr[0]);
-			$('#customer').val(arr[1]);
+$("#empName").autocomplete({
+	source: BASE_URL + 'auto_complete/get_employee',
+	autoFocus: true,
+	close: function(){
+		var rs = $.trim($(this).val());
+		var arr = rs.split(' | ');
+		if( arr.length == 2 ){
+			var empName = arr[0];
+			var empID = arr[1];
+			$("#empName").val(empName);
+			$("#empID").val(empID);
 		}else{
-			$('#customer_code').val('');
-			$('#customer').val('');
+			$("#empID").val('');
+			$(this).val('');
 		}
 	}
 });
+
+
 
 
 $('#zone').autocomplete({

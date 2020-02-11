@@ -24,7 +24,7 @@
     </div>
     <div class="col-sm-2 padding-5">
       <label>ผู้ยืม</label>
-      <input type="text" class="form-control input-sm text-center search" name="customer_code" value="<?php echo $customer_code; ?>" />
+      <input type="text" class="form-control input-sm text-center search" name="empName" value="<?php echo $empName; ?>" />
     </div>
     <div class="col-sm-1 col-1-harf padding-5">
       <label>สถานะ</label>
@@ -81,7 +81,7 @@
             <td class="middle text-center"><?php echo thai_date($rs->date_add, FALSE); ?></td>
             <td class="middle"><?php echo $rs->code; ?></td>
             <td class="middle"><?php echo $rs->lend_code; ?></td>
-            <td class="middle"><?php echo $rs->customer_name; ?></td>
+            <td class="middle"><?php echo $rs->empName; ?></td>
             <td class="middle text-right"><?php echo number($rs->qty); ?></td>
             <td class="middle text-right"><?php echo number($rs->amount, 2); ?></td>
             <td class="middle text-center">

@@ -1,4 +1,36 @@
 // JavaScript Document
+function getItemGrid(){
+	var itemCode 	= $("#item-code").val();
+	var whCode = $('#warehouse').val();
+	var isView = $('#view').length;
+	if( itemCode.length > 0  ){
+		$.ajax({
+			url:BASE_URL + 'orders/orders/get_item_grid',
+			type:'GET',
+			cache:false,
+			data:{
+				'warehouse_code' : whCode,
+				'itemCode' : itemCode,
+				'isView' : isView
+			},
+			success:function(rs){
+				var rs = rs.split(' | ');
+				if(rs[0] === 'success'){
+					$('#stock-qty').val(rs[2]);
+					$('#input-qty').val('').focus();
+				}else{
+					$('#stock-qty').val('');
+					$('#input-qty').val('');
+					swal(rs[1]);
+				}
+			}
+		})
+	}
+}
+
+
+
+// JavaScript Document
 function getProductGrid(){
 	var pdCode 	= $("#pd-box").val();
 	var whCode = $('#warehouse').val();

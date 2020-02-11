@@ -8,7 +8,7 @@ class Lend_model extends CI_Model
 
   public function get($code)
   {
-    $rs = $this->db->where('code', $code)->get('orders');
+    $rs = $this->db->where('role', 'L')->where('code', $code)->get('orders');
     if($rs->num_rows() === 1)
     {
       return $rs->row();

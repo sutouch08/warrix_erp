@@ -11,9 +11,9 @@ $('#barcode').keyup(function(e){
 
 function lend_code_init()
 {
-  let customer_code = $('#customer_code').val();
+  let empID = $('#empID').val();
   $('#lend_code').autocomplete({
-    source:BASE_URL + 'auto_complete/get_valid_lend_code/'+ customer_code,
+    source:BASE_URL + 'auto_complete/get_valid_lend_code/'+ empID,
     autoFocus:true
   });
 }
@@ -54,8 +54,8 @@ function load_lend_details(){
         load_out();
         if(isJson(rs)){
           let data = JSON.parse(rs);
-          $('#customer').val(data.customer_name);
-          $('#customer_code').val(data.customer_code);
+          $('#empName').val(data.empName);
+          $('#empID').val(data.empID);
           let source = $('#template').html();
           let output = $('#result');
           render(source, data, output);

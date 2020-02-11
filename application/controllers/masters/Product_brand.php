@@ -153,7 +153,8 @@ class Product_brand extends PS_Controller
 
       $ds = array(
         'code' => $code,
-        'name' => $name
+        'name' => $name,
+        'old_code' => $old_code
       );
 
       if($sc === TRUE && $this->product_brand_model->is_exists($code, $old_code) === TRUE)
@@ -222,7 +223,7 @@ class Product_brand extends PS_Controller
 
 
 
-  public function export_to_sap($code, $old_code)
+  public function export_to_sap($code, $old_code = NULL)
   {
     $rs = $this->product_brand_model->get($code);
     if(!empty($rs))
@@ -232,25 +233,29 @@ class Product_brand extends PS_Controller
       $arr = array(
         'Code' => $rs->code,
         'Name' => $rs->name,
-        'UpdateDate' => sap_date(now(), TRUE)
+        'UpdateDate' => sap_date(now(), TRUE),
+        'OLDCODE' => $ext ? $old_code : NULL,
+        'Flag' => $ext ? 'U' : 'A'
       );
 
-      if($ext)
-      {
-        $arr['Flag'] = 'U';
-        if($code !== $old_code)
-        {
-          $arr['OLDCODE'] = $old_code;
-        }
+      return $this->product_brand_model->add_sap_brand($arr);
 
-        return $this->product_brand_model->update_sap_brand($old_code, $arr);
-      }
-      else
-      {
-        $arr['Flag'] = 'A';
-
-        return $this->product_brand_model->add_sap_brand($arr);
-      }
+      // if($ext)
+      // {
+      //   $arr['Flag'] = 'U';
+      //   if($code !== $old_code)
+      //   {
+      //     $arr['OLDCODE'] = $old_code;
+      //   }
+      //
+      //   return $this->product_brand_model->update_sap_brand($old_code, $arr);
+      // }
+      // else
+      // {
+      //   $arr['Flag'] = 'A';
+      //
+      //   return $this->product_brand_model->add_sap_brand($arr);
+      // }
     }
 
     return FALSE;

@@ -330,6 +330,24 @@ class Move_model extends CI_Model
   }
 
 
+
+  public function is_exists($code, $old_code = NULL)
+  {
+    if(!empty($old_code))
+    {
+      $this->db->where('code !=', $old_code);
+    }
+
+    $rs = $this->db->where('code', $code)->get('move');
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
   public function is_exists_detail($code)
   {
     $rs = $this->db->select('id')->where('move_code', $code)->get('move_detail');

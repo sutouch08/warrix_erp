@@ -187,10 +187,12 @@ class Products extends PS_Controller
   public function export_style($style_code)
   {
     $style = $this->product_style_model->get($style_code);
+
     if(!empty($style))
     {
-      $ext = $this->product_style_model->is_sap_exists($style_code);
-      $exs = $this->product_style_model->is_middle_exists($style_code);
+      // $ext = $this->product_style_model->is_sap_exists($style_code);
+      // $exs = $this->product_style_model->is_middle_exists($style_code);
+      $ext = $this->product_style_model->is_middle_exists($style_code);
       $flag = $ext === TRUE ? 'U' : 'A';
       $arr = array(
         'Code' => $style->code,
@@ -199,14 +201,16 @@ class Products extends PS_Controller
         'Flag' => $flag
       );
 
-      if($exs)
-      {
-        return $this->product_style_model->update_sap_model($style->code, $arr);
-      }
-      else
-      {
-        return $this->product_style_model->add_sap_model($arr);
-      }
+      return $this->product_style_model->add_sap_model($arr);
+
+      // if($exs)
+      // {
+      //   return $this->product_style_model->update_sap_model($style->code, $arr);
+      // }
+      // else
+      // {
+      //   return $this->product_style_model->add_sap_model($arr);
+      // }
     }
 
     return FALSE;
@@ -941,10 +945,11 @@ class Products extends PS_Controller
   {
     $item = $this->products_model->get($code);
     //--- เช็คข้อมูลในฐานข้อมูลจริง
-    $exst = $this->products_model->is_sap_exists($item->code);
+    //$exst = $this->products_model->is_sap_exists($item->code);
+    $exst = $this->products_model->is_middle_exists($item->code);
 
     //--- เช็คข้อมูลในถังกลาง
-    $middle = $this->products_model->is_middle_exists($item->code);
+    //$middle = $this->products_model->is_middle_exists($item->code);
 
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
@@ -980,14 +985,17 @@ class Products extends PS_Controller
       'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 
-    if($middle)
-    {
-      return $this->products_model->update_item($item->code, $ds);
-    }
-    else
-    {
-      return $this->products_model->add_item($ds);
-    }
+
+    return $this->products_model->add_item($ds);
+
+    // if($middle)
+    // {
+    //   return $this->products_model->update_item($item->code, $ds);
+    // }
+    // else
+    // {
+    //   return $this->products_model->add_item($ds);
+    // }
 
   }
 

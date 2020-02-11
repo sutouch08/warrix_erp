@@ -57,7 +57,6 @@
 			 <div class="modal-body" id="modalBody"></div>
 			 <div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
-				<button type="button" class="btn btn-primary" onClick="addToOrder()" >เพิ่มในรายการ</button>
 			 </div>
 		</div>
 	</div>
