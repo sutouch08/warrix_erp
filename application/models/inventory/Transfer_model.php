@@ -36,7 +36,11 @@ class Transfer_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->mc->insert('OWTR', $ds);
+      $rs = $this->mc->insert('OWTR', $ds);
+      if($rs)
+      {
+        return $this->mc->insert_id();
+      }
     }
 
     return FALSE;

@@ -332,6 +332,41 @@ class Receive_po_model extends CI_Model
   }
 
 
+  public function get_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('receive_product');
+    
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_sap_doc_num($code)
+  {
+    $rs = $this->ms->select('DocNum')->where('U_ECOMNO', $code)->get('OPDN');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->DocNum;
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_inv($code, $doc_num)
+  {
+    return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('receive_product');
+  }
+
+
 }
 
  ?>

@@ -18,8 +18,8 @@ class Product_group extends PS_Controller
 
   public function index()
   {
-		$code = get_filter('code', 'code', '');
-		$name = get_filter('name', 'name', '');
+		$code = get_filter('code', 'pd_group_code', '');
+		$name = get_filter('name', 'pd_group_name_name', '');
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -246,7 +246,7 @@ class Product_group extends PS_Controller
           $arr['OLDCODE'] = $old_code;
         }
 
-        return $this->product_group_model->update_sap_product_group($old_code, $arr);
+        //return $this->product_group_model->update_sap_product_group($old_code, $arr);
       }
       else
       {
@@ -257,8 +257,10 @@ class Product_group extends PS_Controller
           'Flag' => 'A',
           'OLDCODE' => NULL
         );
-        return $this->product_group_model->add_sap_product_group($arr);
+
       }
+
+      return $this->product_group_model->add_sap_product_group($arr);
     }
 
     return FALSE;
@@ -267,8 +269,8 @@ class Product_group extends PS_Controller
 
   public function clear_filter()
 	{
-		$this->session->unset_userdata('code');
-    $this->session->unset_userdata('name');
+		$filter = array('pd_group_code', 'pd_group_name');
+    clear_filter($filter);
 		echo 'done';
 	}
 

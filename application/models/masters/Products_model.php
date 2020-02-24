@@ -467,13 +467,16 @@ class Products_model extends CI_Model
 
   public function get_style_items($code)
   {
-    $qr = "SELECT p.* FROM products AS p
-          LEFT JOIN product_color AS c ON p.color_code = c.code
-          LEFT JOIN product_size AS s ON p.size_code = s.code
-          WHERE style_code = '$code'
-          ORDER BY c.code ASC, s.position ASC";
+    $this->db
+    ->select('p.*')
+    ->from('products AS p')
+    ->join('product_color AS c', 'p.color_code = c.code', 'left')
+    ->join('product_size AS s', 'p.size_code = s.code', 'left')
+    ->where('p.style_code', $code)
+    ->order_by('c.code', 'ASC')
+    ->order_by('s.position', 'ASC');
 
-    $rs = $this->db->query($qr);
+    $rs = $this->db->get();
     if($rs->num_rows() > 0)
     {
       return $rs->result();

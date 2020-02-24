@@ -222,7 +222,13 @@ class Delivery_order_model extends CI_Model
 
     public function add_sap_delivery_order(array $ds = array())
     {
-      return $this->mc->insert('ODLN', $ds);
+      $rs = $this->mc->insert('ODLN', $ds);
+      if($rs)
+      {
+        return $this->mc->insert_id();
+      }
+
+      return FALSE;
     }
 
 
@@ -256,6 +262,7 @@ class Delivery_order_model extends CI_Model
       $rs = $this->ms
       ->select('U_ECOMNO, CANCELED, DocStatus')
       ->where('U_ECOMNO', $code)
+      ->where('CANCELED', 'N')
       ->get('ODLN');
       if($rs->num_rows() === 1)
       {
@@ -266,7 +273,7 @@ class Delivery_order_model extends CI_Model
     }
 
 
-    
+
     public function sap_exists_details($code)
     {
       $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('DLN1');

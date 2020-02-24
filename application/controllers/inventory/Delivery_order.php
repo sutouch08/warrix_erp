@@ -418,6 +418,7 @@ class Delivery_order extends PS_Controller
 
   public function export_order($code)
   {
+    $sc = TRUE;
     $this->load->model('masters/customers_model');
     $this->load->model('masters/products_model');
     $this->load->model('discount/discount_policy_model');
@@ -432,7 +433,7 @@ class Delivery_order extends PS_Controller
     $do = $this->delivery_order_model->get_sap_delivery_order($code);
     $middle = $this->delivery_order_model->is_doc_exists($code);
 
-    if(empty($do) OR $do->DocStatus == 'O')
+    if(empty($do))
     {
       $currency = getConfig('CURRENCY');
       $vat_rate = getConfig('SALE_VAT_RATE');
@@ -463,42 +464,23 @@ class Delivery_order extends PS_Controller
         'F_E_CommerceDate' => sap_date(now(), TRUE)
       );
 
-      $this->mc->trans_start();
+      $this->mc->trans_begin();
 
-      if(!empty($do))
-      {
-        $ds['F_E_Commerce'] = 'U';
-      }
-
-      if($middle)
-      {
-        $sc = $this->delivery_order_model->update_sap_delivery_order($code, $ds);
-      }
-      else
-      {
-        $sc = $this->delivery_order_model->add_sap_delivery_order($ds);
-      }
+      $docEntry = $this->delivery_order_model->add_sap_delivery_order($ds);
 
 
-      if($sc)
+      if($docEntry !== FALSE)
       {
         $details = $this->delivery_order_model->get_sold_details($code);
         if(!empty($details))
         {
           $line = 0;
-          $update = FALSE;
-
-          if($this->delivery_order_model->sap_exists_details($code))
-          {
-            $update = TRUE;
-            $this->delivery_order_model->drop_sap_exists_details($code);
-          }
-
 
           foreach($details as $rs)
           {
 
             $arr = array(
+              'DocEntry' => $docEntry,
               'U_ECOMNO' => $rs->reference,
               'LineNum' => $line,
               'ItemCode' => $rs->product_code,
@@ -521,7 +503,7 @@ class Delivery_order extends PS_Controller
               'GTotal' => round($rs->total_amount, 2),
               'VatSum' => get_vat_amount($rs->total_amount), //---- tool_helper
               'TaxType' => 'Y', //--- คิดภาษีหรือไม่
-              'F_E_Commerce' => $update === TRUE ? 'U' : 'A', //--- A = Add , U = Update
+              'F_E_Commerce' => 'A', //--- A = Add , U = Update
               'F_E_CommerceDate' => sap_date(now(), TRUE),
               'U_PROMOTION' => $this->discount_policy_model->get_code($rs->id_policy)
             );
@@ -530,24 +512,29 @@ class Delivery_order extends PS_Controller
             $line++;
           }
         }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบรายการขาย";
+        }
       }
-
-      $this->mc->trans_complete();
-
-      if($this->mc->trans_status() === FALSE)
+      else
       {
-        $this->error = 'เพิ่มรายการไม่สำเร็จ';
-        return FALSE;
+        $sc = FALSE;
+        $this->error = "เพิ่มเอกสารไม่สำเร็จ";
       }
 
-      return TRUE;
-    }
-    else
-    {
-      $this->error = 'เอกสารถูกปิดไปแล้ว';
+      if($sc === TRUE)
+      {
+        $this->mc->trans_commit();
+      }
+      else
+      {
+        $this->mc->trans_rollback();
+      }
     }
 
-    return FALSE;
+    return $sc;
   }
   //--- end export_order
 
@@ -555,6 +542,7 @@ class Delivery_order extends PS_Controller
 
   private function export_transfer($code)
   {
+    $sc = TRUE;
     $this->load->model('inventory/transfer_model');
     $this->load->model('masters/customers_model');
     $this->load->model('masters/products_model');
@@ -562,7 +550,7 @@ class Delivery_order extends PS_Controller
 
     $doc = $this->orders_model->get($code);
     $tr = $this->transfer_model->get_sap_transfer_doc($code);
-    $middle = $this->transfer_model->is_middle_exists($code);
+
     if($doc->role == 'L' OR $doc->role == 'U' OR $doc->role == 'R')
     {
       $cust = new stdClass();
@@ -576,7 +564,7 @@ class Delivery_order extends PS_Controller
 
     if(!empty($doc))
     {
-      if(empty($tr) OR $tr->DocStatus == 'O')
+      if(empty($tr))
       {
         if($doc->status == 1)
         {
@@ -612,24 +600,12 @@ class Delivery_order extends PS_Controller
             'U_APPROVER' => $doc->approver
           );
 
-          $this->mc->trans_start();
+          $this->mc->trans_begin();
 
-          if($middle)
-          {
-            $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
-          }
-          else
-          {
-            $sc = $this->transfer_model->add_sap_transfer_doc($ds);
-          }
+          $docEntry = $sc = $this->transfer_model->add_sap_transfer_doc($ds);
 
-          if($sc)
+          if($docEntry !== FALSE)
           {
-            if($middle)
-            {
-              $this->transfer_model->drop_sap_exists_details($code);
-            }
-
             $details = $this->delivery_order_model->get_sold_details($code);
 
             if(!empty($details))
@@ -638,6 +614,7 @@ class Delivery_order extends PS_Controller
               foreach($details as $rs)
               {
                 $arr = array(
+                  'DocEntry' => $docEntry,
                   'U_ECOMNO' => $rs->reference,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
@@ -671,6 +648,7 @@ class Delivery_order extends PS_Controller
 
                 if( ! $this->transfer_model->add_sap_transfer_detail($arr))
                 {
+                  $sc = FALSE;
                   $this->error = 'เพิ่มรายการไม่สำเร็จ';
                 }
 
@@ -679,39 +657,45 @@ class Delivery_order extends PS_Controller
             }
             else
             {
+              $sc = FALSE;
               $this->error = "ไม่พบรายการสินค้า";
             }
           }
           else
           {
+            $sc = FALSE;
             $this->error = "เพิ่มเอกสารไม่สำเร็จ";
           }
 
-          $this->mc->trans_complete();
-
-          if($this->mc->trans_status() === FALSE)
+          if($sc === TRUE)
           {
-            return FALSE;
+            $this->mc->trans_commit();
+          }
+          else
+          {
+            $this->mc->trans_rollback();
           }
 
-          return TRUE;
         }
         else
         {
+          $sc = FALSE;
           $this->error = "สถานะเอกสารไม่ถูกต้อง";
         }
       }
       else
       {
+        $sc = FALSE;
         $this->error = "เอกสารถูกปิดไปแล้ว";
       }
     }
     else
     {
+      $sc = FALSE;
       $this->error = "ไม่พบเอกสาร {$code}";
     }
 
-    return FALSE;
+    return $sc;
   }
 //--- end export transfer
 
@@ -719,6 +703,7 @@ class Delivery_order extends PS_Controller
 
 private function export_transform($code)
 {
+  $sc = TRUE;
   $this->load->model('inventory/transfer_model');
   $this->load->model('masters/customers_model');
   $this->load->model('masters/products_model');
@@ -730,7 +715,7 @@ private function export_transform($code)
 
   if(!empty($doc))
   {
-    if(empty($tr) OR $tr->DocStatus == 'O')
+    if(empty($tr))
     {
       if($doc->status == 1)
       {
@@ -766,23 +751,12 @@ private function export_transform($code)
           'U_APPROVER' => $doc->approver
         );
 
-        $this->mc->trans_start();
+        $this->mc->trans_begin();
 
-        if(!empty($tr))
-        {
-          $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
-        }
-        else
-        {
-          $sc = $this->transfer_model->add_sap_transfer_doc($ds);
-        }
+        $docEntry = $sc = $this->transfer_model->add_sap_transfer_doc($ds);
 
-        if($sc)
+        if($docEntry !== FALSE)
         {
-          if(!empty($tr))
-          {
-            $this->transfer_model->drop_sap_exists_details($code);
-          }
 
           $details = $this->delivery_order_model->get_sold_details($code);
 
@@ -792,6 +766,7 @@ private function export_transform($code)
             foreach($details as $rs)
             {
               $arr = array(
+                'DocEntry' => $docEntry,
                 'U_ECOMNO' => $rs->reference,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
@@ -824,6 +799,7 @@ private function export_transform($code)
 
               if( ! $this->transfer_model->add_sap_transfer_detail($arr))
               {
+                $sc = FALSE;
                 $this->error = 'เพิ่มรายการไม่สำเร็จ';
               }
 
@@ -832,39 +808,44 @@ private function export_transform($code)
           }
           else
           {
+            $sc = FALSE;
             $this->error = "ไม่พบรายการสินค้า";
           }
         }
         else
         {
+          $sc = FALSE;
           $this->error = "เพิ่มเอกสารไม่สำเร็จ";
         }
 
-        $this->mc->trans_complete();
-
-        if($this->mc->trans_status() === FALSE)
+        if($sc === TRUE)
         {
-          return FALSE;
+          $this->mc->trans_commit();
         }
-
-        return TRUE;
+        else
+        {
+          $this->mc->trans_rollback();
+        }
       }
       else
       {
+        $sc = FALSE;
         $this->error = "สถานะเอกสารไม่ถูกต้อง";
       }
     }
     else
     {
+      $sc = FALSE;
       $this->error = "เอกสารถูกปิดไปแล้ว";
     }
   }
   else
   {
+    $sc = FALSE;
     $this->error = "ไม่พบเอกสาร {$code}";
   }
 
-  return FALSE;
+  return $sc;
 }
 //--- end export transform
 

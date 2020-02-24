@@ -233,6 +233,8 @@ class Zone_model extends CI_Model
       $this->db->where('zone.warehouse_code', $ds['warehouse']);
     }
 
+    $this->db->order_by('zone.code', 'ASC');
+
     if(!empty($perpage))
     {
       $offset = $offset === NULL ? 0 : $offset;
@@ -431,7 +433,7 @@ class Zone_model extends CI_Model
     $rs = $this->db->select_max('last_sync')->get('zone');
     if($rs->num_rows() === 1)
     {
-      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : $rs->row()->last_sync;
+      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : db_date($rs->row()->last_sync);
     }
 
     return date('2019-01-01 00:00:00');
@@ -443,8 +445,8 @@ class Zone_model extends CI_Model
     $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, WhsCode AS warehouse_code, SL1Code AS old_code');
     $this->ms->where('SysBin', 'N');
     $this->ms->group_start();
-    $this->ms->where('createDate >', sap_date($last_sync));
-    $this->ms->or_where('updateDate >', sap_date($last_sync));
+    $this->ms->where('createDate >=', sap_date($last_sync));
+    $this->ms->or_where('updateDate >=', sap_date($last_sync));
     $this->ms->group_end();
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)

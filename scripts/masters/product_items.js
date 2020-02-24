@@ -120,6 +120,63 @@ function setImages()
 }
 
 
+function checkOldCode(style_code, old_style){
+  if(old_style != ""){
+    confirmGenOldCode(style_code, old_style);
+  }else{
+    swal({
+      title:"ไม่พบรหัสรุ่นเก่า !!",
+      text:"กรุณาระบุรหัสรุ่นเก่าในแถบข้อมูลแล้วบันทึกก่อนใช้งานปุ่มนี้",
+      type:"warning"
+    });
+  }
+}
+
+
+function confirmGenOldCode(style_code){
+  swal({
+    title:'สร้างรหัสเก่า',
+    text:'รหัส(เก่า)เดิม จะถูกแทนที่ด้วยรหัส(เก่า)ที่ถูกสร้างใหม่ ต้องการดำเนินการต่อหรือไม่ ?',
+    type:'warning',
+    showCancelButton: true,
+		confirmButtonColor: '#FA5858',
+		confirmButtonText: 'ใช่, ฉันต้องการ',
+		cancelButtonText: 'ยกเลิก',
+		closeOnConfirm: false
+  },function(){
+    $.ajax({
+      url: BASE_URL + 'masters/products/generate_old_code_item',
+      type:'POST',
+      cache:false,
+      data:{
+        'style_code' : style_code
+      },
+      success:function(rs){
+        if(rs === 'success'){
+          swal({
+            title:'Success',
+            text:'สร้างรหัส(เก่า)เรียบร้อยแล้ว',
+            type:'success',
+            timer:1000
+          });
+
+          setTimeout(function(){
+            window.location.reload();
+          }, 1500);
+          
+        }else{
+          swal({
+            title:'Error!',
+            text:rs,
+            type:'error'
+          });
+        }
+      }
+    })
+  })
+}
+
+
 
 function setBarcodeForm(){
   if($('.cost').length){

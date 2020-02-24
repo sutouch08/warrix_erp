@@ -7,6 +7,9 @@
 		<button type="button" class="btn btn-sm btn-warning" onclick="setBarcodeForm()">Generate Barcode</button>
 		<button type="button" class="btn btn-sm btn-purple" onclick="downloadBarcode('<?php echo $style->code; ?>')">Download Barcode</button>
 		<button type="button" class="btn btn-sm btn-info" onclick="doExport('<?php echo $style->code; ?>')"><i class="fa fa-send"></i> ส่งไป SAP </button>
+		<button type="button" class="btn btn-sm btn-yellow" onclick="checkOldCode('<?php echo $style->code; ?>','<?php echo $style->old_code; ?>')">
+			Generate รหัสเก่า
+		</button>
 		<?php endif; ?>
 	</div>
 </div>
@@ -18,13 +21,14 @@
 				<tr>
 					<th class="width-5 text-center">รูปภาพ</th>
 					<th class="width-20">รหัสสินค้า</th>
-					<th class="width-15">บาร์โค้ด</th>
-					<th class="width-8 text-center">สี</th>
-					<th class="width-8 text-center">ไซส์</th>
+					<th class="width-15">รหัสเก่า</th>
+					<th class="width-10">บาร์โค้ด</th>
+					<th class="width-5 text-center">สี</th>
+					<th class="width-5 text-center">ไซส์</th>
 					<th class="width-8 text-right">ทุน</th>
 					<th class="width-8 text-right">ราคา</th>
 					<th class="width-5 text-center">ขาย</th>
-					<th class="width-8 text-center">ใช้งาน</th>
+					<th class="width-5 text-center">เปิด</th>
 					<th class="width-5 text-center">API</th>
 					<th class=""></th>
 				</tr>
@@ -33,11 +37,12 @@
 <?php if(!empty($items)) : ?>
 	<?php foreach($items as $item) : ?>
 		<?php $img = get_product_image($item->code, 'mini'); ?>
-				<tr id="row-<?php echo $item->code; ?>">
+				<tr id="row-<?php echo $item->code; ?>" style="font-size:12px;">
 					<td class="middle text-center">
 						<img src="<?php echo $img; ?>" style="width:50px;" />
 					</td>
 					<td class="middle"><?php echo $item->code; ?></td>
+					<td class="middle"><?php echo $item->old_code; ?></td>
 					<td class="middle">
 						<span class="lb" id="bc-lbl-<?php echo $item->code; ?>"><?php echo $item->barcode; ?></span>
 						<input type="text"
@@ -104,15 +109,15 @@
 					</td>
 					<td class="middle text-right">
 						<?php if($this->pm->can_edit) : ?>
-							<button type="button" class="btn btn-xs btn-warning lb" id="btn-edit-<?php echo $item->code; ?>" onclick="editItem('<?php echo $item->code; ?>')">
+							<button type="button" class="btn btn-mini btn-warning lb" id="btn-edit-<?php echo $item->code; ?>" onclick="editItem('<?php echo $item->code; ?>')">
 								<i class="fa fa-pencil"></i>
 							</button>
-							<button type="button" class="btn btn-xs btn-success edit hide" id="btn-update-<?php echo $item->code; ?>" onclick="updateItem('<?php echo $item->code; ?>')">
+							<button type="button" class="btn btn-mini btn-success edit hide" id="btn-update-<?php echo $item->code; ?>" onclick="updateItem('<?php echo $item->code; ?>')">
 								<i class="fa fa-save"></i>
 							</button>
 						<?php endif; ?>
 						<?php if($this->pm->can_delete) : ?>
-							<button type="button" class="btn btn-xs btn-danger" onclick="deleteItem('<?php echo $item->code; ?>', '<?php echo $style->code; ?>')">
+							<button type="button" class="btn btn-mini btn-danger" onclick="deleteItem('<?php echo $item->code; ?>', '<?php echo $style->code; ?>')">
 								<i class="fa fa-trash"></i>
 							</button>
 						<?php endif; ?>

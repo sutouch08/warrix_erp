@@ -18,9 +18,9 @@ class Product_color extends PS_Controller
 
   public function index()
   {
-		$code = get_filter('code', 'code', '');
-		$name = get_filter('name', 'name', '');
-    $status = get_filter('status', 'status', 2);
+		$code = get_filter('code', 'color_code', '');
+		$name = get_filter('name', 'color_name', '');
+    $status = get_filter('status', 'color_status', 2);
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -255,14 +255,16 @@ class Product_color extends PS_Controller
           $arr['OLDCODE'] = $old_code;
         }
 
-        return $this->product_color_model->update_sap_color($old_code, $arr);
+        //return $this->product_color_model->update_sap_color($old_code, $arr);
       }
       else
       {
         $arr['Flag'] = 'A';
 
-        return $this->product_color_model->add_sap_color($arr);
+        //return $this->product_color_model->add_sap_color($arr);
       }
+
+      return $this->product_color_model->add_sap_color($arr);
     }
 
     return FALSE;
@@ -271,7 +273,7 @@ class Product_color extends PS_Controller
 
   public function clear_filter()
 	{
-    $filter = array('code', 'name', 'status');
+    $filter = array('color_code', 'color_name', 'color_status');
     clear_filter($filter);
 	}
 

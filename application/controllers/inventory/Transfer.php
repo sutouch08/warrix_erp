@@ -846,11 +846,12 @@ class Transfer extends PS_Controller
 
   private function do_export($code)
   {
+    $sc = TRUE;
     $doc = $this->transfer_model->get($code);
     $tr = $this->transfer_model->get_sap_transfer_doc($code);
     if(!empty($doc))
     {
-      if(empty($tr) OR $tr->DocStatus == 'O')
+      if(empty($tr))
       {
         if($doc->status == 1)
         {
@@ -884,24 +885,12 @@ class Transfer extends PS_Controller
             'U_BOOKCODE' => $doc->bookcode
           );
 
-          $this->mc->trans_start();
+          $this->mc->trans_begin();
 
-          if(!empty($tr))
-          {
-            $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
-          }
-          else
-          {
-            $sc = $this->transfer_model->add_sap_transfer_doc($ds);
-          }
+          $docEntry = $sc = $this->transfer_model->add_sap_transfer_doc($ds);
 
-          if($sc)
+          if($docEntry !== FALSE)
           {
-            if(!empty($tr))
-            {
-              $this->transfer_model->drop_sap_exists_details($code);
-            }
-
             $details = $this->transfer_model->get_details($code);
 
             if(!empty($details))
@@ -910,6 +899,7 @@ class Transfer extends PS_Controller
               foreach($details as $rs)
               {
                 $arr = array(
+                  'DocEntry' => $docEntry,
                   'U_ECOMNO' => $rs->transfer_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
@@ -942,6 +932,7 @@ class Transfer extends PS_Controller
 
                 if( ! $this->transfer_model->add_sap_transfer_detail($arr))
                 {
+                  $sc = FALSE;
                   $this->error = 'เพิ่มรายการไม่สำเร็จ';
                 }
 
@@ -950,39 +941,45 @@ class Transfer extends PS_Controller
             }
             else
             {
+              $sc = FALSE;
               $this->error = "ไม่พบรายการสินค้า";
             }
           }
           else
           {
+            $sc = FALSE;
             $this->error = "เพิ่มเอกสารไม่สำเร็จ";
           }
 
-          $this->mc->trans_complete();
-
-          if($this->mc->trans_status() === FALSE)
+          if($sc === TRUE)
           {
-            return FALSE;
+            $this->mc->trans_commit();
+          }
+          else
+          {
+            $this->mc->trans_rollback();
           }
 
-          return TRUE;
         }
         else
         {
+          $sc = FALSE;
           $this->error = "สถานะเอกสารไม่ถูกต้อง";
         }
       }
       else
       {
+        $sc = FALSE;
         $this->error = "เอกสารถูกปิดไปแล้ว";
       }
     }
     else
     {
+      $sc = FALSE;
       $this->error = "ไม่พบเอกสาร {$code}";
     }
 
-    return FALSE;
+    return $sc;
   }
 
 

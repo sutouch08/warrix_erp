@@ -12,7 +12,11 @@ class Return_order_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->mc->insert('ORDN', $ds);
+      $rs = $this->mc->insert('ORDN', $ds);
+      if($rs)
+      {
+        return $this->mc->insert_id();
+      }
     }
 
     return FALSE;
@@ -47,10 +51,7 @@ class Return_order_model extends CI_Model
   //---- ดึงข้อมูลจากถังกลางมาเช็คสถานะ
   public function get_sap_return_order($code)
   {
-    $rs = $this->mc
-    ->select('U_ECOMNO, DocStatus')
-    ->where('U_ECOMNO', $code)
-    ->get('ORDN');
+    $rs = $this->ms->select('DocStatus')->where('U_ECOMNO', $code)->get('ORDN');
     if($rs->num_rows() === 1)
     {
       return $rs->row();

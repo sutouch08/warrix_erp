@@ -187,6 +187,7 @@ class Lend extends PS_Controller
         'user_ref' => $this->input->post('user_ref'),
         'zone_code' => $this->input->post('zone_code'),
         'remark' => $this->input->post('remark'),
+        'warehouse_code' => $this->input->post('warehouse_code'),
         'status' => 0
       );
 

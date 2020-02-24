@@ -387,6 +387,7 @@ function updateOrder(){
 	var user_ref = $('#user_ref').val();
 	var remark = $("#remark").val();
   var zone_code = $('#zone_code').val();
+  var warehouse = $('#warehouse').val();
 
 	load_in();
 
@@ -401,7 +402,8 @@ function updateOrder(){
       "empName" : empName,
       "user_ref" : user_ref,
   		"remark" : remark,
-      "zone_code" : zone_code
+      "zone_code" : zone_code,
+      "warehouse_code" : warehouse
     },
 		success: function(rs){
 			load_out();

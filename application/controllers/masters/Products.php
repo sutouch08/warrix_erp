@@ -520,6 +520,7 @@ class Products extends PS_Controller
     if($this->input->post('style'))
     {
       $code = $this->input->post('style');
+      $old_code = $this->input->post('old_code');
       $colors = $this->input->post('colors');
       $sizes = $this->input->post('sizes');
       $images = $this->input->post('image');
@@ -528,18 +529,18 @@ class Products extends PS_Controller
 
       if($colors !== NULL && $sizes !== NULL)
       {
-        $rs = $this->gen_color_and_size($code, $colors, $sizes, $cost, $price);
+        $rs = $this->gen_color_and_size($code, $colors, $sizes, $cost, $price, $old_code);
       }
 
       if($colors !== NULL && $sizes === NULL)
       {
-        $rs = $this->gen_color_only($code, $colors);
+        $rs = $this->gen_color_only($code, $colors, $old_code);
       }
 
 
       if($colors === NULL && $sizes !== NULL)
       {
-        $rs = $this->gen_size_only($code, $sizes);
+        $rs = $this->gen_size_only($code, $sizes, $old_code);
       }
 
       if($rs === TRUE && $colors !== NULL && $images !== NULL)
@@ -579,7 +580,7 @@ class Products extends PS_Controller
 
 
 
-  public function gen_color_and_size($style, $colors, $sizes, $cost, $price)
+  public function gen_color_and_size($style, $colors, $sizes, $cost, $price, $old_code)
   {
     $sc = TRUE;
     foreach($colors as $color)
@@ -608,6 +609,9 @@ class Products extends PS_Controller
           'count_stock' => $ds->count_stock,
           'can_sell' => $ds->can_sell,
           'active' => $ds->active,
+          'is_api' => $ds->is_api,
+          'old_style' => $ds->old_code,
+          'old_code' => (isset($old_code[$code]) ? $old_code[$code] : NULL),
           'update_user' => get_cookie('uname')
         );
 
@@ -660,6 +664,9 @@ class Products extends PS_Controller
         'count_stock' => $ds->count_stock,
         'can_sell' => $ds->can_sell,
         'active' => $ds->active,
+        'is_api' => $ds->is_api,
+        'old_style' => $ds->old_code,
+        'old_code' => (isset($old_code[$code]) ? $old_code[$code] : NULL),
         'update_user' => get_cookie('uname')
       );
 
@@ -702,6 +709,9 @@ class Products extends PS_Controller
         'count_stock' => $ds->count_stock,
         'can_sell' => $ds->can_sell,
         'active' => $ds->active,
+        'is_api' => $ds->is_api,
+        'old_style' => $ds->old_code,
+        'old_code' => (isset($old_code[$code]) ? $old_code[$code] : NULL),
         'update_user' => get_cookie('uname')
       );
 
@@ -715,6 +725,60 @@ class Products extends PS_Controller
   }
 
 
+
+
+  public function generate_old_code_item()
+  {
+    $sc = TRUE;
+    $style_code = $this->input->post('style_code');
+    if(!empty($style_code))
+    {
+      $style = $this->product_style_model->get($style_code);
+      if(!empty($style))
+      {
+        if(!empty($style->old_code))
+        {
+          $items = $this->products_model->get_style_items($style->code);
+          if(!empty($items))
+          {
+            foreach($items as $item)
+            {
+              $color = ($item->color_code === NULL OR $item->color_code === '') ? '' : '-'.$item->color_code;
+              $size = ($item->size_code === NULL OR $item->size_code === '') ? '' : '-'.$item->size_code;
+              $old_code = $style->old_code . $color . $size;
+
+              $arr = array(
+                'old_style' => $style->old_code,
+                'old_code' => $old_code
+              );
+
+              if($this->products_model->update($item->code, $arr) === TRUE)
+              {
+                $this->do_export($item->code);
+              }
+            }
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบรหัสรุ่นเก่า กรุณาตรวจสอบ";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบข้อมูลรุ่นสินค้า";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบข้อมูลรุ่นสินค้า";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
 
 
   public function delete_item($item)

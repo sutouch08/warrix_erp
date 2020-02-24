@@ -18,8 +18,8 @@ class Product_type extends PS_Controller
 
   public function index()
   {
-		$code = get_filter('code', 'code', '');
-		$name = get_filter('name', 'name', '');
+		$code = get_filter('code', 'type_code', '');
+		$name = get_filter('name', 'type_name', '');
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -242,14 +242,16 @@ class Product_type extends PS_Controller
           $arr['OLDCODE'] = $old_code;
         }
 
-        return $this->product_type_model->update_sap_type($old_code, $arr);
+        //return $this->product_type_model->update_sap_type($old_code, $arr);
       }
       else
       {
         $arr['Flag'] = 'A';
 
-        return $this->product_type_model->add_sap_type($arr);
+        // return $this->product_type_model->add_sap_type($arr);
       }
+
+      return $this->product_type_model->add_sap_type($arr);
     }
 
     return FALSE;
@@ -258,8 +260,8 @@ class Product_type extends PS_Controller
 
   public function clear_filter()
 	{
-		$this->session->unset_userdata('code');
-    $this->session->unset_userdata('name');
+		$filter = array('type_code', 'type_name');
+    clear_filter($filter);
 		echo 'done';
 	}
 

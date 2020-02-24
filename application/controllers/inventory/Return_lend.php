@@ -74,7 +74,7 @@ class Return_lend extends PS_Controller
   public function add()
   {
     $sc = TRUE;
-    
+
     if($this->input->post('date_add'))
     {
       $this->load->model('inventory/lend_model');
@@ -707,16 +707,17 @@ class Return_lend extends PS_Controller
 
   private function export_return_lend($code)
   {
+    $sc = TRUE;
     $this->load->model('inventory/transfer_model');
     $this->load->model('masters/products_model');
     $this->load->model('masters/employee_model');
 
     $doc = $this->return_lend_model->get($code);
     $tr = $this->transfer_model->get_sap_transfer_doc($code);
-    $temp = $this->transfer_model->is_middle_exists($code);
+
     if(!empty($doc))
     {
-      if(empty($tr) OR $tr->DocStatus == 'O' OR $tr->CANCELED == 'N')
+      if(empty($tr))
       {
         if($doc->status == 1)
         {
@@ -751,23 +752,13 @@ class Return_lend extends PS_Controller
             'U_REQUESTER' => $this->employee_model->get_name($doc->empID)
           );
 
-          $this->mc->trans_start();
+          $this->mc->trans_begin();
 
-          if(!empty($temp))
-          {
-            $sc = $this->transfer_model->update_sap_transfer_doc($code, $ds);
-          }
-          else
-          {
-            $sc = $this->transfer_model->add_sap_transfer_doc($ds);
-          }
+          $docEntry = $sc = $this->transfer_model->add_sap_transfer_doc($ds);
 
-          if($sc)
+
+          if($docEntry !== FALSE)
           {
-            if(!empty($temp))
-            {
-              $this->transfer_model->drop_sap_exists_details($code);
-            }
 
             $details = $this->return_lend_model->get_details($code);
 
@@ -777,6 +768,7 @@ class Return_lend extends PS_Controller
               foreach($details as $rs)
               {
                 $arr = array(
+                  'DocEntry' => $docEntry,
                   'U_ECOMNO' => $rs->return_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
@@ -808,6 +800,7 @@ class Return_lend extends PS_Controller
 
                 if( ! $this->transfer_model->add_sap_transfer_detail($arr))
                 {
+                  $sc = FALSE;
                   $this->error = 'เพิ่มรายการไม่สำเร็จ';
                 }
 
@@ -816,39 +809,44 @@ class Return_lend extends PS_Controller
             }
             else
             {
+              $sc = FALSE;
               $this->error = "ไม่พบรายการสินค้า";
             }
           }
           else
           {
+            $sc = FALSE;
             $this->error = "เพิ่มเอกสารไม่สำเร็จ";
           }
 
-          $this->mc->trans_complete();
-
-          if($this->mc->trans_status() === FALSE)
+          if($sc === TRUE)
           {
-            return FALSE;
+            $this->mc->trans_commit();
           }
-
-          return TRUE;
+          else
+          {
+            $this->mc->trans_rollback();
+          }
         }
         else
         {
+          $sc = FALSE;
           $this->error = "สถานะเอกสารไม่ถูกต้อง";
         }
       }
       else
       {
+        $sc = FALSE;
         $this->error = "เอกสารถูกปิดไปแล้ว";
       }
     }
     else
     {
+      $sc = FALSE;
       $this->error = "ไม่พบเอกสาร {$code}";
     }
 
-    return FALSE;
+    return $sc;
   }
 //--- end export transfer
 

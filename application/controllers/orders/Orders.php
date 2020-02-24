@@ -245,7 +245,7 @@ class Orders extends PS_Controller
       						if($i < 3) //--- limit ไว้แค่ 3 เสต็ป
       						{
       							$disc = explode('%', $discText);
-      							$disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
+      							$disc[0] = floatval(trim($disc[0])); //--- ตัดช่องว่างออก
       							$amount = count($disc) == 1 ? $disc[0] : $price * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
       							$discLabel[$i] = count($disc) == 1 ? $disc[0] : $disc[0].'%';
       							$discAmount += $amount;

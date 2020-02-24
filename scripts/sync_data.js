@@ -12,7 +12,7 @@ function syncData(){
 //--1 Sync Warehouse
 function syncWarehouse(){
   $('body').append('start importing : Warehouse ...<br/>');
-  $.get(BASE_URL +'masters/warehouse/syncData', function(){
+  $.get(BASE_URL +'sync_data/syncWarehouse', function(){
     $('body').append('finish import : Warehouse ...<br/>');
     setTimeout(function(){
       syncZone();
@@ -24,7 +24,7 @@ function syncWarehouse(){
 //--- 2. Sync zone
 function syncZone(){
   $('body').append('start importing : Zone ...<br/>');
-  $.get(BASE_URL+'masters/zone/syncData', function(){
+  $.get(BASE_URL+'sync_data/syncZone', function(){
     $('body').append('finish import : Zone ...<br/>');
     syncCustomer();
   });
@@ -36,8 +36,18 @@ function syncZone(){
 //--- 3. Sync customer
 function syncCustomer(){
   $('body').append('start importing : Customers ...<br/>');
-  $.get(BASE_URL+'masters/customers/syncData', function(){
+  $.get(BASE_URL+'sync_data/syncCustomer', function(){
     $('body').append('finish import : Customers ...<br/>');
-    window.close();
+    syncGoodReceivePo();
   });
+}
+
+//--- 4. sync OPDN
+
+function syncGoodReceivePo(){
+  $('body').append('start updating Goods Receive PO .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncReceivePoInvCode', function(){
+    $('body').append('finished update Good Recieve PO document code...<br/>');
+    window.close();
+  })
 }

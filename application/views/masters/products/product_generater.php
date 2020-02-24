@@ -40,6 +40,7 @@
 				<hr>
 <form class="form-horizontal" id="genItemFrom" method="post" action="<?php echo $this->home; ?>/gen_items">
   <input type="hidden" name="style" id="style" value="<?php echo $style->code; ?>" />
+	<input type="hidden" name="old_style" id="old_style" value="<?php echo $style->old_code; ?>" />
   <input type="hidden" id="cost" value="<?php echo number($style->cost, 2); ?>" />
   <input type="hidden" id="price" value="<?php echo number($style->price, 2); ?>" />
 			<!-- #section:plugins/fuelux.wizard.container -->
@@ -125,6 +126,7 @@
                       <tr>
                         <th class="width-10 text-center">รูปภาพ</th>
                         <th>รหัสสินค้า</th>
+												<th>รหัสเก่า</th>
                       </tr>
                     </thead>
                     <tbody id="preGen">

@@ -2,8 +2,8 @@
 <?php $manual_code = getConfig('MANUAL_DOC_CODE');  ?>
 <?php if($manual_code == 1) :?>
 	<input type="hidden" id="manualCode" value="<?php echo $manual_code; ?>">
-	<input type="hidden" id="prefix" value="<?php echo getConfig('PREFIX_ORDER'); ?>">
-	<input type="hidden" id="runNo" value="<?php echo getConfig('RUN_DIGIT_ORDER'); ?>">
+	<input type="hidden" id="prefix" value="<?php echo getConfig('PREFIX_SPONSOR'); ?>">
+	<input type="hidden" id="runNo" value="<?php echo getConfig('RUN_DIGIT_SPONSOR'); ?>">
 <?php endif; ?>
 <div class="row">
 	<div class="col-sm-6">

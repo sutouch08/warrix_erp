@@ -19,12 +19,21 @@
     	<label>ผู้รับ</label>
       <input type="text" class="form-control input-sm edit" id="user_ref" name="user_ref" value="<?php echo $order->user_ref; ?>" disabled />
     </div>
+
+		<div class="col-sm-2 col-xs-12 padding-5 first">
+			<label>คลัง</label>
+	    <select class="form-control input-sm edit" name="warehouse" id="warehouse" disabled required>
+				<option value="">เลือกคลัง</option>
+				<?php echo select_sell_warehouse($order->warehouse_code); ?>
+			</select>
+	  </div>
+
 		<div class="col-sm-2 padding-5 first">
 			<label>ผู้ทำรายการ</label>
 		  <input type="text" class="form-control input-sm text-center" value="<?php echo $order->user; ?>" disabled />
 		</div>
 
-		<div class="col-sm-9 padding-5 ">
+		<div class="col-sm-7 padding-5 ">
 		 	<label>หมายเหตุ</label>
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
 		</div>

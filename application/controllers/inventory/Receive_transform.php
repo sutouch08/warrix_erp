@@ -243,6 +243,7 @@ class Receive_transform extends PS_Controller
   //--- update receive_qty in order_transform_detail
   public function update_transform_receive_qty($order_code, $product_code, $qty)
   {
+    $sc = TRUE;
     $list = $this->transform_model->get_transform_product_by_code($order_code, $product_code);
     if(!empty($list))
     {
@@ -276,32 +277,119 @@ class Receive_transform extends PS_Controller
 
 
 
+  //--- update receive_qty in order_transform_detail
+  public function unreceive_product($order_code, $product_code, $qty)
+  {
+    $sc = TRUE;
+    $list = $this->transform_model->get_transform_product_by_code($order_code, $product_code);
+    if(!empty($list))
+    {
+      foreach($list as $rs)
+      {
+        if($qty > 0 && $rs->receive_qty > 0)
+        {
+          $diff = $rs->receive_qty - $rs->qty;
+          if($diff >= 0 )
+          {
+            //--- ถ้า dif มากกว่ายอดที่รับมาให้ใช้ยอดรับ
+            //--- หากยอดค้าง มี 2 แถว แถวแรก 5 แถวที่ 2 อีก 5 รวมเป็น 10
+            //--- แต่รับเข้ามา 8
+            //--- รอบแรก ยอด diff = 5 ซึ่งน้อยกว่า ยอดรับ ให้ใช้ยอด diff (ยอดค้างรับของแถวนั้น)
+            //--- รอบสอง ยอด diff = 5 แต่ยอดรับจะเหลือ 3 เพราะถูกตัดออกไปรอบแรก 5 (จากยอดรับ 8)
+            //--- รอบสองจึงต้องใช้ยอดรับที่เหลือในการ update
+            if(!$this->transform_model->update_receive_qty($rs->id, (-1) * $qty))
+            {
+              $sc = FALSE;
+            }
+
+            //--- เมื่อลบยอดค้างรับออกแล้วยังเหลือยอดอีกแสดงว่าแถวนี้รับครบแล้ว ให้ update valid เป็น 1
+            if(!$this->transform_model->unvalid_detail($rs->id))
+            {
+              $sc = FALSE;
+            }
+
+            $qty -= $diff;
+          }
+        } //--- end if qty > 0
+      } //--- endforeach
+    }
+
+    return $sc;
+  }
+
+
+
   public function cancle_received()
   {
+    $sc = TRUE;
+
     if($this->input->post('receive_code'))
     {
       $this->load->model('inventory/movement_model');
       $code = $this->input->post('receive_code');
-      $this->db->trans_start();
-      $this->receive_transform_model->cancle_details($code);
-      $this->receive_transform_model->set_status($code, 2); //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
-      $this->movement_model->drop_movement($code);
-      $this->db->trans_complete();
-
-      if($this->db->trans_status() === FALSE)
+      $doc = $this->receive_transform_model->get($code);
+      if(!empty($doc))
       {
-        echo 'ยกเลิกรายการไม่สำเร็จ';
+        $this->db->trans_begin();
+        if( ! $this->receive_transform_model->cancle_details($code) )
+        {
+          $sc = FALSE;
+          $this->error = "ยกเลิกรายการไม่สำเร็จ";
+        }
+
+        if(! $this->receive_transform_model->set_status($code, 2)) //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
+        {
+          $sc = FALSE;
+          $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+        }
+
+        if(! $this->movement_model->drop_movement($code))
+        {
+          $sc = FALSE;
+          $this->error = "ลบ movement ไม่สำเร็จ";
+        }
+
+        if($sc === TRUE)
+        {
+          $details = $this->receive_transform_model->get_details($code);
+          if(!empty($details))
+          {
+            foreach($details as $rs)
+            {
+              if(!$this->unreceive_product($doc->order_code, $rs->product_code, $rs->qty))
+              {
+                $sc = FALSE;
+                $this->error = "Update ยอดค้างรับไม่สำเร็จ";
+                break;
+              }
+            }
+          }
+        }
+
+        if($sc === TRUE)
+        {
+          $this->db->trans_commit();
+        }
+        else
+        {
+          $this->db->trans_rollback();
+        }
+
       }
       else
       {
-        echo 'success';
+        $sc = FALSE;
+        $this->error = "ไม่พบเลขที่เอกสาร";
       }
+
     }
     else
     {
-      echo 'ไม่พบเลขทีเอกสาร';
+      $sc = FALSE;
+      $this->error = 'ไม่พบเลขทีเอกสาร';
     }
 
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 

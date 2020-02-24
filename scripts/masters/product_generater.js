@@ -61,61 +61,79 @@ $('.sizeBox').change(function(){
 
 function preGen(){
   var style = $('#style').val();
+  var old_style = $('#old_style').val();
   var countColor = $('.color').length;
   var countSize = $('.size').length;
 
   $('#preGen').html('');
 
   if(countColor > 0 && countSize > 0){
-    genColorAndSize(style);
+    genColorAndSize(style, old_style);
   }
 
   if(countColor > 0 && countSize == 0){
-    genColorOnly(style);
+    genColorOnly(style, old_style);
   }
 
   if(countColor == 0 && countSize > 0){
-    genSizeOnly(style);
+    genSizeOnly(style, old_style);
   }
 
 }
 
 
-function genColorAndSize(style){
+function genColorAndSize(style, old_style){
   $('.color').each(function(){
     var color = $(this).val();
     $('.size').each(function(){
       var size = $(this).val();
       var itemCode = style + '-' + color + '-' + size;
-      addItemRow(itemCode, color, size);
+      var old_code = "";
+
+      if(old_style != ""){
+        old_code = old_style + '-' + color + '-' + size;
+      }
+
+      addItemRow(itemCode, color, size, old_code);
     });
   });
 }
 
 
-function genColorOnly(style){
+function genColorOnly(style, old_style){
   $('.color').each(function(){
     var color = $(this).val();
     var itemCode = style + '-' + color;
-    addItemRow(itemCode, color, '');
+    var old_code = "";
+    if(old_style != ""){
+      old_code = old_style + '-' + color;
+    }
+
+    addItemRow(itemCode, color, '', old_code);
   });
 }
 
 
 
-function genSizeOnly(style){
+function genSizeOnly(style, old_style){
   $('.size').each(function(){
     var size = $(this).val();
     var itemCode = style + '-' + size;
-    addItemRow(itemCode, '', size);
+    var old_code = "";
+    if(old_style != ""){
+      old_code = old_style + '-' + size;
+    }
+    addItemRow(itemCode, '', size, old_code);
   })
 }
 
-function addItemRow(itemCode, color, size)
+function addItemRow(itemCode, color, size, old_code)
 {
   var row = '<tr id="'+itemCode+'">'+
             '<td class="middle text-center td-'+color+'">img</td>'+
             '<td class="middle">'+itemCode+'</td>'+
+            '<td class="middle">'+
+            '<input type="text" class="form-control input-sm" name="old_code['+itemCode+']" value="'+old_code+'"></td>'+
             '</tr>';
   $('#preGen').append(row);
 }
@@ -137,8 +155,8 @@ $('.imageBox').change(function(){
 
 
 function addCostPrice(size){
-  var cost = $('#cost').val();
-  var price = $('#price').val();
+  var cost = removeCommas($('#cost').val());
+  var price = removeCommas($('#price').val());
   var field = '<tr id="row-'+size+'">'+
               '<td class="middle text-center"><strong>'+ size +'</strong></td>'+
               '<td><input type="number" name="cost['+size+']" class="text-right" value="'+cost+'" /></td>'+
@@ -159,7 +177,7 @@ function genItems(){
   var style = $('#style').val();
   var countColor = $('.color').length;
   var countSize = $('.size').length;
-
+  
   if(style.length == 0){
     swal('ไม่พบรุ่นสินค้า');
     return false;

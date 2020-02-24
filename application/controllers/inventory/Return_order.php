@@ -583,13 +583,13 @@ class Return_order extends PS_Controller
 
   public function do_export($code)
   {
-    $this->mc = $this->load->database('mc', TRUE);
+    $sc = TRUE;
     $doc = $this->return_order_model->get($code);
     $cust = $this->customers_model->get($doc->customer_code);
     $or = $this->return_order_model->get_sap_return_order($code);
     if(!empty($doc))
     {
-      if(empty($or) OR $or->DocStatus == 'O')
+      if(empty($or))
       {
         if($doc->is_approve == 1 && $doc->status == 1)
         {
@@ -620,25 +620,15 @@ class Return_order extends PS_Controller
             'U_OLDINV' => $doc->invoice
           );
 
-          $this->mc->trans_start();
+          $this->mc->trans_begin();
 
-          if(!empty($or))
-          {
-            $sc = $this->return_order_model->update_sap_return_order($code, $ds);
-          }
-          else
-          {
-            $sc = $this->return_order_model->add_sap_return_order($ds);
-          }
+          $docEntry = $this->return_order_model->add_sap_return_order($ds);
 
-          if($sc)
-          {
-            if(!empty($or))
-            {
-              $this->return_order_model->drop_sap_exists_details($code);
-            }
 
+          if($docEntry !== FALSE)
+          {
             $details = $this->return_order_model->get_details($code);
+
             if( ! empty($details))
             {
               $line = 0;
@@ -646,6 +636,7 @@ class Return_order extends PS_Controller
               foreach($details as $rs)
               {
                 $arr = array(
+                  'DocEntry' => $docEntry,
                   'U_ECOMNO' => $rs->return_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
@@ -675,6 +666,7 @@ class Return_order extends PS_Controller
 
                 if( ! $this->return_order_model->add_sap_return_detail($arr))
                 {
+                  $sc = FALSE;
                   $this->error = 'เพิ่มรายการไม่สำเร็จ';
                 }
 
@@ -683,40 +675,46 @@ class Return_order extends PS_Controller
             }
             else
             {
+              $sc = FALSE;
               $this->error = "ไม่พบรายการรับคืน";
             }
           }
           else
           {
+            $sc = FALSE;
             $this->error = "เพิ่มเอกสารไม่สำเร็จ";
           }
 
-          $this->mc->trans_complete();
 
-          if($this->mc->trans_status() === FALSE)
+
+          if($sc === TRUE)
           {
-            return FALSE;
+            $this->mc->trans_commit();
           }
-
-          return TRUE;
-
+          else
+          {
+            $this->mc->trans_rollback();
+          }
         }
         else
         {
+          $sc = FALSE;
           $this->error = "{$code} ยังไม่ได้รับการอนุมัติ";
         }
       }
       else
       {
+        $sc = FALSE;
         $this->error = "เอกสารถูกปิดไปแล้ว";
       }
     }
     else
     {
+      $sc = FALSE;
       $this->error = "ไม่พบเอกสาร {$code}";
     }
 
-    return FALSE;
+    return $sc;
   }
 
 

@@ -89,7 +89,16 @@ class Consign_order extends PS_Controller
       {
         $date_add = db_date($this->input->post('date_add'), TRUE);
         $zone = $this->zone_model->get($this->input->post('zone_code'));
-        $code = $this->get_new_code($date);
+        $isManual = getConfig('MANUAL_DOC_CODE');
+        if($isManual == 1 && !empty($this->input->post('code')))
+        {
+          $code = $this->input->post('code');
+        }
+        else
+        {
+          $code = $this->get_new_code($date_add);
+        }
+
         $bookcode = getConfig('BOOK_CODE_CONSIGN_SOLD');
 
         $arr = array(
