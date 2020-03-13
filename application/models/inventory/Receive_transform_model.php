@@ -10,8 +10,9 @@ class Receive_transform_model extends CI_Model
   public function get_sap_receive_transform($code)
   {
     $rs = $this->ms
-    ->select('CANCELED, DocStatus')
+    ->select('DocEntry, DocStatus')
     ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
     ->get('OIGN');
     if($rs->num_rows() === 1)
     {
@@ -36,7 +37,13 @@ class Receive_transform_model extends CI_Model
 
   public function add_sap_receive_transform(array $ds = array())
   {
-    return $this->mc->insert('OIGN', $ds);
+    $rs = $this->mc->insert('OIGN', $ds);
+    if($rs)
+    {
+      return $this->mc->insert_id();
+    }
+
+    return FALSE;
   }
 
 

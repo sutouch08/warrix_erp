@@ -60,7 +60,12 @@ function getDiscLabel($disc)
 
 function discountAmountToPercent($amount, $qty, $price)
 {
-	return (($amount/$qty)*100)/$price;
+	if($amount != 0 && $qty != 0 && $price != 0)
+	{
+		return (($amount/$qty)*100)/$price;
+	}
+
+	return 0;
 }
 
 ?>

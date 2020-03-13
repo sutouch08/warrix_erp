@@ -245,7 +245,11 @@ class Consignment_order_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->mc->insert('OIGE', $ds);
+      $rs = $this->mc->insert('OIGE', $ds);
+      if($rs)
+      {
+        return $this->mc->insert_id();
+      }
     }
 
     return FALSE;
@@ -267,9 +271,10 @@ class Consignment_order_model extends CI_Model
 
   public function get_sap_consignment_order_doc($code)
   {
-    $rs = $this->mc
-    ->select('U_ECOMNO, CANCELED, DocStatus')
+    $rs = $this->ms
+    ->select('DocEntry, DocStatus')
     ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
     ->get('OIGE');
     if($rs->num_rows() === 1)
     {

@@ -17,8 +17,8 @@ class Channels extends PS_Controller
 
   public function index()
   {
-		$code = get_filter('code', 'code', '');
-		$name = get_filter('name', 'name', '');
+		$code = get_filter('code', 'channels_code', '');
+		$name = get_filter('name', 'channels_name', '');
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -33,7 +33,7 @@ class Channels extends PS_Controller
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	= pagination_config($this->home.'/index/', $rows, $perpage, $segment);
 		$rs = $this->channels_model->get_data($code, $name, $perpage, $this->uri->segment($segment));
-        
+
     $ds = array(
       'code' => $code,
       'name' => $name,
@@ -206,9 +206,8 @@ class Channels extends PS_Controller
 
   public function clear_filter()
 	{
-		$this->session->unset_userdata('code');
-    $this->session->unset_userdata('name');
-		echo 'done';
+		clear_filter(array('channels_code', 'channels_name'));
+    echo 'done';
 	}
 
 }//--- end class

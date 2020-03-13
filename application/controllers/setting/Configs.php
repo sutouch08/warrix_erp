@@ -13,6 +13,7 @@ class Configs extends PS_Controller
     parent::__construct();
     $this->home = base_url().'setting/configs';
     $this->load->model('setting/config_model');
+    $this->load->helper('channels');
   }
 
 

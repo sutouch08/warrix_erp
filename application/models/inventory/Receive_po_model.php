@@ -106,8 +106,9 @@ class Receive_po_model extends CI_Model
   public function get_sap_receive_doc($code)
   {
     $rs = $this->ms
-    ->select('CANCELED, DocStatus')
+    ->select('DocEntry, DocStatus')
     ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
     ->get('OPDN');
     if($rs->num_rows() === 1)
     {
@@ -132,7 +133,13 @@ class Receive_po_model extends CI_Model
 
   public function add_sap_receive_po(array $ds = array())
   {
-    return $this->mc->insert('OPDN', $ds);
+    $rs = $this->mc->insert('OPDN', $ds);
+    if($rs)
+    {
+      return $this->mc->insert_id();
+    }
+
+    return FALSE;
   }
 
 
@@ -168,7 +175,11 @@ class Receive_po_model extends CI_Model
 
   public function get_doc_status($code)
   {
-    $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OPDN');
+    $rs = $this->ms
+    ->select('DocStatus')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('OPDN');
     if($rs->num_rows() === 1)
     {
       return $rs->row()->DocStatus;
@@ -339,7 +350,7 @@ class Receive_po_model extends CI_Model
     ->where('inv_code IS NULL', NULL, FALSE)
     ->limit($limit)
     ->get('receive_product');
-    
+
     if($rs->num_rows() > 0)
     {
       return $rs->result();

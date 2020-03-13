@@ -17,9 +17,9 @@ class Payment_methods extends PS_Controller
 
   public function index()
   {
-		$code = get_filter('code', 'code', '');
-		$name = get_filter('name', 'name', '');
-    $term = get_filter('term', 'term', 0);
+		$code = get_filter('code', 'payment_code', '');
+		$name = get_filter('name', 'payment_name', '');
+    $term = get_filter('term', 'payment_term', 0);
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -217,9 +217,7 @@ class Payment_methods extends PS_Controller
 
   public function clear_filter()
 	{
-		$this->session->unset_userdata('code');
-    $this->session->unset_userdata('name');
-    $this->session->unset_userdata('term');
+		clear_filter(array('payment_code', 'payment_name', 'payment_term'));
 		echo 'done';
 	}
 

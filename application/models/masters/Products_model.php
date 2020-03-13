@@ -101,7 +101,10 @@ class Products_model extends CI_Model
     {
       if(!empty($ds['code']))
       {
+        $this->db->group_start();
         $this->db->like('products.code', $ds['code']);
+        $this->db->or_like('products.old_code', $ds['code']);
+        $this->db->group_end();
       }
 
       if(!empty($ds['name']))
@@ -196,7 +199,10 @@ class Products_model extends CI_Model
     {
       if(!empty($ds['code']))
       {
+        $this->db->group_start();
         $this->db->like('products.code', $ds['code']);
+        $this->db->or_like('products.old_code', $ds['code']);
+        $this->db->group_end();
       }
 
       if(!empty($ds['name']))

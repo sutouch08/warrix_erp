@@ -1358,87 +1358,11 @@ class Consignment_order extends PS_Controller
   public function export_goods_issue($code)
   {
     $sc = TRUE;
-    $doc = $this->consignment_order_model->get($code);
-    if(!empty($doc))
-    {
-      $do = $this->consignment_order_model->get_sap_consignment_order_doc($code);
-      $update = empty($do) ? FALSE : TRUE;
-      if(empty($do) OR $do->DocStatus == 'O')
-      {
-        $doc_total = $this->consignment_order_model->get_sum_amount($code);
-        $arr = array(
-          'U_ECOMNO' => $code,
-          'DocType' => 'I',
-          'CANCELED' => 'N',
-          'DocDate' => sap_date($doc->date_add),
-          'DocDueDate' => sap_date($doc->date_add),
-          'DocTotal' => $doc_total,
-          'DocTotalFC' => $doc_total,
-          'Comments' => $doc->remark,
-          'F_E_Commerce' => $update ? 'U' : 'A',
-          'F_E_CommerceDate' => sap_date(now(), TRUE)
-        );
-
-        $this->mc->trans_start();
-        if(!empty($do))
-        {
-          if(! $this->consignment_order_model->update_sap_goods_issue($code, $arr))
-          {
-            $sc = FALSE;
-            $this->error = "ปรับปรุงเอกสารไม่สำเร็จ";
-          }
-        }
-        else
-        {
-          if(! $this->consignment_order_model->add_sap_goods_issue($arr))
-          {
-            $sc = FALSE;
-            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
-          }
-        }
-
-
-        //--- now add details
-        if($sc === TRUE)
-        {
-          $details = $this->consignment_order_model->get_details($code);
-          if(!empty($details))
-          {
-            if($update)
-            {
-              $this->consignment_order_model->drop_sap_exists_details($code);
-            }
-
-            $line = 0;
-            foreach($details as $rs)
-            {
-              $arr = array(
-                'U_ECOMNO' => $rs->consign_code,
-                'LineNum' => $line,
-                'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
-                'Quantity' => $rs->qty,
-                'WhsCode' => $doc->warehouse_code,
-                'FisrtBin' => $doc->zone_code,
-                'DocDate' => sap_date($doc->date_add),
-                'F_E_Commerce' => $update ? 'U' : 'A',
-                'F_E_CommerceDate' => sap_date(now(), TRUE)
-              );
-
-              $this->consignment_order_model->add_sap_goods_issue_row($arr);
-              $line++;
-            }
-          }
-        }
-
-        $this->mc->trans_complete();
-      } //-- endif;
-
-    }
-    else
+    $this->load->library('export');
+    if(! $this->export->export_goods_issue($code))
     {
       $sc = FALSE;
-      $this->error = "ไม่พบเลขที่เอกสาร";
+      $this->error = trim($this->export->error);
     }
 
     return $sc;

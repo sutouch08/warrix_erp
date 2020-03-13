@@ -10,7 +10,11 @@ class Move_model extends CI_Model
 
   public function get_sap_move_doc($code)
   {
-    $rs = $this->ms->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    $rs = $this->ms
+    ->select('DocEntry, DocStatus')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('OWTR');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -20,7 +24,7 @@ class Move_model extends CI_Model
   }
 
 
-  public function is_temp_exists($code)
+  public function is_middle_exists($code)
   {
     $rs = $this->mc->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
     if($rs->num_rows() === 1)
@@ -47,9 +51,6 @@ class Move_model extends CI_Model
     return FALSE;
   }
 
-
-
-
   public function update_sap_move_doc($code, $ds = array())
   {
     if(! empty($code) && ! empty($ds))
@@ -59,8 +60,6 @@ class Move_model extends CI_Model
 
     return FALSE;
   }
-
-
 
   public function add_sap_move_detail(array $ds = array())
   {
@@ -331,6 +330,12 @@ class Move_model extends CI_Model
   public function drop_detail($id)
   {
     return $this->db->where('id', $id)->delete('move_detail');
+  }
+
+
+  public function delete($code)
+  {
+    return $this->db->where('code', $code)->delete('move');
   }
 
 

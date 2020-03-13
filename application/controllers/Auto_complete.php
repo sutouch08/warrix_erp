@@ -326,12 +326,14 @@ public function get_style_code()
     ->select('zone.code AS code, zone.name AS name')
     ->from('zone')
     ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left')
-    ->where('warehouse.role', 6); //--- 6 =  คลังแปรสภาพ ดู table warehouse_role
+    ->where('warehouse.role', 7); //--- 7 =  คลังระหว่างทำ ดู table warehouse_role
 
     if($txt != '*')
     {
+      $this->db->group_start();
       $this->db->like('zone.code', $txt);
       $this->db->or_like('zone.name', $txt);
+      $this->db->group_end();
     }
 
     $this->db->limit(20);

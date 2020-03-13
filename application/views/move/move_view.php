@@ -10,9 +10,6 @@
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
 		    <?php if($doc->status == 1) : ?>
 		      <button type="button" class="btn btn-sm btn-info" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
-				<?php if($this->pm->can_edit) : ?>
-					<button type="button" class="btn btn-sm btn-danger" onclick="unSave()"><i class="fa fa-exclamation-triangle"></i> ยกเลิกการบันทึก</button>
-				<?php endif; ?>
 		    <?php endif; ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="printMove()"><i class="fa fa-print"></i> พิมพ์</button>
       </p>

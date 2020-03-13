@@ -24,13 +24,13 @@ class Move extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'from_warehouse'  => get_filter('from_warehouse', 'from_warehouse', ''),
-      'user'      => get_filter('user', 'user', ''),
-      'to_warehouse'  => get_filter('to_warehouse', 'to_warehouse', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date'   => get_filter('toDate', 'toDate', ''),
-      'status' => get_filter('status', 'status', 'all')
+      'code'      => get_filter('code', 'move_code', ''),
+      'from_warehouse'  => get_filter('from_warehouse', 'move_from_warehouse', ''),
+      'user'      => get_filter('user', 'move_user', ''),
+      'to_warehouse'  => get_filter('to_warehouse', 'move_to_warehouse', ''),
+      'from_date' => get_filter('fromDate', 'move_fromDate', ''),
+      'to_date'   => get_filter('toDate', 'move_toDate', ''),
+      'status' => get_filter('status', 'move_status', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -789,28 +789,58 @@ class Move extends PS_Controller
 
   public function delete_move($code)
   {
+    $sc = TRUE;
     $this->load->model('inventory/movement_model');
 
-    $this->db->trans_start();
-
-    //--- clear temp
-    $this->move_model->drop_all_temp($code);
-    //--- delete detail
-    $this->move_model->drop_all_detail($code);
-    //--- drop movement
-    $this->movement_model->drop_movement($code);
-    //--- change status to 2 (cancled)
-    $this->move_model->set_status($code, 2);
-
-    $this->db->trans_complete();
-    if($this->db->trans_status() === FALSE)
+    $move = $this->move_model->get($code);
+    if(!empty($move))
     {
-      echo $this->db->error();
+      if($move->status == 0)
+      {
+        $this->db->trans_begin();
+        //--- clear temp
+        if(! $this->move_model->drop_all_temp($code))
+        {
+          $sc = FALSE;
+          $this->error = "ลบ temp ไม่สำเร็จ";
+        }
+        //--- delete detail
+        if(! $this->move_model->drop_all_detail($code))
+        {
+          $sc = FALSE;
+          $this->error = "ลบรายการไม่สำเร็จ";
+        }
+
+        //--- Delete Doc
+        if(! $this->move_model->delete($code))
+        {
+          $sc = FALSE;
+          $this->error = "ลบเอกสารไม่สำเร็จ";
+        }
+
+        if($sc === TRUE)
+        {
+          $this->db->trans_commit();
+        }
+        else
+        {
+          $this->db->trans_rollback();
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่สามารถลบเอกสารที่มีการบันทึกแล้วได้";
+      }
+
     }
     else
     {
-      echo 'success';
+      $sc = FALSE;
+      $this->error = "ไม่พบเลขที่เอกสาร";
     }
+
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
@@ -850,134 +880,11 @@ class Move extends PS_Controller
   private function do_export($code)
   {
     $sc = TRUE;
-    $doc = $this->move_model->get($code);
-    $tr = $this->move_model->get_sap_move_doc($code);
-
-    if(!empty($doc))
-    {
-      if(empty($tr))
-      {
-        if($doc->status == 1)
-        {
-          $currency = getConfig('CURRENCY');
-          $vat_rate = getConfig('SALE_VAT_RATE');
-          $vat_code = getConfig('SALE_VAT_CODE');
-
-          $ds = array(
-            'U_ECOMNO' => $doc->code,
-            'DocType' => 'I',
-            'CANCELED' => 'N',
-            'DocDate' => $doc->date_add,
-            'DocDueDate' => $doc->date_add,
-            'CardCode' => NULL,
-            'CardName' => NULL,
-            'VatPercent' => 0.000000,
-            'VatSum' => 0.000000,
-            'VatSumFc' => 0.000000,
-            'DiscPrcnt' => 0.000000,
-            'DiscSum' => 0.000000,
-            'DiscSumFC' => 0.000000,
-            'DocCur' => $currency,
-            'DocRate' => 1,
-            'DocTotal' => 0.000000,
-            'DocTotalFC' => 0.000000,
-            'Filler' => $doc->from_warehouse,
-            'ToWhsCode' => $doc->to_warehouse,
-            'Comments' => $doc->remark,
-            'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-            'F_E_CommerceDate' => sap_date(now(), TRUE),
-            'U_BOOKCODE' => $doc->bookcode
-          );
-
-          $this->mc->trans_begin();
-
-          $docEntry = $sc = $this->move_model->add_sap_move_doc($ds);
-
-          if($docEntry !== FALSE)
-          {
-            $details = $this->move_model->get_details($code);
-
-            if(!empty($details))
-            {
-              $line = 0;
-              foreach($details as $rs)
-              {
-                $arr = array(
-                  'DocEntry' => $docEntry,
-                  'U_ECOMNO' => $rs->move_code,
-                  'LineNum' => $line,
-                  'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
-                  'Quantity' => $rs->qty,
-                  'unitMsr' => NULL,
-                  'PriceBefDi' => 0.000000,
-                  'LineTotal' => 0.000000,
-                  'ShipDate' => $doc->date_add,
-                  'Currency' => $currency,
-                  'Rate' => 1,
-                  'DiscPrcnt' => 0.000000,
-                  'Price' => 0.000000,
-                  'TotalFrgn' => 0.000000,
-                  'FromWhsCod' => $doc->from_warehouse,
-                  'WhsCode' => $doc->to_warehouse,
-                  'FisrtBin' => $rs->from_zone,
-                  'AllocBinC' => $rs->to_zone,
-                  'TaxStatus' => 'Y',
-                  'VatPrcnt' => 0.000000,
-                  'VatGroup' => NULL,
-                  'PriceAfVAT' => 0.000000,
-                  'VatSum' => 0.000000,
-                  'TaxType' => 'Y',
-                  'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-                  'F_E_CommerceDate' => sap_date(now(), TRUE)
-                );
-
-                if( ! $this->move_model->add_sap_move_detail($arr))
-                {
-                  $sc = FALSE;
-                  $this->error = 'เพิ่มรายการไม่สำเร็จ';
-                }
-
-                $line++;
-              }
-            }
-            else
-            {
-              $sc = FALSE;
-              $this->error = "ไม่พบรายการสินค้า";
-            }
-          }
-          else
-          {
-            $sc = FALSE;
-            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
-          }
-
-          if($sc === TRUE)
-          {
-            $this->mc->trans_commit();
-          }
-          else
-          {
-            $this->mc->trans_rollback();
-          }
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "สถานะเอกสารไม่ถูกต้อง";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "เอกสารถูกปิดไปแล้ว";
-      }
-    }
-    else
+    $this->load->library('export');
+    if(! $this->export->export_move($code))
     {
       $sc = FALSE;
-      $this->error = "ไม่พบเอกสาร {$code}";
+      $this->error = trim($this->export->error);
     }
 
     return $sc;
@@ -997,6 +904,22 @@ class Move extends PS_Controller
     }
   }
 
+
+  public function clear_filter()
+  {
+    $filter = array(
+      'move_code',
+      'move_from_warehouse',
+      'move_user',
+      'move_to_warehouse',
+      'move_fromDate',
+      'move_toDate',
+      'move_status'
+    );
+
+    clear_filter($filter);
+    echo 'done';
+  }
 
 } //--- end class
 ?>

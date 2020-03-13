@@ -645,7 +645,7 @@ class Consign_order extends PS_Controller
 
         if($sc === TRUE )
         {
-          $this->export_delivery_order($code);
+          $this->export_consign_sold($code);
         }
       }
     }
@@ -1292,7 +1292,7 @@ class Consign_order extends PS_Controller
 
   public function export_consign($code)
   {
-    $rs = $this->export_delivery_order($code);
+    $rs = $this->export_consign_sold($code);
     if($rs === FALSE)
     {
       echo $this->error;
@@ -1358,127 +1358,17 @@ class Consign_order extends PS_Controller
 
 
 
-  public function export_delivery_order($code)
+  public function export_consign_sold($code)
   {
-    $this->load->model('inventory/delivery_order_model');
-    $this->load->model('masters/customers_model');
-    $this->load->model('masters/products_model');
-    $this->load->helper('discount');
-
-    $order = $this->consign_order_model->get($code);
-    $cust = $this->customers_model->get($order->customer_code);
-    $total_amount = $this->consign_order_model->get_sum_amount($code);
-    $do = $this->delivery_order_model->get_sap_delivery_order($code);
-
-    if(empty($do) OR $do->DocStatus == 'O')
+    $sc = TRUE;
+    $this->load->library('export');
+    if(! $this->export->export_consign_order($code))
     {
-      $currency = getConfig('CURRENCY');
-      $vat_rate = getConfig('SALE_VAT_RATE');
-      $vat_code = getConfig('SALE_VAT_CODE');
-      //--- header
-      $ds = array(
-        'DocType' => 'I', //--- I = item, S = Service
-        'CANCELED' => 'N', //--- Y = Yes, N = No
-        'DocDate' => sap_date($order->date_add, TRUE), //--- วันที่เอกสาร
-        'DocDueDate' => sap_date($order->date_add,TRUE), //--- วันที่เอกสาร
-        'CardCode' => $order->customer_code, //--- รหัสลูกค้า
-        'CardName' => $cust->name, //--- ชื่อลูกค้า
-        'DiscPrcnt' => 0.000000,
-        'DiscSum' => 0.000000,
-        'DiscSumFC' => 0.000000,
-        'DocCur' => $currency,
-        'DocRate' => 1.000000,
-        'DocTotal' => $total_amount,
-        'DocTotalFC' => $total_amount,
-        'GroupNum' => $cust->GroupNum,
-        'SlpCode' => $cust->sale_code,
-        'ToWhsCode' => NULL,
-        'Comments' => $order->remark,
-        'U_SONO' => $order->code,
-        'U_ECOMNO' => $order->code,
-        'F_E_Commerce' => 'A',
-        'F_E_CommerceDate' => sap_date(now(), TRUE),
-        'U_BOOKCODE' => $order->bookcode
-      );
-
-      $this->mc->trans_start();
-      if(!empty($do))
-      {
-        $ds['F_E_Commerce'] = 'U';
-        $sc = $this->delivery_order_model->update_sap_delivery_order($code, $ds);
-      }
-      else
-      {
-        $sc = $this->delivery_order_model->add_sap_delivery_order($ds);
-      }
-
-
-      if($sc)
-      {
-        $details = $this->consign_order_model->get_details($code);
-        if(!empty($details))
-        {
-          $line = 0;
-          $update = FALSE;
-
-          if($this->delivery_order_model->sap_exists_details($code))
-          {
-            $update = TRUE;
-            $this->delivery_order_model->drop_sap_exists_details($code);
-          }
-
-
-          foreach($details as $rs)
-          {
-            $arr = array(
-              'U_ECOMNO' => $rs->consign_code,
-              'LineNum' => $line,
-              'ItemCode' => $rs->product_code,
-              'Dscription' => $rs->product_name,
-              'Quantity' => $rs->qty,
-              'UnitMsr' => $this->products_model->get_unit_code($rs->product_code),
-              'PriceBefDi' => $rs->price,  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
-              'LineTotal' => $rs->amount,
-              'Currency' => $currency,
-              'Rate' => 1.000000,
-              'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
-              'Price' => remove_vat($rs->price), //--- ราคา
-              'TotalFrgn' => $rs->amount, //--- จำนวนเงินรวม By Line (Currency)
-              'WhsCode' => $order->warehouse_code,
-              'BinCode' => $order->zone_code,
-              'TaxStatus' => 'Y',
-              'VatPrcnt' => $vat_rate,
-              'VatGroup' => $vat_code,
-              'PriceAfVat' => remove_vat($rs->price),
-              'GTotal' => round($rs->amount, 2),
-              'VatSum' => get_vat_amount($rs->amount), //---- tool_helper
-              'TaxType' => 'Y', //--- คิดภาษีหรือไม่
-              'F_E_Commerce' => $update === TRUE ? 'U' : 'A', //--- A = Add , U = Update
-              'F_E_CommerceDate' => sap_date(now(), TRUE)
-            );
-
-            $this->delivery_order_model->add_delivery_row($arr);
-            $line++;
-          }
-        }
-      }
-
-      $this->mc->trans_complete();
-
-      if($this->mc->trans_status() === FALSE)
-      {
-        $this->error = 'เพิ่มรายการไม่สำเร็จ';
-        return FALSE;
-      }
-
-      return TRUE;
-    }
-    else
-    {
-      $this->error = 'เอกสารถูกปิดไปแล้ว';
+      $sc = FALSE;
+      $this->error = trim($this->export->error);
     }
 
-    return FALSE;
+    return $sc;
   }
   //--- end export_order
 

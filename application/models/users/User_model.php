@@ -44,7 +44,25 @@ class User_model extends CI_Model
   public function get_user($id)
   {
     $rs = $this->db->where('id', $id)->get('user');
-    return $rs->row();
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function get($uname)
+  {
+    $rs = $this->db->where('uname', $uname)->get('user');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
   }
 
 

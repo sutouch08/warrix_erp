@@ -70,7 +70,7 @@
 <div class="row">
 	<div class="col-sm-12">
 		<p  class="pull-right top-p">
-			ว่างๆ = ปกติ, &nbsp; <span class="blue">NC</span> = ยังไม่บันทึก, &nbsp; <span class="red">CN</span> = ยกเลิก
+			ว่างๆ = ปกติ, &nbsp; <span class="blue">NC</span> = ยังไม่บันทึก
 		</p>
 		<table class="table table-striped table-hover border-1">
 			<thead>
@@ -109,7 +109,7 @@
 								<?php if($rs->status == 0 && $this->pm->can_edit) : ?>
 									<button type="button" class="btn btn-minier btn-warning" onclick="goEdit('<?php echo $rs->code; ?>')"><i class="fa fa-pencil"></i></button>
 								<?php endif; ?>
-								<?php if($rs->status != 2 && $this->pm->can_delete) : ?>
+								<?php if($rs->status == 0 && $this->pm->can_delete) : ?>
 									<button type="button" class="btn btn-minier btn-danger" onclick="goDelete('<?php echo $rs->code; ?>', <?php echo $rs->status; ?>)"><i class="fa fa-trash"></i></button>
 								<?php endif; ?>
 							</td>

@@ -382,6 +382,31 @@ class Orders_model extends CI_Model
       $this->db->where('orders.date_add <=', to_date($ds['to_date']));
     }
 
+    if(!empty($ds['warehouse']))
+    {
+      $this->db->where('orders.warehouse_code', $ds['warehouse']);
+    }
+
+    if(!empty($ds['notSave']))
+    {
+      $this->db->where('orders.status', 0);
+    }
+
+    if(!empty($ds['onlyMe']))
+    {
+      $this->db->where('orders.user', get_cookie('uname'));
+    }
+
+    if(!empty($ds['isExpire']))
+    {
+      $this->db->where('orders.is_expired', 1);
+    }
+
+    if(!empty($ds['state_list']))
+    {
+      $this->db->where_in('orders.state', $ds['state_list']);
+    }
+
     return $this->db->count_all_results();
   }
 
@@ -472,22 +497,47 @@ class Orders_model extends CI_Model
       $this->db->where('orders.date_add <=', to_date($ds['to_date']));
     }
 
-      $this->db->order_by('orders.code', 'DESC');
+    if(!empty($ds['warehouse']))
+    {
+      $this->db->where('orders.warehouse_code', $ds['warehouse']);
+    }
 
-      if($perpage != '')
-      {
-        $offset = $offset === NULL ? 0 : $offset;
-        $this->db->limit($perpage, $offset);
-      }
+    if(!empty($ds['notSave']))
+    {
+      $this->db->where('orders.status', 0);
+    }
 
-      $rs = $this->db->get();
-      //echo $this->db->get_compiled_select('orders');
-      if($rs->num_rows() > 0)
-      {
-        return $rs->result();
-      }
+    if(!empty($ds['onlyMe']))
+    {
+      $this->db->where('orders.user', get_cookie('uname'));
+    }
 
-      return FALSE;
+    if(!empty($ds['isExpire']))
+    {
+      $this->db->where('orders.is_expired', 1);
+    }
+
+    if(!empty($ds['state_list']))
+    {
+      $this->db->where_in('orders.state', $ds['state_list']);
+    }
+
+    $this->db->order_by('orders.code', 'DESC');
+
+    if($perpage != '')
+    {
+      $offset = $offset === NULL ? 0 : $offset;
+      $this->db->limit($perpage, $offset);
+    }
+
+    $rs = $this->db->get();
+    //echo $this->db->get_compiled_select('orders');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 
@@ -652,7 +702,13 @@ class Orders_model extends CI_Model
     return $this->db->set('approver', $user)->where('code', $code)->update('orders');
   }
 
-  
+  //---- ระบุที่อยู่จัดส่งในออเดอร์นั้นๆ
+  public function set_address_id($code, $id_address)
+  {
+    return $this->db->set('id_address', $id_address)->where('code', $code)->update('orders');
+  }
+
+
 
   public function clear_order_detail($code)
   {

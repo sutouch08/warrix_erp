@@ -51,7 +51,11 @@ class Return_order_model extends CI_Model
   //---- ดึงข้อมูลจากถังกลางมาเช็คสถานะ
   public function get_sap_return_order($code)
   {
-    $rs = $this->ms->select('DocStatus')->where('U_ECOMNO', $code)->get('ORDN');
+    $rs = $this->ms
+    ->select('DocEntry')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('ORDN');
     if($rs->num_rows() === 1)
     {
       return $rs->row();

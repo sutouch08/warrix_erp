@@ -28,7 +28,7 @@ class Import_order extends CI_Controller
     $file	= 'uploadFile';
 		$config = array(   // initial config for upload class
 			"allowed_types" => "xlsx",
-			"upload_path" => $path,
+			"upload_path" => $this->config->item('upload_path').'orders/',
 			"file_name"	=> "import_order",
 			"max_size" => 5120,
 			"overwrite" => TRUE
@@ -54,6 +54,34 @@ class Import_order extends CI_Controller
         if( $count <= 501 )
         {
           $ds = array();
+          foreach($collection as $cs)
+          {
+            //---- order code from web site
+            $key = $cs['I'];
+
+            $str = substr($key, 0, 2);
+
+            if($str == 'LA')
+            {
+              $key = substr($key, 2);
+            }
+
+            $cs['I'] = $key;
+
+            $key = $key.$cs['M'];
+
+
+            if(isset($ds[$key]))
+            {
+              $ds[$key]['N'] += $cs['N'];
+              $ds[$key]['O'] += $cs['O'];
+            }
+            else
+            {
+              $ds[$key] = $cs;
+            }
+          }
+
 
           //--- รหัสเล่มเอกสาร [อ้างอิงจาก SAP]
           //--- ถ้าเป็นฝากขายแบบโอนคลัง ยืมสินค้า เบิกแปรสภาพ เบิกสินค้า (ไม่เปิดใบกำกับ เปิดใบโอนคลังแทน) นอกนั้น เปิด SO
@@ -61,24 +89,12 @@ class Import_order extends CI_Controller
 
           $role = 'S';
 
-          //---- กำหนดช่องทางขายสำหรับเว็บไซต์ เพราะมีลูกค้าแยกตามช่องทางการชำระเงินอีกที
-          //---- เลยต้องกำหนดลูกค้าแยกตามช่องทางการชำระเงินต่างๆ สำหรับเว็บไซต์เท่านั้น
-          //---- เพราะช่องทางอื่นๆในการนำเข้าจะใช้ช่องทางการชำระเงินแบบเดียวทั้งหมด
-          //---- เช่น K plus จะจ่ายด้วยบัตรเครดิตทั้งหมด  LAZADA จะไปเรียกเก็บเงินกับทาง ลาซาด้า
-          $web_channels = getConfig('WEB_SITE_CHANNELS_CODE');
-
-          //--- รหัสลูกค้าสำหรับ COD เว็บไซต์
-          $web_customer_cod = getConfig('CUSTOMER_CODE_COD');
-
-          //--- รหัสลูกค้าสำหรับ 2c2p บนเว็บไซต์
-          $web_customer_2c2p = getConfig('CUSTOMER_CODE_2C2P');
-
           //--- รหัสลูกค้าเริ่มต้น หากพอว่าไม่มีการระบุรหัสลูกค้าไว้ จะใช้รหัสนี้แทน
           $default_customer = getConfig('DEFAULT_CUSTOMER');
 
           $prefix = getConfig('PREFIX_SHIPPING_NUMBER');
 
-          foreach($collection as $rs)
+          foreach($ds as $rs)
           {
             //--- ถ้าพบ Error ให้ออกจากลูปทันที
             if($sc === FALSE)
@@ -88,29 +104,26 @@ class Import_order extends CI_Controller
 
             if($i == 1)
             {
-              $i++;
               $headCol = array(
-                'A' => 'Date',
-                'B' => 'Document No',
-                'C' => 'Reference No',
-                'D' => 'Shipping No',
-                'E' => 'Consignee Name',
-                'F' => 'Address',
-                'G' => 'District',
-                'H' => 'Province',
-                'I' => 'Postcode',
-                'J' => 'Phone',
-                'K' => 'Channels',
-                'L' => 'Payment',
-                'M' => 'Item',
-                'N' => 'Price',
-                'O' => 'Qty',
-                'P' => 'Discount',
-                'Q' => 'Amount',
-                'R' => 'Shipping fee',
-                'S' => 'Service fee',
-                'T' => 'State',
-                'U' => 'Force update'
+                'A' => 'Consignee Name',
+                'B' => 'Address Line 1',
+                'C' => 'Province',
+                'D' => 'District',
+                'E' => 'Sub District',
+                'F' => 'postcode',
+                'G' => 'email',
+                'H' => 'tel',
+                'I' => 'orderNumber',
+                'J' => 'CreateDateTime',
+                'K' => 'Payment Method',
+                'L' => 'Channels',
+                'M' => 'itemId',
+                'N' => 'amount',
+                'O' => 'price',
+                'P' => 'shipping fee',
+                'Q' => 'service fee',
+                'R' => 'force update',
+                'S' => 'Is DHL'
               );
 
               foreach($headCol as $col => $field)
@@ -128,22 +141,27 @@ class Import_order extends CI_Controller
                 break;
               }
             }
-            else if(!empty($rs['A']))
+            else
             {
-              $date_add = db_date($rs['A'], TRUE);
-
-              //--- order code ได้มาแล้วจากระบบ IS
-              $order_code = $rs['B'];
-
               //---- order code from web site
-              $ref_code = $rs['C'];
+              $ref_code = $rs['I'];
 
-              //--- shipping Number
-              $shipping_code = $rs['D'];
+              // $str = substr($ref_code, 0, 2);
+              //
+              // if($str == 'LA')
+              // {
+              //   $ref_code = substr($ref_code, 2);
+              // }
 
-              //---- กำหนดช่องทางการขายเป็นรหัส
-              $channels = $this->channels_model->get($rs['K']);
-            
+              $shipping_code = '';
+
+              if($rs['S'] == 'Y' OR $rs['S'] == 'y' OR $rs['S'] == '1')
+              {
+                $shipping_code = $prefix.$ref_code;
+              }
+
+              //---- กำหนดช่องทางการขาย
+              $channels = $this->channels_model->get($rs['L']);
               //--- หากไม่ระบุช่องทางขายมา หรือ ช่องทางขายไม่ถูกต้องใช้ default
               if(empty($channels))
               {
@@ -151,75 +169,32 @@ class Import_order extends CI_Controller
               }
 
               //--- กำหนดช่องทางการชำระเงิน
-              $payment = $this->payment_methods_model->get($rs['L']);
+              $payment = $this->payment_methods_model->get($rs['K']);
               if(empty($payment))
               {
                 $payment = $this->payment_methods_model->get_default();
               }
 
-              //--- เลขที่เอกสาร
-              $order_code = $rs['B']; //----
-
-              $is_exists = FALSE;
-
               //------ เช็คว่ามีออเดอร์นี้อยู่ในฐานข้อมูลแล้วหรือยัง
               //------ ถ้ามีแล้วจะได้ order_code กลับมา ถ้ายังจะได้ FALSE;
-              if(!empty($order_code))
-              {
-                //--- ถ้ามีการกำหนดเลขที่เอกสารมาแล้ว
-                //---- ตรวจสอบว่ามีเอกสารแล้วหรือยัง ถ้ายังไม่มีให้เป็น FALSE ถ้ามีแล้ว ให้ระบุเลขที่
-                $is_exists = $this->orders_model->is_exists_order($order_code);
-              }
-              else
-              {
-                //---- ถ้าไม่ได้ระบุเลขทีเอกสารมา ให้เช็คเลขที่เอกสารด้วยเลขที่อ้างอิง
-                //---- ถ้ามีแล้วให้ระบุเลขที่ไป ถ้ายังไม่มีจะได้ FALSE เพื่อให้สร้างเลขที่อัตโนมัติต่อไป
-                $order_code  = $this->orders_model->get_order_code_by_reference($ref_code);
-                if($order_code === FALSE)
-                {
-                  $is_exists = FALSE;
-                  $order_code = $this->get_new_code($date_add);
-                }
-              }
+              $order_code  = $this->orders_model->get_order_code_by_reference($ref_code);
 
               //-- state ของออเดอร์ จะมีการเปลี่ยนแปลงอีกที
               $state = 3;
 
               //---- ถ้ายังไม่มีออเดอร์ ให้เพิ่มใหม่ หรือ มีออเดอร์แล้ว แต่ต้องการ update
               //---- โดยการใส่ force update มาเป็น 1
-              if($is_exists === FALSE OR $rs['U'] == 1)
+              if($order_code === FALSE OR ($order_code !== FALSE && $rs['R'] == 1))
               {
-                //---- รหัสลูกค้าจะมีการเปลี่ยนแปลงตามเงื่อนไขด้านล่างนี้
-                $customer_code = NULL;
-                //---- ตรวจสอบว่าช่องทางขายที่กำหนดมา เป็นเว็บไซต์หรือไม่(เพราะจะมีช่องทางการชำระเงินหลายช่องทาง)
-                if($channels->code === $web_channels)
-                {
-                  if($payment->code === '2C2P')
-                  {
-                    //---- กำหนดรหัสลูกค้าตามค่าที่ config สำหรับเว็บไซต์ที่ชำระโดยบัตรเครดติ(2c2p)
-                    $customer_code = $web_customer_2c2p;
-                  }
-                  else if($payment->code === 'COD')
-                  {
-                    //---- กำหนดรหัสลูกค้าตามค่าที่ config สำหรับเว็บไซต์ที่ชำระแบบ COD
-                    $customer_code = $web_customer_cod;
-                  }
-                }
-                else
-                {
-                  //--- หากไม่ใช่ช่องทางเว็บไซต์
-                  //--- กำหนดรหัสลูกค้าตามช่องทางขายที่ได้ผูกไว้
-                  //--- หากไม่มีการผูกไว้ให้
-                  $customer_code = empty($channels->customer_code) ? $default_customer : $channels->customer_code;
-                }
-
+              	//---	ถ้าเป็นออเดอร์ขายหรือสปอนเซอร์ จะมี id_customer
+              	$customer_code = empty($channels->customer_code) ? $default_customer : $channels->customer_code;
                 $customer = $this->customers_model->get($customer_code);
 
               	//---	ถ้าเป็นออเดอร์ขาย จะมี id_sale
               	$sale_code = $customer->sale_code;
 
               	//---	หากเป็นออนไลน์ ลูกค้าออนไลน์ชื่ออะไร
-              	$customer_ref = addslashes(trim($rs['E']));
+              	$customer_ref = addslashes(trim($rs['A']));
 
                 //---	ช่องทางการชำระเงิน
                 $payment_code = $payment->code;
@@ -228,21 +203,24 @@ class Import_order extends CI_Controller
                 $channels_code = $channels->code;
 
               	//---	วันที่เอกสาร
-              	$date_add = PHPExcel_Style_NumberFormat::toFormattedString($rs['A'], 'YYYY-MM-DD');
+              	$date_add = PHPExcel_Style_NumberFormat::toFormattedString($rs['J'], 'YYYY-MM-DD');
                 $date_add = db_date($date_add, TRUE);
 
                 //--- ค่าจัดส่ง
-                $shipping_fee = $rs['R'] == '' ? 0.00 : $rs['R'];
+                $shipping_fee = $rs['P'] == '' ? 0.00 : $rs['P'];
 
                 //--- ค่าบริการอื่นๆ
-                $service_fee = $rs['S'] == '' ? 0.00 : $rs['S'];
+                $service_fee = $rs['Q'] == '' ? 0.00 : $rs['Q'];
+
+              	//--- รันเลขที่เอกสารตามประเภทเอาสาร
+              	$code = $order_code === FALSE ? $this->get_new_code($date_add) : $order_code;
 
                 //---- กรณียังไม่มีออเดอร์
-                if($is_exists === FALSE)
+                if($order_code === FALSE)
                 {
                   //--- เตรียมข้อมูลสำหรับเพิ่มเอกสารใหม่
                   $ds = array(
-                    'code' => $order_code,
+                    'code' => $code,
                     'role' => $role,
                     'bookcode' => $bookcode,
                     'reference' => $ref_code,
@@ -256,15 +234,14 @@ class Import_order extends CI_Controller
                     'is_term' => $payment->has_term,
                     'status' => 1,
                     'date_add' => $date_add,
-                    'user' => get_cookie('uname'),
-                    'is_import' => 1
+                    'user' => get_cookie('uname')
                   );
 
                   //--- เพิ่มเอกสาร
                   if($this->orders_model->add($ds) === TRUE)
                   {
                     $arr = array(
-                      'order_code' => $order_code,
+                      'order_code' => $code,
                       'state' => 3,
                       'update_user' => get_cookie('uname')
                     );
@@ -272,26 +249,23 @@ class Import_order extends CI_Controller
                     $this->order_state_model->add_state($arr);
 
                     $id_address = $this->address_model->get_id($customer_ref, trim($rs['B']));
-
                     if($id_address === FALSE)
                     {
                       $arr = array(
                         'code' => $customer_ref,
                         'name' => $customer_ref,
-                        'address' => trim($rs['F']),
-                        //'sub_district' => trim($rs['E']),
-                        'district' => trim($rs['G']),
-                        'province' => trim($rs['H']),
-                        'postcode' => trim($rs['I']),
-                        'phone' => trim($rs['J']),
+                        'address' => trim($rs['B']),
+                        'sub_district' => trim($rs['E']),
+                        'district' => trim($rs['D']),
+                        'province' => trim($rs['C']),
+                        'postcode' => trim($rs['F']),
+                        'phone' => trim($rs['H']),
                         'alias' => 'Home',
                         'is_default' => 1
                       );
 
-                      $id = $this->address_model->add_shipping_address($arr);
-                      $this->orders_model->set_address_id($order_code, $id);
+                      $this->address_model->add_shipping_address($arr);
                     }
-
                     $import++;
                   }
                   else
@@ -302,9 +276,10 @@ class Import_order extends CI_Controller
                 }
                 else
                 {
-                  $order = $this->orders_model->get($order_code);
+                  $order = $this->orders_model->get($code);
                   if($order->state <= 3)
                   {
+                    //--- เตรียมข้อมูลสำหรับเพิ่มเอกสารใหม่
                     //--- เตรียมข้อมูลสำหรับเพิ่มเอกสารใหม่
                     $ds = array(
                       'customer_code' => $customer_code,
@@ -338,25 +313,24 @@ class Import_order extends CI_Controller
 
               //---- เช็คข้อมูล ว่ามีรายละเอียดนี้อยู่ในออเดอร์แล้วหรือยัง
               //---- ถ้ามีข้อมูลอยู่แล้ว (TRUE)ให้ข้ามการนำเข้ารายการนี้ไป
-              if($this->orders_model->is_exists_detail($order_code, $item->code) === FALSE)
+              if($this->orders_model->is_exists_detail($code, $item->code) === FALSE)
               {
                 //--- ถ้ายังไม่มีรายการอยู่ เพิ่มใหม่
                 $arr = array(
-                  "order_code"	=> $order_code,
+                  "order_code"	=> $code,
                   "style_code"		=> $item->style_code,
                   "product_code"	=> $item->code,
                   "product_name"	=> $item->name,
                   "cost"  => $item->cost,
-                  "price"	=> $rs['N'],
-                  "qty"		=> $rs['O'],
+                  "price"	=> ($rs['O']/$rs['N']),
+                  "qty"		=> $rs['N'],
                   "discount1"	=> 0,
                   "discount2" => 0,
                   "discount3" => 0,
                   "discount_amount" => 0,
-                  "total_amount"	=> round($rs['O'] * $rs['N'],2),
+                  "total_amount"	=> $rs['O'],
                   "id_rule"	=> NULL,
-                  "is_count" => $item->count_stock,
-                  "is_import" => 1
+                  "is_count" => $item->count_stock
                 );
 
                 if( $this->orders_model->add_detail($arr) === FALSE )
@@ -373,7 +347,7 @@ class Import_order extends CI_Controller
               else
               {
                 //----  ถ้ามี force update และ สถานะออเดอร์ไม่เกิน 3 (รอจัดสินค้า)
-                if($rs['U'] == 1 && $state <= 3)
+                if($rs['R'] == 1 && $state <= 3)
                 {
                   $od  = $this->orders_model->get_order_detail($code, $item->code);
 
@@ -382,16 +356,15 @@ class Import_order extends CI_Controller
                     "product_code"	=> $item->code,
                     "product_name"	=> $item->name,
                     "cost"  => $item->cost,
-                    "price"	=> $rs['N'],
-                    "qty"		=> $rs['O'],
+                    "price"	=> ($rs['O']/$rs['N']),
+                    "qty"		=> $rs['N'],
                     "discount1"	=> 0,
                     "discount2" => 0,
                     "discount3" => 0,
                     "discount_amount" => 0,
-                    "total_amount"	=> round($rs['O'] * $rs['N'],2),
+                    "total_amount"	=> $rs['O'],
                     "id_rule"	=> NULL,
-                    "is_count" => $item->count_stock,
-                    "is_import" => 1
+                    "is_count" => $item->count_stock
                   );
 
                   if($this->orders_model->update_detail($od->id, $arr) === FALSE)
@@ -409,6 +382,7 @@ class Import_order extends CI_Controller
 
             } //--- end header column
 
+            $i++;
           } //--- end foreach
         }
         else

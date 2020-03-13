@@ -260,7 +260,7 @@ class Delivery_order_model extends CI_Model
     public function get_sap_delivery_order($code)
     {
       $rs = $this->ms
-      ->select('U_ECOMNO, CANCELED, DocStatus')
+      ->select('DocEntry, DocStatus')
       ->where('U_ECOMNO', $code)
       ->where('CANCELED', 'N')
       ->get('ODLN');
@@ -305,7 +305,7 @@ class Delivery_order_model extends CI_Model
 
     public function getDocEntry($code)
     {
-      $rs = $this->mc->select('DocEntry')->where('U_ECOMNO', $code)->get('ODLN');
+      $rs = $this->mc->select_max('DocEntry')->where('U_ECOMNO', $code)->get('ODLN');
       if($rs->num_rows() === 1)
       {
         return $rs->row()->DocEntry;

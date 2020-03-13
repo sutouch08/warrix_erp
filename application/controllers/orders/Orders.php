@@ -8,6 +8,7 @@ class Orders extends PS_Controller
   public $menu_sub_group_code = 'ORDER';
 	public $title = 'ออเดอร์';
   public $filter;
+  public $error;
   public function __construct()
   {
     parent::__construct();
@@ -40,16 +41,54 @@ class Orders extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'reference'     => get_filter('reference', 'reference', ''),
-      'ship_code'     => get_filter('shipCode', 'shipCode', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'payment'       => get_filter('payment', 'payment', ''),
-      'from_date'     => get_filter('fromDate', 'fromDate', ''),
-      'to_date'       => get_filter('toDate', 'toDate', '')
+      'code' => get_filter('code', 'order_code', ''),
+      'customer' => get_filter('customer', 'order_customer', ''),
+      'user' => get_filter('user', 'order_user', ''),
+      'reference' => get_filter('reference', 'order_reference', ''),
+      'ship_code' => get_filter('shipCode', 'order_shipCode', ''),
+      'channels' => get_filter('channels', 'order_channels', ''),
+      'payment' => get_filter('payment', 'order_payment', ''),
+      'from_date' => get_filter('fromDate', 'order_fromDate', ''),
+      'to_date' => get_filter('toDate', 'order_toDate', ''),
+      'warehouse' => get_filter('warehouse', 'order_warehouse', ''),
+      'notSave' => get_filter('notSave', 'notSave', NULL),
+      'onlyMe' => get_filter('onlyMe', 'onlyMe', NULL),
+      'isExpire' => get_filter('isExpire', 'isExpire', NULL)
     );
+
+    $state = array(
+      '1' => get_filter('state_1', 'state_1', 'N'),
+      '2' => get_filter('state_2', 'state_2', 'N'),
+      '3' => get_filter('state_3', 'state_3', 'N'),
+      '4' => get_filter('state_4', 'state_4', 'N'),
+      '5' => get_filter('state_5', 'state_5', 'N'),
+      '6' => get_filter('state_6', 'state_6', 'N'),
+      '7' => get_filter('state_7', 'state_7', 'N'),
+      '8' => get_filter('state_8', 'state_8', 'N'),
+      '9' => get_filter('state_9', 'state_9', 'N')
+    );
+
+    $state_list = array();
+
+    $button = array();
+
+    for($i =1; $i <= 9; $i++)
+    {
+    	if($state[$i] === 'Y')
+    	{
+    		$state_list[] = $i;
+    	}
+
+      $btn = 'state_'.$i;
+      $button[$btn] = $state[$i] === 'Y' ? 'btn-info' : '';
+    }
+
+    $button['not_save'] = empty($filter['notSave']) ? '' : 'btn-info';
+    $button['only_me'] = empty($filter['onlyMe']) ? '' : 'btn-info';
+    $button['is_expire'] = empty($filter['isExpire']) ? '' : 'btn-info';
+
+
+    $filter['state_list'] = empty($state_list) ? NULL : $state_list;
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_rows();
@@ -63,7 +102,8 @@ class Orders extends PS_Controller
 		$rows     = $this->orders_model->count_rows($filter);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
-		$orders   = $this->orders_model->get_data($filter, $perpage, $this->uri->segment($segment));
+    $offset   = $rows < $this->uri->segment($segment) ? NULL : $this->uri->segment($segment);
+		$orders   = $this->orders_model->get_data($filter, $perpage, $offset);
     $ds       = array();
     if(!empty($orders))
     {
@@ -79,11 +119,12 @@ class Orders extends PS_Controller
     }
 
     $filter['orders'] = $ds;
+    $filter['state'] = $state;
+    $filter['btn'] = $button;
 
 		$this->pagination->initialize($init);
     $this->load->view('orders/orders_list', $filter);
   }
-
 
 
   public function add_new()
@@ -290,7 +331,8 @@ class Orders extends PS_Controller
               {
                 if($item->count_stock == 1 && $item->is_api == 1)
                 {
-                  $this->update_api_stock($item->code);
+                  $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
+                  $this->update_api_stock($pdCode);
                 }
               }
 
@@ -336,7 +378,8 @@ class Orders extends PS_Controller
               {
                 if($item->count_stock == 1 && $item->is_api == 1)
                 {
-                  $this->update_api_stock($item->code);
+                  $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
+                  $this->update_api_stock($pdCode);
                 }
               }
 
@@ -371,7 +414,8 @@ class Orders extends PS_Controller
     {
       if($detail->is_count == 1 && $item->is_api == 1)
       {
-        $this->update_api_stock($item->code);
+        $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
+        $this->update_api_stock($pdCode);
       }
 
     }
@@ -1473,14 +1517,13 @@ class Orders extends PS_Controller
   public function order_state_change()
   {
     $sc = TRUE;
-
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
       $state = $this->input->post('state');
       $order = $this->orders_model->get($code);
       $details = $this->orders_model->get_order_details($code);
-      if(!empty($order))
+      if(! empty($order))
       {
         //--- ถ้าเป็นเบิกแปรสภาพ จะมีการผูกสินค้าไว้
         if($order->role == 'T')
@@ -1491,8 +1534,20 @@ class Orders extends PS_Controller
           if($is_received === TRUE)
           {
             $sc = FALSE;
-            $message = 'ใบเบิกมีการรับสินค้าแล้วไม่อนุญาติให้ย้อนสถานะ';
+            $this->error = 'ใบเบิกมีการรับสินค้าแล้วไม่อนุญาติให้ย้อนสถานะ';
           }
+
+          if($order->state == 8)
+          {
+            $this->load->model('inventory/transfer_model');
+            $sap = $this->transfer_model->get_sap_transfer_doc($code);
+            if(! empty($sap))
+            {
+              $sc = FALSE;
+              $this->error = 'กรุณายกเลิกใบโอนสินค้าใน SAP ก่อนย้อนสถานะ';
+            }
+          }
+
         }
 
         //--- ถ้าเป็นยืมสินค้า
@@ -1504,9 +1559,34 @@ class Orders extends PS_Controller
           if($is_received === TRUE)
           {
             $sc = FALSE;
-            $message = 'ใบเบิกมีการรับคืนสินค้าแล้วไม่อนุญาติให้ย้อนสถานะ';
+            $this->error = 'ใบเบิกมีการรับคืนสินค้าแล้วไม่อนุญาติให้ย้อนสถานะ';
+          }
+
+          if($order->state == 8)
+          {
+            $this->load->model('inventory/transfer_model');
+            $sap = $this->transfer_model->get_sap_transfer_doc($code);
+            if(! empty($sap))
+            {
+              $sc = FALSE;
+              $this->error = 'กรุณายกเลิกใบโอนสินค้าใน SAP ก่อนย้อนสถานะ';
+            }
           }
         }
+
+
+        if($order->role !== 'L' && $order->role !== 'T')
+        {
+          $this->load->model('inventory/delivery_order_model');
+          $sap = $this->delivery_order_model->get_sap_delivery_order($code);
+          if(! empty($sap))
+          {
+            $sc = FALSE;
+            $this->error = 'กรุณายกเลิกใบส่งสินค้าใน SAP ก่อนย้อนสถานะ';
+          }
+        }
+
+
 
         if($sc === TRUE)
         {
@@ -1515,18 +1595,13 @@ class Orders extends PS_Controller
           //--- ถ้าเปิดบิลแล้ว
           if($sc === TRUE && $order->state == 8)
           {
-            if($state < 8)
+
+            if($state < 8 OR $state == 9)
             {
               $this->roll_back_action($code, $order->role);
             }
 
-            if($state == 9)
-            {
-              $this->roll_back_action($code, $order->role);
-              $this->cancle_order($code, $order->role);
-            }
           }
-
           else if($sc === TRUE && $order->state != 8)
           {
             if($state == 9)
@@ -1568,20 +1643,27 @@ class Orders extends PS_Controller
                 $item = $this->products_model->get($rs->product_code);
                 if($rs->is_count == 1 && $item->is_api == 1 && $rs->is_complete == 1)
                 {
-                  $this->update_api_stock($rs->product_code);
+                  $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
+                  $this->update_api_stock($pdCode);
                 }
               }
             }
           }
         }
       }
-
-      echo $sc === TRUE ? 'success' : $message;
+      else
+      {
+        $sc = FALSE;
+        $this->error = 'ไม่พบข้อมูลออเดอร์';
+      }
     }
     else
     {
-      echo 'ไม่พบข้อมูลออเดอร์';
+      $sc = FALSE;
+      $this->error = 'ไม่พบเลขที่เอกสาร';
     }
+
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
@@ -1959,6 +2041,32 @@ class Orders extends PS_Controller
       'payment',
       'fromDate',
       'toDate'
+    );
+
+
+    $filter = array(
+      'order_code',
+      'order_customer',
+      'order_user',
+      'order_reference',
+      'order_shipCode',
+      'order_channels',
+      'order_payment',
+      'order_fromDate',
+      'order_toDate',
+      'order_warehouse',
+      'notSave',
+      'onlyMe',
+      'isExpire',
+      'state_1',
+      'state_2',
+      'state_3',
+      'state_4',
+      'state_5',
+      'state_6',
+      'state_7',
+      'state_8',
+      'state_9',
     );
 
     clear_filter($filter);

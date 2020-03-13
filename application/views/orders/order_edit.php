@@ -47,5 +47,6 @@
 <script src="<?php echo base_url(); ?>scripts/orders/order_add.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_online.js"></script>
 <script src="<?php echo base_url(); ?>scripts/print/print_order.js"></script>
+<script src="<?php echo base_url(); ?>scripts/print/print_address.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

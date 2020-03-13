@@ -248,7 +248,7 @@ class Products extends PS_Controller
     if($this->input->post('code'))
     {
       $code = $this->input->post('code');
-      $barcode = $this->input->post('barcode');
+      $barcode = trim($this->input->post('barcode'));
       $cost = $this->input->post('cost');
       $price = $this->input->post('price');
 

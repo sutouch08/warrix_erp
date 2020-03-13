@@ -413,16 +413,17 @@ $('#order_code').keyup(function(e) {
 
 
 $("#zoneName").autocomplete({
-	source: BASE_URL + 'auto_complete/get_zone_code', //"controller/receiveProductController.php?search_zone",
+	source: BASE_URL + 'auto_complete/get_zone_code',
 	autoFocus: true,
 	close: function(){
 		var rs = $(this).val();
-		if(rs.length == ''){
+		var arr = rs.split(' | ');
+		if(arr.length == 2){
+			$('#zone_code').val(arr[0]);
+			$('#zoneName').val(arr[1]);
+		}else{
 			$('#zone_code').val('');
 			$('#zoneName').val('');
-		}else{
-			$('#zone_code').val(rs);
-			$('#zoneName').val(rs);
 		}
 	}
 });

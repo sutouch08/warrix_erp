@@ -30,7 +30,7 @@ class Sync_data extends CI_Controller
   public function syncWarehouse()
   {
     $this->load->model('masters/warehouse_model');
-    $last_sync = $this->warehouse_model->get_last_sync_date();
+    $last_sync = from_date($this->warehouse_model->get_last_sync_date());
     $newData = $this->warehouse_model->get_new_data($last_sync);
 
     if(!empty($newData))
@@ -68,7 +68,7 @@ class Sync_data extends CI_Controller
   public function syncZone()
   {
     $this->load->model('masters/zone_model');
-    $last_sync = $this->zone_model->get_last_sync_date();
+    $last_sync = from_date($this->zone_model->get_last_sync_date());
     $newData = $this->zone_model->get_new_data($last_sync);
 
     if(!empty($newData))
@@ -109,7 +109,7 @@ class Sync_data extends CI_Controller
   public function syncCustomer()
   {
     $this->load->model('masters/customers_model');
-    $last_sync = $this->customers_model->get_last_sync_date();
+    $last_sync = from_date($this->customers_model->get_last_sync_date());
     $ds = $this->customers_model->get_update_data($last_sync);
     if(!empty($ds))
     {
@@ -165,7 +165,7 @@ class Sync_data extends CI_Controller
   }
 
 
-  
+
 } //--- end class
 
  ?>

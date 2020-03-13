@@ -89,6 +89,29 @@ $btn_credit_no  = $CONTROL_CREDIT == 0 ? 'btn-danger' : '';
 		</div>
 		<div class="divider-hidden"></div>
 
+		<div class="col-sm-3"><span class="form-control left-label">ช่องทางขายเว็บไซต์</span></div>
+		<div class="col-sm-9">
+			<select class="form-control input-sm input-medium" name="WEB_SITE_CHANNELS_CODE" id="web-site-channels-code" >
+				<?php echo select_channels($WEB_SITE_CHANNELS_CODE); ?>
+			</select>
+			<span class="help-block">เลือกรหัสสำหรับการขายบนเว็บไซต์(ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
+
+		<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ COD</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_COD" required value="<?php echo $CUSTOMER_CODE_COD; ?>" />
+			<span class="help-block">กำหนดรหัสลูกค้า สำหรับช่องทางการชำระเงินแบบ COD บนเว็บไซต์ (ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
+
+		<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ 2C2P</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_2C2P" required value="<?php echo $CUSTOMER_CODE_2C2P; ?>" />
+			<span class="help-block">กำหนดรหัสลูกค้า สำหรับช่องทางการชำระเงินแบบ 2C2P บนเว็บไซต์ (ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
+
 		<div class="col-sm-3"><span class="form-control left-label">รหัสนำหน้าเลขที่จัดส่ง</span></div>
     <div class="col-sm-9">
       <input type="text" class="form-control input-sm input-small text-center" name="PREFIX_SHIPPING_NUMBER" value="<?php echo $PREFIX_SHIPPING_NUMBER; ?>" />

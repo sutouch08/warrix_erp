@@ -76,7 +76,8 @@
           <th class="">ลูกค้า/ผู้รับ/ผู้เบิก</th>
           <th class="width-10 text-center">ยอดเงิน</th>
           <th class="width-10 text-center">รูปแบบ</th>
-          <th class="width-15 text-center">พนักงาน</th>
+          <th class="width-10 text-center">พนักงาน</th>
+					<th class="width-10 text-center"></th>
         </tr>
       </thead>
       <tbody>
@@ -113,6 +114,11 @@
 
           <td class="pointer text-center hide-text" onclick="viewDetail('<?php echo $rs->code; ?>')">
             <?php echo $rs->user; ?>
+          </td>
+					<td class="pointer text-center hide-text">
+            <button type="button" class="btn btn-minier btn-success" onclick="do_export('<?php echo $rs->code; ?>')">
+							<i class="fa fa-send"></i> SAP
+						</button>
           </td>
 
         </tr>

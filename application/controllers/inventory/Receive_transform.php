@@ -519,131 +519,15 @@ class Receive_transform extends PS_Controller
 
   private function export_receive($code)
   {
-    $this->load->model('masters/products_model');
-    $doc = $this->receive_transform_model->get($code);
-    $sap = $this->receive_transform_model->get_sap_receive_transform($code);
-    $middle = $this->receive_transform_model->is_middle_exists($code);
-
-    if(!empty($doc))
+    $sc = TRUE;
+    $this->load->library('export');
+    if(! $this->export->export_receive_transform($code))
     {
-      if(empty($sap) OR $sap->DocStatus == 'O')
-      {
-        if($doc->status == 1)
-        {
-          $currency = getConfig('CURRENCY');
-          $vat_rate = getConfig('PURCHASE_VAT_RATE');
-          $vat_code = getConfig('PURCHASE_VAT_CODE');
-          $total_amount = $this->receive_transform_model->get_sum_amount($code);
-          $ds = array(
-            'U_ECOMNO' => $doc->code,
-            'DocType' => 'I',
-            'CANCELED' => 'N',
-            'DocDate' => $doc->date_add,
-            'DocDueDate' => $doc->date_add,
-            'DocCur' => $currency,
-            'DocRate' => 1,
-            'DocTotal' => remove_vat($total_amount),
-            'Comments' => $doc->remark,
-            'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
-            'F_E_CommerceDate' => now()
-          );
-
-          $this->mc->trans_start();
-
-          if(!empty($middle))
-          {
-            $sc = $this->receive_transform_model->update_sap_receive_transform($code, $ds);
-          }
-          else
-          {
-            $sc = $this->receive_transform_model->add_sap_receive_transform($ds);
-          }
-
-          if($sc)
-          {
-            if(!empty($middle))
-            {
-              $this->receive_transform_model->drop_sap_exists_details($code);
-            }
-
-            $details = $this->receive_transform_model->get_details($code);
-
-            if(!empty($details))
-            {
-              $line = 0;
-              foreach($details as $rs)
-              {
-                $arr = array(
-                  'U_ECOMNO' => $rs->receive_code,
-                  'LineNum' => $line,
-                  'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
-                  'Quantity' => $rs->qty,
-                  'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
-                  'PriceBefDi' => round($rs->price,2),
-                  'LineTotal' => round($rs->amount, 2),
-                  'ShipDate' => $doc->date_add,
-                  'Currency' => $currency,
-                  'Rate' => 1,
-                  'Price' => round(remove_vat($rs->price), 2),
-                  'TotalFrgn' => round($rs->amount, 2),
-                  'WhsCode' => $doc->warehouse_code,
-                  'FisrtBin' => $doc->zone_code,
-                  'BaseRef' => $doc->order_code,
-                  'TaxStatus' => 'Y',
-                  'VatPrcnt' => $vat_rate,
-                  'VatGroup' => $vat_code,
-                  'PriceAfVAT' => $rs->price,
-                  'VatSum' => round(get_vat_amount($rs->amount), 2),
-                  'GTotal' => round($rs->amount, 2),
-                  'TaxType' => 'Y',
-                  'F_E_Commerce' => (empty($sap) ? 'A' : 'U'),
-                  'F_E_CommerceDate' => now()
-                );
-
-                if( ! $this->receive_transform_model->add_sap_receive_transform_detail($arr))
-                {
-                  $this->error = 'เพิ่มรายการไม่สำเร็จ';
-                }
-
-                $line++;
-              }
-            }
-            else
-            {
-              $this->error = "ไม่พบรายการสินค้า";
-            }
-          }
-          else
-          {
-            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
-          }
-
-          $this->mc->trans_complete();
-
-          if($this->mc->trans_status() === FALSE)
-          {
-            return FALSE;
-          }
-
-          return TRUE;
-        }
-        else
-        {
-          $this->error = "สถานะเอกสารไม่ถูกต้อง";
-        }
-      }
-      else
-      {
-        $this->error = "เอกสารถูกปิดไปแล้ว";
-      }
-    }
-    else
-    {
-      $this->error = "ไม่พบเอกสาร {$code}";
+      $sc = FALSE;
+      $this->error = trim($this->export->error);
     }
 
-    return FALSE;
+    return $sc;
   }
   //--- end export transform
 

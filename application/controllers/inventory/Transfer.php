@@ -24,13 +24,13 @@ class Transfer extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'from_warehouse'  => get_filter('from_warehouse', 'from_warehouse', ''),
-      'user'      => get_filter('user', 'user', ''),
-      'to_warehouse'  => get_filter('to_warehouse', 'to_warehouse', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date'   => get_filter('toDate', 'toDate', ''),
-      'status' => get_filter('status', 'status', 'all')
+      'code'      => get_filter('code', 'tr_code', ''),
+      'from_warehouse'  => get_filter('from_warehouse', 'tr_from_warehouse', ''),
+      'user'      => get_filter('user', 'tr_user', ''),
+      'to_warehouse'  => get_filter('to_warehouse', 'tr_to_warehouse', ''),
+      'from_date' => get_filter('fromDate', 'tr_fromDate', ''),
+      'to_date'   => get_filter('toDate', 'tr_toDate', ''),
+      'status' => get_filter('status', 'tr_status', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -847,136 +847,11 @@ class Transfer extends PS_Controller
   private function do_export($code)
   {
     $sc = TRUE;
-    $doc = $this->transfer_model->get($code);
-    $tr = $this->transfer_model->get_sap_transfer_doc($code);
-    if(!empty($doc))
-    {
-      if(empty($tr))
-      {
-        if($doc->status == 1)
-        {
-          $currency = getConfig('CURRENCY');
-          $vat_rate = getConfig('SALE_VAT_RATE');
-          $vat_code = getConfig('SALE_VAT_CODE');
-
-          $ds = array(
-            'U_ECOMNO' => $doc->code,
-            'DocType' => 'I',
-            'CANCELED' => 'N',
-            'DocDate' => $doc->date_add,
-            'DocDueDate' => $doc->date_add,
-            'CardCode' => NULL,
-            'CardName' => NULL,
-            'VatPercent' => 0.000000,
-            'VatSum' => 0.000000,
-            'VatSumFc' => 0.000000,
-            'DiscPrcnt' => 0.000000,
-            'DiscSum' => 0.000000,
-            'DiscSumFC' => 0.000000,
-            'DocCur' => $currency,
-            'DocRate' => 1,
-            'DocTotal' => 0.000000,
-            'DocTotalFC' => 0.000000,
-            'Filler' => $doc->from_warehouse,
-            'ToWhsCode' => $doc->to_warehouse,
-            'Comments' => $doc->remark,
-            'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-            'F_E_CommerceDate' => now(),
-            'U_BOOKCODE' => $doc->bookcode
-          );
-
-          $this->mc->trans_begin();
-
-          $docEntry = $sc = $this->transfer_model->add_sap_transfer_doc($ds);
-
-          if($docEntry !== FALSE)
-          {
-            $details = $this->transfer_model->get_details($code);
-
-            if(!empty($details))
-            {
-              $line = 0;
-              foreach($details as $rs)
-              {
-                $arr = array(
-                  'DocEntry' => $docEntry,
-                  'U_ECOMNO' => $rs->transfer_code,
-                  'LineNum' => $line,
-                  'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
-                  'Quantity' => $rs->qty,
-                  'unitMsr' => NULL,
-                  'PriceBefDi' => 0.000000,
-                  'LineTotal' => 0.000000,
-                  'ShipDate' => $doc->date_add,
-                  'Currency' => $currency,
-                  'Rate' => 1,
-                  'DiscPrcnt' => 0.000000,
-                  'Price' => 0.000000,
-                  'TotalFrgn' => 0.000000,
-                  'FromWhsCod' => $doc->from_warehouse,
-                  'WhsCode' => $doc->to_warehouse,
-                  'FisrtBin' => $rs->from_zone,
-                  'F_FROM_BIN' => $rs->from_zone,
-                  'F_TO_BIN' => $rs->to_zone,
-                  'AllocBinC' => $rs->to_zone,
-                  'TaxStatus' => 'Y',
-                  'VatPrcnt' => 0.000000,
-                  'VatGroup' => NULL,
-                  'PriceAfVAT' => 0.000000,
-                  'VatSum' => 0.000000,
-                  'TaxType' => 'Y',
-                  'F_E_Commerce' => (empty($tr) ? 'A' : 'U'),
-                  'F_E_CommerceDate' => now()
-                );
-
-                if( ! $this->transfer_model->add_sap_transfer_detail($arr))
-                {
-                  $sc = FALSE;
-                  $this->error = 'เพิ่มรายการไม่สำเร็จ';
-                }
-
-                $line++;
-              }
-            }
-            else
-            {
-              $sc = FALSE;
-              $this->error = "ไม่พบรายการสินค้า";
-            }
-          }
-          else
-          {
-            $sc = FALSE;
-            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
-          }
-
-          if($sc === TRUE)
-          {
-            $this->mc->trans_commit();
-          }
-          else
-          {
-            $this->mc->trans_rollback();
-          }
-
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "สถานะเอกสารไม่ถูกต้อง";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "เอกสารถูกปิดไปแล้ว";
-      }
-    }
-    else
+    $this->load->library('export');
+    if( ! $this->export->export_transfer($code))
     {
       $sc = FALSE;
-      $this->error = "ไม่พบเอกสาร {$code}";
+      $this->error = trim($this->export->error);
     }
 
     return $sc;
@@ -994,6 +869,24 @@ class Transfer extends PS_Controller
     {
       echo $this->error;
     }
+  }
+
+
+  public function clear_filter()
+  {
+    $filter = array(
+      'tr_code',
+      'tr_from_warehouse',
+      'tr_user',
+      'tr_to_warehouse',
+      'tr_fromDate',
+      'tr_toDate',
+      'tr_status'
+    );
+
+    clear_filter($filter);
+
+    echo 'done';
   }
 
 

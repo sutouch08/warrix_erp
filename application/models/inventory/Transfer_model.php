@@ -10,7 +10,11 @@ class Transfer_model extends CI_Model
 
   public function get_sap_transfer_doc($code)
   {
-    $rs = $this->ms->select('DocStatus')->where('U_ECOMNO', $code)->get('OWTR');
+    $rs = $this->ms
+    ->select('DocEntry, DocStatus')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('OWTR');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
