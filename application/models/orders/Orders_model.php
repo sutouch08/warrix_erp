@@ -203,7 +203,7 @@ class Orders_model extends CI_Model
   public function get_order_code_by_reference($reference)
   {
     $rs = $this->db->select('code')->where('reference', $reference)->get('orders');
-    if($rs->num_rows() == 1)
+    if($rs->num_rows() > 0)
     {
       return $rs->row()->code;
     }
@@ -644,6 +644,7 @@ class Orders_model extends CI_Model
     ->where('order_details.is_complete', 0)
     ->where('order_details.is_expired', 0)
     ->where('order_details.is_count', 1);
+
     if($warehouse !== NULL)
     {
       $this->db->where('orders.warehouse_code', $warehouse);

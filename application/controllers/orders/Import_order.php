@@ -1,9 +1,14 @@
 <?php
 class Import_order extends CI_Controller
 {
+  public $ms;
+  public $mc;
   public function __construct()
   {
     parent::__construct();
+    $this->ms = $this->load->database('ms', TRUE); //--- SAP database
+    $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
+
     $this->load->model('orders/orders_model');
     $this->load->model('masters/channels_model');
     $this->load->model('masters/payment_methods_model');
@@ -50,8 +55,9 @@ class Import_order extends CI_Controller
 
         $i = 1;
         $count = count($collection);
+        $limit = intval(getConfig('IMPORT_ROWS_LIMIT'))+1;
 
-        if( $count <= 501 )
+        if( $count <= $limit )
         {
           $ds = array();
 
@@ -143,7 +149,7 @@ class Import_order extends CI_Controller
 
               //---- กำหนดช่องทางการขายเป็นรหัส
               $channels = $this->channels_model->get($rs['K']);
-            
+
               //--- หากไม่ระบุช่องทางขายมา หรือ ช่องทางขายไม่ถูกต้องใช้ default
               if(empty($channels))
               {
@@ -156,6 +162,9 @@ class Import_order extends CI_Controller
               {
                 $payment = $this->payment_methods_model->get_default();
               }
+
+              //--- คลังสินค้า
+              $warehouse_code = getConfig('WEB_SITE_WAREHOUSE_CODE');
 
               //--- เลขที่เอกสาร
               $order_code = $rs['B']; //----
@@ -228,7 +237,7 @@ class Import_order extends CI_Controller
                 $channels_code = $channels->code;
 
               	//---	วันที่เอกสาร
-              	$date_add = PHPExcel_Style_NumberFormat::toFormattedString($rs['A'], 'YYYY-MM-DD');
+              	//$date_add = PHPExcel_Style_NumberFormat::toFormattedString($rs['A'], 'YYYY-MM-DD');
                 $date_add = db_date($date_add, TRUE);
 
                 //--- ค่าจัดส่ง
@@ -252,10 +261,12 @@ class Import_order extends CI_Controller
                     'payment_code' => $payment_code,
                     'sale_code' => $sale_code,
                     'state' => $state,
-                    'is_paid' => 1,
+                    'is_paid' => 0,
                     'is_term' => $payment->has_term,
+                    'shipping_code' => $shipping_code,
                     'status' => 1,
                     'date_add' => $date_add,
+                    'warehouse_code' => $warehouse_code,
                     'user' => get_cookie('uname'),
                     'is_import' => 1
                   );
@@ -271,7 +282,7 @@ class Import_order extends CI_Controller
                     //--- add state event
                     $this->order_state_model->add_state($arr);
 
-                    $id_address = $this->address_model->get_id($customer_ref, trim($rs['B']));
+                    $id_address = $this->address_model->get_id($customer_ref, trim($rs['F']));
 
                     if($id_address === FALSE)
                     {
@@ -367,7 +378,7 @@ class Import_order extends CI_Controller
                 }
                 else
                 {
-                  $this->update_api_stock($item->code);
+                  $this->update_api_stock($item->code, $item->old_code);
                 }
               }
               else
@@ -375,7 +386,7 @@ class Import_order extends CI_Controller
                 //----  ถ้ามี force update และ สถานะออเดอร์ไม่เกิน 3 (รอจัดสินค้า)
                 if($rs['U'] == 1 && $state <= 3)
                 {
-                  $od  = $this->orders_model->get_order_detail($code, $item->code);
+                  $od  = $this->orders_model->get_order_detail($order_code, $item->code);
 
                   $arr = array(
                     "style_code"		=> $item->style_code,
@@ -402,7 +413,7 @@ class Import_order extends CI_Controller
                   }
                   else
                   {
-                    $this->update_api_stock($item->code);
+                    $this->update_api_stock($item->code, $item->old_code);
                   }
                 } //--- enf force update
               } //--- end if exists detail
@@ -414,7 +425,7 @@ class Import_order extends CI_Controller
         else
         {
           $sc = FALSE;
-          $message = 'ไฟล์มีจำนวนรายการเกิน 500 บรรทัด';
+          $message = "ไฟล์มีจำนวนรายการเกิน {$limit} บรรทัด";
         }
     } //-- end import success
 
@@ -423,14 +434,15 @@ class Import_order extends CI_Controller
 
 
 
-  public function update_api_stock($item)
+  public function update_api_stock($code, $old_code)
   {
-    if(getConfig('SYNC_WEB_STOCK'))
+    if(getConfig('SYNC_WEB_STOCK') == 1)
     {
-      $sell_stock = $this->stock_model->get_sell_stock($item);
-      $reserv_stock = $this->orders_model->get_reserv_stock($item);
-      $availableStock = $sell_stock - $reserv_stock;
-      $this->api->update_stock($item, $availableStock);
+      $sell_stock = $this->stock_model->get_sell_stock($code);
+      $reserv_stock = $this->orders_model->get_reserv_stock($code);
+      $qty = $sell_stock - $reserv_stock;
+      $item = empty($old_code) ? $code : $old_code;
+      $this->api->update_web_stock($item, $qty);
     }
 
   }

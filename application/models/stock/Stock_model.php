@@ -59,17 +59,17 @@ class stock_model extends CI_Model
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
     ->where('OIBQ.ItemCode', $item);
-    if($zone === NULL)
+    if(empty($zone))
     {
       $this->ms->where('OWHS.U_MAIN', 'Y');
     }
 
-    if($warehouse !== NULL)
+    if(! empty($warehouse))
     {
       $this->ms->where('OWHS.WhsCode', $warehouse);
     }
 
-    if($zone !== NULL)
+    if(! empty($zone))
     {
       $this->ms->where('OBIN.BinCode', $zone);
     }

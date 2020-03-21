@@ -60,6 +60,22 @@ function toggleManualCode(option)
 }
 
 
+
+//--- เปิด/ปิด การ sync ข้อมูลระหว่างเว็บไซต์กับระบบหลัก
+function toggleWebApi(option){
+	$('#web-api').val(option);
+	if(option == 1){
+		$('#btn-api-yes').addClass('btn-success');
+		$('#btn-api-no').removeClass('btn-danger');
+		return;
+	}else if(option == 0){
+		$('#btn-api-yes').removeClass('btn-success');
+		$('#btn-api-no').addClass('btn-danger');
+		return;
+	}
+}
+
+
 //---- ไม่ขายสินค้าให้ลูกค้าที่มียอดค้างเกินกำหนด
 function toggleStrictDue(option)
 {

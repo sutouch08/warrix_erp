@@ -98,6 +98,16 @@ $btn_credit_no  = $CONTROL_CREDIT == 0 ? 'btn-danger' : '';
 		</div>
 		<div class="divider-hidden"></div>
 
+		<div class="col-sm-3"><span class="form-control left-label">คลังเว็บไซต์</span></div>
+		<div class="col-sm-9">
+			<select class="form-control input-sm input-medium" name="WEB_SITE_WAREHOUSE_CODE" >
+				<option value="">ทั้งหมด</option>
+				<?php echo select_sell_warehouse($WEB_SITE_WAREHOUSE_CODE); ?>
+			</select>
+			<span class="help-block">เลือกคลังสำหรับการขายบนเว็บไซต์(ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
+
 		<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ COD</span></div>
 		<div class="col-sm-9">
 			<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_COD" required value="<?php echo $CUSTOMER_CODE_COD; ?>" />
@@ -122,6 +132,12 @@ $btn_credit_no  = $CONTROL_CREDIT == 0 ? 'btn-danger' : '';
     <div class="col-sm-9">
       <input type="text" class="form-control input-sm input-small text-center" name="DHL_DEFAULT_WEIGHT" value="<?php echo $DHL_DEFAULT_WEIGHT; ?>" />
       <span class="help-block">น้ำหนักเหมารวมในการจัดส่ง 1 แพ็คเกจ(กรัม)</span>
+    </div>
+
+		<div class="col-sm-3"><span class="form-control left-label">อัพโหลดออเดอร์(รายการ)/ครั้ง</span></div>
+    <div class="col-sm-9">
+      <input type="text" class="form-control input-sm input-small text-center" name="IMPORT_ROWS_LIMIT" value="<?php echo $IMPORT_ROWS_LIMIT; ?>" />
+      <span class="help-block">จำกัดจำนวนรายการที่ออเดอร์ที่สามารถนำเข้าระบบได้ครั้งละไม่เกินรายการที่กำหนด เพื่อไม่ให้ระบบเกิดข้อผิดพลาด</span>
     </div>
 
 

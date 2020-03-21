@@ -68,6 +68,7 @@ function db_date($date, $time = FALSE, $sp = '-')
 }
 
 
+
 function sap_date($date="", $time = FALSE)
 {
   //$date = empty($date) ? date('Y-m-d H:i:s') : $date;

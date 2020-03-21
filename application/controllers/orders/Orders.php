@@ -331,8 +331,7 @@ class Orders extends PS_Controller
               {
                 if($item->count_stock == 1 && $item->is_api == 1)
                 {
-                  $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
-                  $this->update_api_stock($pdCode);
+                  $this->update_api_stock($item->code, $item->old_code);
                 }
               }
 
@@ -378,8 +377,7 @@ class Orders extends PS_Controller
               {
                 if($item->count_stock == 1 && $item->is_api == 1)
                 {
-                  $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
-                  $this->update_api_stock($pdCode);
+                  $this->update_api_stock($item->code, $item->old_code);
                 }
               }
 
@@ -414,8 +412,7 @@ class Orders extends PS_Controller
     {
       if($detail->is_count == 1 && $item->is_api == 1)
       {
-        $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
-        $this->update_api_stock($pdCode);
+        $this->update_api_stock($item->code, $item->old_code);
       }
 
     }
@@ -699,7 +696,7 @@ class Orders extends PS_Controller
   {
     $sc = "";
     $item_code = $this->input->get('itemCode');
-    $warehouse_code = $this->input->get('warehouse_code');
+    $warehouse_code = get_null($this->input->get('warehouse_code'));
     $filter = getConfig('MAX_SHOW_STOCK');
     $item = $this->products_model->get($item_code);
     if(!empty($item))
@@ -853,9 +850,11 @@ class Orders extends PS_Controller
 				if( !empty($item) )
 				{
 					$active	= $item->active == 0 ? 'Disactive' : ( $item->can_sell == 0 ? 'Not for sell' : ( $item->is_deleted == 1 ? 'Deleted' : TRUE ) );
+
 					$stock	= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_stock($item->code) )  : 0 ) : 0; //---- สต็อกทั้งหมดทุกคลัง
 					$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse, $zone) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
 					$disabled  = $isVisual === TRUE  && $active == TRUE ? '' : ( ($active !== TRUE OR $qty < 1 ) ? 'disabled' : '');
+
 					if( $qty < 1 && $active === TRUE )
 					{
 						$txt = '<span class="font-size-12 red">Sold out</span>';
@@ -1643,8 +1642,7 @@ class Orders extends PS_Controller
                 $item = $this->products_model->get($rs->product_code);
                 if($rs->is_count == 1 && $item->is_api == 1 && $rs->is_complete == 1)
                 {
-                  $pdCode = empty($item->old_code) ? $item->code : $item->old_code;
-                  $this->update_api_stock($pdCode);
+                  $this->update_api_stock($item->code, $item->old_code);
                 }
               }
             }
@@ -2019,13 +2017,14 @@ class Orders extends PS_Controller
   }
 
 
-  public function update_api_stock($item)
+  public function update_api_stock($code, $old_code)
   {
     if(getConfig('SYNC_WEB_STOCK') == 1)
     {
       $this->load->library('api');
-      $available_stock = $this->get_available_stock($item);
-      $this->api->update_web_stock($item, $available_stock);
+      $qty = $this->get_sell_stock($code);
+      $item = empty($old_code) ? $code : $old_code;
+      $this->api->update_web_stock($item, $qty);
     }
   }
 
