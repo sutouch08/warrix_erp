@@ -9,6 +9,7 @@ class Orders extends PS_Controller
 	public $title = 'ออเดอร์';
   public $filter;
   public $error;
+  public $isAPI;
   public function __construct()
   {
     parent::__construct();
@@ -35,6 +36,7 @@ class Orders extends PS_Controller
     $this->load->helper('warehouse');
 
     $this->filter = getConfig('STOCK_FILTER');
+    $this->isAPI = is_true(getConfig('WEB_API'));
   }
 
 
@@ -53,7 +55,9 @@ class Orders extends PS_Controller
       'warehouse' => get_filter('warehouse', 'order_warehouse', ''),
       'notSave' => get_filter('notSave', 'notSave', NULL),
       'onlyMe' => get_filter('onlyMe', 'onlyMe', NULL),
-      'isExpire' => get_filter('isExpire', 'isExpire', NULL)
+      'isExpire' => get_filter('isExpire', 'isExpire', NULL),
+      'order_by' => get_filter('order_by', 'order_order_by', ''),
+      'sort_by' => get_filter('sort_by', 'order_sort_by', '')
     );
 
     $state = array(
@@ -157,7 +161,7 @@ class Orders extends PS_Controller
       $date_add = db_date($this->input->post('date'));
       if($this->input->post('code'))
       {
-        $code = $this->input->post('code');
+        $code = trim($this->input->post('code'));
       }
       else
       {
@@ -1622,6 +1626,11 @@ class Orders extends PS_Controller
               );
 
               $this->order_state_model->add_state($arr);
+              if($isAPI && ! empty($order->order_id))
+              {
+                $this->load->library('api');
+                $this->api->update_order_status($order->order_id, $order->state, $state);
+              }
             }
           }
 
@@ -2057,6 +2066,8 @@ class Orders extends PS_Controller
       'notSave',
       'onlyMe',
       'isExpire',
+      'order_order_by',
+      'order_sort_by',
       'state_1',
       'state_2',
       'state_3',

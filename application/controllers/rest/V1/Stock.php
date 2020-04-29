@@ -56,7 +56,7 @@ class Stock extends REST_Controller
     {
       $ds = array(
         'status' => 'FALSE',
-        'message' => 'Missing required parameter : code'
+        'message' => 'Missing required parameter : sku_code'
       );
 
       $this->response($ds, 400);

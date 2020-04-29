@@ -61,3 +61,34 @@ function toggleActive(option, code)
 function getSearch(){
   $('#searchForm').submit();
 }
+
+
+function export_api(){
+  var code = $('#color_code').val();
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'masters/product_color/export_api',
+    type:'POST',
+    cache:false,
+    data:{
+      'code' : code
+    },
+    success:function(rs){
+      load_out();
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          text:'Color exported successful',
+          type:'success',
+          timer:1000
+        })
+      }else{
+        swal({
+          title:'Error',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}

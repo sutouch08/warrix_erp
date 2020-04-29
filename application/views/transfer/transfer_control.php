@@ -72,20 +72,20 @@
     <label>ต้นทาง</label>
     <input type="text" class="form-control input-sm" id="from-zone" placeholder="ค้นหาชื่อโซน" autofocus />
   </div>
-  <!--
+
   <div class="col-sm-1 padding-5">
     <label class="display-block not-show">ok</label>
     <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getProductInZone()">แสดงสินค้า</button>
   </div>
--->
+
   <div class="col-sm-4 padding-5">
     <label>ปลายทาง</label>
     <input type="text" class="form-control input-sm" id="to-zone" placeholder="ค้นหาชื่อโซน" />
   </div>
 
-  <div class="col-sm-2">
+  <div class="col-sm-2 col-sm-offset-1 last">
     <label class="display-block not-show">ok</label>
-    <button type="button" class="btn btn-xs btn-default btn-block" onclick="showTransferTable()">แสดงรายการ</button>
+    <button type="button" class="btn btn-xs btn-default btn-block" onclick="showTransferTable()">รายการโอนย้าย</button>
   </div>
 
 

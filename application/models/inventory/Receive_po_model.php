@@ -244,6 +244,11 @@ class Receive_po_model extends CI_Model
       $this->db->where('date_add <=', to_date($ds['to_date']));
     }
 
+    if($ds['status'] !== 'all')
+    {
+      $this->db->where('status', $ds['status']);
+    }
+
     $rs = $this->db->get('receive_product');
 
 
@@ -287,6 +292,11 @@ class Receive_po_model extends CI_Model
     {
       $this->db->where('date_add >=', from_date($ds['from_date']));
       $this->db->where('date_add <=', to_date($ds['to_date']));
+    }
+
+    if($ds['status'] !== 'all')
+    {
+      $this->db->where('status', $ds['status']);
     }
 
     $this->db->order_by('date_add', 'DESC');

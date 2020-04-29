@@ -6,6 +6,8 @@ class User_pwd extends CI_Controller
 	public $menu_code = 'change password';
 	public $menu_group_code = 'SC';
 	public $pm;
+  public $error;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -87,5 +89,44 @@ class User_pwd extends CI_Controller
 
 		redirect($this->home);
 	}
+
+
+
+
+  public function change_skey()
+  {
+    $sc = TRUE;
+    $uid = trim($this->input->post('uid'));
+    $user = $this->user_model->get_user_by_uid($uid);
+    if(!empty($user))
+    {
+      $skey = trim($this->input->post('skey'));
+      $skey = md5($skey);
+      $is_exists = $this->user_model->is_skey_exists($skey, $uid);
+      if($is_exists)
+      {
+        $sc = FALSE;
+        $this->error = "ไม่สามารถใช้รหัสนี้ได้กรุณากำหนดรหัสอื่น";
+      }
+      else
+      {
+        $arr = array('skey' => $skey);
+        if(! $this->user_model->update_user($user->id, $arr))
+        {
+          $sc = FALSE;
+          $this->error = "เปลี่ยนรหัสลับไม่สำเร็จ";
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบ user หรือ user ไม่ถูกต้อง";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+
+  }
+
 }
  ?>

@@ -53,6 +53,17 @@ class User_model extends CI_Model
   }
 
 
+  public function get_user_by_uid($uid)
+  {
+    $rs = $this->db->where('uid', $uid)->get('user');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
 
   public function get($uname)
   {
@@ -247,6 +258,18 @@ class User_model extends CI_Model
     return FALSE;
   }
 
+
+
+  public function is_skey_exists($skey, $uid)
+  {
+    $rs = $this->db->where('skey', $skey)->where('uid !=', $uid)->get('user');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
 
 
 

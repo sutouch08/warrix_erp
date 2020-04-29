@@ -21,12 +21,13 @@ class Receive_po extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'    => get_filter('code', 'code', ''),
-      'invoice' => get_filter('invoice', 'invoice', ''),
-      'po'      => get_filter('po', 'po', ''),
-      'vendor'  => get_filter('vendor', 'vendor', ''),
-      'from_date' => get_filter('from_date', 'from_date', ''),
-      'to_date' => get_filter('to_date', 'to_date', '')
+      'code'    => get_filter('code', 'recieve_code', ''),
+      'invoice' => get_filter('invoice', 'receive_invoice', ''),
+      'po'      => get_filter('po', 'receive_po', ''),
+      'vendor'  => get_filter('vendor', 'receive_vendor', ''),
+      'from_date' => get_filter('from_date', 'receive_from_date', ''),
+      'to_date' => get_filter('to_date', 'receive_to_date', ''),
+      'status' => get_filter('status', 'receive_status', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -533,7 +534,16 @@ class Receive_po extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code','invoice','po','vendor','from_date','to_date');
+    $filter = array(
+      'receive_code',
+      'receive_invoice',
+      'receive_po',
+      'receive_vendor',
+      'receive_from_date',
+      'receive_to_date',
+      'receive_status'
+    );
+    
     clear_filter($filter);
   }
 

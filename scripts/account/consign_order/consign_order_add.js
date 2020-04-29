@@ -204,9 +204,24 @@ function update(){
   let code = $('#consign_code').val();
   let date = $('#date').val();
   let remark = $('#remark').val();
+  var customer_code = $('#customer_code').val();
+  let customer_name = $('#customer').val();
+  let zone_code = $('#zone_code').val();
+  let zone_name = $('#zone').val();
 
   if(!isDate(date)){
     swal('วันที่ไม่ถูกต้อง');
+    return false;
+  }
+
+  if(customer_code.length == 0 || customer_name.length == 0){
+    swal('ชื่อลูกค้าไม่ถูกต้อง');
+    return false;
+  }
+
+  if(zone_code.length == 0 || zone_name.length == 0)
+  {
+    swal('โซนไม่ถูกต้อง');
     return false;
   }
 
@@ -217,7 +232,10 @@ function update(){
     cache:false,
     data:{
       'code' : code,
-      'date' : date,
+      'date_add' : date,
+      'customerCode' : customer_code,
+      'customer' : customer_name,
+      'zone_code' : zone_code,
       'remark' : remark
     },
     success:function(rs){

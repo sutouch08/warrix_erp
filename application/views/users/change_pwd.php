@@ -67,7 +67,7 @@
     <label class="col-sm-3 control-label no-padding-right"></label>
     <div class="col-xs-12 col-sm-3">
       <p class="pull-right">
-        <button type="button" class="btn btn-sm btn-success" onclick="changePassword()"><i class="fa fa-save"></i> Update</button>
+        <button type="button" class="btn btn-sm btn-success" onclick="changePassword()"><i class="fa fa-save"></i> เปลี่ยนรหัสผ่าน</button>
       </p>
     </div>
     <div class="help-block col-xs-12 col-sm-reset inline">
@@ -75,6 +75,50 @@
     </div>
   </div>
 	<input type="hidden" name="user_id" id="user_id" value="<?php echo $data->id; ?>" />
+</form>
+
+
+<hr/>
+
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">Secret key</label>
+    <div class="col-xs-12 col-sm-3">
+			<span class="input-icon input-icon-right width-100">
+        <input type="password" name="skey" id="skey" class="width-100" autofocus required />
+				<i class="ace-icon fa fa-key"></i>
+			</span>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline red" id="skey-error"></div>
+  </div>
+
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">Confirm Secret key</label>
+    <div class="col-xs-12 col-sm-3">
+			<span class="input-icon input-icon-right width-100">
+        <input type="password" name="cm-skey" id="cm-skey" class="width-100" required />
+				<i class="ace-icon fa fa-key"></i>
+			</span>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline red" id="cm-skey-error"></div>
+  </div>
+
+	<div class="divider-hidden">
+
+	</div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right"></label>
+    <div class="col-xs-12 col-sm-3">
+      <p class="pull-right">
+        <button type="button" class="btn btn-sm btn-success" onclick="change_skey()"><i class="fa fa-save"></i> เปลี่ยนรหัสลับ</button>
+      </p>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline">
+      &nbsp;
+    </div>
+  </div>
+	<input type="hidden" name="uid" id="uid" value="<?php echo $data->uid; ?>" />
 </form>
 
 <script src="<?php echo base_url(); ?>scripts/users/user_pwd.js"></script>

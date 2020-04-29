@@ -7,7 +7,9 @@
     	<p class="pull-right top-p">
       <?php if($this->pm->can_add) : ?>
         <button type="button" class="btn btn-sm btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิ่มใหม่</button>
+				<button type="button" class="btn btn-sm btn-primary" onclick="getUploadFile()"><i class="fa fa-file-excel"></i> เพิ่มใหม่ (Upload)</button>
       <?php endif; ?>
+			<button type="button" class="btn btn-sm btn-purple" onclick="getTemplate()"><i class="fa fa-download"></i> Download template file</button>
       </p>
     </div>
 </div><!-- End Row -->
@@ -176,6 +178,7 @@
 		</table>
 	</div>
 </div>
+<?php $this->load->view('masters/product_items/import_items'); ?>
 
 <script src="<?php echo base_url(); ?>scripts/masters/items.js"></script>
 

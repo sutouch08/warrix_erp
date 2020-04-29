@@ -16,24 +16,34 @@
 <hr class=""/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
 <div class="row">
-  <div class="col-sm-2 padding-5 first">
+  <div class="col-sm-1 col-1-harf padding-5 first">
     <label>เลขที่เอกสาร</label>
     <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
   </div>
 
-  <div class="col-sm-2 padding-5">
+  <div class="col-sm-1 col-1-harf padding-5">
     <label>ใบสั่งซื้อ</label>
     <input type="text" class="form-control input-sm search" name="po" value="<?php echo $po; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 col-1-harf padding-5">
     <label>ใบส่งสินค้า</label>
     <input type="text" class="form-control input-sm search" name="invoice" value="<?php echo $invoice; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 col-1-harf padding-5">
     <label>ผู้จำหน่าย</label>
 		<input type="text" class="form-control input-sm search" name="vendor" value="<?php echo $vendor; ?>" />
+  </div>
+
+	<div class="col-sm-1 col-1-harf padding-5">
+    <label>สถานะ</label>
+		<select name="status" class="form-control input-sm" onchange="getSearch()">
+			<option value="all">ทั้งหมด</option>
+			<option value="0" <?php echo is_selected('0', $status); ?>>ยังไม่บันทึก</option>
+			<option value="1" <?php echo is_selected('1', $status); ?>>บันทึกแล้ว</option>
+			<option value="2" <?php echo is_selected('2', $status); ?>>ยกเลิก</option>
+		</select>
   </div>
 
 	<div class="col-sm-2 padding-5">

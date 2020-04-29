@@ -494,7 +494,7 @@ function unExpired(){
 function validateOrder(){
   var prefix = $('#prefix').val();
   var runNo = parseInt($('#runNo').val());
-  let code = $('#code').val();
+  let code = $.trim($('#code').val());
   if(code.length == 0){
     swal("เลขที่เอกสารไม่ถูกต้อง");
     return false;

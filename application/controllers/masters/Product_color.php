@@ -271,6 +271,23 @@ class Product_color extends PS_Controller
   }
 
 
+
+  public function export_api()
+  {
+    $code = $this->input->post('code');
+
+    if(!empty($code))
+    {
+      $this->load->library('api');
+      $rs = json_decode($this->api->create_color($code), TRUE);
+      if(count($rs) === 1){
+        echo $rs['message'];
+      }else{
+        echo 'success';
+      }
+    }
+  }
+
   public function clear_filter()
 	{
     $filter = array('color_code', 'color_name', 'color_status');

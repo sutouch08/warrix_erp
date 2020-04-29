@@ -50,7 +50,7 @@ class Qc_model extends CI_Model
 
 
 
-  public function get_data(array $ds = array(), $state = 5)
+  public function get_data(array $ds = array(), $state = 5, $perpage = NULL, $offset = NULL)
   {
     $this->db->select('orders.*, channels.name AS channels_name, customers.name AS customer_name')
     ->from('orders')
@@ -87,9 +87,71 @@ class Qc_model extends CI_Model
       $this->db->where('orders.date_add <=', to_date($ds['to_date']));
     }
 
-    $rs = $this->db->get();
+    if(!empty($ds['order_by']))
+    {
+      $order_by = "orders.{$ds['order_by']}";
+      $this->db->order_by($order_by, $ds['sort_by']);
+    }
+    else
+    {
+      $this->db->order_by('orders.date_add', 'DESC');
+    }
 
-    return $rs->result();
+    if(!empty($perpage))
+    {
+      $offset = $offset === NULL ? 0 : $offset;
+      $this->db->limit($perpage, $offset);
+    }
+
+    $rs = $this->db->get();
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function count_rows(array $ds = array(), $state = 5)
+  {
+    $this->db->select('orders.*, channels.name AS channels_name, customers.name AS customer_name')
+    ->from('orders')
+    ->join('channels', 'channels.code = orders.channels_code','left')
+    ->join('customers', 'customers.code = orders.customer_code', 'left')
+    ->where('orders.state', $state);
+
+    if(!empty($ds['code']))
+    {
+      $this->db->like('orders.code', $ds['code']);
+    }
+
+    if(!empty($ds['customer']))
+    {
+      $this->db->like('customers.name', $ds['customer']);
+      $this->db->or_like('orders.customer_ref', $ds['customer']);
+    }
+
+    //---- user name / display name
+    if(!empty($ds['user']))
+    {
+      $users = user_in($ds['user']);
+      $this->db->where_in('orders.user', $users);
+    }
+
+    if(!empty($ds['channels']))
+    {
+      $this->db->where('orders.channels_code', $ds['channels']);
+    }
+
+    if($ds['from_date'] != '' && $ds['to_date'] != '')
+    {
+      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+    }
+
+    return $this->db->count_all_results();
   }
 
 

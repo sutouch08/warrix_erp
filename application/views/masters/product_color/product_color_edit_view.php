@@ -6,6 +6,7 @@
 	<div class="col-sm-6">
 		<p class="pull-right">
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> Back</button>
+			<button type="button" class="btn btn-sm btn-info" onclick="export_api()"><i class="fa fa-send"></i> Send To Web</button>
 		</p>
 	</div>
 </div><!-- End Row -->
@@ -44,7 +45,7 @@
       &nbsp;
     </div>
   </div>
-	<input type="hidden" name="product_color_code" value="<?php echo $code; ?>" />
+	<input type="hidden" name="product_color_code" id="color_code" value="<?php echo $code; ?>" />
 	<input type="hidden" name="product_color_name" value="<?php echo $name; ?>" />
 </form>
 

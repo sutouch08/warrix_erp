@@ -22,11 +22,12 @@ class Receive_transform extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'    => get_filter('code', 'code', ''),
-      'invoice' => get_filter('invoice', 'invoice', ''),
-      'order_code' => get_filter('order_code', 'order_code', ''),
-      'from_date' => get_filter('from_date', 'from_date', ''),
-      'to_date' => get_filter('to_date', 'to_date', '')
+      'code'    => get_filter('code', 'trans_code', ''),
+      'invoice' => get_filter('invoice', 'trans_invoice', ''),
+      'order_code' => get_filter('order_code', 'trans_order_code', ''),
+      'from_date' => get_filter('from_date', 'trans_from_date', ''),
+      'to_date' => get_filter('to_date', 'trans_to_date', ''),
+      'status' => get_filter('status', 'trans_status', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -558,7 +559,7 @@ class Receive_transform extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code','invoice','order_code','from_date','to_date');
+    $filter = array('trans_code','trans_invoice','trans_order_code','trans_from_date','trans_to_date', 'trans_status');
     clear_filter($filter);
   }
 

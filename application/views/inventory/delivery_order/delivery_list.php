@@ -62,17 +62,21 @@
     <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
 </div>
+<input type="hidden" name="order_by" id="order_by" value="<?php echo $order_by; ?>">
+<input type="hidden" name="sort_by" id="sort_by" value="<?php echo $sort_by; ?>">
 <hr class="margin-top-15">
 </form>
 <?php echo $this->pagination->create_links(); ?>
+<?php $sort_date = $order_by == '' ? "" : ($order_by === 'date_add' ? ($sort_by === 'DESC' ? 'sorting_desc' : 'sorting_asc') : ''); ?>
+<?php $sort_code = $order_by == '' ? '' : ($order_by === 'code' ? ($sort_by === 'DESC' ? 'sorting_desc' : 'sorting_asc') : ''); ?>
 <div class="row">
   <div class="col-sm-12">
-    <table class="table table-striped border-1">
+    <table class="table table-striped border-1 dataTable">
       <thead>
         <tr>
           <th class="width-5 text-center">ลำดับ</th>
-          <th class="width-8 text-center">วันที่</th>
-          <th class="width-20">เลขที่เอกสาร</th>
+          <th class="width-8 sorting <?php echo $sort_date; ?> text-center" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
+          <th class="width-20 sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร </th>
           <th class="">ลูกค้า/ผู้รับ/ผู้เบิก</th>
           <th class="width-10 text-center">ยอดเงิน</th>
           <th class="width-10 text-center">รูปแบบ</th>
@@ -100,7 +104,7 @@
           </td>
 
           <td class="pointer hide-text" onclick="goDetail('<?php echo $rs->code; ?>')">
-						<?php if($rs->role == 'L' OR $rs->role == 'U' OR $rs->role == 'R') : ?>
+						<?php if($rs->role == 'L' OR $rs->role == 'R') : ?>
 							<?php echo $rs->empName; ?>
 						<?php else: ?>
             	<?php echo $rs->customer_name; ?>

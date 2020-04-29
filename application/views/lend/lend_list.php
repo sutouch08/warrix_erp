@@ -28,7 +28,7 @@
 
 	<div class="col-sm-2 padding-5">
     <label>ผู้รับ</label>
-    <input type="text" class="form-control input-sm search" name="empName" value="<?php echo $user_ref; ?>" />
+    <input type="text" class="form-control input-sm search" name="user_ref" value="<?php echo $user_ref; ?>" />
   </div>
 
 	<div class="col-sm-2 padding-5">

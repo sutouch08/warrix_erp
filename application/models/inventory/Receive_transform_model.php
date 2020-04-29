@@ -226,6 +226,12 @@ class Receive_transform_model extends CI_Model
       $this->db->where('date_add <=', to_date($ds['to_date']));
     }
 
+    if($ds['status'] !== 'all')
+    {
+      $this->db->where('status', $ds['status']);
+    }
+
+
     $rs = $this->db->get('receive_transform');
 
 
@@ -261,6 +267,11 @@ class Receive_transform_model extends CI_Model
     {
       $this->db->where('date_add >=', from_date($ds['from_date']));
       $this->db->where('date_add <=', to_date($ds['to_date']));
+    }
+
+    if($ds['status'] !== 'all')
+    {
+      $this->db->where('status', $ds['status']);
     }
 
     if($perpage != '')

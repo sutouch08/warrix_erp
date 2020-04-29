@@ -5,7 +5,7 @@ class Consign_order extends PS_Controller
   public $menu_code = 'ACCSOD';
 	public $menu_group_code = 'AC';
   public $menu_sub_group_code = '';
-	public $title = 'ตัดยอดขาย(Shop)';
+	public $title = 'ตัดยอดขาย(เปิดใบกำกับภาษีเมื่อขายได้)';
   public $filter;
   public $error;
   public function __construct()
@@ -175,13 +175,22 @@ class Consign_order extends PS_Controller
   {
     $sc = TRUE;
     $code = $this->input->post('code');
+    $date_add = db_date($this->input->post('date_add'), TRUE);
+    $zone = $this->zone_model->get($this->input->post('zone_code'));
     if($code)
     {
       if($this->pm->can_edit)
       {
+
         $arr = array(
-          'date_add' => db_date($this->input->post('date'), TRUE),
-          'remark' => trim($this->input->post('remark'))
+          'customer_code' => $this->input->post('customerCode'),
+          'customer_name' => $this->input->post('customer'),
+          'zone_code' => $zone->code,
+          'zone_name' => $zone->name,
+          'warehouse_code' => $zone->warehouse_code,
+          'remark' => $this->input->post('remark'),
+          'date_add' => $date_add,
+          'user' => get_cookie('uname')
         );
 
         if(! $this->consign_order_model->update($code, $arr))
@@ -938,7 +947,7 @@ class Consign_order extends PS_Controller
                   $this->error = "รหัสสินค้าไม่ถูกต้อง : {$product_code}";
                 } //--- end if $item
               }
-              
+
             } //--- end if $i
 
             $i++;

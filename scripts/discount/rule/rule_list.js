@@ -30,7 +30,7 @@ function getDelete(id, name){
 		closeOnConfirm: false
 		}, function(){
 			$.ajax({
-				url:"controller/discountRuleController.php?deleteRule",
+				url:BASE_URL + "discount/discount_rule/delete_rule",
 				type:"POST",
         cache:"false",
         data:{

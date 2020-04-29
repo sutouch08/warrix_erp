@@ -289,7 +289,7 @@ class Products_model extends CI_Model
       $offset = $offset === NULL ? 0 : $offset;
       $this->db->limit($perpage, $offset);
     }
-    //echo $this->db->get_compiled_select();
+    // echo $this->db->get_compiled_select();
     $rs = $this->db->get();
 
     return $rs->result();
@@ -406,7 +406,7 @@ class Products_model extends CI_Model
 
   public function get($code)
   {
-    $rs = $this->db->where('code', $code)->get('products');
+    $rs = $this->db->where('code', $code)->or_where('old_code', $code)->get('products');
     if($rs->num_rows() == 1)
     {
       return $rs->row();

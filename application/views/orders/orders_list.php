@@ -143,16 +143,20 @@
 <input type="hidden" name="onlyMe" id="onlyMe" value="<?php echo $onlyMe; ?>" />
 <input type="hidden" name="isExpire" id="isExpire" value="<?php echo $isExpire; ?>" />
 <hr class="margin-top-15">
+<input type="hidden" name="order_by" id="order_by" value="<?php echo $order_by; ?>">
+<input type="hidden" name="sort_by" id="sort_by" value="<?php echo $sort_by; ?>">
 </form>
 <?php echo $this->pagination->create_links(); ?>
+<?php $sort_date = $order_by == '' ? "" : ($order_by === 'date_add' ? ($sort_by === 'DESC' ? 'sorting_desc' : 'sorting_asc') : ''); ?>
+<?php $sort_code = $order_by == '' ? '' : ($order_by === 'code' ? ($sort_by === 'DESC' ? 'sorting_desc' : 'sorting_asc') : ''); ?>
 <div class="row">
 	<div class="col-sm-12 table-responsive">
-		<table class="table table-striped table-bordered table-hover">
+		<table class="table table-striped table-bordered table-hover dataTable">
 			<thead>
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
-					<th class="width-10 middle text-center">วันที่</th>
-					<th class="width-15 middle">เลขที่เอกสาร</th>
+					<th class="width-10 middle text-center sorting <?php echo $sort_date; ?>" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
+					<th class="width-15 middle sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร</th>
 					<th class="middle">ลูกค้า</th>
 					<th class="width-10 middle">ยอดเงิน</th>
 					<th class="width-10 middle">ช่องทางขาย</th>
@@ -170,7 +174,13 @@
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $no; ?></td>
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo thai_date($rs->date_add); ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->code.$ref; ?></td>
-              <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->customer_name.$cus_ref; ?></td>
+              <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')">
+								<?php if($rs->role == 'L' OR $rs->role == 'R') : ?>
+									<?php echo $rs->empName; ?>
+								<?php else : ?>
+									<?php echo $rs->customer_name.$cus_ref; ?>
+								<?php endif; ?>
+							</td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo number($rs->total_amount, 2); ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->channels_name; ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->payment_name; ?></td>

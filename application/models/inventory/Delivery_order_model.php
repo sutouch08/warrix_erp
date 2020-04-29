@@ -117,6 +117,17 @@ class Delivery_order_model extends CI_Model
       $this->db->where('orders.date_add <=', to_date($ds['to_date']));
     }
 
+    if(!empty($ds['order_by']))
+    {
+      $order_by = "orders.{$ds['order_by']}";
+      $this->db->order_by($order_by, $ds['sort_by']);
+    }
+    else
+    {
+      $this->db->order_by('orders.date_add', 'DESC');
+    }
+
+
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;

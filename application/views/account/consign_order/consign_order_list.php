@@ -7,7 +7,7 @@
     <p class="pull-right top-p">
 <?php if( $this->pm->can_add ) : ?>
       <button type="button" class="btn btn-xs btn-success" onclick="goAdd()">
-        <i class="fa fa-plus"></i> เพิ่มใหม่
+        <i class="fa fa-plus"></i> สร้างใหม่
       </button>
 <?php endif; ?>
     </p>

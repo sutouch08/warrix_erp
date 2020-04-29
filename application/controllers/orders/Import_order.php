@@ -136,7 +136,8 @@ class Import_order extends CI_Controller
             }
             else if(!empty($rs['A']))
             {
-              $date_add = db_date($rs['A'], TRUE);
+              $date = PHPExcel_Style_NumberFormat::toFormattedString($rs['A'], 'YYYY-MM-DD');
+              $date_add = db_date($date, TRUE);
 
               //--- order code ได้มาแล้วจากระบบ IS
               $order_code = $rs['B'];

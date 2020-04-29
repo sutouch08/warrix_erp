@@ -126,7 +126,11 @@ function getDelete(code){
   })
 }
 
-
+function getTemplate(){
+  var token	= new Date().getTime();
+	get_download(token);
+	window.location.href = BASE_URL + 'masters/items/download_template/'+token;
+}
 
 function getSearch(){
   $('#searchForm').submit();

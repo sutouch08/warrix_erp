@@ -116,6 +116,7 @@ class Products extends PS_Controller
       $kind     = $this->input->post('kind_code');
       $type     = $this->input->post('type_code');
       $old_code = get_null($this->input->post('old_style'));
+      $old_code = empty($old_code) ? $code : $old_code;
       $brand    = $this->input->post('brand_code');
       $year     = $this->input->post('year');
       $cost     = $this->input->post('cost');
@@ -286,6 +287,7 @@ class Products extends PS_Controller
       $code = $this->input->post('code'); //--- style code
       $name = $this->input->post('name'); //--- style name
       $old_code = get_null($this->input->post('old_style'));
+      $old_code = empty($old_code) ? $code : $old_code;
       $cost = $this->input->post('cost'); //--- style cost
       $price = $this->input->post('price'); //--- style price
       $unit = $this->input->post('unit_code');
@@ -357,7 +359,8 @@ class Products extends PS_Controller
             'can_sell' => ($sell === NULL ? 0 : 1),
             'active' => ($active === NULL ? 0 : 1),
             'is_api' => ($api === NULL ? 0 : 1),
-            'update_user' => get_cookie('uname')
+            'update_user' => get_cookie('uname'),
+            'old_style' => $old_code
           );
 
           foreach($items as $item)
@@ -611,7 +614,7 @@ class Products extends PS_Controller
           'active' => $ds->active,
           'is_api' => $ds->is_api,
           'old_style' => $ds->old_code,
-          'old_code' => (isset($old_code[$code]) ? $old_code[$code] : NULL),
+          'old_code' => (isset($old_code[$code]) ? $old_code[$code] : $code),
           'update_user' => get_cookie('uname')
         );
 
@@ -666,7 +669,7 @@ class Products extends PS_Controller
         'active' => $ds->active,
         'is_api' => $ds->is_api,
         'old_style' => $ds->old_code,
-        'old_code' => (isset($old_code[$code]) ? $old_code[$code] : NULL),
+        'old_code' => (isset($old_code[$code]) ? $old_code[$code] : $code),
         'update_user' => get_cookie('uname')
       );
 
@@ -711,7 +714,7 @@ class Products extends PS_Controller
         'active' => $ds->active,
         'is_api' => $ds->is_api,
         'old_style' => $ds->old_code,
-        'old_code' => (isset($old_code[$code]) ? $old_code[$code] : NULL),
+        'old_code' => (isset($old_code[$code]) ? $old_code[$code] : $code),
         'update_user' => get_cookie('uname')
       );
 

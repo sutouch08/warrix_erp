@@ -30,7 +30,9 @@ class Invoice extends PS_Controller
       'role'          => get_filter('role', 'inv_role', ''),
       'channels'      => get_filter('channels', 'inv_channels', ''),
       'from_date'     => get_filter('from_date', 'inv_from_date', ''),
-      'to_date'       => get_filter('to_date', 'inv_to_date', '')
+      'to_date'       => get_filter('to_date', 'inv_to_date', ''),
+      'order_by'      => get_filter('order_by', 'inv_order_by', ''),
+      'sort_by'       => get_filter('sort_by', 'inv_sort_by', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -113,7 +115,9 @@ class Invoice extends PS_Controller
       'inv_role',
       'inv_channels',
       'inv_from_date',
-      'inv_to_date'
+      'inv_to_date',
+      'inv_order_by',
+      'inv_sort_by'
     );
     clear_filter($filter);
   }

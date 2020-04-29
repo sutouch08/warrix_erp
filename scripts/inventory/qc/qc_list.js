@@ -43,3 +43,9 @@ function clearFilter(){
     goBack();
   });
 }
+
+function clearProcessFilter(){
+  $.get(HOME + 'clear_filter', function(){
+    viewProcess();
+  });
+}

@@ -278,5 +278,23 @@ class Product_size extends PS_Controller
 		echo 'done';
 	}
 
+
+
+  public function export_api()
+  {
+    $code = $this->input->post('code');
+
+    if(!empty($code))
+    {
+      $this->load->library('api');
+      $rs = json_decode($this->api->create_size($code), TRUE);
+      if(count($rs) === 1){
+        echo $rs['message'];
+      }else{
+        echo 'success';
+      }
+    }
+  }
+
 }//--- end class
  ?>

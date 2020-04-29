@@ -1193,6 +1193,45 @@ class Discount_rule_model extends CI_Model
     return array();
   }
 
+
+  public function delete_rule($id)
+  {
+    //--- start transection
+    $this->db->trans_start();
+
+    //--- 1.
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_style');
+
+    //--- 2.
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_group');
+
+    //--- 3
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_sub_group');
+
+    //--- 4
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_category');
+
+    //--- 5
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_type');
+
+    //--- 6
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_kind');
+
+    //--- 7
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_brand');
+
+    //--- 8
+    $this->db->where('id_rule', $id)->delete('discount_rule_product_year');
+
+    //--- 9
+    $this->db->where('id', $id)->delete('discount_rule');
+
+    //--- end transection
+    $this->db->trans_complete();
+
+    return $this->db->trans_status();
+  }
+
 } //--- end class
 
  ?>

@@ -441,12 +441,13 @@ public function get_style_code()
   public function get_support()
   {
     $sc = array();
-    $txt = $_REQUEST['term'];
-    $qr  = "SELECT CardCode, CardName FROM OCRD ";
-    $qr .= "WHERE CardType = 'C' ";
+    $txt = convert($_REQUEST['term']);
+    $qr = "SELECT BpCode, BpName FROM OOAT ";
+    $this->ms->select('BpCode, BpName');
+
     if($txt != '*')
     {
-      $qr .= "AND (CardCode LIKE N'%{$txt}%' OR CardName LIKE N'%{$txt}%') ";
+      $qr .= "WHERE BpCode LIKE N'%{$txt}%' OR BpName LIKE N'%{$txt}%' ";
     }
 
     $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
@@ -457,7 +458,7 @@ public function get_style_code()
     {
       foreach($sponsor->result() as $rs)
       {
-        $sc[] = $rs->CardCode.' | '.$rs->CardName;
+        $sc[] = $rs->BpCode.' | '.$rs->BpName;
       }
     }
     else
@@ -467,6 +468,37 @@ public function get_style_code()
 
     echo json_encode($sc);
   }
+
+
+  // public function get_support()
+  // {
+  //   $sc = array();
+  //   $txt = $_REQUEST['term'];
+  //   $qr  = "SELECT CardCode, CardName FROM OCRD ";
+  //   $qr .= "WHERE CardType = 'C' ";
+  //   if($txt != '*')
+  //   {
+  //     $qr .= "AND (CardCode LIKE N'%{$txt}%' OR CardName LIKE N'%{$txt}%') ";
+  //   }
+  //
+  //   $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
+  //
+  //   $sponsor = $this->ms->query($qr);
+  //
+  //   if($sponsor->num_rows() > 0)
+  //   {
+  //     foreach($sponsor->result() as $rs)
+  //     {
+  //       $sc[] = $rs->CardCode.' | '.$rs->CardName;
+  //     }
+  //   }
+  //   else
+  //   {
+  //     $sc[] = 'ไม่พบรายการ';
+  //   }
+  //
+  //   echo json_encode($sc);
+  // }
 
 
 

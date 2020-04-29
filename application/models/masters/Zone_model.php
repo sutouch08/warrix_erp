@@ -411,12 +411,18 @@ class Zone_model extends CI_Model
 
   public function search($txt, $warehouse_code = NULL)
   {
+    $limit = 50;
     if(!empty($warehouse_code))
     {
       $this->db->where('warehouse_code', $warehouse_code);
     }
 
-    $rs = $this->db->like('code', $txt)->or_like('name', $txt)->get('zone');
+    if($txt != '*')
+    {
+      $this->db->like('code', $txt)->or_like('name', $txt);
+    }
+    
+    $rs = $this->db->get('zone');
 
     if($rs->num_rows() > 0)
     {

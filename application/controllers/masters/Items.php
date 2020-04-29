@@ -15,6 +15,7 @@ class Items extends PS_Controller
     //--- load model
     $this->load->model('masters/products_model');
     $this->load->model('masters/product_group_model');
+    $this->load->model('masters/product_sub_group_model');
     $this->load->model('masters/product_kind_model');
     $this->load->model('masters/product_type_model');
     $this->load->model('masters/product_style_model');
@@ -88,6 +89,239 @@ class Items extends PS_Controller
 		$this->pagination->initialize($init);
     $this->load->view('masters/product_items/items_list', $filter);
   }
+
+
+  public function import_items()
+  {
+    $sc = TRUE;
+    $file = isset( $_FILES['uploadFile'] ) ? $_FILES['uploadFile'] : FALSE;
+  	$path = $this->config->item('upload_path').'items/';
+    $file	= 'uploadFile';
+		$config = array(   // initial config for upload class
+			"allowed_types" => "xlsx",
+			"upload_path" => $path,
+			"file_name"	=> "import_items",
+			"max_size" => 5120,
+			"overwrite" => TRUE
+			);
+
+			$this->load->library("upload", $config);
+
+			if(! $this->upload->do_upload($file))
+      {
+        $sc = FALSE;
+				$this->error = $this->upload->display_errors();
+			}
+      else
+      {
+        $this->load->library('excel');
+        $this->load->library('api');
+
+        $info = $this->upload->data();
+        /// read file
+				$excel = PHPExcel_IOFactory::load($info['full_path']);
+				//get only the Cell Collection
+        $collection	= $excel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
+
+        $i = 1;
+        $count = count($collection);
+        $limit = intval(getConfig('IMPORT_ROWS_LIMIT'))+1;
+
+        if($count <= $limit)
+        {
+          foreach($collection as $rs)
+          {
+            if($i == 1)
+            {
+              $i++;
+              $headCol = array(
+                'A' => 'Code',
+                'B' => 'Name',
+                'C' => 'Barcode',
+                'D' => 'Model',
+                'E' => 'Color',
+                'F' => 'Size',
+                'G' => 'Group',
+                'H' => 'SubGroup',
+                'I' => 'Category',
+                'J' => 'Kind',
+                'K' => 'Type',
+                'L' => 'Brand',
+                'M' => 'Year',
+                'N' => 'Cost',
+                'O' => 'Price',
+                'P' => 'Unit',
+                'Q' => 'CountStock',
+                'R' => 'IsAPI',
+                'S' => 'OldModel',
+                'T' => 'OldCode'
+              );
+
+              foreach($headCol as $col => $field)
+              {
+                if($rs[$col] !== $field)
+                {
+                  $sc = FALSE;
+                  $this->error = 'Column '.$col.' Should be '.$field;
+                  break;
+                }
+              }
+
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+            }
+            else if(!empty($rs['A']))
+            {
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              $style = get_null(trim($rs['D']));
+              $old_style = get_null(trim($rs['S'])) === NULL ? $style : trim($rs['S']);
+              $color_code = get_null(trim($rs['E']));
+              $size_code = get_null(trim($rs['F']));
+              $group_code = get_null(trim($rs['G']));
+              $sub_group_code = get_null(trim($rs['H']));
+              $category_code = get_null(trim($rs['I']));
+              $kind_code = get_null(trim($rs['J']));
+              $type_code = get_null(trim($rs['K']));
+              $brand_code = get_null(trim($rs['L']));
+              $year = empty($rs['M']) ? '0000' : trim($rs['M']);
+
+              if(!empty($color_code) && ! $this->product_color_model->is_exists($color_code))
+              {
+                $sc = FALSE;
+                $this->error = "Color : {$color_code}  does not exists";
+              }
+              else if(!empty($size_code) && ! $this->product_size_model->is_exists($size_code))
+              {
+                $sc = FALSE;
+                $this->error = "Size : {$size_code}  does not exists";
+              }
+              else if(!empty($group_code) && ! $this->product_group_model->is_exists($group_code))
+              {
+                $sc = FALSE;
+                $this->error = "Product Group : {$group_code}  does not exists";
+              }
+              else if(!empty($sub_group_code) && ! $this->product_sub_group_model->is_exists($sub_group_code))
+              {
+                $sc = FALSE;
+                $this->error = "Product Sub Group : {$sub_roup_code}  does not exists";
+              }
+              else if(!empty($category_code) && ! $this->product_category_model->is_exists($category_code))
+              {
+                $sc = FALSE;
+                $this->error = "Product Category : {$category_code} does not exists";
+              }
+              else if(!empty($kind_code) && ! $this->product_kind_model->is_exists($kind_code))
+              {
+                $sc = FALSE;
+                $this->error = "Product Kind : {$kind_code} does not exists";
+              }
+              else if(!empty($type_code) && ! $this->product_type_model->is_exists($type_code))
+              {
+                $sc = FALSE;
+                $this->error = "Product Type : {$type_code} does not exists";
+              }
+              else if(!empty($brand_code) && ! $this->product_brand_model->is_exists($brand_code))
+              {
+                $sc = FALSE;
+                $this->error = "Brand : {$brand_code} does not exists";
+              }
+
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              if(!empty($style))
+              {
+                if(! $this->product_style_model->is_exists($style) )
+                {
+                  $ds = array(
+                    'code' => $style,
+                    'name' => $style,
+                    'group_code' => $group_code,
+                    'sub_group_code' => $sub_group_code,
+                    'category_code' => $category_code,
+                    'kind_code' => $kind_code,
+                    'type_code' => $type_code,
+                    'brand_code' => $brand_code,
+                    'year' => $year,
+                    'cost' => round(trim($rs['N']), 2),
+                    'price' => round(trim($rs['O']), 2),
+                    'unit_code' => trim($rs['P']),
+                    'count_stock' => trim($rs['Q']) === 'N' ? 0:1,
+                    'is_api' => trim($rs['R']) === 'N' ? 0 : 1,
+                    'update_user' => get_cookie('uname'),
+                    'old_code' => $old_style
+                  );
+
+                  if($this->product_style_model->add($ds))
+                  {
+                    //---- export to SAP
+                    $this->export_style($style);
+                  }
+                }
+              }
+
+              $code = trim($rs['A']);
+              $old_code = get_null(trim($rs['T'])) === NULL ? $code : trim($rs['T']);
+              $arr = array(
+                'code' => $code,
+                'name' => trim($rs['B']),
+                'barcode' => get_null(trim($rs['C'])),
+                'style_code' => get_null(trim($rs['D'])),
+                'color_code' => get_null(trim($rs['E'])),
+                'size_code' => get_null(trim($rs['F'])),
+                'group_code' => get_null(trim($rs['G'])),
+                'sub_group_code' => get_null(trim($rs['H'])),
+                'category_code' => get_null(trim($rs['I'])),
+                'kind_code' => get_null(trim($rs['J'])),
+                'type_code' => get_null(trim($rs['K'])),
+                'brand_code' => get_null(trim($rs['L'])),
+                'year' => trim($rs['M']),
+                'cost' => round(trim($rs['N']), 2),
+                'price' => round(trim($rs['O']), 2),
+                'unit_code' => empty(trim($rs['P'])) ? 'PCS' : trim($rs['P']),
+                'count_stock' => trim($rs['Q']) === 'N' ? 0:1,
+                'is_api' => trim($rs['R']) === 'N' ? 0 : 1,
+                'update_user' => get_cookie('uname'),
+                'old_style' => $old_style,
+                'old_code' => $old_code
+              );
+
+              if($this->products_model->is_exists($code))
+              {
+                $is_done = $this->products_model->update($code, $arr);
+              }
+              else
+              {
+                $is_done = $this->products_model->add($arr);
+              }
+
+              if($is_done)
+              {
+                $this->do_export($code);
+              }
+            }
+          } //-- end foreach
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "จำนวนนำเข้าสูงสุดได้ไม่เกิน {$limit} บรรทัด";
+        } //-- end if count limit
+
+      } //--- end if else
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
 
 
   public function add_new()
@@ -400,8 +634,6 @@ class Items extends PS_Controller
   public function do_export($code)
   {
     $item = $this->products_model->get($code);
-    //$exst = $this->products_model->is_sap_exists($item->code);
-    //$middle = $this->products_model->is_middle_exists($item->code);
     $exst = $this->products_model->is_middle_exists($item->code);
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
@@ -439,18 +671,69 @@ class Items extends PS_Controller
 
     return $this->products_model->add_item($ds);
 
-    // if($middle)
-    // {
-    //   return $this->products_model->update_item($item->code, $ds);
-    // }
-    // else
-    // {
-    //   return $this->products_model->add_item($ds);
-    // }
-
   }
 
 
+
+  public function export_style($style_code)
+  {
+    $style = $this->product_style_model->get($style_code);
+
+    if(!empty($style))
+    {
+      $ext = $this->product_style_model->is_middle_exists($style_code);
+      $flag = $ext === TRUE ? 'U' : 'A';
+      $arr = array(
+        'Code' => $style->code,
+        'Name' => $style->name,
+        'UpdateDate' => sap_date(now(), TRUE),
+        'Flag' => $flag
+      );
+      return $this->product_style_model->add_sap_model($arr);
+    }
+    return FALSE;
+  }
+
+
+    public function download_template($token)
+    {
+      //--- load excel library
+      $this->load->library('excel');
+
+      $this->excel->setActiveSheetIndex(0);
+      $this->excel->getActiveSheet()->setTitle('Items Master Template');
+
+      //--- set report title header
+      $this->excel->getActiveSheet()->setCellValue('A1', 'Code');
+      $this->excel->getActiveSheet()->setCellValue('B1', 'Name');
+      $this->excel->getActiveSheet()->setCellValue('C1', 'Barcode');
+      $this->excel->getActiveSheet()->setCellValue('D1', 'Model');
+      $this->excel->getActiveSheet()->setCellValue('E1', 'Color');
+      $this->excel->getActiveSheet()->setCellValue('F1', 'Size');
+      $this->excel->getActiveSheet()->setCellValue('G1', 'Group');
+      $this->excel->getActiveSheet()->setCellValue('H1', 'SubGroup');
+      $this->excel->getActiveSheet()->setCellValue('I1', 'Category');
+      $this->excel->getActiveSheet()->setCellValue('J1', 'Kind');
+      $this->excel->getActiveSheet()->setCellValue('K1', 'Type');
+      $this->excel->getActiveSheet()->setCellValue('L1', 'Brand');
+      $this->excel->getActiveSheet()->setCellValue('M1', 'Year');
+      $this->excel->getActiveSheet()->setCellValue('N1', 'Cost');
+      $this->excel->getActiveSheet()->setCellValue('O1', 'Price');
+      $this->excel->getActiveSheet()->setCellValue('P1', 'Unit');
+      $this->excel->getActiveSheet()->setCellValue('Q1', 'CountStock');
+      $this->excel->getActiveSheet()->setCellValue('R1', 'IsAPI');
+      $this->excel->getActiveSheet()->setCellValue('S1', 'OldModel');
+      $this->excel->getActiveSheet()->setCellValue('T1', 'OldCode');
+
+
+      setToken($token);
+
+      $file_name = "Items_master_template.xlsx";
+      header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
+      header('Content-Disposition: attachment;filename="'.$file_name.'"');
+      $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
+      $writer->save('php://output');
+    }
 
   public function clear_filter()
 	{

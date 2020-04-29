@@ -6,6 +6,7 @@ class Discount_rule extends PS_Controller
   public $menu_code = 'SCRULE';
 	public $menu_group_code = 'SC';
 	public $title = 'เพิ่ม/แก้ไข เงือนไขส่วนลด';
+  public $error;
 
   public function __construct()
   {
@@ -457,6 +458,39 @@ class Discount_rule extends PS_Controller
     }
 
     echo $sc === TRUE ? 'success' : $message;
+  }
+
+
+  public function delete_rule()
+  {
+    $sc = TRUE;
+    //--- check before delete
+    $id = $this->input->post('id_rule');
+    $rule = $this->discount_rule_model->get($id);
+    if(!empty($rule))
+    {
+      if(!empty($rule->id_policy))
+      {
+        $policy_code = $this->discount_policy_model->get_code($rule->id_policy);
+        $sc = FALSE;
+        $this->error = "มีการเชื่อมโยงเงื่อนไขไว้กับนโยบายเลขที่ : {$policy_code} กรุณาลบการเชื่อมโยงก่อนลบเงื่อนไขนี้";
+      }
+      else
+      {
+        if(! $this->discount_rule_model->delete_rule($id))
+        {
+          $sc = FALSE;
+          $this->error = "ลบรายการไม่สำเร็จ";
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Not found";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 

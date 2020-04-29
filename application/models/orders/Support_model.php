@@ -7,17 +7,35 @@ class Support_model extends CI_Model
   }
 
 
+  // public function get_budget($code)
+  // {
+  //   $this->ms
+  //   ->select('Balance, DNotesBal, OrdersBal, CreditLine')
+  //   ->where('CardType', 'C')
+  //   ->where('CardCode', $code);
+  //   $rs = $this->ms->get('OCRD');
+  //   if($rs->num_rows() === 1)
+  //   {
+  //     $amount = $rs->row()->CreditLine - ($rs->row()->Balance + $rs->row()->DNotesBal + $rs->row()->OrdersBal);
+  //     return $amount;
+  //   }
+  //
+  //   return 0;
+  // }
+
+
   public function get_budget($code)
   {
-    $this->ms
-    ->select('Balance, DNotesBal, OrdersBal, CreditLine')
-    ->where('CardType', 'C')
-    ->where('CardCode', $code);
-    $rs = $this->ms->get('OCRD');
+    $rs = $this->ms
+    ->select('(PlanAmtLC - (UndlvAmntL + CumAmntLC)) AS amount', FALSE)
+    ->from('OOAT')
+    ->join('OAT1', 'OOAT.AbsID = OAT1.AgrNo', 'inner')
+    ->where('BpCode', $code)
+    ->get();
+
     if($rs->num_rows() === 1)
     {
-      $amount = $rs->row()->CreditLine - ($rs->row()->Balance + $rs->row()->DNotesBal + $rs->row()->OrdersBal);
-      return $amount;
+      return $rs->row()->amount;
     }
 
     return 0;

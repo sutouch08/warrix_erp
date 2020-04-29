@@ -12,7 +12,7 @@
           	<th colspan="6">
 							<div class="col-sm-6">
               	<button type="button" class="btn btn-sm btn-info" onclick="selectAll()">เลือกทั้งหมด</button>
-								<button type="button" class="btn btn-sm btn-warning" onclick="claerAll()">เคลียร์</button>
+								<button type="button" class="btn btn-sm btn-warning" onclick="clearAll()">เคลียร์</button>
               </div>
               <div class="col-sm-6">
                 <p class="pull-right top-p">

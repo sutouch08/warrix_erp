@@ -44,12 +44,12 @@
 
   <div class="col-sm-4 col-4-harf col-xs-12 padding-5">
     <label>ลูกค้า[ในระบบ]</label>
-    <input type="text" class="form-control input-sm" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" disabled />
+    <input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" disabled />
   </div>
 
 	<div class="col-sm-4 col-4-harf col-xs-12 padding-5 last">
     <label>โซน[ฝากขาย]</label>
-		<input type="text" class="form-control input-sm" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" disabled />
+		<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" disabled />
   </div>
 
 

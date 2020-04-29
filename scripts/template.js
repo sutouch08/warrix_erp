@@ -291,3 +291,25 @@ function parseDiscount(discount_label, price)
 
 	return discLabel;
 }
+
+function sort(field){
+	var sort_by = "";
+	if(field === 'date_add'){
+		el = $('#sort_date_add');
+		sort_by = el.hasClass('sorting_desc') ? 'ASC' : 'DESC';
+		sort_class = el.hasClass('sorting_desc') ? 'sorting_asc' : 'sorting_desc';
+	}else{
+		el = $('#sort_code');
+		sort_by = el.hasClass('sorting_desc') ? 'ASC' : 'DESC';
+		sort_class = el.hasClass('sorting_desc') ? 'sorting_asc' : 'sorting_desc';
+	}
+
+	$('.sorting').removeClass('sorting_desc');
+	$('.sorting').removeClass('sorting_asc');
+
+	el.addClass(sort_class);
+	$('#sort_by').val(sort_by);
+	$('#order_by').val(field);
+
+	getSearch();
+}

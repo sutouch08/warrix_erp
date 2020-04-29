@@ -216,11 +216,24 @@ function get_null($value)
 	return $value === '' ? NULL : $value;
 }
 
+//--- return TRUE if value ==  1 else return FALSE;
+function is_true($value)
+{
+	if($value === 1 OR $value === '1' OR $value === TRUE)
+	{
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+
+
 function pagination_config( $base_url, $total_rows = 0, $perpage = 20, $segment = 3)
 {
     $rows = get_rows();
     $input_rows  = '<p class="pull-right pagination hidden-xs">';
-    $input_rows .= 'ทั้งหมด '.$total_rows.' รายการ | แสดง';
+    $input_rows .= 'ทั้งหมด '.number($total_rows).' รายการ | แสดง';
     $input_rows .= '<input type="number" name="set_rows" id="set_rows" class="input-mini text-center margin-left-15 margin-right-10" value="'.$rows.'" />';
     $input_rows .= 'ต่อหน้า ';
     $input_rows .= '<buton class="btn btn-success btn-xs" type="button" onClick="set_rows()">แสดง</button>';

@@ -126,16 +126,32 @@ class Qc extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'from_date'     => get_filter('from_date', 'from_date', ''),
-      'to_date'       => get_filter('to_date', 'to_date', '')
+      'code'          => get_filter('code', 'qc_code', ''),
+      'customer'      => get_filter('customer', 'qc_customer', ''),
+      'user'          => get_filter('user', 'qc_user', ''),
+      'channels'      => get_filter('channels', 'qc_channels', ''),
+      'from_date'     => get_filter('from_date', 'qc_from_date', ''),
+      'to_date'       => get_filter('to_date', 'qc_to_date', ''),
+      'sort_by'       => get_filter('sort_by', 'qc_sort_by', ''),
+      'order_by'      => get_filter('order_by', 'qc_order_by', '')
     );
+    //--- แสดงผลกี่รายการต่อหน้า
+		$perpage = get_rows();
+		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
+		if($perpage > 300)
+		{
+			$perpage = 20;
+		}
 
-		$orders   = $this->qc_model->get_data($filter, 5);
+    $state = 5; //---- รอตรวจ
+		$segment  = 4; //-- url segment
+		$rows     = $this->qc_model->count_rows($filter, $state);
+		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
+		$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
+    $offset   = $rows < $this->uri->segment($segment) ? NULL : $this->uri->segment($segment);
+		$orders   = $this->qc_model->get_data($filter, $state, $perpage, $offset);
     $filter['orders'] = $orders;
+    $this->pagination->initialize($init);
     $this->load->view('inventory/qc/qc_list', $filter);
   }
 
@@ -145,16 +161,31 @@ class Qc extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'code', ''),
-      'customer'      => get_filter('customer', 'customer', ''),
-      'user'          => get_filter('user', 'user', ''),
-      'channels'      => get_filter('channels', 'channels', ''),
-      'from_date'     => get_filter('from_date', 'from_date', ''),
-      'to_date'       => get_filter('to_date', 'to_date', '')
+      'code'          => get_filter('code', 'qc_code', ''),
+      'customer'      => get_filter('customer', 'qc_customer', ''),
+      'user'          => get_filter('user', 'qc_user', ''),
+      'channels'      => get_filter('channels', 'qc_channels', ''),
+      'from_date'     => get_filter('from_date', 'qc_from_date', ''),
+      'to_date'       => get_filter('to_date', 'qc_to_date', ''),
+      'sort_by'       => get_filter('sort_by', 'qc_sort_by', ''),
+      'order_by'      => get_filter('order_by', 'qc_order_by', '')
     );
-
-		$orders   = $this->qc_model->get_data($filter, 6);
+    //--- แสดงผลกี่รายการต่อหน้า
+		$perpage = get_rows();
+		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
+		if($perpage > 300)
+		{
+			$perpage = 20;
+		}
+    $state = 6; //---- รอตรวจ
+		$segment  = 5; //-- url segment
+		$rows     = $this->qc_model->count_rows($filter, $state);
+		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
+		$init	    = pagination_config($this->home.'/view_process/index/', $rows, $perpage, $segment);
+    $offset   = $rows < $this->uri->segment($segment) ? NULL : $this->uri->segment($segment);
+		$orders   = $this->qc_model->get_data($filter, $state, $perpage, $offset);
     $filter['orders'] = $orders;
+    $this->pagination->initialize($init);
     $this->load->view('inventory/qc/qc_view_process_list', $filter);
   }
 
@@ -419,7 +450,7 @@ class Qc extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'customer', 'user', 'channels', 'from_date', 'to_date');
+    $filter = array('qc_code', 'qc_customer', 'qc_user', 'qc_channels', 'qc_from_date', 'qc_to_date', 'qc_sort_by', 'qc_order_by');
     clear_filter($filter);
   }
 

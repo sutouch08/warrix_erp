@@ -32,7 +32,9 @@ class Delivery_order extends PS_Controller
       'role'          => get_filter('role', 'do_role', ''),
       'channels'      => get_filter('channels', 'do_channels', ''),
       'from_date'     => get_filter('from_date', 'do_from_date', ''),
-      'to_date'       => get_filter('to_date', 'do_to_date', '')
+      'to_date'       => get_filter('to_date', 'do_to_date', ''),
+      'sort_by'       => get_filter('sort_by', 'do_sort_by', ''),
+      'order_by'      => get_filter('order_by', 'do_order_by', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -60,6 +62,7 @@ class Delivery_order extends PS_Controller
   {
     $sc = TRUE;
     $message = 'ทำรายการไม่สำเร็จ';
+    $this->load->model('masters/products_model');
     $this->load->model('inventory/buffer_model');
     $this->load->model('inventory/cancle_model');
     $this->load->model('inventory/movement_model');
@@ -157,7 +160,7 @@ class Delivery_order extends PS_Controller
                     break;
                   }
 
-
+                  $item = $this->products_model->get($rs->product_code);
                   //--- ข้อมูลสำหรับบันทึกยอดขาย
                   $arr = array(
                           'reference' => $order->code,
@@ -165,8 +168,8 @@ class Delivery_order extends PS_Controller
                           'payment_code'   => $order->payment_code,
                           'channels_code'  => $order->channels_code,
                           'product_code'  => $rs->product_code,
-                          'product_name'  => $rs->product_name,
-                          'product_style' => $rs->style_code,
+                          'product_name'  => $item->name,
+                          'product_style' => $item->style_code,
                           'cost'  => $rs->cost,
                           'price'  => $rs->price,
                           'sell'  => $rs->final_price,
@@ -525,7 +528,7 @@ class Delivery_order extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('do_code','do_customer','do_user','do_role','do_channels','do_from_date','do_to_date');
+    $filter = array('do_code','do_customer','do_user','do_role','do_channels','do_from_date','do_to_date', 'do_sort_by', 'do_order_by');
     clear_filter($filter);
   }
 

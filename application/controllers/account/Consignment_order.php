@@ -5,7 +5,7 @@ class Consignment_order extends PS_Controller
   public $menu_code = 'ACCMOD';
 	public $menu_group_code = 'AC';
   public $menu_sub_group_code = '';
-	public $title = 'ตัดยอดขาย(ห้าง)';
+	public $title = 'ตัดยอดขาย(เปิดใบกำกับภาษีเมื่อส่งของ)';
   public $filter;
   public $error;
   public function __construct()

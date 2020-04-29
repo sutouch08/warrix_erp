@@ -189,7 +189,7 @@ class Orders_model extends CI_Model
 
   public function get_state($code)
   {
-    $rs = $this->db->select('state')->where('code', $code)->get('orders');
+    $rs = $this->db->select('state')->where('code', $code)->or_where('reference', $code)->get('orders');
     if($rs->num_rows() === 1)
     {
       return $rs->row()->state;
@@ -372,7 +372,7 @@ class Orders_model extends CI_Model
 
     if(!empty($ds['empName']))
     {
-      $this->db->like('orders.emp_name', $ds['empName']);
+      $this->db->like('orders.empName', $ds['empName']);
     }
 
 
@@ -488,7 +488,7 @@ class Orders_model extends CI_Model
 
     if(!empty($ds['empName']))
     {
-      $this->db->like('orders.emp_name', $ds['empName']);
+      $this->db->like('orders.empName', $ds['empName']);
     }
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
@@ -522,8 +522,16 @@ class Orders_model extends CI_Model
       $this->db->where_in('orders.state', $ds['state_list']);
     }
 
-    $this->db->order_by('orders.code', 'DESC');
-
+    if(!empty($ds['order_by']))
+    {
+      $order_by = "orders.{$ds['order_by']}";
+      $this->db->order_by($order_by, $ds['sort_by']);
+    }
+    else
+    {
+      $this->db->order_by('orders.code', 'DESC');
+    }
+    
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;

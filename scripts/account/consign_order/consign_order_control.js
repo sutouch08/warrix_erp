@@ -524,7 +524,8 @@ function getProductGrid(){
 			data:{
 				"style_code" : pdCode,
 				"warehouse_code" : whCode,
-        "zone_code" : zoneCode
+        "zone_code" : zoneCode,
+        "isView" : 0
 			},
 			success: function(rs){
 				load_out();

@@ -29,7 +29,9 @@ class Prepare extends PS_Controller
       'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
       'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
-      'to_date'       => get_filter('to_date', 'prepare_to_date', '')
+      'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
+      'order_by'      => get_filter('order_by', 'prepare_order_by', ''),
+      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -67,7 +69,9 @@ class Prepare extends PS_Controller
       'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
       'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
-      'to_date'       => get_filter('to_date', 'prepare_to_date', '')
+      'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
+      'order_by'      => get_filter('order_by', 'prepare_order_by', ''),
+      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -78,7 +82,7 @@ class Prepare extends PS_Controller
 			$perpage = 20;
 		}
 
-		$segment  = 4; //-- url segment
+		$segment  = 5; //-- url segment
 		$rows     = $this->prepare_model->count_rows($filter, 4);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	    = pagination_config($this->home.'/view_process/', $rows, $perpage, $segment);
@@ -446,7 +450,10 @@ class Prepare extends PS_Controller
       'prepare_is_term',
       'prepare_role',
       'prepare_from_date',
-      'prepare_to_date');
+      'prepare_to_date',
+      'prepare_order_by',
+      'prepare_sort_by'
+    );
 
     clear_filter($filter);
   }

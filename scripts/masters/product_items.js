@@ -163,7 +163,7 @@ function confirmGenOldCode(style_code){
           setTimeout(function(){
             window.location.reload();
           }, 1500);
-          
+
         }else{
           swal({
             title:'Error!',

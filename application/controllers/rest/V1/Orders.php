@@ -36,6 +36,52 @@ class Orders extends REST_Controller
   }
 
 
+  public function status_get($code)
+  {
+    if(empty($code))
+    {
+      $arr = array(
+        'status' => FALSE,
+        'error' => "Order Number is required"
+      );
+
+      $this->response($arr, 400);
+    }
+
+    $state = $this->orders_model->get_state($code);
+    if(empty($state))
+    {
+      $arr = array(
+        'status' => FALSE,
+        'error' => "Invalid Order Number"
+      );
+
+      $this->response($arr, 400);
+    }
+    else
+    {
+      //---- status name
+      $state_name = array(
+        '1' => 'Pending',
+        '2' => 'Waiting for payment',
+        '3' => 'Processing',
+        '4' => 'Picking',
+        '5' => 'Picking',
+        '6' => 'Packing',
+        '7' => 'Shipping',
+        '8' => 'Complete',
+        '9' => 'Cancel'
+      );
+
+      $arr = array(
+        'status' => $state_name[$state]
+      );
+
+      $this->response($arr, 200);
+    }
+    
+  }
+
   public function create_post()
   {
     //--- Get raw post data
@@ -284,12 +330,14 @@ class Orders extends REST_Controller
         'user' => $this->user,
         'date_add' => $date_add,
         'warehouse_code' => getConfig('WEB_SITE_WAREHOUSE_CODE'),
-        'is_api' => 1
+        'is_api' => 1,
+        'order_id' => $data->order_id
       );
 
     $this->db->trans_begin();
 
     $rs = $this->orders_model->add($ds);
+
 
     if(!$rs)
     {
@@ -325,9 +373,11 @@ class Orders extends REST_Controller
           'is_default' => 1
         );
 
-        $id = $this->address_model->add_shipping_address($arr);
-        $this->orders_model->set_address_id($order_code, $id);
+        $id_address = $this->address_model->add_shipping_address($arr);
+
       }
+
+      $this->orders_model->set_address_id($order_code, $id_address);
 
       //---- add order details
       $details = $data->details;
@@ -402,7 +452,7 @@ class Orders extends REST_Controller
       $this->db->trans_rollback();
       $arr = array(
         'status' => FALSE,
-        'message' => 'Create order failed'
+        'message' => $this->error
       );
 
       $this->response($arr, 200);

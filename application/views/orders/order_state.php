@@ -18,7 +18,7 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
                     	<option value="0">เลือกสถานะ</option>
 							<?php if( $order->state != 9 && $order->is_expired == 0 && $order->status == 1) : ?>
 
-                 <?php if( $order->state <=3 && $canChange) : ?>
+                 <?php if( $order->state <=3) : ?>
                         <?php if($order->state != 1): ?>
 													<option value="1">รอดำเนินการ</option>
 												<?php endif; ?>
