@@ -339,3 +339,33 @@ function downloadBarcode(code)
 	get_download(token);
 	window.location.href = BASE_URL + 'masters/products/export_barcode/'+code+'/'+token;
 }
+
+
+function sendToWeb(code)
+{
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'masters/products/export_products_to_web',
+    type:'POST',
+    cache:false,
+    data:{
+      'style_code' : code
+    },
+    success:function(rs){
+      load_out();
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
+      }else{
+        swal({
+          title:'Error',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}

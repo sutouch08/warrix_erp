@@ -358,7 +358,8 @@ class Receive_po extends PS_Controller
           'price' => $rs->price,
           'qty' => number($rs->Quantity),
           'limit' => ($rs->Quantity + ($rs->Quantity * $rate)) - $dif,
-          'backlog' => number($rs->OpenQty)
+          'backlog' => number($rs->OpenQty),
+          'isOpen' => ($rs->OpenQty == 0 ? FALSE : TRUE)
         );
         array_push($ds, $arr);
         $no++;
@@ -543,7 +544,7 @@ class Receive_po extends PS_Controller
       'receive_to_date',
       'receive_status'
     );
-    
+
     clear_filter($filter);
   }
 

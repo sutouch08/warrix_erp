@@ -523,7 +523,7 @@ class Products extends PS_Controller
     if($this->input->post('style'))
     {
       $code = $this->input->post('style');
-      $old_code = $this->input->post('old_code');
+      $old_code = $this->input->post('old_code'); //--- array of old_code
       $colors = $this->input->post('colors');
       $sizes = $this->input->post('sizes');
       $images = $this->input->post('image');
@@ -1020,7 +1020,7 @@ class Products extends PS_Controller
 
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
-      'ItemName' => $item->name, //--- ชื่อสินค้า
+      'ItemName' => limitText($item->name, 97),//--- ชื่อสินค้า
       'FrgnName' => NULL,   //--- ชื่อสินค้าภาษาต่างประเทศ
       'ItmsGrpCod' => getConfig('ITEM_GROUP_CODE'),  //--- กลุ่มสินค้า (ต้องตรงกับ SAP)
       'VatGourpSa' => getConfig('SALE_VATE_CODE'), //--- รหัสกลุ่มภาษีขาย
@@ -1092,6 +1092,39 @@ class Products extends PS_Controller
     }
 
     echo $sc === TRUE ? 'success' : "Success : {$success}, Fail : {$fail}";
+  }
+
+
+
+  public function export_products_to_web()
+  {
+    $sc = TRUE;
+    $style_code = $this->input->post('style_code');
+    if(!empty($style_code))
+    {
+      $this->load->library('api');
+      $this->load->helper('stock');
+      $products = $this->products_model->get_style_items($style_code);
+      if(!empty($products))
+      {
+        foreach($products as $item)
+        {
+          $rs = $this->api->create_products($item, get_available_stock($item->code));
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบรายการสินค้าในระบบ";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรหัสสินค้า";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 

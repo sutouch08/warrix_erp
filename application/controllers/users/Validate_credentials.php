@@ -51,6 +51,11 @@ class Validate_credentials extends CI_Controller
           {
             $allow = FALSE;
           }
+
+          if($field == 'approve' && $rs->can_approve == 0)
+          {
+            $allow = FALSE;
+          }
         }
 
   			$ds = array(

@@ -99,7 +99,7 @@
 			</thead>
 			<tbody>
         <?php if(!empty($orders)) : ?>
-          <?php $no = $this->uri->segment(5) + 1; ?>
+          <?php $no = $this->uri->segment(4) + 1; ?>
           <?php foreach($orders as $rs) : ?>
             <?php $customer_name = (!empty($rs->customer_ref)) ? $rs->customer_ref : $rs->customer_name; ?>
             <tr id="row-<?php echo $rs->code; ?>">

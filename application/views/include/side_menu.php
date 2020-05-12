@@ -64,7 +64,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICTRZN',  'inventory/move', 'ย้าย สินค้า'); ?>
 				</ul>
 			</li>
-<!--
+
 			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'CHECK'); ?>">
 				<a href="#" class="dropdown-toggle">
 					<i class="menu-icon fa fa-caret-right"></i> ตรวจสอบ
@@ -76,7 +76,7 @@ $menu_group = $this->menu_group_code;
 					<?php echo side_menu($menu, 'ICCKMV',  'inventory/movement', 'ตรวจสอบ MOVEMENT'); ?>
 				</ul>
 			</li>
-			-->
+
 			<?php echo side_menu($menu, 'ICCSRC',  'inventory/consign_check', 'กระทบยอดสินค้า'); ?>
 		</ul>
 	</li>
@@ -188,6 +188,29 @@ $menu_group = $this->menu_group_code;
 			<?php echo side_menu($menu, 'DBCHAN', 'masters/channels','เพิ่ม/แก้ไข ช่องทางขาย'); ?>
 			<?php echo side_menu($menu, 'DBPAYM', 'masters/payment_methods','เพิ่ม/แก้ไข การชำระเงิน'); ?>
 			<?php echo side_menu($menu, 'DBSALE', 'masters/saleman','ข้อมูลพนักงานขาย'); ?>
+		</ul>
+	</li>
+
+	<li class="<?php echo isActiveOpenMenu($menu_group, 'RE'); ?>">
+		<a href="#" class="dropdown-toggle">
+			<i class="menu-icon fa fa-bar-chart"></i>
+			<span class="menu-text">รายงาน</span>
+			<b class="arrow fa fa-angle-down"></b>
+		</a>
+		<ul class="submenu">
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'REINVT'); ?>">
+				<a href="#" class="dropdown-toggle"><i class="menu-icon fa fa-caret-right"></i> รายงานระบบคลัง <b class="arrow fa fa-angle-down"></b></a>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'REICST', 'report/inventory/stock_balance','รายงานสินค้าคงเหลือ'); ?>
+				</ul>
+			</li>
+			<li class="<?php echo isActiveOpenMenu($menu_sub_group_code, 'RESALE'); ?>">
+				<a href="#" class="dropdown-toggle"><i class="menu-icon fa fa-caret-right"></i> รายงานระบบขาย <b class="arrow fa fa-angle-down"></b></a>
+				<b class="arrow"></b>
+				<ul class="submenu">
+					<?php echo side_menu($menu, 'RESOCU', 'report/sales/sale_order_by_customer','รายงานยอดขาย แยกตามลูกค้า'); ?>
+				</ul>
+			</li>
 		</ul>
 	</li>
 </ul><!-- /.nav-list -->

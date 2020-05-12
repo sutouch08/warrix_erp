@@ -206,7 +206,10 @@ public function get_style_code()
 
     if($txt != '*')
     {
+      $this->ms->group_start();
       $this->ms->like('DocNum', $txt);
+      $this->ms->or_like('NumAtCard', $txt);
+      $this->ms->group_end();
     }
 
     if($receive_due == 0)

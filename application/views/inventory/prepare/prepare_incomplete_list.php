@@ -24,7 +24,9 @@
 <?php  if(!empty($uncomplete_details)) : ?>
 <?php   foreach($uncomplete_details as $rs) : ?>
     <tr class="font-size-12 incomplete" id="incomplete-<?php echo $rs->id; ?>">
-      <td class="middle text-center b-click"><?php echo $rs->barcode; ?></td>
+      <td class="middle text-center b-click">
+        <?php echo (empty($rs->barcode) ? $rs->product_code : $rs->barcode); ?>
+      </td>
       <td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
       <td class="middle text-center" id="order-qty-<?php echo $rs->id; ?>"><?php echo number($rs->qty); ?></td>
       <td class="middle text-center" id="prepared-qty-<?php echo $rs->id; ?>"><?php echo number($rs->prepared); ?></td>

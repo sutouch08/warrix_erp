@@ -64,7 +64,7 @@ class Api
       'product' => array(
         'sku' => $item->code,
         'name' => $item->name,
-        //'attribute_set_id' => $this->attribute_set_id,
+        'attribute_set_id' => $this->attribute_set_id,
         'price' => $item->price,
         'status' => 1,
         'visibility' => 1,
@@ -81,8 +81,8 @@ class Api
           ),
         ),
         'custom_attributes' => array(
-          array('attribute_code' => 'color', 'value' => $item->color_code),
-          array('attribute_code' => 'size', 'value' => $item->size_code)
+          // array('attribute_code' => 'color', 'value' => $item->color_code),
+          // array('attribute_code' => 'size', 'value' => $item->size_code)
         )
       )
     );
@@ -267,7 +267,6 @@ class Api
     return TRUE;
 
   }
-
 
 
 } //-- end class

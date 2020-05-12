@@ -82,7 +82,7 @@ class Prepare extends PS_Controller
 			$perpage = 20;
 		}
 
-		$segment  = 5; //-- url segment
+		$segment  = 4; //-- url segment
 		$rows     = $this->prepare_model->count_rows($filter, 4);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	    = pagination_config($this->home.'/view_process/', $rows, $perpage, $segment);
@@ -172,6 +172,11 @@ class Prepare extends PS_Controller
       if($state == 4)
       {
         $item = $this->products_model->get_product_by_barcode($barcode);
+        if(empty($item))
+        {
+          $item = $this->products_model->get($barcode);
+        }
+
         //--- ตรวจสอบบาร์โค้ดที่ยิงมา
         if(!empty($item))
         {

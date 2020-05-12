@@ -10,6 +10,9 @@
 		<button type="button" class="btn btn-sm btn-yellow" onclick="checkOldCode('<?php echo $style->code; ?>','<?php echo $style->old_code; ?>')">
 			Generate รหัสเก่า
 		</button>
+		<?php if(is_true(getConfig('WEB_API')) === TRUE) : ?>
+			<button type="button" class="btn btn-sm btn-success" onclick="sendToWeb('<?php echo $style->code; ?>')"><i class="fa fa-send"></i> ส่งไป Magento</button>
+		<?php endif; ?>
 		<?php endif; ?>
 	</div>
 </div>

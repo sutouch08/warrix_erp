@@ -318,8 +318,8 @@ function validate_credentials(){
 
 function doApprove(){
 	var s_key = $("#sKey").val();
-	var menu = 'APOVPO'; //-- อนุมัติรับสินค้าเกินใบสั่งซื้อ
-	var field = '';
+	var menu = 'ICPURC'; //-- อนุมัติรับสินค้าเกินใบสั่งซื้อ
+	var field = 'approve';
 
 	if( s_key.length > 0 )
 	{

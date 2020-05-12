@@ -91,7 +91,7 @@ class Receive_po_model extends CI_Model
     ->join('OPOR', 'POR1.DocEntry = OPOR.DocEntry', 'left')
     ->where('OPOR.DocNum', $po_code)
     ->where('OPOR.DocStatus', 'O')
-    ->where('POR1.LineStatus', 'O')
+    //->where('POR1.LineStatus', 'O')
     ->get();
 
     if(!empty($rs))

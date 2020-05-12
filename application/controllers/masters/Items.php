@@ -637,7 +637,7 @@ class Items extends PS_Controller
     $exst = $this->products_model->is_middle_exists($item->code);
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
-      'ItemName' => $item->name, //--- ชื่อสินค้า
+      'ItemName' => limitText($item->name, 97),//--- ชื่อสินค้า
       'FrgnName' => NULL,   //--- ชื่อสินค้าภาษาต่างประเทศ
       'ItmsGrpCod' => getConfig('ITEM_GROUP_CODE'),  //--- กลุ่มสินค้า (ต้องตรงกับ SAP)
       'VatGourpSa' => getConfig('SALE_VATE_CODE'), //--- รหัสกลุ่มภาษีขาย

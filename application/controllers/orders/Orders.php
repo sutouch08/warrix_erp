@@ -1626,7 +1626,7 @@ class Orders extends PS_Controller
               );
 
               $this->order_state_model->add_state($arr);
-              if($isAPI && ! empty($order->order_id))
+              if($this->isAPI && ! empty($order->order_id))
               {
                 $this->load->library('api');
                 $this->api->update_order_status($order->order_id, $order->state, $state);

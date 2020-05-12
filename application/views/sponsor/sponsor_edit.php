@@ -21,9 +21,9 @@
 				<?php endif; ?>
 				<?php if($order->state < 4 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
 				<button type="button" class="btn btn-sm btn-yellow" onclick="editDetail()"><i class="fa fa-pencil"></i> แก้ไขรายการ</button>
-					<?php if($order->status == 0) : ?>
-						<button type="button" class="btn btn-sm btn-success" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
-					<?php endif; ?>
+				<?php endif; ?>
+				<?php if($order->status == 0) : ?>
+					<button type="button" class="btn btn-sm btn-success" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
 				<?php endif; ?>
 				<?php if($order->state == 1 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
 						<button type="button" class="btn btn-sm btn-success" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>

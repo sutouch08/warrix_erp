@@ -227,8 +227,8 @@ class Qc extends PS_Controller
       foreach($uncomplete as $rs)
       {
         $barcode = $this->get_barcode($rs->product_code);
-        $rs->barcode = $barcode;
-        $barcode_list[$rs->id] = $barcode;
+        $rs->barcode = empty($barcode) ? $rs->product_code : $barcode;
+        $barcode_list[$rs->id] = $rs->barcode;
         $rs->from_zone = $this->get_prepared_from_zone($code, $rs->product_code, $rs->is_count);
       }
     }
@@ -239,8 +239,8 @@ class Qc extends PS_Controller
       foreach($complete as $rs)
       {
         $barcode = $this->get_barcode($rs->product_code);
-        $rs->barcode = $barcode;
-        $barcode_list[$rs->product_code] = $barcode;
+        $rs->barcode = empty($barcode) ? $rs->product_code : $barcode;
+        $barcode_list[$rs->product_code] = $rs->barcode;
         //$rs->barcode = $this->get_barcode($rs->product_code);
         //$rs->prepared = $rs->is_count == 1 ? $this->get_prepared($rs->order_code, $rs->product_code) : $rs->qty;
         $rs->from_zone = $this->get_prepared_from_zone($code, $rs->product_code, $rs->is_count);

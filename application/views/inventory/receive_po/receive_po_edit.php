@@ -165,8 +165,10 @@
 						<input type="hidden" id="backlog_{{pdCode}}" value="{{backlog}}" />
 						</td>
             <td class="middle text-center">
+							{{#if isOpen}}
                 <input type="text" class="form-control input-sm text-center receive-box pdCode" name="receive[{{pdCode}}]" id="receive_{{pdCode}}" />
-								<input type="hidden" name="prices[{{pdCode}}]" id="price_{{pdCode}}" value="{{price}}" />
+								<input type="hidden" name="prices[{{pdCode}}]" id="price_{{pdCode}}" value="{{price}}" />								
+							{{/if}}
             </td>
         </tr>
     {{/if}}
