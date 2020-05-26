@@ -26,7 +26,7 @@
 
 	<div class="col-sm-2 padding-5">
     <label>กลุ่ม</label>
-    <select class="form-control" name="group" onchange="getSearch()">
+    <select class="form-control" name="group" id="group" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_product_group($group); ?>
 		</select>
@@ -34,7 +34,7 @@
 
 	<div class="col-sm-2 padding-5">
     <label>กลุ่มย่อย</label>
-		<select class="form-control" name="sub_group" onchange="getSearch()">
+		<select class="form-control" name="sub_group" id="sub_group" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_product_sub_group($sub_group); ?>
 		</select>
@@ -42,7 +42,7 @@
 
 	<div class="col-sm-2 padding-5">
     <label>หมวดหมู่</label>
-		<select class="form-control" name="category" onchange="getSearch()">
+		<select class="form-control" name="category" id="category" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_product_category($category); ?>
 		</select>
@@ -50,7 +50,7 @@
 
 	<div class="col-sm-2 padding-5 last">
     <label>ประเภท</label>
-		<select class="form-control" name="kind" onchange="getSearch()">
+		<select class="form-control" name="kind" id="kind" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_product_kind($kind); ?>
 		</select>
@@ -58,7 +58,7 @@
 
 	<div class="col-sm-2 padding-5 first">
     <label>ชนิด</label>
-		<select class="form-control" name="type" onchange="getSearch()">
+		<select class="form-control" name="type" id="type" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_product_type($type); ?>
 		</select>
@@ -66,7 +66,7 @@
 
 	<div class="col-sm-2 padding-5">
     <label>ยี่ห้อ</label>
-		<select class="form-control" name="brand" onchange="getSearch()">
+		<select class="form-control" name="brand" id="brand" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_product_brand($brand); ?>
 		</select>
@@ -74,22 +74,39 @@
 
 	<div class="col-sm-2 padding-5">
     <label>ปี</label>
-		<select class="form-control" name="year" onchange="getSearch()">
+		<select class="form-control" name="year" id="year" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_years($year); ?>
 		</select>
   </div>
 
-  <div class="col-sm-2 padding-5">
+  <div class="col-sm-1 padding-5">
     <label class="display-block not-show">buton</label>
     <button type="submit" class="btn btn-sm btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
   </div>
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 padding-5">
     <label class="display-block not-show">buton</label>
     <button type="button" class="btn btn-sm btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
+	<div class="col-sm-1 padding-5">
+    <label class="display-block not-show">buton</label>
+    <button type="button" class="btn btn-sm btn-info btn-block" onclick="export_filter()"><i class="fa fa-file-excel-o"></i> Export</button>
+  </div>
+
 </div>
 <hr class="margin-top-15">
+</form>
+<form id="export_filter_form" action="<?php echo $this->home; ?>/export_filter" method="post">
+	<input type="hidden" name="export_code" id="export_code">
+	<input type="hidden" name="export_name" id="export_name">
+	<input type="hidden" name="export_group" id="export_group">
+	<input type="hidden" name="export_sub_group" id="export_sub_group">
+	<input type="hidden" name="export_category" id="export_category">
+	<input type="hidden" name="export_kind" id="export_kind">
+	<input type="hidden" name="export_type" id="export_type">
+	<input type="hidden" name="export_brand" id="export_brand">
+	<input type="hidden" name="export_year" id="export_year">
+	<input type="hidden" name="token" id="token">
 </form>
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">

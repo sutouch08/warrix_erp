@@ -296,6 +296,79 @@ class Products_model extends CI_Model
   }
 
 
+
+  public function get_products_list(array $ds = array())
+  {
+    $this->db
+    ->select('products.*')
+    ->from('products')
+    ->join('product_color', 'products.color_code = product_color.code', 'left')
+    ->join('product_size', 'products.size_code = product_size.code', 'left');
+
+    if(!empty($ds))
+    {
+      if(!empty($ds['code']))
+      {
+        $this->db->group_start();
+        $this->db->like('products.code', $ds['code']);
+        $this->db->or_like('products.old_code', $ds['code']);
+        $this->db->group_end();
+      }
+
+      if(!empty($ds['name']))
+      {
+        $this->db->like('products.name', $ds['name']);
+      }
+
+
+      if(!empty($ds['group']))
+      {
+        $this->db->where('group_code', $ds['group']);
+      }
+
+      if(!empty($ds['sub_group']))
+      {
+        $this->db->where('sub_group_code', $ds['sub_group']);
+      }
+
+      if(!empty($ds['category']))
+      {
+        $this->db->where('category_code', $ds['category']);
+      }
+
+      if(!empty($ds['kind']))
+      {
+        $this->db->where('kind_code', $ds['kind']);
+      }
+
+      if(!empty($ds['type']))
+      {
+        $this->db->where('type_code', $ds['type']);
+      }
+
+      if(!empty($ds['brand']))
+      {
+        $this->db->where('brand_code', $ds['brand']);
+      }
+
+      if(!empty($ds['year']))
+      {
+        $this->db->where('year', $ds['year']);
+      }
+    }
+
+    $this->db->order_by('style_code', 'ASC');
+    $this->db->order_by('color_code', 'ASC');
+    $this->db->order_by('product_size.position', 'ASC');
+
+    $rs = $this->db->get();
+
+    return $rs->result();
+  }
+
+
+
+
   public function add(array $ds = array())
   {
     if(!empty($ds))
@@ -406,7 +479,7 @@ class Products_model extends CI_Model
 
   public function get($code)
   {
-    $rs = $this->db->where('code', $code)->or_where('old_code', $code)->get('products');
+    $rs = $this->db->where('code', $code)->get('products');
     if($rs->num_rows() == 1)
     {
       return $rs->row();

@@ -98,6 +98,90 @@ class Products extends PS_Controller
   }
 
 
+  public function export_filter()
+  {
+    $token = $this->input->post('token');
+    $this->load->library('excel');
+    $this->excel->setActiveSheetIndex(0);
+    $this->excel->getActiveSheet()->setTitle('Stock Balance Report');
+
+    //--- set report title header
+    $this->excel->getActiveSheet()->setCellValue('A1', 'Code');
+    $this->excel->getActiveSheet()->setCellValue('B1', 'Name');
+    $this->excel->getActiveSheet()->setCellValue('C1', 'Barcode');
+    $this->excel->getActiveSheet()->setCellValue('D1', 'Model');
+    $this->excel->getActiveSheet()->setCellValue('E1', 'Color');
+    $this->excel->getActiveSheet()->setCellValue('F1', 'Size');
+    $this->excel->getActiveSheet()->setCellValue('G1', 'Group');
+    $this->excel->getActiveSheet()->setCellValue('H1', 'SubGroup');
+    $this->excel->getActiveSheet()->setCellValue('I1', 'Category');
+    $this->excel->getActiveSheet()->setCellValue('J1', 'Kind');
+    $this->excel->getActiveSheet()->setCellValue('K1', 'Type');
+    $this->excel->getActiveSheet()->setCellValue('L1', 'Brand');
+    $this->excel->getActiveSheet()->setCellValue('M1', 'Year');
+    $this->excel->getActiveSheet()->setCellValue('N1', 'Cost');
+    $this->excel->getActiveSheet()->setCellValue('O1', 'Price');
+    $this->excel->getActiveSheet()->setCellValue('P1', 'Unit');
+    $this->excel->getActiveSheet()->setCellValue('Q1', 'CountStock');
+    $this->excel->getActiveSheet()->setCellValue('R1', 'IsAPI');
+    $this->excel->getActiveSheet()->setCellValue('S1', 'OldModel');
+    $this->excel->getActiveSheet()->setCellValue('T1', 'OldCode');
+
+    $row = 2;
+
+    $ds = array(
+      'code' => $this->input->post('export_code'),
+      'name' => $this->input->post('export_name'),
+      'group' => $this->input->post('export_group'),
+      'sub_group' => $this->input->post('export_sub_group'),
+      'category' => $this->input->post('export_category'),
+      'kind' => $this->input->post('export_kind'),
+      'type' => $this->input->post('export_type'),
+      'brand' => $this->input->post('export_brand'),
+      'year' => $this->input->post('export_year')
+    );
+
+    $products = $this->products_model->get_products_list($ds);
+
+    if(!empty($products))
+    {
+      foreach($products as $rs)
+      {
+        $this->excel->getActiveSheet()->setCellValue('A'.$row, $rs->code);
+        $this->excel->getActiveSheet()->setCellValue('B'.$row, $rs->name);
+        $this->excel->getActiveSheet()->setCellValue('C'.$row, $rs->barcode);
+        $this->excel->getActiveSheet()->setCellValue('D'.$row, $rs->style_code);
+        $this->excel->getActiveSheet()->setCellValue('E'.$row, $rs->color_code);
+        $this->excel->getActiveSheet()->setCellValue('F'.$row, $rs->size_code);
+        $this->excel->getActiveSheet()->setCellValue('G'.$row, $rs->group_code);
+        $this->excel->getActiveSheet()->setCellValue('H'.$row, $rs->sub_group_code);
+        $this->excel->getActiveSheet()->setCellValue('I'.$row, $rs->category_code);
+        $this->excel->getActiveSheet()->setCellValue('J'.$row, $rs->kind_code);
+        $this->excel->getActiveSheet()->setCellValue('K'.$row, $rs->type_code);
+        $this->excel->getActiveSheet()->setCellValue('L'.$row, $rs->brand_code);
+        $this->excel->getActiveSheet()->setCellValue('M'.$row, $rs->year);
+        $this->excel->getActiveSheet()->setCellValue('N'.$row, $rs->cost);
+        $this->excel->getActiveSheet()->setCellValue('O'.$row, $rs->price);
+        $this->excel->getActiveSheet()->setCellValue('P'.$row, $rs->unit_code);
+        $this->excel->getActiveSheet()->setCellValue('Q'.$row, ($rs->count_stock == 1 ? 'Y':'N'));
+        $this->excel->getActiveSheet()->setCellValue('R'.$row, ($rs->is_api == 1 ? 'Y':'N'));
+        $this->excel->getActiveSheet()->setCellValue('S'.$row, $rs->old_style);
+        $this->excel->getActiveSheet()->setCellValue('T'.$row, $rs->old_code);
+        $row++;
+      }
+    }
+
+    setToken($token);
+
+    $file_name = "Products Master.xlsx";
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
+    header('Content-Disposition: attachment;filename="'.$file_name.'"');
+    $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
+    $writer->save('php://output');
+
+  }
+
+
   public function add_new()
   {
     $this->load->view('masters/products/products_add_view');
@@ -110,15 +194,15 @@ class Products extends PS_Controller
     {
       $code     = trim($this->input->post('code')); //--- ตัดช่องว่างหัว-ท้าย
       $name     = addslashes(trim($this->input->post('name'))); //--- escape string
-      $group    = $this->input->post('group_code');
-      $sub_group = $this->input->post('sub_group_code');
-      $category = $this->input->post('category_code');
-      $kind     = $this->input->post('kind_code');
-      $type     = $this->input->post('type_code');
+      $group    = get_null($this->input->post('group_code'));
+      $sub_group = get_null($this->input->post('sub_group_code'));
+      $category = get_null($this->input->post('category_code'));
+      $kind     = get_null($this->input->post('kind_code'));
+      $type     = get_null($this->input->post('type_code'));
       $old_code = get_null($this->input->post('old_style'));
       $old_code = empty($old_code) ? $code : $old_code;
-      $brand    = $this->input->post('brand_code');
-      $year     = $this->input->post('year');
+      $brand    = get_null($this->input->post('brand_code'));
+      $year     = get_null($this->input->post('year'));
       $cost     = $this->input->post('cost');
       $price    = $this->input->post('price');
       $unit     = $this->input->post('unit_code');

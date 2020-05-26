@@ -274,6 +274,7 @@ class Receive_transform_model extends CI_Model
       $this->db->where('status', $ds['status']);
     }
 
+    $this->db->order_by('code', 'DESC');
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;

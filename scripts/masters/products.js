@@ -41,6 +41,36 @@ function clearFilter(){
   });
 }
 
+function export_filter(){
+  let code = $('#code').val();
+  let name = $('#name').val();
+  let group = $('#group').val();
+  let sub_group = $('#sub_group').val();
+  let category = $('#category').val();
+  let kind = $('#kind').val();
+  let type = $('#type').val();
+  let brand = $('#brand').val();
+  let year = $('#year').val();
+  let token	= new Date().getTime();
+
+
+  $('#export_code').val(code);
+  $('#export_name').val(name);
+  $('#export_group').val(group);
+  $('#export_sub_group').val(sub_group);
+  $('#export_category').val(category);
+  $('#export_kind').val(kind);
+  $('#export_type').val(type);
+  $('#export_brand').val(brand);
+  $('#export_year').val(year);
+  $('#token').val(token);
+
+  get_download(token);
+  
+  $('#export_filter_form').submit();
+
+}
+
 
 function getDelete(code){
   swal({
