@@ -407,14 +407,12 @@ class Move_model extends CI_Model
     if(!empty($ds['from_warehouse']))
     {
       $from_warehouse = $this->get_warehouse_in($ds['from_warehouse']);
+      $this->db->group_start();
       $this->db->where_in('from_warehouse', $from_warehouse);
+      $this->db->or_where_in('to_warehouse', $from_warehouse);
+      $this->db->group_end();
     }
 
-    if(!empty($ds['to_warehouse']))
-    {
-      $to_warehouse = $this->get_warehouse_in($ds['to_warehouse']);
-      $this->db->where_in('to_warehouse', $to_warehouse);
-    }
 
     if(!empty($ds['user']))
     {
@@ -425,6 +423,11 @@ class Move_model extends CI_Model
     if($ds['status'] != 'all')
     {
       $this->db->where('status', $ds['status']);
+    }
+
+    if($ds['is_export'] != 'all')
+    {
+      $this->db->where('is_exported', $ds['is_export']);
     }
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
@@ -468,6 +471,11 @@ class Move_model extends CI_Model
       $this->db->where('status', $ds['status']);
     }
 
+    if($ds['is_export'] != 'all')
+    {
+      $this->db->where('is_exported', $ds['is_export']);
+    }
+
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
       $this->db->where('date_add >=', from_date($ds['from_date']));
@@ -491,7 +499,7 @@ class Move_model extends CI_Model
 
   public function get_warehouse_in($txt)
   {
-    $rs = $this->ms
+    $rs = $this->db
     ->select('code')
     ->like('code', $txt)
     ->or_like('name', $txt)
@@ -503,7 +511,7 @@ class Move_model extends CI_Model
     {
       foreach($rs->result() as $wh)
       {
-        $arr[] = $wh->WhsCode;
+        $arr[] = $wh->code;
       }
     }
 
@@ -521,6 +529,33 @@ class Move_model extends CI_Model
     ->get('move');
 
     return $rs->row()->code;
+  }
+
+
+  public function exported($code)
+  {
+    return $this->db->set('is_exported', 1)->where('code', $code)->update('move');
+  }
+
+
+  public function get_un_export_list($from_date, $to_date, $limit)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('date_add >=', $from_date)
+    ->where('date_add <=', $to_date)
+    ->where('status', 1)
+    ->where('is_exported', 0)
+    ->order_by('date_add', 'ASC')
+    ->limit($limit)
+    ->get('move');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
 

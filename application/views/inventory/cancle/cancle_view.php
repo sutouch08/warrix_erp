@@ -40,11 +40,11 @@
   </div>
   <div class="col-sm-1 padding-5">
     <label class="display-block not-show">buton</label>
-    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> <?php label('search'); ?></button>
+    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> ค้นหา</button>
   </div>
 	<div class="col-sm-1 padding-5 last">
     <label class="display-block not-show">buton</label>
-    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> <?php label('reset'); ?></button>
+    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
 </div>
 <hr class="margin-top-15">
@@ -76,11 +76,7 @@
     		<td class="text-center"><?php echo $rs->state_name; ?></td>
         <td> <?php echo $rs->zone_name; ?></td>
     		<td class="text-right">
-    			<?php if($this->pm->can_edit OR $this->pm->can_delete) : ?>
-						<button type="button" class="btn btn-mini btn-warning" onclick="move_back(<?php echo $rs->id; ?>)">
-							<i class="fa fa-refresh"></i> ย้ายกลับโซนเดิม
-						</button>
-					<?php endif; ?>
+    			
     		</td>
       </tr>
     <?php  $no++; ?>

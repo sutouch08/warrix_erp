@@ -167,7 +167,7 @@
             <td class="middle text-center">
 							{{#if isOpen}}
                 <input type="text" class="form-control input-sm text-center receive-box pdCode" name="receive[{{pdCode}}]" id="receive_{{pdCode}}" />
-								<input type="hidden" name="prices[{{pdCode}}]" id="price_{{pdCode}}" value="{{price}}" />								
+								<input type="hidden" name="prices[{{pdCode}}]" id="price_{{pdCode}}" value="{{price}}" />
 							{{/if}}
             </td>
         </tr>
@@ -179,6 +179,6 @@
   <?php redirect($this->home.'/view_detail/'.$document->code); ?>
 <?php endif; ?>
 <script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po.js"></script>
-<script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po_add.js?v=1"></script>
 
 <?php $this->load->view('include/footer'); ?>

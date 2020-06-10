@@ -1310,18 +1310,17 @@ class Orders extends PS_Controller
   public function save_address()
   {
     $sc = TRUE;
-    if($this->input->post('customer_code'))
+    if($this->input->post('customer_ref'))
     {
       $this->load->model('address/address_model');
       $id = $this->input->post('id_address');
       $cus_ref = $this->input->post('customer_ref');
-      $cus_ref = empty($cus_ref) ? trim($this->input->post('customer_code')) : $cus_ref;
 
       if(!empty($id))
       {
         $arr = array(
           'code' => $cus_ref,
-          'customer_code' => trim($this->input->post('customer_code')),
+          'customer_code' => NULL,
           'name' => trim($this->input->post('name')),
           'address' => trim($this->input->post('address')),
           'sub_district' => trim($this->input->post('sub_district')),
@@ -1340,15 +1339,15 @@ class Orders extends PS_Controller
         }
         else
         {
-          $this->export_ship_to_address($id);
+          //$this->export_ship_to_address($id);
         }
       }
       else
       {
         $arr = array(
-          'address_code' => $this->address_model->get_new_code($this->input->post('customer_code')),
+          'address_code' => $this->address_model->get_new_code($this->input->post('customer_ref')),
           'code' => $cus_ref,
-          'customer_code' => trim($this->input->post('customer_code')),
+          'customer_code' => NULL,
           'name' => trim($this->input->post('name')),
           'address' => trim($this->input->post('address')),
           'sub_district' => trim($this->input->post('sub_district')),
@@ -1369,7 +1368,7 @@ class Orders extends PS_Controller
         }
         else
         {
-          $this->export_ship_to_address($rs);
+          //$this->export_ship_to_address($rs);
         }
       }
     }

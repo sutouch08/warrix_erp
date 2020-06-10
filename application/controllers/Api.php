@@ -26,18 +26,22 @@ class Api extends CI_Controller
 
   public function update_receive_stock($code)
   {
-    $this->load->model('inventory/receive_po_model');
-    $details = $this->receive_po_model->get_details($code);
-    if(!empty($details))
+    $isApi = getConfig('WEB_API');
+    if($isApi == 1)
     {
-      $this->get_token();
-      if(!empty($this->token))
+      $this->load->model('inventory/receive_po_model');
+      $details = $this->receive_po_model->get_details($code);
+      if(!empty($details))
       {
-        if(!empty($details))
+        $this->get_token();
+        if(!empty($this->token))
         {
-          foreach($details as $rs)
+          if(!empty($details))
           {
-            $this->update_web_stock($rs->product_code, $qty);
+            foreach($details as $rs)
+            {
+              $this->update_web_stock($rs->product_code, $qty);
+            }
           }
         }
       }
@@ -45,7 +49,7 @@ class Api extends CI_Controller
   }
 
 
-  
+
   public function get_available_stock($item)
   {
     $sell_stock = $this->stock_model->get_sell_stock($item);

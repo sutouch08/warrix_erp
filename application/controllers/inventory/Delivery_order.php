@@ -447,6 +447,20 @@ class Delivery_order extends PS_Controller
   }
 
 
+  private function export_transfer_draft($code)
+  {
+    $sc = TRUE;
+    $this->load->library('export');
+    if(! $this->export->export_transfer_draft($code))
+    {
+      $sc = FALSE;
+      $this->error = trim($this->export->error);
+    }
+
+    return $sc;
+  }
+
+
   private function export_transform($code)
   {
     $sc = TRUE;
@@ -479,7 +493,7 @@ class Delivery_order extends PS_Controller
           break;
 
         case 'N' : //--- Consign (TR)
-          $sc = $this->export_transfer_order($code);
+          $sc = $this->export_transfer_draft($code);
           break;
 
         case 'P' : //--- Sponsor

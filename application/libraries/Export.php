@@ -432,6 +432,175 @@ class Export
 
 
 
+//---- OWTR WTR1
+public function export_transfer_draft($code)
+{
+  $sc = TRUE;
+  $this->ci->load->model('orders/orders_model');
+  $this->ci->load->model('inventory/delivery_order_model');
+  $this->ci->load->model('inventory/transfer_model');
+  $this->ci->load->model('masters/customers_model');
+  $this->ci->load->model('masters/products_model');
+  $this->ci->load->helper('discount');
+
+  $doc = $this->ci->orders_model->get($code);
+  $sap = $this->ci->transfer_model->get_sap_transfer_doc($code);
+  $middle = $this->ci->transfer_model->is_middle_exists($code);
+
+  if($doc->role == 'L' OR $doc->role == 'U' OR $doc->role == 'R')
+  {
+    $cust = new stdClass();
+    $cust->code = NULL;
+    $cust->name = NULL;
+  }
+  else
+  {
+    $cust = $this->ci->customers_model->get($doc->customer_code);
+  }
+
+  if(!empty($doc))
+  {
+    if(empty($sap))
+    {
+      if($doc->status == 1)
+      {
+        $currency = getConfig('CURRENCY');
+        $vat_rate = getConfig('SALE_VAT_RATE');
+        $vat_code = getConfig('SALE_VAT_CODE');
+        $total_amount = $this->ci->orders_model->get_bill_total_amount($code);
+        $ds = array(
+          'U_ECOMNO' => $doc->code,
+          'DocType' => 'I',
+          'CANCELED' => 'N',
+          'DocDate' => sap_date($doc->date_add, TRUE),
+          'DocDueDate' => sap_date($doc->date_add, TRUE),
+          'CardCode' => $cust->code,
+          'CardName' => $cust->name,
+          'VatPercent' => $vat_rate,
+          'VatSum' => round(get_vat_amount($total_amount), 6),
+          'VatSumFc' => round(get_vat_amount($total_amount), 6),
+          'DiscPrcnt' => 0.000000,
+          'DiscSum' => 0.000000,
+          'DiscSumFC' => 0.000000,
+          'DocCur' => $currency,
+          'DocRate' => 1,
+          'DocTotal' => remove_vat($total_amount),
+          'DocTotalFC' => remove_vat($total_amount),
+          'Filler' => $doc->warehouse_code,
+          'ToWhsCode' => $doc->warehouse_code,
+          'Comments' => $doc->remark,
+          'F_E_Commerce' => 'A',
+          'F_E_CommerceDate' => sap_date(now(), TRUE),
+          'U_BOOKCODE' => $doc->bookcode,
+          'U_REQUESTER' => $doc->empName,
+          'U_APPROVER' => $doc->approver
+        );
+
+        $this->ci->mc->trans_begin();
+
+        if($middle)
+        {
+          $cs = $this->ci->transfer_model->update_sap_transfer_doc($code, $ds);
+        }
+        else
+        {
+          $cs = $this->ci->transfer_model->add_sap_transfer_doc($ds);
+        }
+
+        if($cs)
+        {
+          $drop = $middle === TRUE ? $this->ci->transfer_model->drop_sap_exists_details($code) : TRUE;
+
+          $details = $this->ci->delivery_order_model->get_sold_details($code);
+
+          if(!empty($details) && $drop === TRUE)
+          {
+            $line = 0;
+            foreach($details as $rs)
+            {
+              $arr = array(
+                'U_ECOMNO' => $rs->reference,
+                'LineNum' => $line,
+                'ItemCode' => $rs->product_code,
+                'Dscription' => $rs->product_name,
+                'Quantity' => $rs->qty,
+                'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
+                'PriceBefDi' => round($rs->price,2),
+                'LineTotal' => round($rs->total_amount,2),
+                'ShipDate' => $doc->date_add,
+                'Currency' => $currency,
+                'Rate' => 1,
+                //--- คำนวณส่วนลดจากยอดเงินกลับมาเป็น % (เพราะบางทีมีส่วนลดหลายชั้น)
+                'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
+                'Price' => round(remove_vat($rs->price),2),
+                'TotalFrgn' => round($rs->total_amount,2),
+                'FromWhsCod' => $rs->warehouse_code,
+                'WhsCode' => $doc->warehouse_code,
+                'FisrtBin' => $doc->zone_code, //-- โซนปลายทาง
+                'F_FROM_BIN' => $rs->zone_code, //--- โซนต้นทาง
+                'F_TO_BIN' => $doc->zone_code, //--- โซนปลายทาง
+                'TaxStatus' => 'Y',
+                'VatPrcnt' => $vat_rate,
+                'VatGroup' => $vat_code,
+                'PriceAfVAT' => round($rs->sell,2),
+                'VatSum' => round(get_vat_amount($rs->total_amount),2),
+                'GTotal' => round($rs->total_amount, 2),
+                'TaxType' => 'Y',
+                'F_E_Commerce' => 'A',
+                'F_E_CommerceDate' => sap_date(now())
+              );
+
+              if( ! $this->ci->transfer_model->add_sap_transfer_detail($arr))
+              {
+                $sc = FALSE;
+                $this->error = 'เพิ่มรายการไม่สำเร็จ';
+              }
+
+              $line++;
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "ไม่พบรายการสินค้า";
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+        }
+
+        if($sc === TRUE)
+        {
+          $this->ci->mc->trans_commit();
+        }
+        else
+        {
+          $this->ci->mc->trans_rollback();
+        }
+
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "สถานะเอกสารไม่ถูกต้อง";
+      }
+    }
+  }
+  else
+  {
+    $sc = FALSE;
+    $this->error = "ไม่พบเอกสาร {$code}";
+  }
+
+  return $sc;
+}
+//--- end export transfer draf
+
+
+
+
 
 public function export_transfer($code)
 {
@@ -558,7 +727,7 @@ public function export_transfer($code)
         $this->error = "สถานะเอกสารไม่ถูกต้อง";
       }
     }
-    
+
   }
   else
   {
@@ -576,8 +745,8 @@ public function export_move($code)
 {
   $sc = TRUE;
   $this->ci->load->model('inventory/move_model');
-  $doc = $this->move_model->get($code);
-  $sap = $this->move_model->get_sap_move_doc($code);
+  $doc = $this->ci->move_model->get($code);
+  $sap = $this->ci->move_model->get_sap_move_doc($code);
 
   if(!empty($doc))
   {
@@ -615,13 +784,13 @@ public function export_move($code)
           'U_BOOKCODE' => $doc->bookcode
         );
 
-        $this->mc->trans_begin();
+        $this->ci->mc->trans_begin();
 
-        $docEntry = $this->move_model->add_sap_move_doc($ds);
+        $docEntry = $this->ci->move_model->add_sap_move_doc($ds);
 
         if($docEntry !== FALSE)
         {
-          $details = $this->move_model->get_details($code);
+          $details = $this->ci->move_model->get_details($code);
 
           if(!empty($details))
           {
@@ -658,13 +827,19 @@ public function export_move($code)
                 'F_E_CommerceDate' => sap_date(now(), TRUE)
               );
 
-              if( ! $this->move_model->add_sap_move_detail($arr))
+              if( ! $this->ci->move_model->add_sap_move_detail($arr))
               {
                 $sc = FALSE;
                 $this->error = 'เพิ่มรายการไม่สำเร็จ';
               }
 
               $line++;
+            }
+
+            if($sc === TRUE)
+            {
+              //---- set exported = 1
+              $this->ci->move_model->exported($doc->code);
             }
           }
           else
@@ -681,11 +856,11 @@ public function export_move($code)
 
         if($sc === TRUE)
         {
-          $this->mc->trans_commit();
+          $this->ci->mc->trans_commit();
         }
         else
         {
-          $this->mc->trans_rollback();
+          $this->ci->mc->trans_rollback();
         }
       }
       else

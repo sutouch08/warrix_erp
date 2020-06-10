@@ -14,6 +14,10 @@ class Receive_po extends PS_Controller
     parent::__construct();
     $this->home = base_url().'inventory/receive_po';
     $this->load->model('inventory/receive_po_model');
+    $this->load->model('stock/stock_model');
+    $this->load->model('orders/orders_model');
+    $this->load->model('masters/products_model');
+    $this->load->library('api');
   }
 
 
@@ -21,13 +25,14 @@ class Receive_po extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'    => get_filter('code', 'recieve_code', ''),
+      'code'    => get_filter('code', 'receive_code', ''),
       'invoice' => get_filter('invoice', 'receive_invoice', ''),
       'po'      => get_filter('po', 'receive_po', ''),
       'vendor'  => get_filter('vendor', 'receive_vendor', ''),
       'from_date' => get_filter('from_date', 'receive_from_date', ''),
       'to_date' => get_filter('to_date', 'receive_to_date', ''),
-      'status' => get_filter('status', 'receive_status', 'all')
+      'status' => get_filter('status', 'receive_status', 'all'),
+      'sap' => get_filter('sap', 'receive_sap', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -274,7 +279,6 @@ class Receive_po extends PS_Controller
   }
 
 
-
   public function cancle_received()
   {
     $sc = TRUE;
@@ -339,7 +343,8 @@ class Receive_po extends PS_Controller
     $this->load->model('masters/products_model');
     $po_code = $this->input->get('po_code');
     $details = $this->receive_po_model->get_po_details($po_code);
-    $rate = (getConfig('RECEIVE_OVER_PO') * 0.01);
+    $ro = getConfig('RECEIVE_OVER_PO');
+    $rate = ($ro * 0.01);
     $ds = array();
     if(!empty($details))
     {
@@ -359,7 +364,7 @@ class Receive_po extends PS_Controller
           'qty' => number($rs->Quantity),
           'limit' => ($rs->Quantity + ($rs->Quantity * $rate)) - $dif,
           'backlog' => number($rs->OpenQty),
-          'isOpen' => ($rs->OpenQty == 0 ? FALSE : TRUE)
+          'isOpen' => $rs->LineStatus === 'O' ? TRUE : FALSE
         );
         array_push($ds, $arr);
         $no++;
@@ -510,6 +515,58 @@ class Receive_po extends PS_Controller
   }
 
 
+
+
+
+  public function update_receive_stock()
+  {
+    $code = $this->input->post('receive_code');
+    if(!empty($code))
+    {
+      $isApi = getConfig('WEB_API');
+      if($isApi == 1)
+      {
+
+        $details = $this->receive_po_model->get_details($code);
+        if(!empty($details))
+        {
+          foreach($details as $rs)
+          {
+            $item = $this->products_model->get($rs->product_code);
+            if(!empty($item))
+            {
+              $this->update_api_stock($item->code, $item->old_code);
+            }
+          } //--- end foreach
+        }
+      }
+    }
+  }
+
+
+
+  public function update_api_stock($code, $old_code)
+  {
+    if(getConfig('SYNC_WEB_STOCK') == 1)
+    {
+      $qty = $this->get_sell_stock($code);
+      $item = empty($old_code) ? $code : $old_code;
+      $this->api->update_web_stock($item, $qty);
+    }
+  }
+
+
+  public function get_sell_stock($item_code, $warehouse = NULL, $zone = NULL)
+  {
+    $sell_stock = $this->stock_model->get_sell_stock($item_code, $warehouse, $zone);
+    $reserv_stock = $this->orders_model->get_reserv_stock($item_code, $warehouse, $zone);
+    $availableStock = $sell_stock - $reserv_stock;
+    return $availableStock < 0 ? 0 : $availableStock;
+  }
+
+
+
+
   public function get_new_code($date)
   {
     $date = $date == '' ? date('Y-m-d') : $date;
@@ -542,10 +599,12 @@ class Receive_po extends PS_Controller
       'receive_vendor',
       'receive_from_date',
       'receive_to_date',
-      'receive_status'
+      'receive_status',
+      'receive_sap'
     );
 
     clear_filter($filter);
+    echo "done";
   }
 
 

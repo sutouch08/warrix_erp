@@ -79,8 +79,45 @@ class Orders extends REST_Controller
 
       $this->response($arr, 200);
     }
-    
+
   }
+
+
+  public function status_put()
+  {
+    $data = json_decode(file_get_contents("php://input"));
+    if(empty($data))
+    {
+      $arr = array(
+        'status' => FALSE,
+        'error' => 'empty data'
+      );
+      $this->response($arr, 400);
+    }
+
+    if(! property_exists($data, 'order_num') OR $data->order_number == '')
+    {
+      $arr = array(
+        'status' => FALSE,
+        'error' => 'order_number is required'
+      );
+      $this->response($arr, 400);
+    }
+
+    if( ! property_exists($data, 'status') OR $data->status == '')
+    {
+      $arr = array(
+        'status' => FALSE,
+        'error' => 'Invalid status'
+      );
+      $this->response($arr, 400);
+    }
+
+  }
+
+
+
+
 
   public function create_post()
   {

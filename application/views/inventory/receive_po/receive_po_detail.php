@@ -48,9 +48,13 @@
   	<label>ชื่อโซน</label>
     <input type="text" class="form-control input-sm" value="<?php echo $doc->zone_name; ?>" disabled/>
   </div>
-  <div class="col-sm-12 padding-5 first last">
+  <div class="col-sm-10 padding-5 first">
 		<label>หมายเหตุ</label>
 		<input type="text" class="form-control input-sm" value="<?php echo $doc->remark; ?>" disabled />
+	</div>
+	<div class="col-sm-2 padding-5 last">
+		<label>Document No. [SAP]</label>
+		<input type="text" class="form-control input-sm text-center" value="<?php echo $doc->inv_code; ?>" disabled />
 	</div>
   <input type="hidden" name="receive_code" id="receive_code" value="<?php echo $doc->code; ?>" />
 </div>

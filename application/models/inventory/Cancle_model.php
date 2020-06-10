@@ -6,6 +6,105 @@ class Cancle_model extends CI_Model
     parent::__construct();
   }
 
+  public function get($id)
+  {
+    $rs = $this->db->where('id', $id)->get('cancle');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
+  
+  public function get_data(array $ds = array(), $perpage = NULL, $offset = NULL)
+  {
+    $this->db
+    ->select('cancle.*')
+    ->select('zone.name AS zone_name')
+    ->select('order_state.name AS state_name')
+    ->from('cancle')
+    ->join('zone', 'cancle.zone_code = zone.code', 'left')
+    ->join('orders', 'cancle.order_code = orders.code', 'left')
+    ->join('order_state', 'orders.state = order_state.state');
+
+    if(!empty($ds['order_code']))
+    {
+      $this->db->like('cancle.order_code',$ds['order_code']);
+    }
+
+    if(!empty($ds['pd_code']))
+    {
+      $this->db->like('cancle.product_code', $ds['pd_code']);
+    }
+
+    if(!empty($ds['zone_code']))
+    {
+      $this->db->group_start();
+      $this->db->like('cancle.zone_code', $ds['zone_code']);
+      $this->db->or_like('zone.name', $ds['zone_code']);
+      $this->db->group_end();
+    }
+
+    if(!empty($ds['from_date']) && !empty($ds['to_date']))
+    {
+      $this->db->where('cancle.date_upd >=', from_date($ds['from_date']));
+      $this->db->where('cancle.date_upd <=', to_date($ds['to_date']));
+    }
+
+    if($perpage > 0)
+    {
+      $offset = $offset === NULL ? 0 : $offset;
+      $this->db->limit($perpage, $offset);
+    }
+
+    $rs = $this->db->get();
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function count_rows(array $ds = array(), $perpage = NULL, $offset = NULL)
+  {
+    $this->db
+    ->from('cancle')
+    ->join('zone', 'cancle.zone_code = zone.code', 'left')
+    ->join('orders', 'cancle.order_code = orders.code', 'left')
+    ->join('order_state', 'orders.state = order_state.state');
+
+    if(!empty($ds['order_code']))
+    {
+      $this->db->like('cancle.order_code',$ds['order_code']);
+    }
+
+    if(!empty($ds['pd_code']))
+    {
+      $this->db->like('cancle.product_code', $ds['pd_code']);
+    }
+
+    if(!empty($ds['zone_code']))
+    {
+      $this->db->group_start();
+      $this->db->like('cancle.zone_code', $ds['zone_code']);
+      $this->db->or_like('zone.name', $ds['zone_code']);
+      $this->db->group_end();
+    }
+
+    if(!empty($ds['from_date']) && !empty($ds['to_date']))
+    {
+      $this->db->where('cancle.date_upd >=', from_date($ds['from_date']));
+      $this->db->where('cancle.date_upd <=', to_date($ds['to_date']));
+    }
+
+    return $this->db->count_all_results();
+  }
 
 
   public function get_sum_cancle_product($order_code, $product_code)

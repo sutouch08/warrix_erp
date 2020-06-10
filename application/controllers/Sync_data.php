@@ -42,7 +42,8 @@ class Sync_data extends CI_Controller
           $ds = array(
             'name' => $rs->name,
             'last_sync' => date('Y-m-d H:i:s'),
-            'update_user' => 'SAP'
+            'update_user' => 'SAP',
+            'old_code' => $rs->old_code
           );
 
           $this->warehouse_model->update($rs->code, $ds);
@@ -53,7 +54,8 @@ class Sync_data extends CI_Controller
             'code' => $rs->code,
             'name' => $rs->name,
             'last_sync' => date('Y-m-d H:i:s'),
-            'update_user' => 'SAP'
+            'update_user' => 'SAP',
+            'old_code' => $rs->old_code
           );
 
           $this->warehouse_model->add($ds);

@@ -27,10 +27,10 @@ class Move extends PS_Controller
       'code'      => get_filter('code', 'move_code', ''),
       'from_warehouse'  => get_filter('from_warehouse', 'move_from_warehouse', ''),
       'user'      => get_filter('user', 'move_user', ''),
-      'to_warehouse'  => get_filter('to_warehouse', 'move_to_warehouse', ''),
       'from_date' => get_filter('fromDate', 'move_fromDate', ''),
       'to_date'   => get_filter('toDate', 'move_toDate', ''),
-      'status' => get_filter('status', 'move_status', 'all')
+      'status' => get_filter('status', 'move_status', 'all'),
+      'is_export' => get_filter('is_export', 'move_is_export', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -914,7 +914,8 @@ class Move extends PS_Controller
       'move_to_warehouse',
       'move_fromDate',
       'move_toDate',
-      'move_status'
+      'move_status',
+      'move_is_export'
     );
 
     clear_filter($filter);

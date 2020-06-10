@@ -22,13 +22,8 @@
   </div>
 
   <div class="col-sm-1 col-1-harf padding-5">
-    <label>คลังต้นทาง</label>
+    <label>คลัง</label>
     <input type="text" class="form-control input-sm search" name="from_warehouse" value="<?php echo $from_warehouse; ?>" />
-  </div>
-
-	<div class="col-sm-1 col-1-harf padding-5">
-    <label>คลังปลายทาง</label>
-    <input type="text" class="form-control input-sm search" name="to_warehouse" value="<?php echo $to_warehouse; ?>" />
   </div>
 
 	<div class="col-sm-1 col-1-harf padding-5">
@@ -36,13 +31,22 @@
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
-	<div class="col-sm-1 col-1-harf padding-5">
+	<div class="col-sm-1 padding-5">
     <label>สถานะ</label>
     <select class="form-control input-sm" name="status" onchange="getSearch()">
 			<option value="all">ทั้งหมด</option>
-			<option value="0" <?php if($status == '0'){ echo 'selected'; } ?>>ยังไม่บันทึก</option>
-			<option value="1" <?php echo is_selected(1, $status); ?>>บันทึกแล้ว</option>
-			<option value="2" <?php echo is_selected(2, $status); ?>>ยกเลิก</option>
+			<option value="0" <?php echo is_selected('0', $status); ?>>ยังไม่บันทึก</option>
+			<option value="1" <?php echo is_selected('1', $status); ?>>บันทึกแล้ว</option>
+			<option value="2" <?php echo is_selected('2', $status); ?>>ยกเลิก</option>
+		</select>
+  </div>
+
+	<div class="col-sm-1 padding-5">
+    <label>SAP</label>
+    <select class="form-control input-sm" name="is_export" onchange="getSearch()">
+			<option value="all">ทั้งหมด</option>
+			<option value="0" <?php echo is_selected("0", $is_export); ?>>ยังไม่ส่ง</option>
+			<option value="1" <?php echo is_selected('1', $is_export); ?>>ส่งออกแล้ว</option>
 		</select>
   </div>
 
@@ -105,6 +109,9 @@
 								<?php endif; ?>
 							</td>
 							<td class="middle text-right">
+								<?php if($rs->status == 1 && $rs->date_add >= '2019-10-01 00:00:00') : ?>
+									<button type="button" class="btn btn-minier btn-primary" onclick="export_to_sap('<?php echo $rs->code; ?>')"><i class="fa fa-send"></i> SAP</button>
+								<?php endif; ?>
 								<button type="button" class="btn btn-minier btn-info" onclick="goDetail('<?php echo $rs->code; ?>')"><i class="fa fa-eye"></i></button>
 								<?php if($rs->status == 0 && $this->pm->can_edit) : ?>
 									<button type="button" class="btn btn-minier btn-warning" onclick="goEdit('<?php echo $rs->code; ?>')"><i class="fa fa-pencil"></i></button>
@@ -123,5 +130,35 @@
 </div>
 
 <script src="<?php echo base_url(); ?>scripts/move/move.js"></script>
+<script>
+
+	function export_to_sap(code)
+	{
+		load_in();
+		$.ajax({
+			url:HOME + 'export_move/' + code,
+			type:'POST',
+			cache:false,
+			success:function(rs){
+				load_out();
+				if(rs == 'success'){
+					$('#row-'+code).remove();
+					swal({
+						title:'Success',
+						text:'ส่งข้อมูลไป SAP เรียบร้อยแล้ว',
+						type:'success',
+						timer:1000
+					});
+				}else{
+					swal({
+						title:'Error!',
+						text:rs,
+						type:'error'
+					});
+				}
+			}
+		});
+	}
+</script>
 
 <?php $this->load->view('include/footer'); ?>

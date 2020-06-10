@@ -150,6 +150,7 @@ class Warehouse extends PS_Controller
   public function syncData()
   {
     $last_sync = $this->warehouse_model->get_last_sync_date();
+    //$last_sync = date('Y-m-d H:i:s', strtotime('2019-01-01 00:00:00'));
     $newData = $this->warehouse_model->get_new_data($last_sync);
 
     if(!empty($newData))
@@ -161,7 +162,8 @@ class Warehouse extends PS_Controller
           $ds = array(
             'name' => $rs->name,
             'last_sync' => date('Y-m-d H:i:s'),
-            'update_user' => 'SAP'
+            'update_user' => 'SAP',
+            'old_code' => $rs->old_code
           );
 
           $this->warehouse_model->update($rs->code, $ds);
@@ -172,7 +174,8 @@ class Warehouse extends PS_Controller
             'code' => $rs->code,
             'name' => $rs->name,
             'last_sync' => date('Y-m-d H:i:s'),
-            'update_user' => 'SAP'
+            'update_user' => 'SAP',
+            'old_code' => $rs->old_code
           );
 
           $this->warehouse_model->add($ds);

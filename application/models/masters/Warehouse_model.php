@@ -187,7 +187,7 @@ class Warehouse_model extends CI_Model
 
   public function get_new_data($last_sync)
   {
-    $this->ms->select('WhsCode AS code, WhsName AS name');
+    $this->ms->select('WhsCode AS code, WhsName AS name, U_OLDWHSCODE AS old_code');
     $this->ms->where('createDate >=', sap_date($last_sync));
     $this->ms->or_where('updateDate >=', sap_date($last_sync));
     $rs = $this->ms->get('OWHS');

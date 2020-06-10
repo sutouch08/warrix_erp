@@ -86,7 +86,7 @@ class Receive_po_model extends CI_Model
   public function get_po_details($po_code)
   {
     $rs = $this->ms
-    ->select('POR1.LineNum, POR1.ItemCode, POR1.Dscription, POR1.Quantity, POR1.OpenQty, POR1.PriceAfVAT AS price')
+    ->select('POR1.LineNum, POR1.ItemCode, POR1.Dscription, POR1.Quantity, POR1.LineStatus, POR1.OpenQty, POR1.PriceAfVAT AS price')
     ->from('POR1')
     ->join('OPOR', 'POR1.DocEntry = OPOR.DocEntry', 'left')
     ->where('OPOR.DocNum', $po_code)
@@ -218,12 +218,14 @@ class Receive_po_model extends CI_Model
 
   public function count_rows(array $ds = array())
   {
-    $this->db->select('status');
 
     //---- เลขที่เอกสาร
     if($ds['code'] != '')
     {
+      $this->db->group_start();
       $this->db->like('code', $ds['code']);
+      $this->db->or_like('inv_code', $ds['code']);
+      $this->db->group_end();
     }
 
     //--- ใบสั่งซื้อ
@@ -249,10 +251,20 @@ class Receive_po_model extends CI_Model
       $this->db->where('status', $ds['status']);
     }
 
-    $rs = $this->db->get('receive_product');
+    if($ds['sap'] !== 'all')
+    {
+      if($ds['sap'] == '0')
+      {
+        $this->db->where('inv_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('inv_code IS NOT NULL', NULL, FALSE);
+      }
+    }
 
 
-    return $rs->num_rows();
+    return $this->db->count_all_results('receive_product');
   }
 
 
@@ -264,7 +276,10 @@ class Receive_po_model extends CI_Model
     //---- เลขที่เอกสาร
     if($ds['code'] != '')
     {
+      $this->db->group_start();
       $this->db->like('code', $ds['code']);
+      $this->db->or_like('inv_code', $ds['code']);
+      $this->db->group_end();
     }
 
     //--- ใบสั่งซื้อ
@@ -299,7 +314,20 @@ class Receive_po_model extends CI_Model
       $this->db->where('status', $ds['status']);
     }
 
+    if($ds['sap'] !== 'all')
+    {
+      if($ds['sap'] == '0')
+      {
+        $this->db->where('inv_code IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('inv_code IS NOT NULL', NULL, FALSE);
+      }
+    }
+
     $this->db->order_by('date_add', 'DESC');
+    $this->db->order_by('code', 'DESC');
 
     if($perpage != '')
     {

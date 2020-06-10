@@ -30,7 +30,8 @@ class Transfer extends PS_Controller
       'to_warehouse'  => get_filter('to_warehouse', 'tr_to_warehouse', ''),
       'from_date' => get_filter('fromDate', 'tr_fromDate', ''),
       'to_date'   => get_filter('toDate', 'tr_toDate', ''),
-      'status' => get_filter('status', 'tr_status', 'all')
+      'status' => get_filter('status', 'tr_status', 'all'),
+      'is_export' => get_filter('is_export', 'tr_is_export', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -853,6 +854,10 @@ class Transfer extends PS_Controller
       $sc = FALSE;
       $this->error = trim($this->export->error);
     }
+    else
+    {
+      $this->transfer_model->set_export($code, 1);
+    }
 
     return $sc;
   }
@@ -881,7 +886,8 @@ class Transfer extends PS_Controller
       'tr_to_warehouse',
       'tr_fromDate',
       'tr_toDate',
-      'tr_status'
+      'tr_status',
+      'tr_is_export'
     );
 
     clear_filter($filter);

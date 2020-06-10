@@ -426,6 +426,11 @@ class Transfer_model extends CI_Model
       $this->db->where('status', $ds['status']);
     }
 
+    if($ds['is_export'] != 'all')
+    {
+      $this->db->where('is_export', $ds['is_export']);
+    }
+
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
       $this->db->where('date_add >=', from_date($ds['from_date']));
@@ -465,6 +470,11 @@ class Transfer_model extends CI_Model
     if($ds['status'] != 'all')
     {
       $this->db->where('status', $ds['status']);
+    }
+
+    if($ds['is_export'] != 'all')
+    {
+      $this->db->where('is_export', $ds['is_export']);
     }
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
@@ -522,6 +532,13 @@ class Transfer_model extends CI_Model
     return $rs->row()->code;
   }
 
+
+
+
+  public function set_export($code, $value)
+  {
+    return $this->db->set('is_export', $value)->where('code', $code)->update('transfer');
+  }
 
 }
  ?>

@@ -229,7 +229,18 @@ function save(){
 
 function update_api_stock(code)
 {
-	$.post(BASE_URL + 'api/update_receive_stock/'+code);
+	$.ajax({
+		url:HOME + 'update_receive_stock',
+		type:'POST',
+		cache:false,
+		data:{
+			'receive_code' : code
+		},
+		success:function(rs){
+			console.log(rs);
+		}
+	});
+	
 }
 
 

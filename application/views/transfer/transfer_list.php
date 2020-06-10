@@ -32,17 +32,21 @@
   </div>
 
 	<div class="col-sm-1 col-1-harf padding-5">
-    <label>พนักงาน</label>
-    <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
-  </div>
-
-	<div class="col-sm-1 col-1-harf padding-5">
     <label>สถานะ</label>
     <select class="form-control input-sm" name="status" onchange="getSearch()">
 			<option value="all">ทั้งหมด</option>
-			<option value="0" <?php if($status == '0'){ echo 'selected'; } ?>>ยังไม่บันทึก</option>
-			<option value="1" <?php echo is_selected(1, $status); ?>>บันทึกแล้ว</option>
-			<option value="2" <?php echo is_selected(2, $status); ?>>ยกเลิก</option>
+			<option value="0" <?php echo is_selected('0', $status); ?>>ยังไม่บันทึก</option>
+			<option value="1" <?php echo is_selected('1', $status); ?>>บันทึกแล้ว</option>
+			<option value="2" <?php echo is_selected('2', $status); ?>>ยกเลิก</option>
+		</select>
+  </div>
+
+	<div class="col-sm-1 col-1-harf padding-5">
+    <label>SAP</label>
+		<select class="form-control input-sm" name="is_export" onchange="getSearch()">
+			<option value="all">ทั้งหมด</option>
+			<option value="0" <?php echo is_selected($is_export, '0'); ?>>ยังไม่ส่งออก</option>
+			<option value="1" <?php echo is_selected($is_export, '1'); ?>>ส่งออกแล้ว</option>
 		</select>
   </div>
 
@@ -70,7 +74,10 @@
 <div class="row">
 	<div class="col-sm-12">
 		<p  class="pull-right top-p">
-			ว่างๆ = ปกติ, &nbsp; <span class="blue">NC</span> = ยังไม่บันทึก, &nbsp; <span class="red">CN</span> = ยกเลิก
+			ว่างๆ = ปกติ, &nbsp;
+			<span class="blue">NC</span> = ยังไม่บันทึก, &nbsp;
+			<span class="red">CN</span> = ยกเลิก, &nbsp;
+			<span class="red">NE</span> = ยังไม่ส่งออก
 		</p>
 		<table class="table table-striped table-hover border-1">
 			<thead>
@@ -102,6 +109,9 @@
 								<?php endif; ?>
 								<?php if($rs->status == 0) : ?>
 									<span class="blue">NC</span>
+								<?php endif; ?>
+								<?php if($rs->status == 1 && $rs->is_export == 0) : ?>
+									<span class="red">NE</span>
 								<?php endif; ?>
 							</td>
 							<td class="middle text-right">

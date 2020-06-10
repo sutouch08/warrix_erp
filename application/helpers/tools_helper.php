@@ -32,7 +32,7 @@ function limitText($str, $length)
 
 function is_selected($val, $select)
 {
-  return $val == $select ? 'selected' : '';
+  return $val === $select ? 'selected' : '';
 }
 
 
@@ -63,7 +63,7 @@ function get_filter($postName, $cookieName, $defaultValue = "")
     $sc = $CI->input->post($postName);
     $CI->input->set_cookie(array('name' => $cookieName, 'value' => $sc, 'expire' => 3600 , 'path' => '/'));
   }
-  else if($CI->input->cookie($cookieName))
+  else if($CI->input->cookie($cookieName) !== NULL)
   {
     $sc = $CI->input->cookie($cookieName);
   }
