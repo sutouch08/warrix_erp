@@ -36,11 +36,86 @@ class Transfer_model extends CI_Model
   }
 
 
+  public function get_middle_transfer_doc($code)
+  {
+    $rs = $this->mc
+    ->select('DocEntry')
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL',NULL, FALSE)
+    ->group_end()
+    ->get('OWTR');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_middle_transfer_draft($code)
+  {
+    $rs = $this->mc
+    ->select('DocEntry')
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL',NULL, FALSE)
+    ->group_end()
+    ->get('DFOWTR');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_transfer_draft($code)
+  {
+    $rs = $this->mc
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL', NULL, FALSE)
+    ->group_end()
+    ->get('DFOWTR');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+
   public function add_sap_transfer_doc(array $ds = array())
   {
     if(!empty($ds))
     {
       $rs = $this->mc->insert('OWTR', $ds);
+      if($rs)
+      {
+        return $this->mc->insert_id();
+      }
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function add_sap_transfer_draft(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      $rs = $this->mc->insert('DFOWTR', $ds);
       if($rs)
       {
         return $this->mc->insert_id();
@@ -64,6 +139,17 @@ class Transfer_model extends CI_Model
   }
 
 
+  public function confirm_draft_receipted($docEntry)
+  {
+    $ds = array(
+      'F_Receipt' => 'Y',
+      'F_ReceiptDate' => sap_date(now(), TRUE)
+    );
+
+    return $this->mc->where('DocEntry', $docEntry)->update('DFOWTR', $ds);
+  }
+
+
 
   public function add_sap_transfer_detail(array $ds = array())
   {
@@ -76,11 +162,43 @@ class Transfer_model extends CI_Model
   }
 
 
+  public function add_sap_transfer_draft_detail(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->mc->insert('DFWTR1', $ds);
+    }
+
+    return FALSE;
+  }
+
 
 
   public function drop_sap_exists_details($code)
   {
     return $this->mc->where('U_ECOMNO', $code)->delete('WTR1');
+  }
+
+
+  public function drop_middle_exits_data($docEntry)
+  {
+    $this->mc->trans_start();
+    $this->mc->where('DocEntry', $docEntry)->delete('WTR1');
+    $this->mc->where('DocEntry', $docEntry)->delete('OWTR');
+    $this->mc->trans_complete();
+
+    return $this->mc->trans_status();
+  }
+
+  //---- transfer draft
+  public function drop_middle_transfer_draft($docEntry)
+  {
+    $this->mc->trans_start();
+    $this->mc->where('DocEntry', $docEntry)->delete('DFWTR1');
+    $this->mc->where('DocEntry', $docEntry)->delete('DFOWTR');
+    $this->mc->trans_complete();
+
+    return $this->mc->trans_status();
   }
 
 

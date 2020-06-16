@@ -297,6 +297,26 @@ class Consignment_order_model extends CI_Model
   }
 
 
+  public function get_middle_consignment_order_doc($code)
+  {
+    $rs = $this->mc
+    ->select('DocEntry')
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL', NULL, FALSE)
+    ->group_end()
+    ->get('OIGE');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
 
   public function add_sap_goods_issue_row($ds = array())
   {
@@ -313,6 +333,18 @@ class Consignment_order_model extends CI_Model
   public function drop_sap_exists_details($code)
   {
     return $this->mc->where('U_ECOMNO', $code)->delete('IGE1');
+  }
+
+
+
+  public function drop_middle_exits_data($docEntry)
+  {
+    $this->mc->trans_start();
+    $this->mc->where('DocEntry', $docEntry)->delete('IGE1');
+    $this->mc->where('DocEntry', $docEntry)->delete('OIGE');
+    $this->mc->trans_complete();
+
+    return $this->mc->trans_status();
   }
 
 

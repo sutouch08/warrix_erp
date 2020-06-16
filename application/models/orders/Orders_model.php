@@ -531,7 +531,7 @@ class Orders_model extends CI_Model
     {
       $this->db->order_by('orders.code', 'DESC');
     }
-    
+
     if($perpage != '')
     {
       $offset = $offset === NULL ? 0 : $offset;
@@ -724,6 +724,13 @@ class Orders_model extends CI_Model
     return $this->db->where('order_code', $code)->delete('order_details');
   }
 
+
+
+  //--- Set is_valid = 1 when transfer draft is confirmed (use in Controller inventory/transfer->confirm_receipted)
+  public function valid_transfer_draft($code)
+  {
+    return $this->db->set('is_valid', 1)->where('code', $code)->update('orders');
+  }
 
 } //--- End class
 

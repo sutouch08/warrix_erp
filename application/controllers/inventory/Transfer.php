@@ -876,6 +876,53 @@ class Transfer extends PS_Controller
     }
   }
 
+  //---- Update status transfer draft to receipted
+  public function confirm_receipted()
+  {
+    $sc = TRUE;
+    $code = trim($this->input->post('code'));
+    if(!empty($code))
+    {
+      $this->load->model('orders/orders_model');
+
+      //--- check ว่ามีเลขที่เอกสารนี้ใน transfer draft หรือไม่
+      $draft = $this->transfer_model->get_transfer_draft($code);
+      if(!empty($draft))
+      {
+        if(empty($draft->F_Receipt) OR $draft->F_Receipt == 'N')
+        {
+          //---- ยืนยันรับสินค้า
+          if($this->transfer_model->confirm_draft_receipted($draft->DocEntry))
+          {
+            $this->orders_model->valid_transfer_draft($code);
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "ยืนยันการรับสินค้าใน Transfer Draft ไม่สำเร็จ";
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "เอกสารถูกยืนยันไปแล้ว";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบเอกสาร Transfer draft";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบเลขที่เอกสาร";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
 
   public function clear_filter()
   {

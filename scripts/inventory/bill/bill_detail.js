@@ -46,24 +46,6 @@ function confirmOrder(){
         setTimeout(function(){
           window.location.reload();
         },1200);
-
-        // $.ajax({
-        //   url: 'controller/interfaceController.php?export&order',
-        //   type:'POST',
-        //   cache: 'false',
-        //   data: {'order_code' : order_code},
-        //   success: function(rs){
-        //     var rs = $.trim(rs);
-        //     if(rs == 'success'){
-        //       swal({title: 'Success', type:'success', timer:1000})
-        //       setTimeout(function(){ window.location.reload(); }, 1200);
-        //     }else{
-        //       swal({title:'Warning !', text: 'บันทึกขายสำเร็จ แต่ส่งข้อมูลไป Formula ไม่สำเร็จ คุณต้องส่งข้อมูลไป Formula ด้วยตัวเอง', type: 'warning'});
-        //       setTimeout(function(){ window.location.reload(); }, 60000);
-        //     }
-        //   }
-        // });
-
       }else {
         swal('Error!', rs, 'error');
       }

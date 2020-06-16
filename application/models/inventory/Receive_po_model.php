@@ -131,6 +131,26 @@ class Receive_po_model extends CI_Model
   }
 
 
+  public function get_middle_receive_po($code)
+  {
+    $rs = $this->mc
+    ->select('DocEntry')
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL', NULL, FALSE)
+    ->group_end()
+    ->get('OPDN');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
   public function add_sap_receive_po(array $ds = array())
   {
     $rs = $this->mc->insert('OPDN', $ds);
@@ -155,21 +175,13 @@ class Receive_po_model extends CI_Model
   }
 
 
-  public function drop_sap_exists_details($code)
+  public function drop_sap_received($docEntry)
   {
-    return $this->mc->where('U_ECOMNO', $code)->delete('PDN1');
-  }
-
-
-  public function drop_sap_received($code)
-  {
-    $rs = $this->mc->where('U_ECOMNO', $code)->delete('PDN1');
-    if($rs)
-    {
-      return $this->mc->where('U_ECOMNO', $code)->delete('OPDN');
-    }
-
-    return FALSE;
+    $this->mc->trans_start();
+    $this->mc->where('DocEntry', $docEntry)->delete('PDN1');
+    $this->mc->where('DocEntry', $docEntry)->delete('OPDN');
+    $this->mc->trans_complete();
+    return $this->mc->trans_status();
   }
 
 

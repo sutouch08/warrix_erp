@@ -6,6 +6,11 @@
   <div class="col-sm-6">
     <p class="pull-right top-p">
       <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
+      <?php if($order->role == 'N' && $order->is_valid == '0') : ?>
+      <button type="button" class="btn btn-sm btn-primary" onclick="confirm_receipted()"><i class="fa fa-check"></i> ยืนยันการรับสินค้า</button>
+      <?php elseif($order->role == 'N' && $order->is_valid == '1') : ?>
+      <button type="button" class="btn btn-sm btn-default" disabled><i class="fa fa-check"></i> รับสินค้าแล้ว</button>
+      <?php endif; ?>
       <button type="button" class="btn btn-sm btn-success" onclick="doExport()">ส่งข้อมูลไป SAP</button>
     </p>
   </div>
@@ -17,49 +22,51 @@
   <input type="hidden" id="order_code" value="<?php echo $order->code; ?>" />
   <input type="hidden" id="customer_code" value="<?php echo $order->customer_code; ?>" />
   <input type="hidden" id="customer_ref" value="<?php echo $order->customer_ref; ?>" />
+<?php $reference = empty($order->reference) ? $order->code : $order->code . " [{$order->reference}]"; ?>
+<?php $cust_name = empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?>
   <div class="row">
     <div class="col-sm-2 padding-5 first">
-      <?php if(!empty($order->reference)) : ?>
-        <label class="font-size-12 blod">
-          <?php echo $order->code.' ['.$order->reference.']';  ?>
-        </label>
-      <?php else : ?>
-      <label class="font-size-14 blod">
-        <?php echo $order->code; ?>
-      </label>
-      <?php endif; ?>
+      <label>เลขที่เอกสาร</label>
+      <input type="text" class="form-control input-sm text-center" value="<?php echo $reference; ?>" disabled />
     </div>
 
     <?php if($order->role == 'C' OR $order->role == 'N') : ?>
     <div class="col-sm-4 padding-5">
-      <label class="font-size-12 blod">ลูกค้า : <?php echo empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?></label>
+      <label>ลูกค้า</label>
+      <input type="text" class="form-control input-sm" value="<?php echo $cust_name; ?>" disabled />
+    </div>
+    <div class="col-sm-4 padding-5">
+      <label>โซน</label>
+      <input type="text" class="form-control input-sm" value="<?php echo $order->zone_name; ?>" disabled />
+    </div>
+    <div class="col-sm-2 padding-5 last">
+      <label>พนักงาน</label>
+      <input type="text" class="form-control input-sm" value="<?php echo $order->user; ?>" disabled />
+    </div>
+    <div class="col-sm-10 padding-5 first">
+      <label>หมายเหตุ</label>
+      <input type="text" class="form-control input-sm" value="<?php echo $order->remark; ?>" disabled />
+    </div>
+    <div class="col-sm-2 padding-5 last">
+      <label class="font-size-2 blod">SAP No</label>
+      <input type="text" class="form-control input-sm text-center" value="<?php echo $order->inv_code; ?>" disabled />
     </div>
     <?php else : ?>
-      <div class="col-sm-4 padding-5">
-        <label class="font-size-14 blod">ลูกค้า : <?php echo empty($order->customer_ref) ? $order->customer_name : $order->customer_ref; ?></label>
+      <div class="col-sm-6 padding-5">
+        <label>ลูกค้า</label>
+        <input type="text" class="form-control input-sm" value="<?php echo $cust_name; ?>" disabled />
       </div>
-    <?php endif; ?>
-
-    <div class="col-sm-2 padding-5">
-      <label class="font-size-2 blod">SAP No : <?php echo $order->inv_code; ?></label>
-    </div>
-    <?php if($order->role == 'C' OR $order->role == 'N') : ?>
-      <div class="col-sm-4 padding-5">
-        <label class="font-size-2 blod">โซน : <?php echo $order->zone_name; ?></label>
+      <div class="col-sm-4 padding-5 last">
+        <label>พนักงาน</label>
+        <input type="text" class="form-control input-sm" value="<?php echo $order->user; ?>" disabled />
       </div>
-      <div class="col-sm-2 padding-5 last text-right">
-        <label class="font-size-14 blod">พนักงาน : <?php echo $order->user; ?></label>
+      <div class="col-sm-10 padding-5 first">
+        <label>หมายเหตุ</label>
+        <input type="text" class="form-control input-sm" value="<?php echo $order->remark; ?>" disabled />
       </div>
-    <?php else : ?>
-    <div class="col-sm-4 padding-5 last text-right">
-      <label class="font-size-14 blod">พนักงาน : <?php echo $order->user; ?></label>
-    </div>
-    <?php endif; ?>
-
-    <?php if( $order->remark != '') : ?>
-      <div class="col-sm-12">
-        <label class="font-size-14 blod">หมายเหตุ :</label>
-        <?php echo $order->remark; ?>
+      <div class="col-sm-2 padding-5 last">
+        <label class="font-size-2 blod">SAP No</label>
+        <input type="text" class="form-control input-sm text-center" value="<?php echo $order->inv_code; ?>" disabled />
       </div>
     <?php endif; ?>
   </div>
@@ -192,8 +199,10 @@
 
 
           <tr>
-            <td colspan="4" rowspan="3">
+            <td colspan="4" rowspan="3" style="white-space:normal;">
+              <?php if(!empty($order->remark)) : ?>
               หมายเหตุ : <?php echo $order->remark; ?>
+              <?php endif; ?>
             </td>
             <td colspan="3" class="blod">
               ราคารวม
@@ -256,6 +265,52 @@
 <?php else : ?>
   <?php $this->load->view('inventory/delivery_order/invalid_state'); ?>
 <?php endif; ?>
+
+
+<script>
+
+  function confirm_receipted(){
+    var code = $('#order_code').val();
+    swal({
+      title: "ยืนยันการรับสินค้า",
+      text: "คุณได้รับสินค้าครบเอกสารเลขที่ "+code+" แล้วใช่หรือไม่ ?",
+      type:"warning",
+      showCancelButton:true,
+      confirmButtonColor:"#428bca",
+      confirmButtonText:"ยืนยัน ได้รับครบแล้ว",
+      cancelButtonText:"ยกเลิก",
+      closeOnConfirm: false
+    }, function(){
+      $.ajax({
+        url:BASE_URL + 'inventory/transfer/confirm_receipted',
+        type:'POST',
+        cache:false,
+        data:{
+          'code' : code
+        },
+        success:function(rs){
+          var rs = $.trim(rs);
+          if(rs === 'success'){
+            swal({
+              title:'Confirmed',
+              type:'success',
+              timer:1000
+            });
+            setTimeout(function(){
+              window.location.reload();
+            }, 1200);
+          }else{
+            swal({
+              title:'Error!!',
+              text:rs,
+              type:'error'
+            });
+          }
+        }
+      })
+    })
+  }
+</script>
 <script src="<?php echo base_url(); ?>scripts/inventory/order_closed/closed.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

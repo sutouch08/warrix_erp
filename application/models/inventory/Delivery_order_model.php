@@ -267,6 +267,26 @@ class Delivery_order_model extends CI_Model
     }
 
 
+    public function get_middle_delivery_order($code)
+    {
+      $rs = $this->mc
+      ->select('DocEntry')
+      ->where('U_ECOMNO', $code)
+      ->group_start()
+      ->where('F_Sap', 'N')
+      ->or_where('F_Sap IS NULL', NULL, FALSE)
+      ->group_end()
+      ->get('ODLN');
+
+      if($rs->num_rows() > 0)
+      {
+        return $rs->result();
+      }
+
+      return NULL;
+    }
+
+
 
     public function get_sap_delivery_order($code)
     {
@@ -296,6 +316,16 @@ class Delivery_order_model extends CI_Model
       return FALSE;
     }
 
+
+    //--- ลบรายการที่ค้างใน middle ที่ยังไม่ได้เอาเข้า SAP ออก
+    public function drop_middle_exits_data($docEntry)
+    {
+      $this->mc->trans_start();
+      $this->mc->where('DocEntry', $docEntry)->delete('DLN1');
+      $this->mc->where('DocEntry', $docEntry)->delete('ODLN');
+      $this->mc->trans_complete();
+      return $this->mc->trans_status();
+    }
 
 
     public function drop_sap_exists_details($code)

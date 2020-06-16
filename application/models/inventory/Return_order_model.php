@@ -23,6 +23,26 @@ class Return_order_model extends CI_Model
   }
 
 
+  public function get_middle_return_doc($code)
+  {
+    $rs = $this->mc
+    ->select('DocEntry')
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL', NULL, FALSE)
+    ->group_end()
+    ->get('ORDN');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
   //--- เพิ่มรายการรับคืน
   public function add_sap_return_detail(array $ds = array())
   {
@@ -141,6 +161,17 @@ class Return_order_model extends CI_Model
   public function drop_sap_exists_details($code)
   {
     return $this->mc->where('U_ECOMNO', $code)->delete('RDN1');
+  }
+
+
+  public function drop_middle_exits_data($docEntry)
+  {
+    $this->mc->trans_start();
+    $this->mc->where('DocEntry', $docEntry)->delete('RDN1');
+    $this->mc->where('DocEntry', $docEntry)->delete('ORDN');
+    $this->mc->trans_complete();
+
+    return $this->mc->trans_status();
   }
 
 

@@ -76,11 +76,12 @@
         <tr>
           <th class="width-5 text-center">ลำดับ</th>
           <th class="width-8 sorting <?php echo $sort_date; ?> text-center" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
-          <th class="width-20 sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร </th>
+          <th class="width-15 sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร </th>
           <th class="">ลูกค้า/ผู้รับ/ผู้เบิก</th>
           <th class="width-10 text-center">ยอดเงิน</th>
           <th class="width-10 text-center">รูปแบบ</th>
-          <th class="width-15 text-center">พนักงาน</th>
+          <th class="width-10 text-center">พนักงาน</th>
+					<th class="width-10 text-right"></th>
         </tr>
       </thead>
       <tbody>
@@ -88,7 +89,7 @@
 <?php $no = $this->uri->segment(4) + 1; ?>
 <?php   foreach($orders as $rs)  : ?>
 
-        <tr class="font-size-12">
+        <tr class="font-size-12" id="row-<?php echo $rs->code; ?>">
 
           <td class="text-center pointer" onclick="goDetail('<?php echo $rs->code; ?>')">
             <?php echo $no; ?>
@@ -122,13 +123,18 @@
           <td class="pointer text-center hide-text" onclick="goDetail('<?php echo $rs->code; ?>')">
             <?php echo $rs->user; ?>
           </td>
+					<td class="text-right">
+            <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
+							<button type="button" class="btn btn-xs btn-primary" onclick="confirmBill('<?php echo $rs->code; ?>')">เปิดบิล</button>
+						<?php endif; ?>
+          </td>
 
         </tr>
 <?php  $no++; ?>
 <?php endforeach; ?>
 <?php else : ?>
       <tr>
-        <td colspan="7" class="text-center"><h4>ไม่พบรายการ</h4></td>
+        <td colspan="8" class="text-center"><h4>ไม่พบรายการ</h4></td>
       </tr>
 <?php endif; ?>
       </tbody>
@@ -136,6 +142,36 @@
   </div>
 </div>
 
+<script>
+function confirmBill(order_code){
+
+	load_in();
+	$.ajax({
+		url: HOME + 'confirm_order',
+		type:'POST',
+		cache:'false',
+		data:{
+			'order_code' : order_code
+		},
+		success:function(rs){
+			load_out();
+			var rs = $.trim(rs);
+			if( rs == 'success'){
+				swal({
+					title:'Success',
+					type:'success',
+					timer:1000
+				});
+
+				$('#row-'+order_code).remove();
+
+			}else {
+				swal('Error!', rs, 'error');
+			}
+		}
+	});
+}
+</script>
 <script src="<?php echo base_url(); ?>scripts/inventory/bill/bill.js"></script>
 <script src="<?php echo base_url(); ?>scripts/inventory/bill/bill_list.js"></script>
 
