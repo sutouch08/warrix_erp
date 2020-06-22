@@ -21,16 +21,21 @@
 			<input type="text" class="form-control input-sm text-center edit" name="gp" id="gp" value="<?php echo $order->gp; ?>" disabled />
 	  </div>
 
+		<?php if(empty($approve_view) && ($this->pm->can_add OR $this->pm->can_edit)): ?>
 		<div class="col-sm-10 padding-5 first">
 		 	<label>หมายเหตุ</label>
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
 		</div>
-		<?php if($this->pm->can_add OR $this->pm->can_edit): ?>
 		<div class="col-sm-2 padding-5 last">
 			<label class="display-block not-show">แก้ไข</label>
 			<button type="button" class="btn btn-xs btn-warning btn-block" id="btn-edit" onclick="getEdit()"><i class="fa fa-pencil"></i> แก้ไข</i></button>
 			<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-update" onclick="validUpdate()"><i class="fa fa-save"></i> บันทึก</i></button>
 		</div>
+		<?php else : ?>
+			<div class="col-sm-12 padding-5 first last">
+			 	<label>หมายเหตุ</label>
+			  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
+			</div>
 		<?php endif; ?>
 
     <input type="hidden" name="order_code" id="order_code" value="<?php echo $order->code; ?>" />

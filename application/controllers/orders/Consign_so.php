@@ -37,13 +37,54 @@ class Consign_so extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code' => get_filter('code', 'code', ''),
-      'customer' => get_filter('customer', 'customer', ''),
-      'user' => get_filter('user', 'user', ''),
-      'zone_code' => get_filter('zone', 'zone', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date' => get_filter('toDate', 'toDate', '')
+      'code' => get_filter('code', 'consign_code', ''),
+      'customer' => get_filter('customer', 'consign_customer', ''),
+      'user' => get_filter('user', 'consign_user', ''),
+      'zone_code' => get_filter('zone', 'consign_zone', ''),
+      'from_date' => get_filter('fromDate', 'consign_fromDate', ''),
+      'to_date' => get_filter('toDate', 'consign_toDate', ''),
+      'notSave' => get_filter('notSave', 'consign_notSave', NULL),
+      'onlyMe' => get_filter('onlyMe', 'consign_onlyMe', NULL),
+      'isExpire' => get_filter('isExpire', 'consign_isExpire', NULL),
+      'isApprove' => get_filter('isApprove', 'consign_isApprove', 'all')
     );
+
+    $state = array(
+      '1' => get_filter('state_1', 'consign_state_1', 'N'),
+      '2' => get_filter('state_2', 'consign_state_2', 'N'),
+      '3' => get_filter('state_3', 'consign_state_3', 'N'),
+      '4' => get_filter('state_4', 'consign_state_4', 'N'),
+      '5' => get_filter('state_5', 'consign_state_5', 'N'),
+      '6' => get_filter('state_6', 'consign_state_6', 'N'),
+      '7' => get_filter('state_7', 'consign_state_7', 'N'),
+      '8' => get_filter('state_8', 'consign_state_8', 'N'),
+      '9' => get_filter('state_9', 'consign_state_9', 'N')
+    );
+
+    $state_list = array();
+
+    $button = array();
+
+    for($i =1; $i <= 9; $i++)
+    {
+    	if($state[$i] === 'Y')
+    	{
+    		$state_list[] = $i;
+    	}
+
+      $btn = 'state_'.$i;
+      $button[$btn] = $state[$i] === 'Y' ? 'btn-info' : '';
+    }
+
+    $button['not_save'] = empty($filter['notSave']) ? '' : 'btn-info';
+    $button['only_me'] = empty($filter['onlyMe']) ? '' : 'btn-info';
+    $button['is_expire'] = empty($filter['isExpire']) ? '' : 'btn-info';
+
+
+    $filter['state_list'] = empty($state_list) ? NULL : $state_list;
+
+
+
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_rows();
@@ -72,9 +113,44 @@ class Consign_so extends PS_Controller
     }
 
     $filter['orders'] = $ds;
+    $filter['state'] = $state;
+    $filter['btn'] = $button;
 
 		$this->pagination->initialize($init);
     $this->load->view('order_consign/consign_list', $filter);
+  }
+
+  //---- รายการรออนุมัติ
+  public function get_un_approve_list()
+  {
+    $role = 'C'; //--- ฝากขายเปิดใบกำกับ
+    $rows = $this->orders_model->count_un_approve_rows($role);
+    $limit = empty($this->input->get('limit')) ? 20 : intval($this->input->get('limit'));
+    $list = $this->orders_model->get_un_approve_list($role, $limit);
+    $result_rows = empty($list) ? 0 :count($list);
+
+    $ds = array();
+    if(!empty($list))
+    {
+      foreach($list as $rs)
+      {
+        $arr = array(
+          'date_add' => thai_date($rs->date_add),
+          'code' => $rs->code,
+          'customer' => $rs->customer_name
+        );
+
+        array_push($ds, $arr);
+      }
+    }
+
+    $data = array(
+      'result_rows' => $result_rows,
+      'rows' => $rows,
+      'data' => $ds
+    );
+
+    echo json_encode($data);
   }
 
 
@@ -153,7 +229,7 @@ class Consign_so extends PS_Controller
 
 
 
-  public function edit_order($code)
+  public function edit_order($code, $approve_view = NULL)
   {
     $ds = array();
     $rs = $this->orders_model->get($code);
@@ -176,6 +252,7 @@ class Consign_so extends PS_Controller
     }
 
     $details = $this->orders_model->get_order_details($code);
+    $ds['approve_view'] = $approve_view;
     $ds['state'] = $ost;
     $ds['order'] = $rs;
     $ds['details'] = $details;
@@ -316,12 +393,25 @@ class Consign_so extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'code',
-      'customer',
-      'user',
-      'zone',
-      'fromDate',
-      'toDate'
+      'consign_code',
+      'consign_customer',
+      'consign_user',
+      'consign_zone',
+      'consign_fromDate',
+      'consign_toDate',
+      'consign_isApprove',
+      'consign_notSave',
+      'consign_onlyMe',
+      'consign_isExpire',
+      'consign_state_1',
+      'consign_state_2',
+      'consign_state_3',
+      'consign_state_4',
+      'consign_state_5',
+      'consign_state_6',
+      'consign_state_7',
+      'consign_state_8',
+      'consign_state_9'
     );
 
     clear_filter($filter);

@@ -46,6 +46,7 @@
 				var BASE_URL = '<?php echo base_url(); ?>';
 			</script>
 			<div class="navbar-container" id="navbar-container">
+				<?php if(! isset($_GET['nomenu'])) : ?>
 				<!-- #section:basics/sidebar.mobile.toggle -->
 				<button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
 					<span class="sr-only">Toggle sidebar</span>
@@ -53,6 +54,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
+				<?php endif; ?>
 				<div class="navbar-header pull-left">
 					<a href="<?php echo base_url(); ?>" class="navbar-brand">
 						<small>
@@ -110,13 +112,16 @@
 			<script type="text/javascript">
 				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
 			</script>
+			<?php if(! isset($_GET['nomenu'])) : ?>
 			<!-- #section:basics/sidebar -->
 			<div id="sidebar" class="sidebar responsive <?php echo get_cookie('sidebar_layout'); ?>" data-sidebar="true" data-sidebar-scoll="true" data-sidebar-hover="true">
 				<script type="text/javascript">
 					try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
 				</script>
 						<!--- side menu  ------>
+
 				<?php $this->load->view("include/side_menu"); ?>
+
 
 				<!-- #section:basics/sidebar.layout.minimize -->
 				<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse" onclick="toggle_layout()">
@@ -124,7 +129,7 @@
 				</div>
 
 			</div>
-
+			<?php endif; ?>
 			<!-- /section:basics/sidebar -->
 			<div class="main-content">
 				<div class="main-content-inner">

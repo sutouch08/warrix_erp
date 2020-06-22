@@ -407,6 +407,24 @@ class Orders_model extends CI_Model
       $this->db->where_in('orders.state', $ds['state_list']);
     }
 
+    //--- ใช้กับเอกสารที่ต้อง approve เท่านั้น
+    if(isset($ds['isApprove']))
+    {
+      if($ds['isApprove'] !== 'all')
+      {
+        $this->db->where('orders.is_approved', $ds['isApprove']);
+      }
+    }
+
+    //--- ใช้กับเอกสารที่ต้อง ว่ารับสินค้าเข้าปลายทางหรือยัง เท่านั้น
+    if(isset($ds['isValid']))
+    {
+      if($ds['isValid'] !== 'all')
+      {
+        $this->db->where('orders.is_valid', $ds['isValid']);
+      }
+    }
+
     return $this->db->count_all_results();
   }
 
@@ -522,6 +540,25 @@ class Orders_model extends CI_Model
       $this->db->where_in('orders.state', $ds['state_list']);
     }
 
+    //--- ใช้กับเอกสารที่ต้อง approve เท่านั้น
+    if(isset($ds['isApprove']))
+    {
+      if($ds['isApprove'] !== 'all')
+      {
+        $this->db->where('orders.is_approved', $ds['isApprove']);
+      }
+    }
+
+    //--- ใช้กับเอกสารที่ต้อง ว่ารับสินค้าเข้าปลายทางหรือยัง เท่านั้น
+    if(isset($ds['isValid']))
+    {
+      if($ds['isValid'] !== 'all')
+      {
+        $this->db->where('orders.is_valid', $ds['isValid']);
+      }
+    }
+
+
     if(!empty($ds['order_by']))
     {
       $order_by = "orders.{$ds['order_by']}";
@@ -546,6 +583,103 @@ class Orders_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function get_un_approve_list($role = 'C', $perpage = '', $offset = '')
+  {
+    $this->db
+    ->select('orders.date_add, orders.code, customers.name AS customer_name')
+    ->from('orders')
+    ->join('customers', 'orders.customer_code = customers.code', 'left')
+    ->where('orders.role', $role)
+    ->where('orders.status', 1)
+    ->where('orders.state <', 3)
+    ->where('orders.is_expired', 0)
+    ->where('orders.is_cancled', 0)
+    ->where('orders.is_approved', 0)
+    ->order_by('orders.date_add', 'ASC')
+    ->order_by('orders.code', 'ASC');
+
+    if($perpage != '')
+    {
+      $offset = $offset === NULL ? 0 : $offset;
+      $this->db->limit($perpage, $offset);
+    }
+
+    $rs = $this->db->get();
+    //echo $this->db->get_compiled_select('orders');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function count_un_approve_rows($role = 'C')
+  {
+    $this->db
+    ->where('role', $role)
+    ->where('status', 1)
+    ->where('state <', 3)
+    ->where('is_expired', 0)
+    ->where('is_cancled', 0)
+    ->where('is_approved', 0);
+
+    return $this->db->count_all_results('orders');
+  }
+
+
+
+  public function get_un_received_list($perpage = '', $offset = '')
+  {
+    $this->db
+    ->select('orders.date_add, orders.code, customers.name AS customer_name')
+    ->from('orders')
+    ->join('customers', 'orders.customer_code = customers.code', 'left')
+    ->where('orders.role', 'N')
+    ->where('orders.status', 1)
+    ->where('orders.state', 8)
+    ->where('orders.is_expired', 0)
+    ->where('orders.is_cancled', 0)
+    ->where('orders.is_approved', 1)
+    ->where('orders.is_valid', 0)
+    ->order_by('orders.date_add', 'ASC')
+    ->order_by('orders.code', 'ASC');
+
+    if($perpage != '')
+    {
+      $offset = $offset === NULL ? 0 : $offset;
+      $this->db->limit($perpage, $offset);
+    }
+
+    $rs = $this->db->get();
+    //echo $this->db->get_compiled_select('orders');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function count_un_receive_rows()
+  {
+    $this->db
+    ->where('role', 'N')
+    ->where('status', 1)
+    ->where('state', 8)
+    ->where('is_expired', 0)
+    ->where('is_cancled', 0)
+    ->where('is_approved', 1)
+    ->where('is_valid', 0);
+
+    return $this->db->count_all_results('orders');
   }
 
 
@@ -708,7 +842,12 @@ class Orders_model extends CI_Model
 
   public function update_approver($code, $user)
   {
-    return $this->db->set('approver', $user)->where('code', $code)->update('orders');
+    return $this->db
+    ->set('approver', $user)
+    ->set('approve_date', now())
+    ->set('is_approved', 1)
+    ->where('code', $code)
+    ->update('orders');
   }
 
   //---- ระบุที่อยู่จัดส่งในออเดอร์นั้นๆ
@@ -732,6 +871,43 @@ class Orders_model extends CI_Model
     return $this->db->set('is_valid', 1)->where('code', $code)->update('orders');
   }
 
+
+  public function get_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('state', 8)
+    ->where('status', 1)
+    ->where('is_cancled', 0)
+    ->where('is_expired', 0)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+  public function get_sap_doc_num($code)
+  {
+    $rs = $this->ms->select('DocNum')->where('U_ECOMNO', $code)->get('ODLN');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->DocNum;
+    }
+
+    return FALSE;
+  }
+
+
+  public function update_inv($code, $doc_num)
+  {
+    return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('orders');
+  }
 } //--- End class
 
 

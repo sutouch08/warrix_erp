@@ -43,11 +43,20 @@ function syncCustomer(){
 }
 
 //--- 4. sync OPDN
-
 function syncGoodReceivePo(){
   $('body').append('start updating Goods Receive PO .... <br/>');
   $.get(BASE_URL + 'sync_data/syncReceivePoInvCode', function(){
     $('body').append('finished update Good Recieve PO document code...<br/>');
+    syncDeliveryOrder()
+  })
+}
+
+
+//--- 5. sync ODLN
+function syncDeliveryOrder(){
+  $('body').append('start updating Delivery Oder .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncOrderInvCode', function(){
+    $('body').append('finished update Delivery Orders document code...<br/>');
     window.close();
   })
 }

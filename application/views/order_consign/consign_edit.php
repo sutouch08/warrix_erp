@@ -9,6 +9,7 @@
     	<p class="pull-right" style="margin-bottom:1px;">
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
 				<button type="button" class="btn btn-sm btn-default" onclick="printOrderSheet()"><i class="fa fa-print"></i> พิมพ์</button>
+				<?php if(empty($approve_view)) : ?>
 				<?php if($order->state < 4 && $this->pm->can_delete && $order->never_expire == 0) : ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="setNotExpire(1)">ยกเว้นการหมดอายุ</button>
 				<?php endif; ?>
@@ -24,6 +25,7 @@
 						<button type="button" class="btn btn-sm btn-success" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
 					<?php endif; ?>
 				<?php endif; ?>
+				<?php endif; ?>
 				<?php if($order->state == 1 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
 						<button type="button" class="btn btn-sm btn-success" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
 				<?php endif; ?>
@@ -36,9 +38,19 @@
 <input type="hidden" id="zone_code" value="<?php echo $order->zone_code; ?>" />
 
 <?php $this->load->view('order_consign/consign_edit_header'); ?>
+<?php if(empty($approve_view)) : ?>
 <?php $this->load->view('orders/order_state'); ?>
 <?php $this->load->view('orders/order_discount_bar'); ?>
+<?php endif; ?>
 <?php $this->load->view('order_consign/consign_detail'); ?>
+
+<?php if($order->is_approved && !empty($order->approver)) : ?>
+	<div class="row">
+		<div class="col-sm-12 text-right padding-5 first last">
+			อนุมัติโดย : <?php echo $order->approver; ?> @ <?php echo thai_date($order->approve_date, TRUE); ?>
+		</div>
+	</div>
+<?php endif; ?>
 
 <?php if($this->menu_code == 'SOCCSO') : ?>
 <script src="<?php echo base_url(); ?>scripts/order_consign/consign.js"></script>

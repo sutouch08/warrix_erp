@@ -115,6 +115,9 @@
 								<?php endif; ?>
 							</td>
 							<td class="middle text-right">
+								<?php if($rs->status == 1) : ?>
+									<button type="button" class="btn btn-minier btn-primary" onclick="sendToSAP('<?php echo $rs->code; ?>')"><i class="fa fa-send"></i> SAP</button>
+								<?php endif; ?>
 								<button type="button" class="btn btn-minier btn-info" onclick="goDetail('<?php echo $rs->code; ?>')"><i class="fa fa-eye"></i></button>
 								<?php if($rs->status == 0 && $this->pm->can_edit) : ?>
 									<button type="button" class="btn btn-minier btn-warning" onclick="goEdit('<?php echo $rs->code; ?>')"><i class="fa fa-pencil"></i></button>
@@ -133,5 +136,34 @@
 </div>
 
 <script src="<?php echo base_url(); ?>scripts/transfer/transfer.js"></script>
+<script>
+function sendToSAP(code)
+{
+	load_in();
+	$.ajax({
+		url:HOME + 'export_transfer/' + code,
+		type:'POST',
+		cache:false,
+		success:function(rs){
+			load_out();
+			if(rs == 'success'){
+				swal({
+					title:'Success',
+					text:'ส่งข้อมูลไป SAP เรียบร้อยแล้ว',
+					type:'success',
+					timer:1000
+				});
+				$('#row-'+code).remove();
+			}else{
+				swal({
+					title:'Error!',
+					text:rs,
+					type:'error'
+				});
+			}
+		}
+	});
+}
+</script>
 
 <?php $this->load->view('include/footer'); ?>

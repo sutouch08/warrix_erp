@@ -18,8 +18,25 @@ class Welcome extends CI_Controller
 
 	public function index()
 	{
-		$this->load->helper('barcode');
-		$ds['barcode'] = generateEAN('885952705522');
-		$this->load->view('welcome_message', $ds);
+		$uid = get_cookie('uid');
+		$id_profile = get_cookie('id_profile');
+		$WC = get_permission('SOCCSO', $uid, $id_profile);
+		$WT = get_permission('SOCCTR', $uid, $id_profile);
+		$WS = get_permission('SOODSP', $uid, $id_profile);
+		$WU = get_permission('ICSUPP', $uid, $id_profile);
+		$WQ = get_permission('ICTRFM', $uid, $id_profile);
+
+		$ds = array(
+			'WC' => $WC,
+			'WT' => $WT,
+			'WS' => $WS,
+			'WU' => $WU,
+			'WQ' => $WQ,
+			'refresh_rate' => 300000,
+			'limit_rows' => 10
+		);
+
+
+		$this->load->view('main_view', $ds);
 	}
 }

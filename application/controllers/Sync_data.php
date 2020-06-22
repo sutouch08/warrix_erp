@@ -167,6 +167,26 @@ class Sync_data extends CI_Controller
   }
 
 
+  public function syncOrderInvCode()
+  {
+    $this->load->model('orders/orders_model');
+    $ds = $this->orders_model->get_non_inv_code(100);
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $inv = $this->orders_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          $this->orders_model->update_inv($rs->code, $inv);
+        }
+      }
+    }
+
+    echo 'done';
+  }
+
+
 
 } //--- end class
 
