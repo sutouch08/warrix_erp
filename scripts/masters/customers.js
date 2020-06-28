@@ -79,6 +79,23 @@ function syncData(){
 }
 
 
+
+function syncAllData(){
+  load_in();
+  $.ajax({
+    url: BASE_URL + 'masters/customers/syncAllData',
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      load_out();
+      setTimeout(function(){
+        goBack();
+      },500);
+    }
+  });
+}
+
+
 function doExport(){
   var code = $('#customers_code').val();
   load_in();

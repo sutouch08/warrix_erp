@@ -109,7 +109,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">ยี่ห้อ</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="brand_code" id="brand" class="form-control" required>
+				<select name="brand_code" id="brand" class="form-control">
 					<option value="">โปรดเลือก</option>
 				<?php echo select_product_brand($brand_code); ?>
 				</select>
@@ -120,7 +120,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">กลุ่มสินค้า</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="group_code" id="group" class="form-control input-sm" required>
+				<select name="group_code" id="group" class="form-control input-sm" >
 					<option value="">โปรดเลือก</option>
 				<?php echo select_product_group($group_code); ?>
 				</select>
@@ -131,7 +131,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">กลุ่มย่อย</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="sub_group_code" id="subGroup" class="form-control" required>
+				<select name="sub_group_code" id="subGroup" class="form-control">
 					<option value="">โปรดเลือก</option>
 				<?php echo select_product_sub_group($sub_group_code); ?>
 				</select>
@@ -142,7 +142,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">หมวดหมู่</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="category_code" id="category" class="form-control" required>
+				<select name="category_code" id="category" class="form-control" >
 					<option value="">โปรดเลือก</option>
 				<?php echo select_product_category($category_code); ?>
 				</select>
@@ -153,7 +153,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">ประเภท</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="kind_code" id="kind" class="form-control" required>
+				<select name="kind_code" id="kind" class="form-control" >
 					<option value="">โปรดเลือก</option>
 				<?php echo select_product_kind($kind_code); ?>
 				</select>
@@ -164,7 +164,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">ชนิด</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="type_code" id="type" class="form-control" required>
+				<select name="type_code" id="type" class="form-control" >
 					<option value="">โปรดเลือก</option>
 				<?php echo select_product_type($type_code); ?>
 				</select>
@@ -176,7 +176,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">ปี</label>
 			<div class="col-xs-12 col-sm-3">
-				<select name="year" id="year" class="form-control" required>
+				<select name="year" id="year" class="form-control">
 					<option value="">โปรดเลือก</option>
 				<?php echo select_years($year); ?>
 				</select>

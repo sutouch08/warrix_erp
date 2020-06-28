@@ -479,7 +479,7 @@ class Customers_model extends CI_Model
     $rs = $this->db->select_max('last_sync')->get('customers');
     if($rs->num_rows() === 1)
     {
-      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : $rs->row()->last_sync;
+      return $rs->row()->last_sync === NULL ? date('2019-01-01 00:00:00') : from_date($rs->row()->last_sync);
     }
 
     return date('2019-01-01 00:00:00');

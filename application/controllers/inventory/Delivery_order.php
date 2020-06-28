@@ -383,6 +383,11 @@ class Delivery_order extends PS_Controller
     {
       $this->do_export($code);
     }
+    else
+    {
+      //--- ถ้า error
+      $this->orders_model->set_exported($code, 3, $message);
+    }
 
     echo $sc === TRUE ? 'success' : $message;
   }

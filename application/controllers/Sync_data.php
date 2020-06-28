@@ -129,6 +129,7 @@ class Sync_data extends CI_Controller
           'sale_code' => $rs->sale_code,
           'CreditLine' => $rs->CreditLine,
           'old_code' => $rs->old_code,
+          'active' => ($rs->validFor == 'Y' ? 1 : 0),
           'last_sync' => now()
         );
 

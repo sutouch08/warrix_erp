@@ -156,10 +156,13 @@ class Orders_model extends CI_Model
   public function get_unvalid_details($code)
   {
     $rs = $this->db
-    ->where('order_code', $code)
-    ->where('valid', 0)
-    ->where('is_count', 1)
-    ->get('order_details');
+    ->select('ods.*, pd.old_code')
+    ->from('order_details AS ods')
+    ->join('products AS pd', 'ods.product_code = pd.code', 'left')
+    ->where('ods.order_code', $code)
+    ->where('ods.valid', 0)
+    ->where('ods.is_count', 1)
+    ->get();
 
     if($rs->num_rows() > 0)
     {
@@ -173,10 +176,21 @@ class Orders_model extends CI_Model
 
   public function get_valid_details($code)
   {
-    $qr  = "SELECT * FROM order_details
-            WHERE order_code = '{$code}'
-            AND (valid = 1 OR is_count = 0)";
-    $rs = $this->db->query($qr);
+    $rs = $this->db
+    ->select('ods.*, pd.old_code')
+    ->from('order_details AS ods')
+    ->join('products AS pd', 'ods.product_code = pd.code', 'left')
+    ->where('ods.order_code', $code)
+    ->group_start()
+    ->where('ods.valid', 1)
+    ->or_where('ods.is_count', 0)
+    ->group_end()
+    ->get();
+    //
+    // $qr  = "SELECT * FROM order_details
+    //         WHERE order_code = '{$code}'
+    //         AND (valid = 1 OR is_count = 0)";
+    // $rs = $this->db->query($qr);
 
     if($rs->num_rows() > 0)
     {
@@ -907,6 +921,12 @@ class Orders_model extends CI_Model
   public function update_inv($code, $doc_num)
   {
     return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('orders');
+  }
+
+
+  public function set_exported($code, $status, $error)
+  {
+    return $this->db->set('is_exported', $status)->set('export_error', $error)->where('code', $code)->update('orders');
   }
 } //--- End class
 

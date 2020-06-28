@@ -44,14 +44,14 @@
       </div>
       <div class="divider-hidden"></div>
 
-			<div class="col-sm-3"><span class="form-control left-label">ฝากขาย(ใบกำกับ)</span></div>
+			<div class="col-sm-3"><span class="form-control left-label">ฝากขาย(โอนคลัง)</span></div>
       <div class="col-sm-8">
         <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_CONSIGN_TR" value="<?php echo $BOOK_CODE_CONSIGN_TR; ?>" />
         <span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบโอนสินค้า"</span>
       </div>
       <div class="divider-hidden"></div>
 
-      <div class="col-sm-3"><span class="form-control left-label">ฝากขาย(โอนคลัง)</span></div>
+      <div class="col-sm-3"><span class="form-control left-label">ฝากขาย(ใบกำกับ)</span></div>
       <div class="col-sm-8">
         <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_CONSIGN_SO" value="<?php echo $BOOK_CODE_CONSIGN_SO; ?>" />
         <span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบโอนสินค้า"</span>

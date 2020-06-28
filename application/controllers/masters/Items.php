@@ -631,10 +631,24 @@ class Items extends PS_Controller
 
 
 
-  public function do_export($code)
+  public function do_export($code, $method = 'A')
   {
     $item = $this->products_model->get($code);
-    $exst = $this->products_model->is_middle_exists($item->code);
+    //--- เช็คข้อมูลในฐานข้อมูลจริง
+    $exst = $this->products_model->is_sap_exists($item->code);
+
+    $method = $exst === TRUE ? 'U' : $method;
+
+    //--- เช็คข้อมูลในถังกลาง
+    $middle = $this->products_model->get_un_import_middle($item->code);
+    if(!empty($middle))
+    {
+      foreach($middle as $mid)
+      {
+        $this->products_model->drop_middle_item($mid->DocEntry);
+      }
+    }
+
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
       'ItemName' => limitText($item->name, 97),//--- ชื่อสินค้า
@@ -652,6 +666,7 @@ class Items extends PS_Controller
       'VatGroupPu' => getConfig('PURCHASE_VAT_CODE'), //---- รหัสกลุ่มภาษีซื้อ (ต้องตรงกับ SAP)
       'ItemType' => 'I', //--- ประเภทของรายการ F=Fixed Assets, I=Items, L=Labor, T=Travel
       'InvntryUom' => $item->unit_code, //--- หน่วยในการนับสต็อก
+      'validFor' => $item->active == 1 ? 'Y' : 'N',
       'U_MODEL' => $item->style_code,
       'U_COLOR' => $item->color_code,
       'U_SIZE' => $item->size_code,
@@ -665,7 +680,7 @@ class Items extends PS_Controller
       'U_COST' => $item->cost,
       'U_PRICE' => $item->price,
       'U_OLDCODE' => $item->old_code,
-      'F_E_Commerce' => $exst === TRUE ? 'U' : 'A',
+      'F_E_Commerce' => $method,
       'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 

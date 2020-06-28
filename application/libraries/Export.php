@@ -12,6 +12,17 @@ class Export
 	}
 
 
+  public function set_exported($code, $sc)
+  {
+    //--- ถ้า error  set เป็น 3(export แล้ว แต่ error) ถ้าไม่ error เป็น 1 (export แล้ว)
+    $is_exported = $sc === FALSE ? 3 : 1;
+    $export_error = $sc === FALSE ? $this->error : NULL;
+
+    return $this->ci->orders_model->set_exported($code, $is_exported, $export_error );
+  }
+
+
+
 
   //--- ODLN  DLN1
   public function export_order($code)
@@ -70,7 +81,7 @@ class Export
           'GroupNum' => $cust->GroupNum,
           'SlpCode' => $cust->sale_code,
           'ToWhsCode' => NULL,
-          'Comments' => $order->remark,
+          'Comments' => limitText($order->remark, 250),
           'U_SONO' => $order->code,
           'U_ECOMNO' => $order->code,
           'U_BOOKCODE' => $order->bookcode,
@@ -154,6 +165,8 @@ class Export
       $sc = FALSE;
       $this->error = "เอกสารถูกนำเข้า SAP แล้ว หากต้องการเปลี่ยนแปลงกรุณายกเลิกเอกสารใน SAP ก่อน";
     }
+
+    $this->set_exported($code, $sc);
 
     return $sc;
   }
@@ -217,7 +230,7 @@ class Export
           'GroupNum' => $cust->GroupNum,
           'SlpCode' => $cust->sale_code,
           'ToWhsCode' => NULL,
-          'Comments' => $order->remark,
+          'Comments' => limitText($order->remark,250),
           'U_SONO' => $order->code,
           'U_ECOMNO' => $order->code,
           'U_BOOKCODE' => $order->bookcode,
@@ -300,6 +313,8 @@ class Export
       $sc = FALSE;
       $this->error = "เอกสารถูกนำเข้า SAP แล้ว หากต้องการเปลี่ยนแปลงกรุณายกเลิกเอกสารใน SAP ก่อน";
     }
+
+    $this->set_exported($code, $sc);
 
     return $sc;
   }
@@ -379,7 +394,7 @@ class Export
               'DocTotalFC' => remove_vat($total_amount),
               'Filler' => $doc->warehouse_code,
               'ToWhsCode' => $doc->warehouse_code,
-              'Comments' => $doc->remark,
+              'Comments' => limitText($doc->remark, 250),
               'F_E_Commerce' => 'A',
               'F_E_CommerceDate' => sap_date(now(), TRUE),
               'U_BOOKCODE' => $doc->bookcode,
@@ -483,6 +498,8 @@ class Export
       $this->error = "ไม่พบเอกสาร {$code}";
     }
 
+    $this->set_exported($code, $sc);
+
     return $sc;
   }
 //--- end export transfer order
@@ -560,7 +577,7 @@ public function export_transfer_draft($code)
             'DocTotalFC' => remove_vat($total_amount),
             'Filler' => $doc->warehouse_code,
             'ToWhsCode' => $doc->warehouse_code,
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE),
             'U_BOOKCODE' => $doc->bookcode,
@@ -664,6 +681,8 @@ public function export_transfer_draft($code)
     $this->error = "ไม่พบเอกสาร {$code}";
   }
 
+  $this->set_exported($code, $sc);
+
   return $sc;
 }
 //--- end export transfer draf
@@ -725,7 +744,7 @@ public function export_transfer($code)
             'DocTotalFC' => 0.000000,
             'Filler' => $doc->from_warehouse,
             'ToWhsCode' => $doc->to_warehouse,
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE),
             'U_BOOKCODE' => $doc->bookcode
@@ -886,7 +905,7 @@ public function export_move($code)
             'DocTotalFC' => 0.000000,
             'Filler' => $doc->from_warehouse,
             'ToWhsCode' => $doc->to_warehouse,
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A' ,
             'F_E_CommerceDate' => sap_date(now(), TRUE),
             'U_BOOKCODE' => $doc->bookcode
@@ -1054,7 +1073,7 @@ public function export_transform($code)
             'DocTotalFC' => remove_vat($total_amount),
             'Filler' => $doc->warehouse_code,
             'ToWhsCode' => getConfig('TRANSFORM_WAREHOUSE'),
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE),
             'U_BOOKCODE' => $doc->bookcode,
@@ -1158,6 +1177,8 @@ public function export_transform($code)
     $this->error = "ไม่พบเอกสาร {$code}";
   }
 
+  $this->set_exported($code, $sc);
+
   return $sc;
 }
 
@@ -1220,7 +1241,7 @@ public function export_receive($code)
             'DocTotal' => remove_vat($total_amount),
             'DocTotalFC' => remove_vat($total_amount),
             'ToWhsCode' => $doc->warehouse_code,
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(),TRUE)
           );
@@ -1365,7 +1386,7 @@ public function export_receive_transform($code)
             'DocCur' => $currency,
             'DocRate' => 1,
             'DocTotal' => remove_vat($total_amount),
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => now()
           );
@@ -1517,7 +1538,7 @@ public function export_return($code)
             'DocRate' => 1,
             'DocTotal' => $total_amount,
             'DocTotalFC' => $total_amount,
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'GroupNum' => $cust->GroupNum,
             'SlpCode' => $cust->sale_code,
             'ToWhsCode' => $doc->warehouse_code,
@@ -1686,7 +1707,7 @@ public function export_return_lend($code)
             'DocTotalFC' => remove_vat($total_amount),
             'Filler' => $doc->from_warehouse,
             'ToWhsCode' => $doc->to_warehouse,
-            'Comments' => $doc->remark,
+            'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => now(),
             'U_BOOKCODE' => $doc->bookcode,
@@ -1831,7 +1852,7 @@ public function export_goods_issue($code)
           'DocDueDate' => sap_date($doc->date_add),
           'DocTotal' => $doc_total,
           'DocTotalFC' => $doc_total,
-          'Comments' => $doc->remark,
+          'Comments' => limitText($doc->remark, 250),
           'F_E_Commerce' => 'A',
           'F_E_CommerceDate' => sap_date(now(), TRUE)
         );

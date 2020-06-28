@@ -19,6 +19,13 @@
     <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
   </div>
 
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">รหัสเก่า</label>
+    <div class="col-xs-12 col-sm-3">
+      <input type="text" class="form-control input-sm" name="old_code" id="old_code" value="<?php echo $ds->old_code; ?>" />
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline red" id="old_code-error"></div>
+  </div>
 
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">เลขประจำตัว/Tax ID</label>
@@ -71,7 +78,7 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">กลุ่มลูกค้า</label>
     <div class="col-xs-12 col-sm-4">
-			<select name="group" id="group" class="form-control" required>
+			<select name="group" id="group" class="form-control" >
 				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_group($ds->group_code); ?>
 			</select>
@@ -83,7 +90,7 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">ประเภทลูกค้า</label>
     <div class="col-xs-12 col-sm-4">
-			<select name="kind" id="kind" class="form-control" required>
+			<select name="kind" id="kind" class="form-control">
 				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_kind($ds->kind_code); ?>
 			</select>
@@ -95,7 +102,7 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">ชนิดลูกค้า</label>
     <div class="col-xs-12 col-sm-4">
-			<select name="type" id="type" class="form-control" required>
+			<select name="type" id="type" class="form-control">
 				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_type($ds->type_code); ?>
 			</select>
@@ -108,7 +115,7 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">เกรดลูกค้า</label>
     <div class="col-xs-12 col-sm-4">
-			<select name="class" id="class" class="form-control" required>
+			<select name="class" id="class" class="form-control" >
 				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_class($ds->class_code); ?>
 			</select>
@@ -120,7 +127,7 @@
 	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">พื้นที่ขาย</label>
     <div class="col-xs-12 col-sm-4">
-			<select name="area" id="area" class="form-control" required>
+			<select name="area" id="area" class="form-control">
 				<option value="">เลือกรายการ</option>
 				<?php echo select_customer_area($ds->area_code); ?>
 			</select>

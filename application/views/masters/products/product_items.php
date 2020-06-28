@@ -45,7 +45,15 @@
 						<img src="<?php echo $img; ?>" style="width:50px;" />
 					</td>
 					<td class="middle"><?php echo $item->code; ?></td>
-					<td class="middle"><?php echo $item->old_code; ?></td>
+					<td class="middle">
+						<span class="lb" id="old-lbl-<?php echo $item->code; ?>"><?php echo $item->old_code; ?></span>
+						<input type="text"
+						class="form-control input-sm old-code edit hide"
+						name="oldCode[<?php echo $item->code; ?>]"
+						id="old-<?php echo $item->code; ?>"
+						value="<?php echo $item->old_code; ?>"
+						/>
+					</td>
 					<td class="middle">
 						<span class="lb" id="bc-lbl-<?php echo $item->code; ?>"><?php echo $item->barcode; ?></span>
 						<input type="text"

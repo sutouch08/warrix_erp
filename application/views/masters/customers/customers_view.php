@@ -7,7 +7,8 @@
     </div>
     <div class="col-sm-6">
     	<p class="pull-right">
-				<button type="button" class="btn btn-sm btn-info" onclick="syncData()"><i class="fa fa-refresh"></i> Sync</button>
+				<button type="button" class="btn btn-sm btn-info" onclick="syncData()"><i class="fa fa-refresh"></i> Update</button>
+				<button type="button" class="btn btn-sm btn-primary" onclick="syncAllData()"><i class="fa fa-refresh"></i> Sync All</button>
       <?php if($this->pm->can_add) : ?>
         <button type="button" class="btn btn-sm btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
       <?php endif; ?>

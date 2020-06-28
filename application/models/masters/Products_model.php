@@ -58,6 +58,33 @@ class Products_model extends CI_Model
   }
 
 
+  public function get_un_import_middle($code)
+  {
+    $rs = $this->mc
+    ->select('DocEntry, ItemCode')
+    ->where('ItemCode', $code)
+    ->group_start()
+    ->where('F_Sap', 'N')
+    ->or_where('F_Sap IS NULL', NULL, FALSE)
+    ->group_end()
+    ->get('OITM');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+
+  public function drop_middle_item($docEntry)
+  {
+    return $this->mc->where('DocEntry', $docEntry)->delete('OITM');
+  }
+
+
   public function is_sap_exists($code)
   {
     $rs = $this->ms->select('ItemCode')->where('ItemCode', $code)->get('OITM');

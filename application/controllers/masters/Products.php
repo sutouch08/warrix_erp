@@ -287,15 +287,6 @@ class Products extends PS_Controller
       );
 
       return $this->product_style_model->add_sap_model($arr);
-
-      // if($exs)
-      // {
-      //   return $this->product_style_model->update_sap_model($style->code, $arr);
-      // }
-      // else
-      // {
-      //   return $this->product_style_model->add_sap_model($arr);
-      // }
     }
 
     return FALSE;
@@ -333,18 +324,22 @@ class Products extends PS_Controller
     if($this->input->post('code'))
     {
       $code = $this->input->post('code');
-      $barcode = trim($this->input->post('barcode'));
-      $cost = $this->input->post('cost');
-      $price = $this->input->post('price');
+      $old_code = get_null(trim($this->input->post('old_code')));
+      $barcode = get_null(trim($this->input->post('barcode')));
+      $cost = get_null($this->input->post('cost'));
+      $price = get_null($this->input->post('price'));
 
       $ds = array(
         'barcode' => ($barcode === '' ? NULL: $barcode),
         'cost' => ($cost === NULL ? 0.00 : $cost),
-        'price' => ($price === NULL ? 0.00 : $price)
+        'price' => ($price === NULL ? 0.00 : $price),
+        'old_code' => $old_code
       );
 
       if($this->products_model->update($code, $ds))
       {
+        $this->do_export($code, 'U'); //--- A = add, U = update
+
         echo 'success';
       }
       else
@@ -1092,15 +1087,24 @@ class Products extends PS_Controller
 
 
 
-  public function do_export($code)
+  public function do_export($code, $method = 'A')
   {
     $item = $this->products_model->get($code);
     //--- เช็คข้อมูลในฐานข้อมูลจริง
-    //$exst = $this->products_model->is_sap_exists($item->code);
-    $exst = $this->products_model->is_middle_exists($item->code);
+    $exst = $this->products_model->is_sap_exists($item->code);
+
+    $method = $exst === TRUE ? 'U' : $method;
 
     //--- เช็คข้อมูลในถังกลาง
-    //$middle = $this->products_model->is_middle_exists($item->code);
+    $middle = $this->products_model->get_un_import_middle($item->code);
+    if(!empty($middle))
+    {
+      foreach($middle as $mid)
+      {
+        $this->products_model->drop_middle_item($mid->DocEntry);
+      }
+    }
+
 
     $ds = array(
       'ItemCode' => $item->code, //--- รหัสสินค้า
@@ -1119,6 +1123,7 @@ class Products extends PS_Controller
       'VatGroupPu' => getConfig('PURCHASE_VAT_CODE'), //---- รหัสกลุ่มภาษีซื้อ (ต้องตรงกับ SAP)
       'ItemType' => 'I', //--- ประเภทของรายการ F=Fixed Assets, I=Items, L=Labor, T=Travel
       'InvntryUom' => $item->unit_code, //--- หน่วยในการนับสต็อก
+      'validFor' => $item->active == 1 ? 'Y' : 'N',
       'U_MODEL' => $item->style_code,
       'U_COLOR' => $item->color_code,
       'U_SIZE' => $item->size_code,
@@ -1132,22 +1137,11 @@ class Products extends PS_Controller
       'U_COST' => $item->cost,
       'U_PRICE' => $item->price,
       'U_OLDCODE' => $item->old_code,
-      'F_E_Commerce' => $exst === TRUE ? 'U' : 'A',
+      'F_E_Commerce' => $method,
       'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 
-
     return $this->products_model->add_item($ds);
-
-    // if($middle)
-    // {
-    //   return $this->products_model->update_item($item->code, $ds);
-    // }
-    // else
-    // {
-    //   return $this->products_model->add_item($ds);
-    // }
-
   }
 
 

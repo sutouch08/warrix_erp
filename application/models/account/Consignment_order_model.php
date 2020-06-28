@@ -372,17 +372,26 @@ class Consignment_order_model extends CI_Model
     //--- อ้างอิงเลขที่กระทบยอดสินค้า
     if(!empty($ds['ref_code']))
     {
-      $this->db->like('ref_code', $ds['ref_code']);   }
+      $this->db->like('ref_code', $ds['ref_code']);
+    }
 
 
     if(!empty($ds['customer']))
     {
-      $this->db->like('customer_code', $ds['customer'])->or_like('customer_name', $ds['customer']);
+      $this->db
+      ->group_start()
+      ->like('customer_code', $ds['customer'])
+      ->or_like('customer_name', $ds['customer'])
+      ->group_end();
     }
 
     if(!empty($ds['zone']))
     {
-      $this->db->like('zone_code', $ds['zone'])->or_like('zone_name', $ds['zone']);
+      $this->db
+      ->group_start()
+      ->like('zone_code', $ds['zone'])
+      ->or_like('zone_name', $ds['zone'])
+      ->group_end();
     }
 
     $this->db->order_by('code', 'DESC');
@@ -429,18 +438,27 @@ class Consignment_order_model extends CI_Model
     //--- อ้างอิงเลขที่กระทบยอดสินค้า
     if(!empty($ds['ref_code']))
     {
-      $this->db->like('ref_code', $ds['ref_code']);   }
-
-
-    if(!empty($ds['customer']))
-    {
-      $this->db->like('customer_code', $ds['customer'])->or_like('customer_name', $ds['customer']);
+      $this->db->like('ref_code', $ds['ref_code']);
     }
 
-    if(!empty($ds['zone']))
-    {
-      $this->db->like('zone_code', $ds['zone'])->or_like('zone_name', $ds['zone']);
-    }
+
+      if(!empty($ds['customer']))
+      {
+        $this->db
+        ->group_start()
+        ->like('customer_code', $ds['customer'])
+        ->or_like('customer_name', $ds['customer'])
+        ->group_end();
+      }
+
+      if(!empty($ds['zone']))
+      {
+        $this->db
+        ->group_start()
+        ->like('zone_code', $ds['zone'])
+        ->or_like('zone_name', $ds['zone'])
+        ->group_end();
+      }
 
     return $this->db->count_all_results('consignment_order');
   }

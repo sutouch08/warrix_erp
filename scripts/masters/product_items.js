@@ -1,4 +1,6 @@
 function editItem(code){
+  $('#old-lbl-'+code).addClass('hide');
+  $('#old-'+code).removeClass('hide');
   $('#bc-lbl-'+code).addClass('hide');
   $('#bc-'+code).removeClass('hide');
   $('#cost-lbl-'+code).addClass('hide');
@@ -14,6 +16,7 @@ function editItem(code){
 
 function updateItem(code)
 {
+  var oldCode = $('#old-'+code).val();
   var barcode = $('#bc-'+code).val();
   var cost = $('#cost-'+code).val();
   var price = $('#price-'+code).val();
@@ -34,6 +37,7 @@ function updateItem(code)
     cache:false,
     data:{
       'code' : code,
+      'old_code' : oldCode,
       'barcode' : barcode,
       'cost' : cost,
       'price' : price
@@ -41,6 +45,9 @@ function updateItem(code)
     success:function(rs){
       var rs = $.trim(rs);
       if(rs === 'success'){
+        $('#old-lbl-'+code).text(oldCode);
+        $('#old-'+code).addClass('hide');
+        $('#old-lbl-'+code).removeClass('hide');
         $('#bc-lbl-'+code).text(barcode);
         $('#bc-'+code).addClass('hide');
         $('#bc-lbl-'+code).removeClass('hide');

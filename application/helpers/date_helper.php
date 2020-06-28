@@ -136,12 +136,13 @@ function select_years($se = '')
 	$sc 		= '';
 	$length	= 5;
 	$startYear = getConfig('START_YEAR');
-  $y = $se === '' ? $startYear : $se;
+  $y = ($se === '' OR $sc === NULL) ? $startYear : $se;
 	$year = ($y - $length) < $startYear ? $startYear : $y - $length;
 	$lastYear = date('Y') + $length;
 	while( $year <= $lastYear )
 	{
-		$sc .= '<option value="'.$year.'" '.is_selected($year, $se).'>'.$year.'</option>';
+    $is_select = ($year == $se) ? 'selected' : '';
+		$sc .= '<option value="'.$year.'" '.$is_select.'>'.$year.'</option>';
 		$year++;
 	}
 

@@ -27,7 +27,14 @@
       <td class="middle text-center b-click">
         <?php echo (empty($rs->barcode) ? $rs->product_code : $rs->barcode); ?>
       </td>
-      <td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
+      <td class="middle">
+        <?php echo $rs->product_code; ?> :
+        <?php if(empty($rs->old_code) OR $rs->old_code == $rs->product_code) : ?>
+        <?php     echo $rs->product_name; ?>
+        <?php else : ?>
+        <?php     echo $rs->old_code; ?>
+        <?php endif; ?>
+      </td>
       <td class="middle text-center" id="order-qty-<?php echo $rs->id; ?>"><?php echo number($rs->qty); ?></td>
       <td class="middle text-center" id="prepared-qty-<?php echo $rs->id; ?>"><?php echo number($rs->prepared); ?></td>
       <td class="middle text-center" id="balance-qty-<?php echo $rs->id; ?>"><?php echo number($rs->qty - $rs->prepared); ?></td>

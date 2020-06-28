@@ -387,6 +387,7 @@ class Customers extends PS_Controller
       $old_name = $this->input->post('customers_name');
       $code = $this->input->post('code');
       $name = $this->input->post('name');
+      $fml_code = get_null($this->input->post('old_code'));
 
       $ds = array(
         'code' => $code,
@@ -396,13 +397,14 @@ class Customers extends PS_Controller
         'GroupCode' => $this->input->post('GroupCode'),
         'cmpPrivate' => $this->input->post('cmpPrivate'),
         'GroupNum' => $this->input->post('GroupNum'),
-        'group_code' => $this->input->post('group'),
-        'kind_code' => $this->input->post('kind'),
-        'type_code' => $this->input->post('type'),
-        'class_code' => $this->input->post('class'),
-        'area_code' => $this->input->post('area'),
-        'sale_code' => $this->input->post('sale'),
-        'CreditLine' => $this->input->post('CreditLine')
+        'group_code' => get_null($this->input->post('group')),
+        'kind_code' => get_null($this->input->post('kind')),
+        'type_code' => get_null($this->input->post('type')),
+        'class_code' => get_null($this->input->post('class')),
+        'area_code' => get_null($this->input->post('area')),
+        'sale_code' => get_null($this->input->post('sale')),
+        'CreditLine' => floatval($this->input->post('CreditLine')),
+        'old_code' => $fml_code
       );
 
       if($sc === TRUE && $this->customers_model->is_exists($code, $old_code) === TRUE)
@@ -559,7 +561,46 @@ class Customers extends PS_Controller
           'cmpPrivate' => $rs->CmpPrivate,
           'GroupNum' => $rs->GroupNum,
           'sale_code' => $rs->sale_code,
-          'CreditLine' => $rs->CreditLine,
+          'CreditLine' => floatval($rs->CreditLine),
+          'old_code' => $rs->old_code,
+          'last_sync' => now()
+        );
+
+        if($this->customers_model->is_exists($rs->code) === TRUE)
+        {
+          $this->customers_model->update($rs->code, $arr);
+        }
+        else
+        {
+          $this->customers_model->add($arr);
+        }
+      }
+    }
+
+    set_message('Sync completed');
+  }
+
+
+
+  public function syncAllData()
+  {
+    $last_sync = from_date('2020-01-01');
+    $ds = $this->customers_model->get_update_data($last_sync);
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $arr = array(
+          'code' => $rs->code,
+          'name' => $rs->name,
+          'Tax_Id' => $rs->Tax_Id,
+          'DebPayAcct' => $rs->DebPayAcct,
+          'CardType' => $rs->CardType,
+          'GroupCode' => $rs->GroupCode,
+          'cmpPrivate' => $rs->CmpPrivate,
+          'GroupNum' => $rs->GroupNum,
+          'sale_code' => $rs->sale_code,
+          'CreditLine' => floatval($rs->CreditLine),
           'old_code' => $rs->old_code,
           'last_sync' => now()
         );
