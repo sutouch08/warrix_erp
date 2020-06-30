@@ -140,3 +140,26 @@ $db['mc'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+
+$db['is'] = array(
+	'dsn'	=> 'mysql:host=172.21.12.8;port=3306;dbname=warrix_erp',
+	'hostname' => '172.21.12.8',
+	'username' => 'wrxadmin',
+	'password' => 'W@rr1X$p0rt',
+	'database' => 'warrix_erp',
+	'dbdriver' => 'pdo',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8',
+	'dbcollat' => 'utf8_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);

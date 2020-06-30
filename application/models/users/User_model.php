@@ -162,11 +162,11 @@ class User_model extends CI_Model
   {
     if(!empty($menu))
     {
-      $user_pm = $this->get_user_permission($menu, $uid);
-      if($user_pm !== FALSE)
-      {
-        return $user_pm;
-      }
+      // $user_pm = $this->get_user_permission($menu, $uid);
+      // if($user_pm !== FALSE)
+      // {
+      //   return $user_pm;
+      // }
 
       return $this->get_profile_permission($menu, $id_profile);
     }

@@ -87,6 +87,9 @@ class stock_model extends CI_Model
   }
 
 
+
+  
+
   //---- ยอดสินค้าคงเหลือในแต่ละโซน
   public function get_stock_in_zone($item, $warehouse = NULL)
   {
@@ -119,6 +122,9 @@ class stock_model extends CI_Model
 
     return $result;
   }
+
+
+
 
 
   //---- สินค้าทั้งหมดที่อยู่ในโซน (ใช้โอนสินค้าระหว่างคลัง)

@@ -127,7 +127,7 @@ class Prepare extends PS_Controller
       {
         $rs->barcode = $this->get_barcode($rs->product_code);
         $rs->prepared = $this->get_prepared($rs->order_code, $rs->product_code);
-        $rs->stock_in_zone = $this->get_stock_in_zone($rs->product_code, get_null($order->warehouse_code));
+        $rs->stock_in_zone = $this->get_stock_in_zone($rs->product_code, $rs->old_code, get_null($order->warehouse_code));
       }
     }
 
@@ -302,23 +302,59 @@ class Prepare extends PS_Controller
 
 
 
-  public function get_stock_in_zone($item_code, $warehouse = NULL)
+  // public function get_stock_in_zone($item_code, $warehouse = NULL)
+  // {
+  //   $sc = "ไม่มีสินค้า";
+  //   $this->load->model('stock/stock_model');
+  //   $stock = $this->stock_model->get_stock_in_zone($item_code, $warehouse);
+  //   if(!empty($stock))
+  //   {
+  //     $sc = "";
+  //     foreach($stock as $rs)
+  //     {
+  //       $prepared = $this->prepare_model->get_buffer_zone($item_code, $rs->code);
+  //       $sc .= $rs->name.' : '.($rs->qty - $prepared).'<br/>';
+  //     }
+  //   }
+  //
+  //   return $sc;
+  // }
+
+
+  public function get_stock_in_zone($item_code, $old_code, $warehouse = NULL)
   {
+
     $sc = "ไม่มีสินค้า";
-    $this->load->model('stock/stock_model');
-    $stock = $this->stock_model->get_stock_in_zone($item_code, $warehouse);
-    if(!empty($stock))
+    $rs = $this->is->select('id')->where('code', $old_code)->get('tbl_product');
+    if(!empty($rs))
     {
-      $sc = "";
-      foreach($stock as $rs)
+      $id = $rs->row()->id;
+      $qs = $this->is
+      ->select('z.barcode_zone AS code, z.zone_name AS name, s.qty AS qty')
+      ->from('tbl_stock AS s')
+      ->join('tbl_zone AS z', 's.id_zone = z.id_zone')
+      ->join('tbl_warehouse AS w', 'z.id_warehouse = w.id')
+      ->where('s.id_product', $id)
+      ->where('w.prepare', 1)
+      ->where('w.active', 1)
+      ->get();
+
+
+      if($qs->num_rows() > 0)
       {
-        $prepared = $this->prepare_model->get_buffer_zone($item_code, $rs->code);
-        $sc .= $rs->name.' : '.($rs->qty - $prepared).'<br/>';
+        $sc = "";
+        $stock = $qs->result();
+
+        foreach($stock as $rs)
+        {
+          $sc .= $rs->name.' : '.$rs->qty.'<br/>';
+        }
       }
     }
 
     return $sc;
   }
+
 
 
   //---- สินค้าคงเหลือในโซน ลบด้วย สินค้าที่จัดไปแล้ว

@@ -7,6 +7,8 @@ class PS_Controller extends CI_Controller
   public $home;
   public $ms;
   public $mc;
+  public $close_system;
+
   public function __construct()
   {
     parent::__construct();
@@ -15,9 +17,9 @@ class PS_Controller extends CI_Controller
     //--- check is user has logged in ?
     _check_login();
 
-    $closed   = getConfig('CLOSE_SYSTEM'); //--- ปิดระบบทั้งหมดหรือไม่
+    $this->close_system   = getConfig('CLOSE_SYSTEM'); //--- ปิดระบบทั้งหมดหรือไม่
 
-    if($closed == 1)
+    if($this->close_system == 1)
     {
       redirect('setting/maintenance');
     }
@@ -27,6 +29,7 @@ class PS_Controller extends CI_Controller
 
     $this->ms = $this->load->database('ms', TRUE); //--- SAP database
     $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
+    $this->is = $this->load->database('is', TRUE); //---- Ecom database
   }
 }
 

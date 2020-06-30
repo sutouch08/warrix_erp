@@ -265,7 +265,15 @@ class Return_order extends PS_Controller
       $zone = $this->zone_model->get($this->input->post('zone_code'));
       $remark = trim($this->input->post('remark'));
 
-      $code = $this->get_new_code($date_add);
+      if($this->input->post('code'))
+      {
+        $code = trim($this->input->post('code'));
+      }
+      else
+      {
+        $code = $this->get_new_code($date_add);
+      }
+
       $arr = array(
         'code' => $code,
         'bookcode' => getConfig('BOOK_CODE_RETURN_ORDER'),

@@ -160,10 +160,11 @@ class Qc_model extends CI_Model
   //--- รายการที่ตรวจครบแล้ว
   public function get_complete_list($order_code)
   {
-    $qr = "SELECT o.id, o.product_code, o.product_name, o.qty AS order_qty, o.is_count, ";
+    $qr = "SELECT o.id, o.product_code, o.product_name, o.qty AS order_qty, o.is_count, pd.old_code, ";
     $qr .= "(SELECT SUM(qty) FROM buffer WHERE order_code = '{$order_code}' AND product_code = o.product_code) AS prepared, ";
     $qr .= "(SELECT SUM(qty) FROM qc WHERE order_code = '{$order_code}' AND product_code = o.product_code) AS qc ";
     $qr .= "FROM order_details AS o ";
+    $qr .= "LEFT JOIN products AS pd ON o.product_code = pd.code ";
     $qr .= "WHERE o.order_code = '{$order_code}' GROUP BY o.product_code HAVING prepared <= qc ";
 
     $rs = $this->db->query($qr);
@@ -180,13 +181,15 @@ class Qc_model extends CI_Model
   //--- รายการที่ยังไม่ได้ตรวจหรือยังตรวจไม่ครบ
   public function get_in_complete_list($order_code)
   {
-    $qr = "SELECT o.id, o.product_code, o.product_name, o.qty AS order_qty, o.is_count, ";
+    $qr = "SELECT o.id, o.product_code, o.product_name, o.qty AS order_qty, o.is_count, pd.old_code, ";
     $qr .= "(SELECT SUM(qty) FROM buffer WHERE order_code = '{$order_code}' AND product_code = o.product_code) AS prepared, ";
     $qr .= "(SELECT SUM(qty) FROM qc WHERE order_code = '{$order_code}' AND product_code = o.product_code) AS qc ";
     $qr .= "FROM order_details AS o ";
     $qr .= "JOIN buffer AS b ON o.product_code = b.product_code ";
+    $qr .= "LEFT JOIN products AS pd ON o.product_code = pd.code ";
     $qr .= "WHERE o.order_code = '{$order_code}' AND o.is_count = 1 ";
     $qr .= "GROUP BY o.product_code HAVING ( prepared > qc OR ISNULL(qc) )";
+
 
     $rs = $this->db->query($qr);
 

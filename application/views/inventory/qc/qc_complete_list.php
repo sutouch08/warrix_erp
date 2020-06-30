@@ -18,7 +18,14 @@
 <?php   foreach($complete_details as $rs) : ?>
       <tr class="font-size-12" id="row-<?php echo $rs->id; ?>">
         <td class="middle text-center"><?php echo $rs->barcode; ?></td>
-        <td class="middle"><?php echo $rs->product_code.' : '.$rs->product_name; ?></td>
+        <td class="middle">
+          <?php echo $rs->product_code; ?> :
+          <?php if(empty($rs->old_code) OR $rs->old_code == $rs->product_code) : ?>
+          <?php     echo $rs->product_name; ?>
+          <?php else : ?>
+          <?php     echo $rs->old_code; ?>
+          <?php endif; ?>
+        </td>
         <td class="middle text-center"><?php echo number($rs->order_qty); ?></td>
         <td class="middle text-center" id="prepared-<?php echo $rs->id; ?>"><?php echo number($rs->prepared); ?></td>
         <td class="middle text-center" id="qc-<?php echo $rs->id; ?>"><?php echo number($rs->qc); ?></td>

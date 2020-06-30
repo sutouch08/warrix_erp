@@ -53,9 +53,11 @@
 
 
       <div class="col-sm-8 col-sm-offset-4">
+				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
         <button type="button" class="btn btn-sm btn-success input-small" onClick="updateConfig('sapForm')">
           <i class="fa fa-save"></i> บันทึก
         </button>
+				<?php endif; ?>
       </div>
       <div class="divider-hidden"></div>
 

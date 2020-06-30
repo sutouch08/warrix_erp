@@ -83,7 +83,7 @@ public function get_style_code()
   if($qs->num_rows() > 0)
   {
     foreach($qs->result() as $rs)
-    $sc[] = $rs->code;
+    $sc[] = $rs->code .' | '.$rs->old_code;
   }
 
 	echo json_encode($sc);

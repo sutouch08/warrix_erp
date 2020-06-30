@@ -240,7 +240,7 @@ function update_api_stock(code)
 			console.log(rs);
 		}
 	});
-	
+
 }
 
 
@@ -616,8 +616,9 @@ function validateOrder(){
   var prefix = $('#prefix').val();
   var runNo = parseInt($('#runNo').val());
   let code = $('#code').val();
+
   if(code.length == 0){
-    swal("เลขที่เอกสารไม่ถูกต้อง");
+    $('#addForm').submit();
     return false;
   }
 

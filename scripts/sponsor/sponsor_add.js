@@ -117,8 +117,9 @@ function validateOrder(){
   var prefix = $('#prefix').val();
   var runNo = parseInt($('#runNo').val());
   let code = $('#code').val();
+  
   if(code.length == 0){
-    swal("เลขที่เอกสารไม่ถูกต้อง");
+    $('#addForm').submit();
     return false;
   }
 
@@ -278,7 +279,12 @@ function removeDetail(id, name){
 
 $("#pd-box").autocomplete({
 	source: BASE_URL + 'auto_complete/get_style_code',
-	autoFocus: true
+	autoFocus: true,
+  close:function(){
+    var rs = $(this).val();
+    var arr = rs.split(' | ');
+    $(this).val(arr[0]);
+  }
 });
 
 

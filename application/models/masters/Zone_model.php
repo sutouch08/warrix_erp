@@ -421,7 +421,7 @@ class Zone_model extends CI_Model
     {
       $this->db->like('code', $txt)->or_like('name', $txt);
     }
-    
+
     $rs = $this->db->get('zone');
 
     if($rs->num_rows() > 0)
@@ -449,11 +449,11 @@ class Zone_model extends CI_Model
   public function get_new_data($last_sync)
   {
     $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, WhsCode AS warehouse_code, SL1Code AS old_code');
-    $this->ms->where('SysBin', 'N');
-    $this->ms->group_start();
+    //$this->ms->where('SysBin', 'N');
+    //$this->ms->group_start();
     $this->ms->where('createDate >=', sap_date($last_sync));
     $this->ms->or_where('updateDate >=', sap_date($last_sync));
-    $this->ms->group_end();
+    //$this->ms->group_end();
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)
     {
@@ -468,7 +468,7 @@ class Zone_model extends CI_Model
   {
     $this->ms->select('AbsEntry AS id, BinCode AS code, Descr AS name, SL1Code AS old_code, WhsCode AS warehouse_code');
     $this->ms->select('createDate, updateDate');
-    $this->ms->where('SysBin', 'N');
+    //$this->ms->where('SysBin', 'N');
     $rs = $this->ms->get('OBIN');
     if($rs->num_rows() > 0)
     {

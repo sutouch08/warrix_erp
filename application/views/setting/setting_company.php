@@ -83,9 +83,11 @@
       <div class="divider-hidden"></div>
 
       <div class="col-sm-9 col-sm-offset-3">
+				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
         <button type="button" class="btn btn-sm btn-success" onClick="checkCompanySetting()">
           <i class="fa fa-save"></i> บันทึก
         </button>
+				<?php endif; ?>
       </div>
       <div class="divider-hidden"></div>
 

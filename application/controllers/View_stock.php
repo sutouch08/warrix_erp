@@ -2,7 +2,7 @@
 class View_stock extends CI_Controller
 {
   public $title = 'เช็คสต็อก';
-	public $menu_code = 'view_stock';
+	public $menu_code = 'SOVIEW';
 	public $menu_group_code = 'SO';
 	public $pm;
 	public function __construct()

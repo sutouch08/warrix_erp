@@ -92,10 +92,15 @@ class Return_lend extends PS_Controller
       $zone = $this->zone_model->get($zone_code);
       $isManual = getConfig('MANUAL_DOC_CODE');
 
-      if($isManual == 0 OR empty($code))
+      if($this->input->post('code'))
+      {
+        $code = trim($this->input->post('code'));
+      }
+      else
       {
         $code = $this->get_new_code($date_add);
       }
+
 
 
       $arr = array(

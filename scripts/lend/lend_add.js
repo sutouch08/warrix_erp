@@ -306,7 +306,12 @@ function removeDetail(id, name){
 
 $("#pd-box").autocomplete({
 	source: BASE_URL + 'auto_complete/get_style_code',
-	autoFocus: true
+	autoFocus: true,
+  close:function(){
+    var rs = $(this).val();
+    var arr = rs.split(' | ');
+    $(this).val(arr[0]);
+  }
 });
 
 

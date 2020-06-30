@@ -11,11 +11,7 @@
 <ul id="myTab1" class="setting-tabs">
   <li class="li-block active"><a href="#general" data-toggle="tab">ทั่วไป</a></li>
 	<li class="li-block"><a href="#company" data-toggle="tab">ข้อมูลบริษัท</a></li>
-
-	<?php if($cando) : ?>
 	<li class="li-block"><a href="#system" data-toggle="tab">ระบบ</a></li>
-	<?php endif; ?>
-
 	<li class="li-block"><a href="#inventory" data-toggle="tab">คลังสินค้า</a></li>
   <li class="li-block"><a href="#order" data-toggle="tab">ออเดอร์</a></li>
   <li class="li-block"><a href="#document" data-toggle="tab">เลขที่เอกสาร</a></li>
@@ -33,10 +29,7 @@
 
 <!---  ตั้งค่าระบบ  ----------------------------------------------------->
 <?php
-	if($cando)
-	{
 		$this->load->view('setting/setting_system');
-	}
  ?>
 
 <!---  ตั้งค่าออเดอร์  --------------------------------------------------->
