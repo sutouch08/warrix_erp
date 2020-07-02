@@ -27,6 +27,7 @@ class Prepare extends PS_Controller
       'user'          => get_filter('user', 'prepare_user', ''),
       'channels'      => get_filter('channels', 'prepare_channels', ''),
       'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
+      'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
       'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
       'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
@@ -67,6 +68,7 @@ class Prepare extends PS_Controller
       'user'          => get_filter('user', 'prepare_user', ''),
       'channels'      => get_filter('channels', 'prepare_channels', ''),
       'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
+      'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
       'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
       'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
@@ -199,7 +201,7 @@ class Prepare extends PS_Controller
               }
               else
               {
-                $stock = $this->get_stock_zone($zone_code, $ds->product_code);
+                $stock = 1000; //$this->get_stock_zone($zone_code, $ds->product_code);
                 if($stock < $qty)
                 {
                   $sc = FALSE;
@@ -489,6 +491,7 @@ class Prepare extends PS_Controller
       'prepare_user',
       'prepare_channels',
       'prepare_is_term',
+      'prepare_is_online',
       'prepare_role',
       'prepare_from_date',
       'prepare_to_date',

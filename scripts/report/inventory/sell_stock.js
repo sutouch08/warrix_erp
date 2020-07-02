@@ -1,4 +1,4 @@
-var HOME = BASE_URL + 'report/inventory/stock_balance/';
+var HOME = BASE_URL + 'report/inventory/sell_stock/';
 
 function toggleAllProduct(option){
   $('#allProduct').val(option);
@@ -75,35 +75,11 @@ function toggleAllWarehouse(option){
 }
 
 
-function toggleDate(option){
-  $('#currentDate').val(option);
-  if(option == 1){
-    $('#btn-date-now').addClass('btn-primary');
-    $('#btn-date-range').removeClass('btn-primary');
-    $('#date').val('');
-    $('#date').attr('disabled', 'disabled');
-    return
-  }
-
-  if(option == 0){
-    $('#btn-date-now').removeClass('btn-primary');
-    $('#btn-date-range').addClass('btn-primary');
-    $('#date').removeAttr('disabled');
-  }
-}
-
-$('#date').datepicker({
-  dateFormat:'dd-mm-yy'
-});
-
-
 function getReport(){
   var allProduct = $('#allProduct').val();
   var allWhouse = $('#allWarehouse').val();
-  var currentDate = $('#currentDate').val();
   var pdFrom = $('#pdFrom').val();
   var pdTo = $('#pdTo').val();
-  var date = $('#date').val();
 
   if(allProduct == 0){
     if(pdFrom.length == 0){
@@ -127,33 +103,17 @@ function getReport(){
 
   if(allWhouse == 0){
     var count = $('.chk:checked').length;
-    console.log(count);
     if(count == 0){
       $('#wh-modal').modal('show');
       return false;
     }
   }
 
-  if(currentDate == 0){
-    if(date == ''){
-      $('#date').addClass('has-error');
-      return false;
-    }else{
-      $('#date').removeClass('has-error');
-    }
-  }
-  else
-  {
-    $('#date').removeClass('has-error');
-  }
-
   var data = [
     {'name' : 'allProduct', 'value' : allProduct},
     {'name' : 'allWhouse' , 'value' : allWhouse},
-    {'name' : 'currentDate' , 'value' : currentDate},
     {'name' : 'pdFrom', 'value' : pdFrom},
-    {'name' : 'pdTo', 'value' : pdTo},
-    {'name' : 'date', 'value' : date}
+    {'name' : 'pdTo', 'value' : pdTo}
   ];
 
   if(allWhouse == 0){
@@ -190,10 +150,10 @@ function getReport(){
 function doExport(){
   var allProduct = $('#allProduct').val();
   var allWhouse = $('#allWarehouse').val();
-  var currentDate = $('#currentDate').val();
   var pdFrom = $('#pdFrom').val();
   var pdTo = $('#pdTo').val();
-  var date = $('#date').val();
+  var token = new Date().getTime();
+  $('#token').val(token);
 
   if(allProduct == 0){
     if(pdFrom.length == 0){
@@ -217,46 +177,31 @@ function doExport(){
 
   if(allWhouse == 0){
     var count = $('.chk:checked').length;
-    console.log(count);
     if(count == 0){
       $('#wh-modal').modal('show');
       return false;
     }
   }
 
-  if(currentDate == 0){
-    if(date == ''){
-      $('#date').addClass('has-error');
-      return false;
-    }else{
-      $('#date').removeClass('has-error');
-    }
-  }
-  else
-  {
-    $('#date').removeClass('has-error');
-  }
-
-  var data = [
-    {'name' : 'allProduct', 'value' : allProduct},
-    {'name' : 'allWhouse' , 'value' : allWhouse},
-    {'name' : 'currentDate' , 'value' : currentDate},
-    {'name' : 'pdFrom', 'value' : pdFrom},
-    {'name' : 'pdTo', 'value' : pdTo},
-    {'name' : 'date', 'value' : date}
-  ];
-
-  if(allWhouse == 0){
-    $('.chk').each(function(index, el) {
-      if($(this).is(':checked')){
-        let names = 'warehouse['+$(this).val()+']';
-        data.push({'name' : names, 'value' : $(this).val() });
-      }
-    });
-  }
-
-  $('#reportForm').submit();
+  // var data = [
+  //   {'name' : 'allProduct', 'value' : allProduct},
+  //   {'name' : 'allWhouse' , 'value' : allWhouse},
+  //   {'name' : 'pdFrom', 'value' : pdFrom},
+  //   {'name' : 'pdTo', 'value' : pdTo}
+  // ];
   //
+  // if(allWhouse == 0){
+  //   $('.chk').each(function(index, el) {
+  //     if($(this).is(':checked')){
+  //       let names = 'warehouse['+$(this).val()+']';
+  //       data.push({'name' : names, 'value' : $(this).val() });
+  //     }
+  //   });
+  // }
+
+  get_download(token);
+  $('#reportForm').submit();
+
   // data = $.param(data);
   //
   // var token = new Date().getTime();

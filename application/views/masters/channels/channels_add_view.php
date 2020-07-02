@@ -37,6 +37,16 @@
   </div>
 
 	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right"></label>
+    <div class="col-xs-12 col-sm-3">
+			<label>
+				<input type="checkbox" class="ace" name="is_online" id="is_online" value="1"  />
+				<span class="lbl">&nbsp; &nbsp;Online</span>
+			</label>
+    </div>
+  </div>
+
+	<div class="form-group">
     <label class="col-sm-3 control-label no-padding-right">ลูกค้าเริ่มต้น</label>
     <div class="col-xs-12 col-sm-3">
 			<span class="input-icon input-icon-right width-100">

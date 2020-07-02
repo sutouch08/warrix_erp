@@ -1265,7 +1265,7 @@ public function export_receive($code)
                   'U_ECOMNO' => $rs->receive_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => remove_vat($rs->price),

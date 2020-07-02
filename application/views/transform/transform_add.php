@@ -37,24 +37,31 @@
     <input type="text" class="form-control input-sm text-center" name="date" id="date" value="<?php echo date('d-m-Y'); ?>" required />
   </div>
 
-  <div class="col-sm-5 padding-5">
+  <div class="col-sm-3 col-3-harf padding-5">
     <label>ลูกค้า[ในระบบ]</label>
     <input type="text" class="form-control input-sm" name="customer" id="customer" value="" required />
   </div>
 
-	<div class="col-sm-4 padding-5 last">
+	<div class="col-sm-2 col-2-harf padding-5">
     <label>ผู้เบิก[คนสั่ง]</label>
     <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
-	<div class="col-sm-3 padding-5 first">
+	<div class="col-sm-3 padding-5 last">
 		<label>โซนแปรสภาพ</label>
 		<input type="text" class="form-control input-sm" name="zone" id="zone" placeholder="ระบุโซนแปรสภาพ" value="">
 	</div>
+	<div class="col-sm-2 col-2-harf col-xs-12 padding-5 first">
+		<label>คลัง</label>
+    <select class="form-control input-sm" name="warehouse" id="warehouse" required>
+			<option value="">เลือกคลัง</option>
+			<?php echo select_sell_warehouse(); ?>
+		</select>
+  </div>
   <div class="col-sm-8 padding-5">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="">
   </div>
-  <div class="col-sm-1 padding-5 last">
+  <div class="col-sm-1 col-1-harf padding-5 last">
     <label class="display-block not-show">Submit</label>
     <button type="button" class="btn btn-xs btn-success btn-block" onclick="add()"><i class="fa fa-plus"></i> เพิ่ม</button>
   </div>

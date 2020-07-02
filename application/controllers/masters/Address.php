@@ -75,8 +75,8 @@ class Address extends PS_Controller
   {
     $this->load->library('printer');
     $this->load->model('inventory/qc_model');
-    $id_address = $id_address === '' ? $this->address_model->get_id($customer_code) : $id_address;
-    $id_sender = $id_sender === '' ? $this->transport_model->get_id($customer_code) : $id_sender;
+    $id_address = empty($id_address) ? $this->address_model->get_id($customer_code) : $id_address;
+    $id_sender = empty($id_sender) ? $this->transport_model->get_id($customer_code) : $id_sender;
     $ds = array(
       'reference' => $code,
       'boxes' => $this->qc_model->count_box($code),

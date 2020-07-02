@@ -81,6 +81,28 @@ class Menu extends CI_Model{
   }
 
 
+  public function get_valid_menus_by_group($group_code, $all = TRUE)
+  {
+    $this->db
+    ->where('group_code', $group_code)
+    ->where('active', 1);
+    if($all === FALSE)
+    {
+      $this->db->where('sub_group IS NULL', NULL, FALSE)
+      ->where('url IS NOT NULL');
+    }
+
+    $this->db->order_by('position', 'ASC');
+    $rs = $this->db->where('valid', 1)->get('menu');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+    return FALSE;
+
+  }
+
+
   public function count_menu($group_code)
   {
     return $this->db->where('group_code', $group_code)->count_all_results('menu');

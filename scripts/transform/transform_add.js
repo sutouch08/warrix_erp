@@ -122,6 +122,7 @@ function addOrder(){
   var role = $('#role').val();
   var zoneCode = $('#zoneCode').val();
   var zoneName = $('#zone').val();
+  var warehouse_code = $('#warehouse').val();
 
   if(customer_code.length == 0 || customer_name.length == 0){
     swal('ชื่อผู้รับไม่ถูกต้อง');
@@ -144,6 +145,11 @@ function addOrder(){
   if(zoneCode.length == 0 || zoneName.length == 0 )
   {
     swal('โซนแปรสภาพไม่ถูกต้อง');
+    return false;
+  }
+
+  if(warehouse_code.length == 0){
+    swal('กรุณาเลือกคลัง');
     return false;
   }
 
@@ -312,28 +318,51 @@ function countInput(){
 
 
 
+
 function validUpdate(){
-	var date_add = $("#date").val();
-	var customer_code = $("#customerCode").val();
+  var customer_code = $('#customerCode').val();
   var customer_name = $('#customer').val();
-	var user_ref = $("#user_ref").val();
+  var date_add = $('#date').val();
+  var empName = $('#empName').val();
+  var role = $('#role').val();
+  var zoneCode = $('#zoneCode').val();
+  var zoneName = $('#zone').val();
+  var warehouse_code = $('#warehouse').val();
+
+  if(customer_code.length == 0 || customer_name.length == 0){
+    swal('ชื่อผู้รับไม่ถูกต้อง');
+    return false;
+  }
+
+  if(!isDate(date_add))
+  {
+    swal('วันที่ไม่ถูกต้อง');
+    console.log('date error');
+    return false;
+  }
+
+  if(empName.length == 0)
+  {
+    swal('ชื่อผู้เบิกไม่ถูกต้อง');
+    return false;
+  }
+
+  if(zoneCode.length == 0 || zoneName.length == 0 )
+  {
+    swal('โซนแปรสภาพไม่ถูกต้อง');
+    return false;
+  }
+
+  if(warehouse_code.length == 0){
+    swal('กรุณาเลือกคลัง');
+    return false;
+  }
 
 	//---- ตรวจสอบวันที่
 	if( ! isDate(date_add) ){
 		swal("วันที่ไม่ถูกต้อง");
 		return false;
 	}
-
-	//--- ตรวจสอบลูกค้า
-	if( customer_code.length == 0 || customer_name == "" ){
-		swal("ชื่อลูกค้าไม่ถูกต้อง");
-		return false;
-	}
-
-  if(user_ref == ""){
-    swal('กรุณาระบุผู้เบิก[ผู้สั่งงาน]');
-    return false;
-  }
 
   updateOrder();
 }
@@ -347,8 +376,11 @@ function updateOrder(){
 	var date_add = $("#date").val();
 	var customer_code = $("#customerCode").val();
   var customer_name = $("#customer").val();
-	var user_ref = $('#user_ref').val();
+	var user_ref = $('#empName').val();
 	var remark = $("#remark").val();
+  var zoneCode = $('#zoneCode').val();
+  var zoneName = $('#zone').val();
+  var warehouse_code = $('#warehouse').val();
 
 	load_in();
 
@@ -361,6 +393,8 @@ function updateOrder(){
   		"date_add"	: date_add,
   		"customer_code" : customer_code,
       "user_ref" : user_ref,
+      "zone_code" : zoneCode,
+      "warehouse_code" : warehouse_code,      
   		"remark" : remark,
     },
 		success: function(rs){

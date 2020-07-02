@@ -38,12 +38,22 @@
     </select>
   </div>
 
-	<div class="col-sm-1 col-1-harf padding-5">
+
+	<!-- <div class="col-sm-1 col-1-harf padding-5">
     <label>การชำระเงิน</label>
 		<select class="form-control input-sm" name="is_term" onchange="getSearch()">
       <option value="2">ทั้งหมด</option>
       <option value="1" <?php echo is_selected($is_term, '1'); ?>>เครดิต</option>
 			<option value="0" <?php echo is_selected($is_term, '0'); ?>>เงินสด</option>
+    </select>
+  </div> -->
+
+	<div class="col-sm-1 col-1-harf padding-5">
+    <label>ออนไลน์</label>
+		<select class="form-control input-sm" name="is_online" onchange="getSearch()">
+      <option value="2">ทั้งหมด</option>
+      <option value="1" <?php echo is_selected($is_online, '1'); ?>>ออนไลน์</option>
+			<option value="0" <?php echo is_selected($is_online, '0'); ?>>ออฟไลน์</option>
     </select>
   </div>
 

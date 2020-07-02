@@ -64,11 +64,13 @@ class Channels extends PS_Controller
       $name = $this->input->post('name');
       $customer_code = $this->input->post('customer_code');
       $customer_name = $this->input->post('customer_name');
+      $is_online = $this->input->post('is_online');
       $ds = array(
         'code' => $code,
         'name' => $name,
         'customer_code' => empty($customer_code) ? NULL : $customer_code,
-        'customer_name' => empty($customer_name) ? NULL : $customer_code
+        'customer_name' => empty($customer_name) ? NULL : $customer_code,
+        'is_online' => empty($is_online) ? 0 : 1
       );
 
       if($this->channels_model->is_exists($code) === TRUE)
@@ -131,12 +133,14 @@ class Channels extends PS_Controller
       $name = $this->input->post('name');
       $customer_code = $this->input->post('customer_code');
       $customer_name = $this->input->post('customer_name');
+      $is_online = $this->input->post('is_online');
 
       $ds = array(
         'code' => $code,
         'name' => $name,
         'customer_code' => empty($customer_code) ? NULL : $customer_code,
-        'customer_name' => empty($customer_name) ? NULL : $customer_name
+        'customer_name' => empty($customer_name) ? NULL : $customer_name,
+        'is_online' => empty($is_online) ? 0 : 1
       );
 
       if($sc === TRUE && $this->channels_model->is_exists($code, $old_code) === TRUE)
@@ -202,6 +206,42 @@ class Channels extends PS_Controller
     redirect($this->home);
   }
 
+
+  public function toggle_online()
+  {
+    $sc = TRUE;
+    $code = $this->input->post('code');
+    if(!empty($code))
+    {
+      $current = $this->input->post('is_online');
+
+      $option = empty($current) ? 1 : 0;
+      $arr = array(
+        'is_online' => $option
+      );
+
+      if($this->pm->can_add OR $this->pm->can_edit)
+      {
+        if(! $this->channels_model->update($code, $arr))
+        {
+          $sc = FALSE;
+          $this->error = "Update failed";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "No Permission";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Channels Code not found";
+    }
+
+    echo $sc === TRUE ? $option : $this->error;
+  }
 
 
   public function clear_filter()

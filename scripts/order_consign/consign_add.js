@@ -107,6 +107,7 @@ function addOrder(){
   var date_add = $('#date').val();
   var zone_code = $('#zone_code').val();
   var zone_name = $('#zone').val();
+  var warehouse = $('#warehouse').val();
 
   if(customer_code.length == 0 || customer_name.length == 0){
     swal('ชื่อลูกค้าไม่ถูกต้อง');
@@ -122,6 +123,11 @@ function addOrder(){
   if(zone_code.length == 0 || zone_name.length == 0)
   {
     swal('โซนไม่ถูกต้อง');
+    return false;
+  }
+
+  if(warehouse.length == 0){
+    swal('กรุณาเลือกคลัง');
     return false;
   }
 
@@ -296,6 +302,8 @@ function validUpdate(){
   var customer_name = $('#customer').val();
 	var zone_code = $('#zone_code').val();
   var zone_name = $('#zone').val();
+  var warehouse = $('#warehouse').val();
+
 	//---- ตรวจสอบวันที่
 	if( ! isDate(date_add) ){
 		swal("วันที่ไม่ถูกต้อง");
@@ -314,6 +322,11 @@ function validUpdate(){
     return false;
   }
 
+  if(warehouse.length == 0){
+    swal('กรุณาเลือกคลัง');
+    return false;
+  }
+
   updateOrder();
 }
 
@@ -327,6 +340,7 @@ function updateOrder(){
 	var customer_code = $("#customerCode").val();
   var zone_code = $('#zone_code').val();
   var gp = $('#gp').val();
+  var warehouse = $('#warehouse').val();
 	var remark = $("#remark").val();
 
 	load_in();
@@ -341,7 +355,8 @@ function updateOrder(){
   		"customer_code" : customer_code,
       "gp" : gp,
   		"remark" : remark,
-      "zone_code" : zone_code
+      "zone_code" : zone_code,
+      "warehouse_code" : warehouse
     },
 		success: function(rs){
 			load_out();

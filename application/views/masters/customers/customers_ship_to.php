@@ -64,6 +64,7 @@
             <div class="modal-body">
             <form id="addAddressForm"	>
             <input type="hidden" name="id_address" id="id_address" />
+            <input type="hidden" name="customer_ref" id="customer_ref" value="<?php echo $ds->code; ?>" />
             <div class="row">
             	<div class="col-sm-12 col-xs-12">
                 	<label class="input-label">ชื่อ</label>

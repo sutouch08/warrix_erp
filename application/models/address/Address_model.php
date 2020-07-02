@@ -19,6 +19,18 @@ class Address_model extends CI_Model
   }
 
 
+  public function get_shipping_address_by_code($code)
+  {
+    $rs = $this->db->where('code', $code)->limit(1)->get('address_ship_to');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+
 
   public function get_default_address($code)
   {

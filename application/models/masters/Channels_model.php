@@ -94,6 +94,21 @@ class Channels_model extends CI_Model
     return FALSE;
   }
 
+
+  public function get_online_list()
+  {
+    $rs = $this->db->where('is_online', 1)->get('channels');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+
   public function get_name($code)
   {
     $rs = $this->db->select('name')->where('code', $code)->get('channels');

@@ -289,7 +289,7 @@ class Receive_transform extends PS_Controller
       {
         if($qty > 0 && $rs->receive_qty > 0)
         {
-          $diff = $rs->receive_qty - $rs->qty;
+          $diff = $rs->receive_qty - $qty;
           if($diff >= 0 )
           {
             //--- ถ้า dif มากกว่ายอดที่รับมาให้ใช้ยอดรับ

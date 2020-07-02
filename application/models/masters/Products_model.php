@@ -516,6 +516,18 @@ class Products_model extends CI_Model
   }
 
 
+  public function get_with_old_code($code)
+  {
+    $rs = $this->db->where('code', $code)->or_where('old_code', $code)->get('products');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return FALSE;
+  }
+
+
 
   public function get_name($code)
   {

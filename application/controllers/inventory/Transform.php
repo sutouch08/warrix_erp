@@ -28,6 +28,7 @@ class Transform extends PS_Controller
     $this->load->helper('state');
     $this->load->helper('product_images');
     $this->load->helper('transform');
+    $this->load->helper('warehouse');
   }
 
 
@@ -98,10 +99,11 @@ class Transform extends PS_Controller
       {
         $code = $this->get_new_code($date_add);
       }
-      
+
       $role = 'T'; //--- T = เบิกแปรสภาพ
       $zone_code = $this->input->post('zoneCode');
-      $warehouse_code = $this->zone_model->get_warehouse_code($zone_code);
+      $warehouse_code = $this->input->post('warehouse');
+      //$warehouse_code = $this->zone_model->get_warehouse_code($zone_code);
 
       $ds = array(
         'code' => $code,
@@ -201,8 +203,11 @@ class Transform extends PS_Controller
       $this->load->model('masters/zone_model');
 
       $code = $this->input->post('order_code');
-      $zone_code = $this->input->post('zoneCode');
-      $warehouse_code = $this->zone_model->get_warehouse_code($zone_code);
+      $customer_code = $this->input->post('customer_code');
+      $zone_code = $this->input->post('zone_code');
+      $warehouse_code = $this->input->post('warehouse_code');
+      $user_ref = $this->input->post('user_ref');
+      $remark = get_null($this->input->post('remark'));
 
       $ds = array(
         'customer_code' => $this->input->post('customer_code'),
@@ -211,7 +216,8 @@ class Transform extends PS_Controller
         'remark' => $this->input->post('remark'),
         'status' => 0,
         'zone_code' => $zone_code,
-        'warehouse_code' => $warehouse_code
+        'warehouse_code' => $warehouse_code,
+        'remark' => $remark
       );
 
       $rs = $this->orders_model->update($code, $ds);

@@ -91,6 +91,7 @@ function saveShipTo()
 	var province  = $('#province').val();
 	var email			= $("#email").val();
 	var alias 		= $("#alias").val();
+	var cust_ref = $('#customer_ref').val();
 
 	if(code == ''){
 		swal('กรุณาระบุชื่อลูกค้า');
@@ -138,6 +139,7 @@ function saveShipTo()
 
 	ds.push( {"name" : "id_address", "value" : $("#id_address").val() } );
 	ds.push( {"name" : "customer_code", "value" : code});
+	ds.push( {"name" : "customer_ref", "value" : cust_ref});
 	ds.push( {"name" : "name", "value" : name } );
 	ds.push( {"name" : "address", "value" : $("#address1").val() } );
 	ds.push( {"name" : "sub_district", "value" : $("#sub_district").val() } );

@@ -56,3 +56,29 @@ $('#customer_name').autocomplete({
 		}
 	}
 })
+
+
+function toggleOnline(code){
+  var option = $('#online-'+code).val();
+  $.ajax({
+    url:BASE_URL + 'masters/channels/toggle_online',
+    type:'POST',
+    cache:false,
+    data:{
+      'code' : code,
+      'is_online' : option
+    },
+    success:function(rs){
+      var rs = $.trim(rs);
+      if(rs == '1'){
+        $('#online-label-'+code).html('<i class="fa fa-check green"></i>');
+        $('#online-'+code).val(rs);
+      }else if(rs == '0'){
+        $('#online-label-'+code).html('<i class="fa fa-times"></i>');
+        $('#online-'+code).val(rs);
+      }else{
+        swal('Error', rs, 'error');
+      }
+    }
+  })
+}

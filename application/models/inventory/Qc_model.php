@@ -341,14 +341,17 @@ class Qc_model extends CI_Model
 
   public function get_box_details($order_code, $box_id)
   {
-    $qr = "SELECT b.box_no, od.product_code, od.product_name, qc.qty
-           FROM qc
-           JOIN order_details AS od ON od.order_code = qc.order_code
-           AND od.product_code = qc.product_code
-           JOIN qc_box AS b ON b.id = qc.box_id
-           WHERE qc.order_code = '{$order_code}'
-           AND qc.box_id = {$box_id}";
-    $rs = $this->db->query($qr);
+    $rs = $this->db
+    ->select('b.box_no')
+    ->select('od.product_code, od.product_name')
+    ->select('qc.qty')
+    ->from('qc')
+    ->join('order_details AS od', 'od.order_code = qc.order_code AND od.product_code = qc.product_code')
+    ->join('qc_box AS b', 'b.id = qc.box_id')
+    ->where('qc.order_code', $order_code)
+    ->where('qc.box_id', $box_id)
+    ->get();
+    
     if($rs->num_rows() > 0)
     {
       return $rs->result();

@@ -151,7 +151,7 @@ function validateOrder(){
   var runNo = parseInt($('#runNo').val());
   let code = $('#code').val();
   if(code.length == 0){
-    swal("เลขที่เอกสารไม่ถูกต้อง");
+    addOrder();
     return false;
   }
 

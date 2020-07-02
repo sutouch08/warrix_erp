@@ -252,7 +252,7 @@ class Orders extends PS_Controller
           $qty = ceil($qty);
 
           //---- ยอดสินค้าที่่สั่งได้
-          $sumStock = $this->get_sell_stock($code);
+          $sumStock = $this->get_sell_stock($code, $order->warehouse_code);
 
 
           //--- ถ้ามีสต็อกมากว่าที่สั่ง หรือ เป็นสินค้าไม่นับสต็อก
@@ -1315,12 +1315,13 @@ class Orders extends PS_Controller
       $this->load->model('address/address_model');
       $id = $this->input->post('id_address');
       $cus_ref = $this->input->post('customer_ref');
+      $customer_code = $this->input->post('customer_code');
 
       if(!empty($id))
       {
         $arr = array(
           'code' => $cus_ref,
-          'customer_code' => NULL,
+          'customer_code' => $customer_code,
           'name' => trim($this->input->post('name')),
           'address' => trim($this->input->post('address')),
           'sub_district' => trim($this->input->post('sub_district')),
@@ -1347,7 +1348,7 @@ class Orders extends PS_Controller
         $arr = array(
           'address_code' => $this->address_model->get_new_code($this->input->post('customer_ref')),
           'code' => $cus_ref,
-          'customer_code' => NULL,
+          'customer_code' => $customer_code,
           'name' => trim($this->input->post('name')),
           'address' => trim($this->input->post('address')),
           'sub_district' => trim($this->input->post('sub_district')),

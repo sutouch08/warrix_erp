@@ -162,13 +162,25 @@ class User_model extends CI_Model
   {
     if(!empty($menu))
     {
-      // $user_pm = $this->get_user_permission($menu, $uid);
-      // if($user_pm !== FALSE)
-      // {
-      //   return $user_pm;
-      // }
+      $rs = $this->db->where('code', $menu)->get('menu');
+      if($rs->num_rows() === 1)
+      {
+        if($rs->row()->valid == 1)
+        {
+          return $this->get_profile_permission($menu, $id_profile);
+        }
+        else
+        {
+          $ds = new stdClass();
+          $ds->can_view = 1;
+          $ds->can_add = 1;
+          $ds->can_edit = 1;
+          $ds->can_delete = 1;
+          $ds->can_approve = 1;
+          return $ds;
+        }
+      }
 
-      return $this->get_profile_permission($menu, $id_profile);
     }
 
     return FALSE;

@@ -1,40 +1,39 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class Stock_balance extends PS_Controller
+class Sell_stock extends PS_Controller
 {
-  public $menu_code = 'RICSTB';
+  public $menu_code = 'RICSST';
 	public $menu_group_code = 'RE';
   public $menu_sub_group_code = 'REINVT';
-	public $title = 'รายงานสินค้าคงเหลือ';
+	public $title = 'รายงานสินค้าคงเหลือ(หักยอดจอง)';
   public $filter;
   public function __construct()
   {
     parent::__construct();
-    $this->home = base_url().'report/inventory/stock_balance';
+    $this->home = base_url().'report/inventory/sell_stock';
     $this->load->model('report/inventory/inventory_report_model');
     $this->load->model('masters/products_model');
+    $this->load->model('orders/orders_model');
   }
 
   public function index()
   {
     $this->load->model('masters/warehouse_model');
-    $whList = $this->warehouse_model->get_all_warehouse();
+    $whList = $this->warehouse_model->get_sell_warehouse_list();
     $ds['whList'] = $whList;
-    $this->load->view('report/inventory/report_stock_balance', $ds);
+    $this->load->view('report/inventory/report_sell_stock', $ds);
   }
 
 
   public function get_report()
   {
+    $limit = 2000;
     $allProduct = $this->input->get('allProduct');
     $pdFrom = $this->input->get('pdFrom');
     $pdTo = $this->input->get('pdTo');
-
     $allWhouse = $this->input->get('allWhouse');
     $warehouse = $this->input->get('warehouse');
 
-    $currentDate = $this->input->get('currentDate');
-    $date = $this->input->get('date');
 
     $wh_list = '';
     if(!empty($warehouse))
@@ -48,50 +47,56 @@ class Stock_balance extends PS_Controller
     }
 
     //---  Report title
-    $sc['reportDate'] = $currentDate == 0 ? thai_date($date,FALSE, '/') : thai_date(date('Y-m-d'),FALSE, '/');
+    $sc['reportDate'] = thai_date(date('Y-m-d'),FALSE, '/');
     $sc['whList']   = $allWhouse == 1 ? 'ทั้งหมด' : $wh_list;
     $sc['productList']   = $allProduct == 1 ? 'ทั้งหมด' : '('.$pdFrom.') - ('.$pdTo.')';
 
+    $result = $this->inventory_report_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
 
-    if($currentDate == 1)
-    {
-      $result = $this->inventory_report_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
-    }
-    else
-    {
-      $result = $this->inventory_report_model->get_stock_balance_prev_date($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse, $date);
-    }
+
 
     $bs = array();
 
     if(!empty($result))
     {
+      $count = count($result);
+
+      if($count > $limit)
+      {
+        echo 'ผลลัพธ์ของรายงานมีมากกว่า '.number($limit).' รายการ กรุณาส่งออกเป็นไฟล์ Excel แทนการแสดงผลหน้าจอ';
+        exit;
+      }
+
       $no = 1;
       $totalQty = 0;
       $totalAmount = 0;
+
       foreach($result as $rs)
       {
         $item = $this->products_model->get($rs->product_code);
         if(!empty($item))
         {
+          $reserv_stock = $this->inventory_report_model->get_reserv_stock($item->code, $warehouse);
+          $availableStock = $rs->qty - $reserv_stock;
+
           $arr = array(
             'no' => number($no),
-            'barcode' => $item->barcode,
             'pdCode' => $item->code,
+            'oldCode' => $item->old_code,
             'pdName' => $item->name,
             'cost' => number($item->cost, 2),
-            'qty' => number($rs->qty),
-            'amount' => number($item->cost * $rs->qty, 2)
+            'qty' => number($availableStock),
+            'amount' => number($item->cost * $availableStock, 2)
           );
 
           array_push($bs, $arr);
           $no++;
 
-          $totalQty += $rs->qty;
-          $totalAmount += ($rs->qty * $item->cost);
+          $totalQty += $availableStock;
+          $totalAmount += ($availableStock * $item->cost);
         }
 
-      }
+      } //--- end foreach
 
       $arr = array(
         'totalQty' => number($totalQty),
@@ -99,8 +104,6 @@ class Stock_balance extends PS_Controller
       );
 
       array_push($bs, $arr);
-
-      $bs;
     }
     else
     {
@@ -122,12 +125,10 @@ class Stock_balance extends PS_Controller
     $allProduct = $this->input->post('allProduct');
     $pdFrom = $this->input->post('pdFrom');
     $pdTo = $this->input->post('pdTo');
-
     $allWhouse = $this->input->post('allWhouse');
     $warehouse = $this->input->post('warehouse');
+    $token = $this->input->post('token');
 
-    $currentDate = $this->input->post('currentDate');
-    $date = $this->input->post('date');
 
     $wh_list = '';
     if(!empty($warehouse))
@@ -142,24 +143,17 @@ class Stock_balance extends PS_Controller
 
 
     //---  Report title
-    $report_title = 'รายงานสินค้าคงเหลือ ณ วันที่  '.thai_date(date('Y-m-d'), '/').'      (  วันที่พิมพ์รายงาน : '.date('d/m/Y').'  เวลา : '.date('H:i:s').' )';
+    $report_title = 'รายงานสินค้าคงเหลือ(หักยอดจอง) ณ วันที่  '.thai_date(date('Y-m-d'), '/');
     $wh_title     = 'คลัง :  '. ($allWhouse == 1 ? 'ทั้งหมด' : $wh_list);
     $pd_title     = 'สินค้า :  '. ($allProduct == 1 ? 'ทั้งหมด' : '('.$pdFrom.') - ('.$pdTo.')');
 
-    if($currentDate == 1)
-    {
-      $result = $this->stock_balance_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
-    }
-    else
-    {
-      $result = $this->stock_balance_model->get_stock_balance_prev_date($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse, $date);
-    }
+    $result = $this->inventory_report_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
 
     //--- load excel library
     $this->load->library('excel');
 
     $this->excel->setActiveSheetIndex(0);
-    $this->excel->getActiveSheet()->setTitle('Stock Balance Report');
+    $this->excel->getActiveSheet()->setTitle('Sell Stock Report');
 
     //--- set report title header
     $this->excel->getActiveSheet()->setCellValue('A1', $report_title);
@@ -171,8 +165,8 @@ class Stock_balance extends PS_Controller
 
     //--- set Table header
     $this->excel->getActiveSheet()->setCellValue('A4', 'ลำดับ');
-    $this->excel->getActiveSheet()->setCellValue('B4', 'บาร์โค้ด');
-    $this->excel->getActiveSheet()->setCellValue('C4', 'รหัส');
+    $this->excel->getActiveSheet()->setCellValue('B4', 'รหัส');
+    $this->excel->getActiveSheet()->setCellValue('C4', 'รหัสเก่า');
     $this->excel->getActiveSheet()->setCellValue('D4', 'สินค้า');
     $this->excel->getActiveSheet()->setCellValue('E4', 'ทุน');
     $this->excel->getActiveSheet()->setCellValue('F4', 'จำนวน');
@@ -181,18 +175,27 @@ class Stock_balance extends PS_Controller
     $row = 5;
     if(!empty($result))
     {
+
       $no = 1;
       foreach($result as $rs)
       {
-        $this->excel->getActiveSheet()->setCellValue('A'.$row, $no);
-        $this->excel->getActiveSheet()->setCellValue('B'.$row, $rs->barcode);
-        $this->excel->getActiveSheet()->setCellValue('C'.$row, $rs->code);
-        $this->excel->getActiveSheet()->setCellValue('D'.$row, $rs->name);
-        $this->excel->getActiveSheet()->setCellValue('E'.$row, $rs->cost);
-        $this->excel->getActiveSheet()->setCellValue('F'.$row, $rs->qty);
-        $this->excel->getActiveSheet()->setCellValue('G'.$row, '=E'.$row.'*F'.$row);
-        $no++;
-        $row++;
+        $item = $this->products_model->get($rs->product_code);
+        if(!empty($item))
+        {
+          $reserv_stock = $this->inventory_report_model->get_reserv_stock($item->code, $warehouse);
+          $availableStock = $rs->qty - $reserv_stock;
+
+          $this->excel->getActiveSheet()->setCellValue('A'.$row, $no);
+          $this->excel->getActiveSheet()->setCellValue('B'.$row, $item->code);
+          $this->excel->getActiveSheet()->setCellValue('C'.$row, $item->old_code);
+          $this->excel->getActiveSheet()->setCellValue('D'.$row, $item->name);
+          $this->excel->getActiveSheet()->setCellValue('E'.$row, $item->cost);
+          $this->excel->getActiveSheet()->setCellValue('F'.$row, $availableStock);
+          $this->excel->getActiveSheet()->setCellValue('G'.$row, '=E'.$row.'*F'.$row);
+          $no++;
+          $row++;
+        }
+
       }
 
       $res = $row -1;
@@ -209,8 +212,8 @@ class Stock_balance extends PS_Controller
       $this->excel->getActiveSheet()->getStyle('G5:G'.$row)->getNumberFormat()->setFormatCode('#,##0.00');
     }
 
-
-    $file_name = "Report Stock Balance.xlsx";
+    setToken($token);
+    $file_name = "Report Sell Stock.xlsx";
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
     header('Content-Disposition: attachment;filename="'.$file_name.'"');
     $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');

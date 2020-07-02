@@ -29,6 +29,7 @@ class Consign_tr extends PS_Controller
     $this->load->helper('product_images');
     $this->load->helper('discount');
     $this->load->helper('zone');
+    $this->load->helper('warehouse');
 
     $this->filter = getConfig('STOCK_FILTER');
   }
@@ -213,7 +214,8 @@ class Consign_tr extends PS_Controller
       }
 
       $role = 'N'; //--- C = ฝากขายโอนคลัง
-      $zone = $this->zone_model->get($this->input->post('zone_code'));
+      $zone = $this->input->post('zone_code');
+      $warehouse_code = $this->input->post('warehouse');
       if(!empty($zone))
       {
         $ds = array(
@@ -225,8 +227,8 @@ class Consign_tr extends PS_Controller
           'gp' => $this->input->post('gp'),
           'user' => get_cookie('uname'),
           'remark' => $this->input->post('remark'),
-          'zone_code' => $zone->code,
-          'warehouse_code' => $zone->warehouse_code
+          'zone_code' => $zone,
+          'warehouse_code' => $warehouse_code
         );
 
         if($this->orders_model->add($ds) === TRUE)
@@ -328,7 +330,8 @@ class Consign_tr extends PS_Controller
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
-      $zone = $this->zone_model->get($this->input->post('zone_code'));
+      $zone = $$this->input->post('zone_code');
+      $warehouse_code = $this->input->post('warehouse_code');
       if(!empty($code))
       {
         $ds = array(
@@ -336,8 +339,8 @@ class Consign_tr extends PS_Controller
           'gp' => $this->input->post('gp'),
           'date_add' => db_date($this->input->post('date_add')),
           'remark' => $this->input->post('remark'),
-          'zone_code' => $zone->code,
-          'warehouse_code' => $zone->warehouse_code
+          'zone_code' => $code,
+          'warehouse_code' => $warehouse_code
         );
 
         $rs = $this->orders_model->update($code, $ds);

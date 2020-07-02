@@ -48,6 +48,7 @@
 					<th class="width-15 middle">รหัส</th>
 					<th class="width-20 middle">ชื่อ</th>
 					<th class="width-30 middle">ลูกค้าเริ่มต้น</th>
+					<th class="width-5 middle text-center">Online</th>
 					<th class="width-5 middle text-center">Default</th>
 					<th class="width-15 middle">ปรับปรุง</th>
 					<th></th>
@@ -62,6 +63,24 @@
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle"><?php echo $rs->customer_name; ?></td>
+						<td class="middle text-center">
+						<?php if($this->pm->can_edit) : ?>
+							<input type="hidden" id="online-<?php echo $rs->code; ?>" value="<?php echo $rs->is_online; ?>" />
+								<a href="javascript:void(0)" id="online-label-<?php echo $rs->code; ?>" onclick="toggleOnline('<?php echo $rs->code; ?>')">
+									<?php if($rs->is_online) : ?>
+									<i class="fa fa-check green"></i>
+									<?php else : ?>
+									<i class="fa fa-times"></i>
+									<?php endif; ?>
+								</a>
+						<?php else : ?>
+							<?php if($rs->is_online) : ?>
+							<i class="fa fa-check green"></i>
+							<?php else : ?>
+							<i class="fa fa-times"></i>
+							<?php endif; ?>
+						<?php endif; ?>
+						</td>
 						<td class="middle text-center">
 							<?php if($rs->is_default) : ?>
 								<i class="fa fa-check green"></i>

@@ -7,7 +7,7 @@ class Sync_data extends CI_Controller
 	public $menu_code = '';
 	public $menu_group_code = '';
 	public $pm;
-  public $limit = 10;
+  public $limit = 1000;
   public $date;
 
   public function __construct()
@@ -151,20 +151,31 @@ class Sync_data extends CI_Controller
   public function syncReceivePoInvCode()
   {
     $this->load->model('inventory/receive_po_model');
-    $ds = $this->receive_po_model->get_non_inv_code(100);
+    $ds = $this->receive_po_model->get_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
     if(!empty($ds))
     {
       foreach($ds as $rs)
       {
+        $count++;
         $inv = $this->receive_po_model->get_sap_doc_num($rs->code);
+
         if(!empty($inv))
         {
           $this->receive_po_model->update_inv($rs->code, $inv);
+          $update++;
         }
+
       }
     }
+    else
+    {
+      $message = 'not found';
+    }
 
-    echo 'done';
+    echo $count.' | '.$update.' | '.$message;
   }
 
 

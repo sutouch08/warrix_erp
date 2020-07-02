@@ -217,6 +217,11 @@ class Prepare_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
+    if($ds['is_online'] != '2')
+    {
+      $this->db->where('channels.is_online', $ds['is_online']);
+    }
+
     if($ds['is_term'] != '2')
     {
       $this->db->where('orders.is_term', $ds['is_term']);
@@ -277,6 +282,12 @@ class Prepare_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
+    if($ds['is_online'] != '2')
+    {
+      $this->db->where('channels.is_online', $ds['is_online']);
+    }
+
+    
     if($ds['is_term'] != '2')
     {
       $this->db->where('orders.is_term', $ds['is_term']);

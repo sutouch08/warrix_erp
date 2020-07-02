@@ -26,6 +26,7 @@ class Sponsor extends PS_Controller
     $this->load->helper('users');
     $this->load->helper('state');
     $this->load->helper('product_images');
+    $this->load->helper('warehouse');
   }
 
 

@@ -179,7 +179,7 @@ while($total_page > 0 )
   $sub_qty .= '</td>';
 
   //--- ราคารวม
-  $sub_price  = '<td rowspan="'.($subtotal_row).'" class="subtotal-first font-size-10" style="height:'.$this->printer->row_height.'mm;">';
+  $sub_price  = '<td rowspan="'.($subtotal_row).'" class="subtotal-first font-size-10" style="height:'.$this->printer->row_height.'mm; white-space:normal;">';
   $sub_price .=  '<strong>หมายเหตุ : </strong> '.$order->remark;
   $sub_price .= '</td>';
   $sub_price .= '<td class="subtotal">';

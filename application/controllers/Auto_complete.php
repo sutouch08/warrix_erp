@@ -635,6 +635,35 @@ public function get_style_code()
   }
 
 
+
+
+  public function get_item_code()
+  {
+    $sc = array();
+    $txt = $_REQUEST['term'];
+    $rs = $this->db
+    ->select('code, old_code')
+    ->like('code', $txt)
+    ->or_like('old_code', $txt)
+    ->limit(20)
+    ->get('products');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $pd)
+      {
+        $sc[] = $pd->code .' | '.$pd->old_code;
+      }
+    }
+    else
+    {
+      $sc[] = 'no item found';
+    }
+
+    echo json_encode($sc);
+  }
+
+
   public function get_warehouse_code_and_name()
   {
     $txt = $_REQUEST['term'];

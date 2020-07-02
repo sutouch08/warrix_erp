@@ -3,6 +3,10 @@ function thai_date($date, $time = FALSE, $sp = '-')
 {
   $sp = $sp === '' ? '-' : $sp;
   $format = $time === TRUE ? 'd'.$sp.'m'.$sp.'Y'.' H:i:s' : 'd'.$sp.'m'.$sp.'Y';
+  if(empty($date))
+  {
+    $date = date('d-m-Y');
+  }
 
   return date($format, strtotime($date));
 }
@@ -54,7 +58,11 @@ function today()
 
 function db_date($date, $time = FALSE, $sp = '-')
 {
-
+  if(empty($date))
+  {
+    $date = date('Y-m-d');
+  }
+  
   if($time === TRUE)
   {
     $c_time = date('H:i:s', strtotime($date));
