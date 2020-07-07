@@ -13,10 +13,6 @@
 </div>
 
 <hr class="margin-top-10 margin-bottom-10" />
-<?php if($order->state != 6) : ?>
-<?php   $this->load->view('inventory/qc/invalid_state'); ?>
-<?php else : ?>
-
   <div class="row">
     <div class="col-sm-2 padding-5 first">
       <label>เลขที่ : <?php echo $order->code; ?></label>
@@ -43,13 +39,13 @@
   </div>
   <hr />
 <?php
+        
     $this->load->view('inventory/qc/qc_box');
     $this->load->view('inventory/qc/qc_control');
     $this->load->view('inventory/qc/qc_incomplete_list');
     $this->load->view('inventory/qc/qc_complete_list');
 ?>
 
-<?php endif; ?>
 
   <!--************** Address Form Modal ************-->
   <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="addressModal" aria-hidden="true">

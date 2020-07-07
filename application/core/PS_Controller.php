@@ -8,6 +8,11 @@ class PS_Controller extends CI_Controller
   public $ms;
   public $mc;
   public $close_system;
+  public $WC;
+  public $WT;
+  public $WS;
+  public $WU;
+  public $WQ;
 
   public function __construct()
   {
@@ -30,6 +35,14 @@ class PS_Controller extends CI_Controller
     $this->ms = $this->load->database('ms', TRUE); //--- SAP database
     $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
     $this->is = $this->load->database('is', TRUE); //---- Ecom database
+
+    $uid = get_cookie('uid');
+
+		$this->WC = get_permission('SOCCSO', $uid);
+		$this->WT = get_permission('SOCCTR', $uid);
+		$this->WS = get_permission('SOODSP', $uid);
+		$this->WU = get_permission('ICSUPP', $uid);
+		$this->WQ = get_permission('ICTRFM', $uid);
   }
 }
 

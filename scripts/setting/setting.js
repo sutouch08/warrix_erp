@@ -138,6 +138,22 @@ function toggleControlCredit(option)
 }
 
 
+function toggleShowStock(option)
+{
+	$('#show-sum-stock').val(option);
+	if(option == 1){
+		$('#btn-show-stock-yes').addClass('btn-success');
+		$('#btn-show-stock-no').removeClass('btn-primary');
+		return;
+	}
+	if(option == 0){
+		$('#btn-show-stock-yes').removeClass('btn-success');
+		$('#btn-show-stock-no').addClass('btn-primary');
+		return;
+	}
+}
+
+
 
 function toggleReceiveDue(option)
 {
@@ -247,3 +263,49 @@ function checkCompanySetting(){
 
 	updateConfig('companyForm');
 }
+
+$('#default-warehouse').autocomplete({
+	source: BASE_URL + 'auto_complete/get_warehouse_by_role/1',
+	autoFocus:true,
+	close:function(){
+		let rs = $(this).val();
+		let arr = rs.split(' | ');
+
+		if(arr[0] === 'not found'){
+			$(this).val('');
+		}else{
+			$(this).val(arr[0]);
+		}
+	}
+})
+
+$('#lend-warehouse').autocomplete({
+	source: BASE_URL + 'auto_complete/get_warehouse_by_role/8',
+	autoFocus:true,
+	close:function(){
+		let rs = $(this).val();
+		let arr = rs.split(' | ');
+
+		if(arr[0] === 'not found'){
+			$(this).val('');
+		}else{
+			$(this).val(arr[0]);
+		}
+	}
+})
+
+
+$('#transform-warehouse').autocomplete({
+	source: BASE_URL + 'auto_complete/get_warehouse_by_role/7',
+	autoFocus:true,
+	close:function(){
+		let rs = $(this).val();
+		let arr = rs.split(' | ');
+
+		if(arr[0] === 'not found'){
+			$(this).val('');
+		}else{
+			$(this).val(arr[0]);
+		}
+	}
+})

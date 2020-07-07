@@ -32,7 +32,8 @@ class Invoice extends PS_Controller
       'from_date'     => get_filter('from_date', 'inv_from_date', ''),
       'to_date'       => get_filter('to_date', 'inv_to_date', ''),
       'order_by'      => get_filter('order_by', 'inv_order_by', ''),
-      'sort_by'       => get_filter('sort_by', 'inv_sort_by', '')
+      'sort_by'       => get_filter('sort_by', 'inv_sort_by', ''),
+      'is_valid'      => get_filter('is_valid', 'inv_valid', '2')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -117,7 +118,8 @@ class Invoice extends PS_Controller
       'inv_from_date',
       'inv_to_date',
       'inv_order_by',
-      'inv_sort_by'
+      'inv_sort_by',
+      'inv_valid'
     );
     clear_filter($filter);
   }

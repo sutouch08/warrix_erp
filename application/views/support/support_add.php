@@ -51,11 +51,19 @@
     <input type="text" class="form-control input-sm" name="empName" id="empName" value="" required />
   </div>
 
-  <div class="col-sm-11 padding-5 first">
+	<div class="col-sm-2 col-2-harf col-xs-12 padding-5 first">
+		<label>คลัง</label>
+    <select class="form-control input-sm" name="warehouse" id="warehouse" required>
+			<option value="">เลือกคลัง</option>
+			<?php echo select_sell_warehouse(); ?>
+		</select>
+  </div>
+
+  <div class="col-sm-8 padding-5">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="">
   </div>
-  <div class="col-sm-1 padding-5 last">
+  <div class="col-sm-1 col-1-harf padding-5 last">
     <label class="display-block not-show">Submit</label>
     <button type="button" class="btn btn-xs btn-success btn-block" onclick="add()"><i class="fa fa-plus"></i> เพิ่ม</button>
   </div>

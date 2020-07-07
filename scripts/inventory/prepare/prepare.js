@@ -46,3 +46,14 @@ function pullBack(code){
 function viewProcess(){
   window.location.href = HOME + '/view_process';
 }
+
+
+// $('#item-code').autocomplete({
+//   source : BASE_URL + 'auto_complete/get_prepare_item_code',
+//   autoFocus: true,
+//   close:function(){
+//     let code = $(this).val();
+//     let arr = code.split(' | ');
+//     $(this).val(arr[1]);
+//   }
+// })

@@ -330,7 +330,7 @@ class Consign_tr extends PS_Controller
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
-      $zone = $$this->input->post('zone_code');
+      $zone = $this->input->post('zone_code');
       $warehouse_code = $this->input->post('warehouse_code');
       if(!empty($code))
       {
@@ -339,7 +339,7 @@ class Consign_tr extends PS_Controller
           'gp' => $this->input->post('gp'),
           'date_add' => db_date($this->input->post('date_add')),
           'remark' => $this->input->post('remark'),
-          'zone_code' => $code,
+          'zone_code' => $zone,
           'warehouse_code' => $warehouse_code
         );
 

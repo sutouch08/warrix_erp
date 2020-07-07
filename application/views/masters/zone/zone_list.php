@@ -46,9 +46,22 @@
     <label class="display-block not-show">buton</label>
 		<button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()">Reset</button>
   </div>
+	<div class="col-sm-1 padding-5 last">
+    <label class="display-block not-show">buton</label>
+		<button type="button" class="btn btn-xs btn-purple btn-block" onclick="exportFilter()">
+			<i class="fa fa-file-excel-o"></i> Export
+		</button>
+  </div>
 
 </div>
 <hr class="margin-top-15">
+</form>
+<form class="hidden" id="exportForm" method="post" action="<?php echo $this->home; ?>/export_filter">
+	<input type="hidden" name="zone_code" id="export-code" >
+	<input type="hidden" name="zone_name" id="export-name" >
+	<input type="hidden" name="zone_customer" id="zone-customer">
+	<input type="hidden" name="zone_warehouse" id="zone-warehouse">
+	<input type="hidden" name="token" id="token" value="<?php echo date('YmdHis'); ?>">
 </form>
 <?php echo $this->pagination->create_links(); ?>
 
@@ -102,6 +115,6 @@
 	</div>
 </div>
 
-<script src="<?php echo base_url(); ?>scripts/masters/zone.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/zone.js?v=<?php echo date('YmdHis'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

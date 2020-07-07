@@ -94,6 +94,7 @@ function addOrder(){
   var customer_name = $('#customer').val();
   var date_add = $('#date').val();
   var empName = $('#empName').val();
+  var warehouse = $('#warehouse').val();
 
   if(customer_code.length == 0 || customer_name.length == 0){
     swal('ชื่อผู้รับไม่ถูกต้อง');
@@ -110,6 +111,11 @@ function addOrder(){
   if(empName.length == 0)
   {
     swal('ชื่อผู้เบิกไม่ถูกต้อง');
+    return false;
+  }
+
+  if(warehouse.length == 0){
+    swal('กรุณาเลือกคลัง');
     return false;
   }
 
@@ -327,6 +333,7 @@ function validUpdate(){
 	var customer_code = $("#customerCode").val();
   var customer_name = $('#customer').val();
 	var user_ref = $("#user_ref").val();
+  var warehouse = $('#warehouse').val();
 
 	//---- ตรวจสอบวันที่
 	if( ! isDate(date_add) ){
@@ -345,6 +352,12 @@ function validUpdate(){
     return false;
   }
 
+  if(warehouse.length == 0)
+  {
+    swal('กรุณาเลือกคลัง');
+    return false;
+  }
+
   updateOrder();
 }
 
@@ -358,6 +371,7 @@ function updateOrder(){
 	var customer_code = $("#customerCode").val();
   var customer_name = $("#customer").val();
 	var user_ref = $('#user_ref').val();
+  var warehouse = $('#warehouse').val();
 	var remark = $("#remark").val();
 
 	load_in();
@@ -371,6 +385,7 @@ function updateOrder(){
   		"date_add"	: date_add,
   		"customer_code" : customer_code,
       "user_ref" : user_ref,
+      "warehouse" : warehouse,
   		"remark" : remark,
     },
 		success: function(rs){

@@ -247,12 +247,7 @@ $('#pd-box').keyup(function(event) {
 $('#item-code').autocomplete({
 	source:BASE_URL + 'auto_complete/get_product_code',
 	minLength: 4,
-	autoFocus:true,
-	close:function(){
-		setTimeout(function(){
-			getItemGrid();
-		}, 200);
-	}
+	autoFocus:true
 });
 
 $('#item-code').keyup(function(e){

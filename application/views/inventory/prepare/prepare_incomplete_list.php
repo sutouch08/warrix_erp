@@ -9,11 +9,11 @@
       <thead>
         <tr><td colspan="6" align="center">รายการรอจัด</td></tr>
         <tr>
-          <th class="width-15 middle text-center">บาร์โค้ด</th>
-          <th class="width-30 middle text-center">สินค้า</th>
-          <th class="width-10 middle text-center">จำนวน</th>
-          <th class="width-10 middle text-center">จัดแล้ว</th>
-          <th class="width-10 middle text-center">คงเหลือ</th>
+          <th class="width-15 middle">บาร์โค้ด</th>
+          <th class="width-50 middle">สินค้า</th>
+          <th class="width-5 middle text-center">จำนวน</th>
+          <th class="width-5 middle text-center">จัดแล้ว</th>
+          <th class="width-5 middle text-center">คงเหลือ</th>
           <th class="text-right">
             <label><input type="checkbox" id="showZone" style="margin-right:10px;" <?php echo $checked; ?> />แสดงที่เก็บ</label>
           </th>
@@ -28,11 +28,13 @@
         <?php echo (empty($rs->barcode) ? $rs->product_code : $rs->barcode); ?>
       </td>
       <td class="middle">
-        <?php echo $rs->product_code; ?> :
-        <?php if(empty($rs->old_code) OR $rs->old_code == $rs->product_code) : ?>
+        <b class="blue">
+        <?php echo (empty($rs->old_code) ? $rs->product_code : $rs->old_code); ?>
+        </b>  |
+        <?php if($rs->old_code == $rs->product_code) : ?>
         <?php     echo $rs->product_name; ?>
         <?php else : ?>
-        <?php     echo $rs->old_code; ?>
+        <?php     echo $rs->product_code; ?>
         <?php endif; ?>
       </td>
       <td class="middle text-center" id="order-qty-<?php echo $rs->id; ?>"><?php echo number($rs->qty); ?></td>

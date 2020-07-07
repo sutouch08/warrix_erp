@@ -64,7 +64,7 @@
               </label>
             </div>
             <div class="<?php echo $show_close; ?>" id="close-bar">
-              <button type="button" class="btn btn-sm btn-success close-order" id="btn-close" onclick="closeOrder()">
+              <button type="button" class="btn btn-sm btn-success close-order" id="btn-close" onclick="closeOrder()" <?php echo $disActive; ?>>
                 ตรวจเสร็จแล้ว
               </button>
             </div>

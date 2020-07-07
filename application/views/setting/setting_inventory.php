@@ -48,11 +48,19 @@
       </div>
       <div class="divider-hidden"></div>
 
+			<div class="col-sm-3">
+        <span class="form-control left-label">รหัสคลังซื้อ-ขาย เริ่มต้น</span>
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control input-sm input-large" id="default-warehouse" name="DEFAULT_WAREHOUSE" value="<?php echo $DEFAULT_WAREHOUSE; ?>" required/>
+      </div>
+      <div class="divider-hidden"></div>
+
       <div class="col-sm-3">
         <span class="form-control left-label">รหัสคลังสินค้าระหว่างทำ</span>
       </div>
       <div class="col-sm-9">
-        <input type="text" class="form-control input-sm input-small" name="TRANSFORM_WAREHOUSE" value="<?php echo $TRANSFORM_WAREHOUSE; ?>" />
+        <input type="text" class="form-control input-sm input-large" id="transform-warehouse" name="TRANSFORM_WAREHOUSE" value="<?php echo $TRANSFORM_WAREHOUSE; ?>" required/>
       </div>
       <div class="divider-hidden"></div>
 
@@ -60,7 +68,7 @@
         <span class="form-control left-label">รหัสคลังยืมสินค้า</span>
       </div>
       <div class="col-sm-9">
-        <input type="text" class="form-control input-sm input-small" name="LEND_WAREHOUSE" value="<?php echo $LEND_WAREHOUSE; ?>" />
+        <input type="text" class="form-control input-sm input-large" id="lend-warehouse" name="LEND_WAREHOUSE" value="<?php echo $LEND_WAREHOUSE; ?>" />
       </div>
       <div class="divider-hidden"></div>
 

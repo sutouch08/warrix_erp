@@ -159,9 +159,12 @@ class Orders_model extends CI_Model
     ->select('ods.*, pd.old_code')
     ->from('order_details AS ods')
     ->join('products AS pd', 'ods.product_code = pd.code', 'left')
+    ->join('product_size AS size', 'pd.size_code = size.code', 'left')
     ->where('ods.order_code', $code)
     ->where('ods.valid', 0)
     ->where('ods.is_count', 1)
+    ->order_by('pd.color_code', 'ASC')
+    ->order_by('size.position', 'ASC')
     ->get();
 
     if($rs->num_rows() > 0)
@@ -392,8 +395,18 @@ class Orders_model extends CI_Model
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
-      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
-      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      if(!empty($ds['stated']))
+      {
+        $from_date = from_date($ds['from_date']);
+        $to_date = to_date($ds['to_date']);
+        $array = $this->getOrderStateChangeIn($ds['stated'], $from_date, $to_date, $ds['startTime'], $ds['endTime'] );
+        $this->db->where_in('orders.code', $array);
+      }
+      else
+      {
+        $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+        $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      }
     }
 
     if(!empty($ds['warehouse']))
@@ -525,8 +538,18 @@ class Orders_model extends CI_Model
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
-      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
-      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      if(!empty($ds['stated']))
+      {
+        $from_date = from_date($ds['from_date']);
+        $to_date = to_date($ds['to_date']);
+        $array = $this->getOrderStateChangeIn($ds['stated'], $from_date, $to_date, $ds['startTime'], $ds['endTime'] );
+        $this->db->where_in('orders.code', $array);
+      }
+      else
+      {
+        $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+        $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      }
     }
 
     if(!empty($ds['warehouse']))
@@ -590,13 +613,40 @@ class Orders_model extends CI_Model
     }
 
     $rs = $this->db->get();
-    //echo $this->db->get_compiled_select('orders');
+    //echo $this->db->get_compiled_select();
     if($rs->num_rows() > 0)
     {
       return $rs->result();
     }
 
     return FALSE;
+  }
+
+
+  private function getOrderStateChangeIn($state, $fromDate, $toDate, $startTime, $endTime)
+  {
+    $qr  = "SELECT order_code FROM order_state_change ";
+    $qr .= "WHERE state = {$state} ";
+    $qr .= "AND date_upd >= '{$fromDate}' ";
+    $qr .= "AND date_upd <= '{$toDate}' ";
+    $qr .= "AND time_upd >= '{$startTime}' ";
+    $qr .= "AND time_upd <= '{$endTime}' ";
+
+    $rs = $this->db->query($qr);
+
+  	$sc = array();
+
+  	if($rs->num_rows() > 0)
+  	{
+  		foreach($rs->result() as $row)
+  		{
+  			$sc[] = $row->order_code;
+  		}
+
+      return $sc;
+  	}
+
+  	return 'xx';
   }
 
 

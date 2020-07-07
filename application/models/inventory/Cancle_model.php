@@ -18,7 +18,7 @@ class Cancle_model extends CI_Model
   }
 
 
-  
+
   public function get_data(array $ds = array(), $perpage = NULL, $offset = NULL)
   {
     $this->db
@@ -144,6 +144,18 @@ class Cancle_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function get_sum_stock($code)
+  {
+    $rs = $this->db->select_sum('qty')->where('product_code', $code)->get('cancle');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->qty;
+    }
+
+    return 0;
   }
 
 

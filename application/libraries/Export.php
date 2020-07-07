@@ -331,10 +331,12 @@ class Export
     $this->ci->load->model('inventory/transfer_model');
     $this->ci->load->model('masters/customers_model');
     $this->ci->load->model('masters/products_model');
+    $this->ci->load->model('masters/zone_model');
     $this->ci->load->helper('discount');
 
     $doc = $this->ci->orders_model->get($code);
     $sap = $this->ci->transfer_model->get_sap_transfer_doc($code);
+    $zone = $this->ci->zone_model->get($doc->zone_code);
 
     if($doc->role == 'L' OR $doc->role == 'R')
     {
@@ -374,6 +376,7 @@ class Export
             $vat_rate = getConfig('SALE_VAT_RATE');
             $vat_code = getConfig('SALE_VAT_CODE');
             $total_amount = $this->ci->orders_model->get_bill_total_amount($code);
+
             $ds = array(
               'U_ECOMNO' => $doc->code,
               'DocType' => 'I',
@@ -392,8 +395,8 @@ class Export
               'DocRate' => 1,
               'DocTotal' => remove_vat($total_amount),
               'DocTotalFC' => remove_vat($total_amount),
-              'Filler' => $doc->warehouse_code,
-              'ToWhsCode' => $doc->warehouse_code,
+              'Filler' => empty($zone) ? NULL : $zone->warehouse_code,
+              'ToWhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
               'Comments' => limitText($doc->remark, 250),
               'F_E_Commerce' => 'A',
               'F_E_CommerceDate' => sap_date(now(), TRUE),
@@ -434,7 +437,7 @@ class Export
                     'Price' => round(remove_vat($rs->price),2),
                     'TotalFrgn' => round($rs->total_amount,2),
                     'FromWhsCod' => $rs->warehouse_code,
-                    'WhsCode' => $doc->warehouse_code,
+                    'WhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
                     'FisrtBin' => $doc->zone_code, //-- โซนปลายทาง
                     'F_FROM_BIN' => $rs->zone_code, //--- โซนต้นทาง
                     'F_TO_BIN' => $doc->zone_code, //--- โซนปลายทาง
@@ -516,10 +519,12 @@ public function export_transfer_draft($code)
   $this->ci->load->model('inventory/transfer_model');
   $this->ci->load->model('masters/customers_model');
   $this->ci->load->model('masters/products_model');
+  $this->ci->load->model('masters/zone_model');
   $this->ci->load->helper('discount');
 
   $doc = $this->ci->orders_model->get($code);
   $sap = $this->ci->transfer_model->get_sap_transfer_doc($code);
+  $zone = $this->ci->zone_model->get($doc->zone_code);
 
   if($doc->role == 'L' OR $doc->role == 'U' OR $doc->role == 'R')
   {
@@ -575,8 +580,8 @@ public function export_transfer_draft($code)
             'DocRate' => 1,
             'DocTotal' => remove_vat($total_amount),
             'DocTotalFC' => remove_vat($total_amount),
-            'Filler' => $doc->warehouse_code,
-            'ToWhsCode' => $doc->warehouse_code,
+            'Filler' => empty($zone) ? NULL : $zone->warehouse_code,
+            'ToWhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
             'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE),
@@ -616,7 +621,7 @@ public function export_transfer_draft($code)
                   'Price' => round(remove_vat($rs->price),2),
                   'TotalFrgn' => round($rs->total_amount,2),
                   'FromWhsCod' => $rs->warehouse_code,
-                  'WhsCode' => $doc->warehouse_code,
+                  'WhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
                   'FisrtBin' => $doc->zone_code, //-- โซนปลายทาง
                   'F_FROM_BIN' => $rs->zone_code, //--- โซนต้นทาง
                   'F_TO_BIN' => $doc->zone_code, //--- โซนปลายทาง
@@ -1022,6 +1027,7 @@ public function export_transform($code)
   $this->ci->load->model('inventory/transfer_model');
   $this->ci->load->model('masters/customers_model');
   $this->ci->load->model('masters/products_model');
+  $this->ci->load->model('masters/zone_model');
   $this->ci->load->helper('discount');
 
   $doc = $this->ci->orders_model->get($code);
@@ -1071,8 +1077,8 @@ public function export_transform($code)
             'DocRate' => 1,
             'DocTotal' => remove_vat($total_amount),
             'DocTotalFC' => remove_vat($total_amount),
-            'Filler' => $doc->warehouse_code,
-            'ToWhsCode' => getConfig('TRANSFORM_WAREHOUSE'),
+            'Filler' => empty($zone) ? NULL : $zone->warehouse_code,
+            'ToWhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
             'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE),
@@ -1111,7 +1117,7 @@ public function export_transform($code)
                   'Price' => round(remove_vat($rs->price),2),
                   'TotalFrgn' => round($rs->total_amount,2),
                   'FromWhsCod' => $rs->warehouse_code,
-                  'WhsCode' => $doc->warehouse_code,
+                  'WhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
                   'FisrtBin' => $doc->zone_code, //--- zone ปลายทาง
                   'F_FROM_BIN' => $rs->zone_code, //--- โซนต้นทาง
                   'F_TO_BIN' => $doc->zone_code, //--- โซนปลายทาง

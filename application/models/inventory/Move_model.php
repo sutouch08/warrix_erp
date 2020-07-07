@@ -252,6 +252,18 @@ class Move_model extends CI_Model
   }
 
 
+  public function get_sum_temp_stock($product_code)
+  {
+    $rs = $this->db->select_sum('qty')->where('product_code', $product_code)->get('move_temp');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->qty;
+    }
+
+    return 0;
+  }
+
+
   public function add_temp(array $ds = array())
   {
     if(!empty($ds))

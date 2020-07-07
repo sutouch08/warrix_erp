@@ -370,6 +370,85 @@ class Zone extends PS_Controller
 
 
 
+  public function export_filter()
+  {
+    $ds = array(
+      'code' => $this->input->post('zone_code'),
+      'name' => $this->input->post('zone_name'),
+      'customer' => $this->input->post('zone_customer'),
+      'warehouse' => $this->input->post('zone_warehouse')
+    );
+
+    $token = $this->input->post('token');
+
+    $list = $this->zone_model->get_list($ds);
+
+    //--- load excel library
+    $this->load->library('excel');
+
+    $this->excel->setActiveSheetIndex(0);
+    $this->excel->getActiveSheet()->setTitle('Zone master data');
+
+    //--- set Table header
+
+
+    $this->excel->getActiveSheet()->setCellValue('A1', 'ลำดับ');
+    $this->excel->getActiveSheet()->setCellValue('B1', 'รหัสโซน');
+    $this->excel->getActiveSheet()->setCellValue('C1', 'ชื่อโซน');
+    $this->excel->getActiveSheet()->setCellValue('D1', 'รหัสคลัง');
+    $this->excel->getActiveSheet()->setCellValue('E1', 'คลังสินค้า');
+    $this->excel->getActiveSheet()->setCellValue('F1', 'รหัสเก่า');
+
+
+    //---- กำหนดความกว้างของคอลัมภ์
+    $this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+    $this->excel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
+    $this->excel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
+    $this->excel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
+    $this->excel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+
+
+    $row = 2;
+
+
+    if(!empty($list))
+    {
+      $no = 1;
+
+      foreach($list as $rs)
+      {
+        //--- ลำดับ
+        $this->excel->getActiveSheet()->setCellValue('A'.$row, $no);
+
+        //--- zone code
+        $this->excel->getActiveSheet()->setCellValue('B'.$row, $rs->code);
+
+        //--- zone name
+        $this->excel->getActiveSheet()->setCellValue('C'.$row, $rs->name);
+
+        //--- warehouse code
+        $this->excel->getActiveSheet()->setCellValue('D'.$row, $rs->warehouse_code);
+
+        //---- waehouser name
+        $this->excel->getActiveSheet()->setCellValue('E'.$row, $rs->warehouse_name);
+        //--- old code
+        $this->excel->getActiveSheet()->setCellValue('F'.$row, "{$rs->old_code}");
+
+        $no++;
+        $row++;
+      }
+
+      setToken($token);
+      $file_name = "Zone Master Data.xlsx";
+      header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
+      header('Content-Disposition: attachment;filename="'.$file_name.'"');
+      $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
+      $writer->save('php://output');
+    }
+  }
+
+
+
   public function clear_filter()
   {
     $filter = array('code', 'name', 'customer', 'warehouse');

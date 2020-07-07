@@ -186,12 +186,22 @@ class Prepare_model extends CI_Model
     ->from('orders')
     ->join('channels', 'channels.code = orders.channels_code','left')
     ->join('customers', 'customers.code = orders.customer_code', 'left')
+    ->join('order_details', 'orders.code = order_details.order_code', 'left')
+    ->join('products', 'order_details.product_code = products.code', 'left')
     ->where('orders.state', $state)
     ->where('orders.status', 1);
 
     if(!empty($ds['code']))
     {
       $this->db->like('orders.code', $ds['code']);
+    }
+
+    if(!empty($ds['item_code']))
+    {
+      $this->db->group_start();
+      $this->db->like('products.code', $ds['item_code']);
+      $this->db->or_like('products.old_code', $ds['item_code']);
+      $this->db->group_end();
     }
 
     if(!empty($ds['customer']))
@@ -219,24 +229,42 @@ class Prepare_model extends CI_Model
 
     if($ds['is_online'] != '2')
     {
-      $this->db->where('channels.is_online', $ds['is_online']);
+      if($ds['is_online'] == 1)
+      {
+        $this->db->where('channels.is_online', $ds['is_online']);
+      }
+      else
+      {
+        $this->db->group_start()
+        ->where('channels.is_online !=', 1)
+        ->or_where('channels.is_online IS NULL', NULL, FALSE)
+        ->group_end();
+      }
     }
 
-    if($ds['is_term'] != '2')
-    {
-      $this->db->where('orders.is_term', $ds['is_term']);
-    }
 
     if($ds['role'] != 'all')
     {
       $this->db->where('orders.role', $ds['role']);
     }
 
-    if($ds['from_date'] != '' && $ds['to_date'] != '')
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
-      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
-      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      if(!empty($ds['stated']))
+      {
+        $from_date = from_date($ds['from_date']);
+        $to_date = to_date($ds['to_date']);
+        $array = $this->getOrderStateChangeIn($ds['stated'], $from_date, $to_date, $ds['startTime'], $ds['endTime'] );
+        $this->db->where_in('orders.code', $array);
+      }
+      else
+      {
+        $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+        $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      }
     }
+
+    $this->db->group_by('orders.code');
 
     $rs = $this->db->get();
 
@@ -251,12 +279,22 @@ class Prepare_model extends CI_Model
     ->from('orders')
     ->join('channels', 'channels.code = orders.channels_code','left')
     ->join('customers', 'customers.code = orders.customer_code', 'left')
+    ->join('order_details', 'orders.code = order_details.order_code','left')
+    ->join('products', 'order_details.product_code = products.code', 'left')
     ->where('orders.state', $state)
     ->where('orders.status', 1);
 
     if(!empty($ds['code']))
     {
       $this->db->like('orders.code', $ds['code']);
+    }
+
+    if(!empty($ds['item_code']))
+    {
+      $this->db->group_start();
+      $this->db->like('products.code', $ds['item_code']);
+      $this->db->or_like('products.old_code', $ds['item_code']);
+      $this->db->group_end();
     }
 
     if(!empty($ds['customer']))
@@ -284,14 +322,19 @@ class Prepare_model extends CI_Model
 
     if($ds['is_online'] != '2')
     {
-      $this->db->where('channels.is_online', $ds['is_online']);
+      if($ds['is_online'] == 1)
+      {
+        $this->db->where('channels.is_online', $ds['is_online']);
+      }
+      else
+      {
+        $this->db->group_start()
+        ->where('channels.is_online !=', 1)
+        ->or_where('channels.is_online IS NULL', NULL, FALSE)
+        ->group_end();
+      }
     }
 
-    
-    if($ds['is_term'] != '2')
-    {
-      $this->db->where('orders.is_term', $ds['is_term']);
-    }
 
     if($ds['role'] != 'all')
     {
@@ -300,11 +343,23 @@ class Prepare_model extends CI_Model
 
 
 
-    if($ds['from_date'] != '' && $ds['to_date'] != '')
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
-      $this->db->where('orders.date_add >=', from_date($ds['from_date']));
-      $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      if(!empty($ds['stated']))
+      {
+        $from_date = from_date($ds['from_date']);
+        $to_date = to_date($ds['to_date']);
+        $array = $this->getOrderStateChangeIn($ds['stated'], $from_date, $to_date, $ds['startTime'], $ds['endTime'] );
+        $this->db->where_in('orders.code', $array);
+      }
+      else
+      {
+        $this->db->where('orders.date_add >=', from_date($ds['from_date']));
+        $this->db->where('orders.date_add <=', to_date($ds['to_date']));
+      }
     }
+
+    $this->db->group_by('orders.code');
 
     if(!empty($ds['order_by']))
     {
@@ -324,10 +379,36 @@ class Prepare_model extends CI_Model
     }
 
     $rs = $this->db->get();
-
+    //echo $this->db->get_compiled_select();
     return $rs->result();
   }
 
+
+  private function getOrderStateChangeIn($state, $fromDate, $toDate, $startTime, $endTime)
+  {
+    $qr  = "SELECT order_code FROM order_state_change ";
+    $qr .= "WHERE state = {$state} ";
+    $qr .= "AND date_upd >= '{$fromDate}' ";
+    $qr .= "AND date_upd <= '{$toDate}' ";
+    $qr .= "AND time_upd >= '{$startTime}' ";
+    $qr .= "AND time_upd <= '{$endTime}' ";
+    $qr .= "LIMIT 1000";
+    $rs = $this->db->query($qr);
+
+  	$sc = array();
+
+  	if($rs->num_rows() > 0)
+  	{
+  		foreach($rs->result() as $row)
+  		{
+  			$sc[] = $row->order_code;
+  		}
+
+      return $sc;
+  	}
+
+  	return 'xx';
+  }
 
 
   public function clear_prepare($code)

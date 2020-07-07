@@ -48,23 +48,23 @@ function getProductGrid(){
 			},
 			success: function(rs){
 				load_out();
-				var rs = rs.split(' | ');
-				if( rs.length == 4 ){
-					var grid = rs[0];
-					var width = rs[1];
-					var pdCode = rs[2];
-					var style = rs[3];
+				var ars = rs.split(' | ');
+				if( ars.length == 4 ){
+					var grid = ars[0];
+					var width = ars[1];
+					var pdCode = ars[2] + ' | ' + ars[3];
+					//var style = rs[3];
 					if(grid == 'notfound'){
 						swal("ไม่พบสินค้า");
 						return false;
 					}
 					$("#modal").css("width", width +"px");
 					$("#modalTitle").html(pdCode);
-					$("#id_style").val(style);
+					//$("#id_style").val(style);
 					$("#modalBody").html(grid);
 					$("#orderGrid").modal('show');
 				}else{
-					swal("สินค้าไม่ถูกต้อง");
+					swal(rs);
 				}
 			}
 		});
@@ -92,8 +92,8 @@ function getOrderGrid(styleCode){
 			if( rs.length == 4 ){
 				var grid = rs[0];
 				var width = rs[1];
-				var pdCode = rs[2];
-				var style = rs[3];
+				var pdCode = rs[2] + ' | ' + rs[3];
+				//var style = rs[3];
 				if(grid == 'notfound'){
 					swal("ไม่พบสินค้า");
 					return false;
@@ -101,7 +101,7 @@ function getOrderGrid(styleCode){
 
 				$("#modal").css("width", width +"px");
 				$("#modalTitle").html(pdCode);
-				$("#id_style").val(style);
+				//$("#id_style").val(style);
 				$("#modalBody").html(grid);
 				$("#orderGrid").modal('show');
 			}else{

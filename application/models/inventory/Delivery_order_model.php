@@ -60,6 +60,11 @@ class Delivery_order_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
+    if(isset($ds['is_valid']) && $ds['is_valid'] != 2)
+    {
+      $this->db->where('orders.is_valid', $ds['is_valid']);
+    }
+
     if($ds['from_date'] != '' && $ds['to_date'] != '')
     {
       $this->db->where('orders.date_add >=', from_date($ds['from_date']));
@@ -109,6 +114,11 @@ class Delivery_order_model extends CI_Model
     if(!empty($ds['channels']))
     {
       $this->db->where('orders.channels_code', $ds['channels']);
+    }
+
+    if(isset($ds['is_valid']) && $ds['is_valid'] != 2)
+    {
+      $this->db->where('orders.is_valid', $ds['is_valid']);
     }
 
     if($ds['from_date'] != '' && $ds['to_date'] != '')

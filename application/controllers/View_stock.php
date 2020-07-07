@@ -1,5 +1,5 @@
 <?php
-class View_stock extends CI_Controller
+class View_stock extends PS_Controller
 {
   public $title = 'เช็คสต็อก';
 	public $menu_code = 'SOVIEW';

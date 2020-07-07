@@ -327,15 +327,20 @@ class Receive_po extends PS_Controller
   public function cancle_sap_doc($code)
   {
     $sc = TRUE;
-    $this->load->library('export');
-    if(! $this->export->cancle_sap_doc($code))
+
+    $middle = $this->receive_po_model->get_middle_receive_po($code);
+    if(!empty($middle))
     {
-      $sc = FALSE;
-      $this->error = trim($this->export->error);
+      foreach($middle as $rs)
+      {
+        $this->receive_po_model->drop_sap_received($rs->DocEntry);
+      }
     }
 
     return $sc;
   }
+
+
 
   public function get_po_detail()
   {

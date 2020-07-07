@@ -14,7 +14,14 @@ class Order_state_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->db->insert('order_state_change', $ds);
+      $arr = array(
+        'order_code' => $ds['order_code'],
+        'state' => $ds['state'],
+        'update_user' => (empty($ds['update_user']) ? get_cookie('uname') : $ds['update_user']),
+        'time_upd' => date('H:i:s')
+      );
+
+      return $this->db->insert('order_state_change', $arr);
     }
 
     return FALSE;

@@ -312,3 +312,19 @@ function syncData(){
     }, 1500);
   });
 }
+
+function exportFilter(){
+  let code = $('#code').val();
+  let name = $('#name').val();
+  let customer = $('#customer').val();
+  let warehouse = $('#warehouse').val();
+
+  $('#zone-code').val(code);
+  $('#zone-name').val(name);
+  $('#zone-customer').val(customer);
+  $('#zone-warehouse').val(warehouse);
+
+  var token = $('#token').val();
+  get_download(token);
+  $('#exportForm').submit();
+}

@@ -133,6 +133,18 @@ class Buffer_model extends CI_Model
   }
 
 
+  public function get_sum_stock($code)
+  {
+    $rs = $this->db->select_sum('qty')->where('product_code', $code)->get('buffer');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row()->qty;
+    }
+
+    return 0;
+  }
+
+
 
   public function add(array $ds = array())
   {

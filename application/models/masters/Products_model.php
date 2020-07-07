@@ -507,6 +507,7 @@ class Products_model extends CI_Model
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('products');
+
     if($rs->num_rows() == 1)
     {
       return $rs->row();
@@ -519,10 +520,11 @@ class Products_model extends CI_Model
   public function get_with_old_code($code)
   {
     $rs = $this->db->where('code', $code)->or_where('old_code', $code)->get('products');
-    if($rs->num_rows() === 1)
+    if($rs->num_rows() > 0)
     {
-      return $rs->row();
+      return $rs->num_rows() == 1 ? $rs->row() : $rs->result();
     }
+
 
     return FALSE;
   }

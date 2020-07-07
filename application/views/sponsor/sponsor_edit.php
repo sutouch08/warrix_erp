@@ -38,7 +38,7 @@
 <?php $this->load->view('sponsor/sponsor_discount_bar'); ?>
 <?php $this->load->view('sponsor/sponsor_detail'); ?>
 <script src="<?php echo base_url(); ?>scripts/sponsor/sponsor.js"></script>
-<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor_add.js?v=<?php echo date('YmdHis'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/print/print_order.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

@@ -26,13 +26,16 @@ class Prepare extends PS_Controller
       'customer'      => get_filter('customer', 'prepare_customer', ''),
       'user'          => get_filter('user', 'prepare_user', ''),
       'channels'      => get_filter('channels', 'prepare_channels', ''),
-      'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
       'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
       'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
       'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
       'order_by'      => get_filter('order_by', 'prepare_order_by', ''),
-      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', '')
+      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', ''),
+      'stated'        => get_filter('stated', 'prepare_stated', ''),
+      'startTime'     => get_filter('startTime', 'prepare_startTime', ''),
+      'endTime'       => get_filter('endTime', 'prepare_endTime', ''),
+      'item_code'    => get_filter('item_code', 'prepare_item_code', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -67,13 +70,16 @@ class Prepare extends PS_Controller
       'customer'      => get_filter('customer', 'prepare_customer', ''),
       'user'          => get_filter('user', 'prepare_user', ''),
       'channels'      => get_filter('channels', 'prepare_channels', ''),
-      'is_term'       => get_filter('is_term', 'prepare_is_term', '2'),
       'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
       'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
       'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
       'order_by'      => get_filter('order_by', 'prepare_order_by', ''),
-      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', '')
+      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', ''),
+      'stated'        => get_filter('stated', 'prepare_stated', ''),
+      'startTime'     => get_filter('startTime', 'prepare_startTime', ''),
+      'endTime'       => get_filter('endTime', 'prepare_endTime', ''),
+      'item_code'    => get_filter('item_code', 'prepare_item_code', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -129,7 +135,7 @@ class Prepare extends PS_Controller
       {
         $rs->barcode = $this->get_barcode($rs->product_code);
         $rs->prepared = $this->get_prepared($rs->order_code, $rs->product_code);
-        $rs->stock_in_zone = $this->get_stock_in_zone($rs->product_code, $rs->old_code, get_null($order->warehouse_code));
+        $rs->stock_in_zone = $this->get_stock_in_zone($rs->product_code, get_null($order->warehouse_code));
       }
     }
 
@@ -304,58 +310,64 @@ class Prepare extends PS_Controller
 
 
 
-  // public function get_stock_in_zone($item_code, $warehouse = NULL)
-  // {
-  //   $sc = "ไม่มีสินค้า";
-  //   $this->load->model('stock/stock_model');
-  //   $stock = $this->stock_model->get_stock_in_zone($item_code, $warehouse);
-  //   if(!empty($stock))
-  //   {
-  //     $sc = "";
-  //     foreach($stock as $rs)
-  //     {
-  //       $prepared = $this->prepare_model->get_buffer_zone($item_code, $rs->code);
-  //       $sc .= $rs->name.' : '.($rs->qty - $prepared).'<br/>';
-  //     }
-  //   }
-  //
-  //   return $sc;
-  // }
-
-
-  public function get_stock_in_zone($item_code, $old_code, $warehouse = NULL)
+  public function get_stock_in_zone($item_code, $warehouse = NULL)
   {
-
     $sc = "ไม่มีสินค้า";
-    $rs = $this->is->select('id')->where('code', $old_code)->get('tbl_product');
-    if(!empty($rs))
+    $this->load->model('stock/stock_model');
+    $stock = $this->stock_model->get_stock_in_zone($item_code, $warehouse);
+    if(!empty($stock))
     {
-      $id = $rs->row()->id;
-      $qs = $this->is
-      ->select('z.barcode_zone AS code, z.zone_name AS name, s.qty AS qty')
-      ->from('tbl_stock AS s')
-      ->join('tbl_zone AS z', 's.id_zone = z.id_zone')
-      ->join('tbl_warehouse AS w', 'z.id_warehouse = w.id')
-      ->where('s.id_product', $id)
-      ->where('w.prepare', 1)
-      ->where('w.active', 1)
-      ->get();
-
-
-      if($qs->num_rows() > 0)
+      $sc = "";
+      foreach($stock as $rs)
       {
-        $sc = "";
-        $stock = $qs->result();
-
-        foreach($stock as $rs)
+        $prepared = $this->prepare_model->get_buffer_zone($item_code, $rs->code);
+        $qty = $rs->qty - $prepared;
+        if($qty > 0)
         {
-          $sc .= $rs->name.' : '.$rs->qty.'<br/>';
+          $sc .= $rs->name.' : '.($rs->qty - $prepared).'<br/>';
         }
+
       }
     }
 
     return $sc;
   }
+
+
+  // public function get_stock_in_zone($item_code, $old_code, $warehouse = NULL)
+  // {
+  //
+  //   $sc = "ไม่มีสินค้า";
+  //   $code = empty($old_code) ? $old_code : $item_code;
+  //   $pd = $this->is->select('id')->where('code', $code)->get('tbl_product');
+  //   if($pd->num_rows() == 1)
+  //   {
+  //     $id = $pd->row()->id;
+  //     $qs = $this->is
+  //     ->select('z.barcode_zone AS code, z.zone_name AS name, s.qty AS qty')
+  //     ->from('tbl_stock AS s')
+  //     ->join('tbl_zone AS z', 's.id_zone = z.id_zone')
+  //     ->join('tbl_warehouse AS w', 'z.id_warehouse = w.id')
+  //     ->where('s.id_product', $id)
+  //     ->where('w.prepare', 1)
+  //     ->where('w.active', 1)
+  //     ->get();
+  //
+  //
+  //     if($qs->num_rows() > 0)
+  //     {
+  //       $sc = "";
+  //       $stock = $qs->result();
+  //
+  //       foreach($stock as $rs)
+  //       {
+  //         $sc .= $rs->name.' : '.$rs->qty.'<br/>';
+  //       }
+  //     }
+  //   }
+  //
+  //   return $sc;
+  // }
 
 
 
@@ -490,13 +502,16 @@ class Prepare extends PS_Controller
       'prepare_customer',
       'prepare_user',
       'prepare_channels',
-      'prepare_is_term',
       'prepare_is_online',
       'prepare_role',
       'prepare_from_date',
       'prepare_to_date',
       'prepare_order_by',
-      'prepare_sort_by'
+      'prepare_sort_by',
+      'prepare_stated',
+      'prepare_startTime',
+      'prepare_endTime',
+      'prepare_item_code'
     );
 
     clear_filter($filter);

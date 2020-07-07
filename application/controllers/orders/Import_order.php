@@ -112,6 +112,14 @@ class Import_order extends CI_Controller
 
           $prefix = getConfig('PREFIX_SHIPPING_NUMBER');
 
+          $shipping_item_code = getConfig('SHIPPING_ITEM_CODE');
+
+          $shipping_item = !empty($shipping_item_code) ? $this->products_model->get($shipping_item_code) : NULL;
+
+          //--- ไว้เช็คว่าเพิ่มรหัสค่าจัดส่งไปแล้วหรือยัง หากเพิ่มแล้วจะใส่ order_code ไว้ที่นี่
+          //--- หาก order_code ไม่ตรงกันหมายถึงยังไม่ได้ใส่
+          $shipping_added = NULL;
+
           foreach($ds as $rs)
           {
             //--- ถ้าพบ Error ให้ออกจากลูปทันที
@@ -289,6 +297,7 @@ class Import_order extends CI_Controller
                     'is_paid' => 0,
                     'is_term' => $payment->has_term,
                     'shipping_code' => $shipping_code,
+                    'shipping_fee' => $shipping_fee,
                     'status' => 1,
                     'date_add' => $date_add,
                     'warehouse_code' => $warehouse_code,
@@ -468,6 +477,74 @@ class Import_order extends CI_Controller
                   }
                 } //--- enf force update
               } //--- end if exists detail
+
+
+              //----- ใส่รหัสค่าจัดส่งสินค้า
+              if($shipping_fee > 0 && !empty($shipping_item))
+              {
+                //---- เช็คข้อมูล ว่ามีรายละเอียดนี้อยู่ในออเดอร์แล้วหรือยัง
+                //---- ถ้ามีข้อมูลอยู่แล้ว (TRUE)ให้ข้ามการนำเข้ารายการนี้ไป
+                //---- เพิ่มรายได้ค่าจัดส่ง
+                if($shipping_added != $order_code )
+                {
+                  $shipping_exists = $this->orders_model->is_exists_detail($order_code, $shipping_item->code);
+                  if($shipping_exists === FALSE)
+                  {
+                    //--- ถ้ายังไม่มีรายการอยู่ เพิ่มใหม่
+                    $arr = array(
+                      "order_code"	=> $order_code,
+                      "style_code"		=> $shipping_item->style_code,
+                      "product_code"	=> $shipping_item->code,
+                      "product_name"	=> $shipping_item->name,
+                      "cost"  => $shipping_item->cost,
+                      "price"	=> $shipping_fee,
+                      "qty"		=> 1,
+                      "discount1"	=> 0,
+                      "discount2" => 0,
+                      "discount3" => 0,
+                      "discount_amount" => 0,
+                      "total_amount"	=> $shipping_fee,
+                      "id_rule"	=> NULL,
+                      "is_count" => $shipping_item->count_stock,
+                      "is_import" => 1
+                    );
+
+                    if( $this->orders_model->add_detail($arr) === FALSE )
+                    {
+                      $sc = FALSE;
+                      $message = 'เพิ่มรายการ รายได้ค่าจัดส่ง ไม่สำเร็จ : '.$ref_code;
+                      break;
+                    }
+                    else
+                    {
+                      $shipping_added = $order_code;
+                    }
+                  }
+                  else
+                  {
+                    if($rs['S'] == 1)
+                    {
+                      $od  = $this->orders_model->get_order_detail($order_code, $shipping_item->code);
+                      $arr = array(
+                        "price"	=> $shipping_fee
+                      );
+
+                      if($this->orders_model->update_detail($od->id, $arr) === FALSE)
+                      {
+                        $sc = FALSE;
+                        $message = 'update ค่าจัดส่ง ไม่สำเร็จ : '.$ref_code;
+                        break;
+                      }
+                      else
+                      {
+                        $shipping_added = $order_code;
+                      }
+                    }
+                  }
+
+                } //--- end if shipping_added
+
+              } //--- end shipping_fee = 0
 
             } //--- end header column
 

@@ -57,7 +57,10 @@ class Orders extends PS_Controller
       'onlyMe' => get_filter('onlyMe', 'onlyMe', NULL),
       'isExpire' => get_filter('isExpire', 'isExpire', NULL),
       'order_by' => get_filter('order_by', 'order_order_by', ''),
-      'sort_by' => get_filter('sort_by', 'order_sort_by', '')
+      'sort_by' => get_filter('sort_by', 'order_sort_by', ''),
+      'stated' => get_filter('stated', 'stated', ''),
+      'startTime' => get_filter('startTime', 'startTime', ''),
+      'endTime' => get_filter('endTime', 'endTime', '')
     );
 
     $state = array(
@@ -247,12 +250,12 @@ class Orders extends PS_Controller
         $qty = $rs['qty'];
         $item = $this->products_model->get($code);
 
-        if( $qty > 0 )
+        if( $qty > 0 && !empty($item))
         {
           $qty = ceil($qty);
 
           //---- ยอดสินค้าที่่สั่งได้
-          $sumStock = $this->get_sell_stock($code, $order->warehouse_code);
+          $sumStock = $this->get_sell_stock($item->code, $order->warehouse_code);
 
 
           //--- ถ้ามีสต็อกมากว่าที่สั่ง หรือ เป็นสินค้าไม่นับสต็อก
@@ -260,7 +263,7 @@ class Orders extends PS_Controller
           {
 
             //---- ถ้ายังไม่มีรายการในออเดอร์
-            if( $this->orders_model->is_exists_detail($order_code, $code) === FALSE )
+            if( $this->orders_model->is_exists_detail($order_code, $item->code) === FALSE )
             {
               //---- คำนวณ ส่วนลดจากนโยบายส่วนลด
               $discount = array(
@@ -390,7 +393,7 @@ class Orders extends PS_Controller
           else 	// if getStock
           {
             $result = FALSE;
-            $error = "Error : สินค้าไม่เพียงพอ";
+            $error = "Error : สินค้าไม่เพียงพอ : {$item->code}";
           } 	//--- if getStock
         }	//--- if qty > 0
       }
@@ -632,6 +635,7 @@ class Orders extends PS_Controller
   	$id_tab = $this->input->post('id');
     $whCode = get_null($this->input->post('warehouse_code'));
   	$qs     = $this->product_tab_model->getStyleInTab($id_tab);
+    $showStock = getConfig('SHOW_SUM_STOCK');
   	if( $qs->num_rows() > 0 )
   	{
   		foreach( $qs->result() as $rs)
@@ -650,7 +654,7 @@ class Orders extends PS_Controller
   				$ds	.= 			'<div class="description" style="font-size:10px; min-height:50px;">';
   				$ds	.= 				'<a href="javascript:void(0)" onClick="getOrderGrid(\''.$style->code.'\')">';
   				$ds	.= 			$style->code.'<br/>'. number($style->price,2);
-  				$ds 	.=  		$style->count_stock == 1 ? ' | <span style="color:red;">'.$this->get_style_sell_stock($style->code, $whCode).'</span>' : '';
+  				$ds 	.=  		($style->count_stock && $showStock) ? ' | <span style="color:red;">'.$this->get_style_sell_stock($style->code, $whCode).'</span>' : '';
   				$ds	.= 				'</a>';
   				$ds 	.= 			'</div>';
   				$ds	.= 		'</div>';
@@ -682,17 +686,40 @@ class Orders extends PS_Controller
   public function get_order_grid()
   {
     //----- Attribute Grid By Clicking image
-    $style_code = $this->input->get('style_code');
-    $warehouse = get_null($this->input->get('warehouse_code'));
-    $zone = get_null($this->input->get('zone_code'));
-  	$sc = 'not exists';
-    $view = $this->input->get('isView') == '0' ? FALSE : TRUE;
-  	$sc = $this->getOrderGrid($style_code, $view, $warehouse, $zone);
-  	$tableWidth	= $this->products_model->countAttribute($style_code) == 1 ? 600 : $this->getOrderTableWidth($style_code);
-  	$sc .= ' | '.$tableWidth;
-  	$sc .= ' | ' . $style_code;
-  	$sc .= ' | ' . $style_code;
-  	echo $sc;
+    $style = $this->product_style_model->get_with_old_code($this->input->get('style_code'));
+    if(!empty($style))
+    {
+      //--- ถ้าได้ style เดียว จะเป็น object ไม่ใช่ array
+      if(! is_array($style))
+      {
+        $warehouse = get_null($this->input->get('warehouse_code'));
+        $zone = get_null($this->input->get('zone_code'));
+      	$sc = 'not exists';
+        $view = $this->input->get('isView') == '0' ? FALSE : TRUE;
+      	$sc = $this->getOrderGrid($style->code, $view, $warehouse, $zone);
+      	$tableWidth	= $this->products_model->countAttribute($style->code) == 1 ? 600 : $this->getOrderTableWidth($style->code);
+      	$sc .= ' | ' . $tableWidth;
+      	$sc .= ' | ' . $style->code;
+      	$sc .= ' | ' . $style->old_code;
+      	echo $sc;
+      }
+      else
+      {
+        $this->error = "รหัสซ้ำ ";
+        foreach($style as $rs)
+        {
+          $this->error .= " : {$rs->code} : {$rs->old_code}";
+        }
+
+        echo $this->error;
+      }
+
+    }
+    else
+    {
+      echo 'notfound';
+    }
+
   }
 
 
@@ -702,11 +729,26 @@ class Orders extends PS_Controller
     $item_code = $this->input->get('itemCode');
     $warehouse_code = get_null($this->input->get('warehouse_code'));
     $filter = getConfig('MAX_SHOW_STOCK');
-    $item = $this->products_model->get($item_code);
+    $item = $this->products_model->get_with_old_code($item_code);
+
     if(!empty($item))
     {
-      $qty = $item->count_stock == 1 ? ($item->active == 1 ? $this->showStock($this->get_sell_stock($item->code, $warehouse_code)) : 0) : 1000000;
-      $sc = "success | {$item_code} | {$qty}";
+      if(! is_array($item))
+      {
+        $qty = $item->count_stock == 1 ? ($item->active == 1 ? $this->showStock($this->get_sell_stock($item->code, $warehouse_code)) : 0) : 1000000;
+        $sc = "success | {$item_code} | {$qty}";
+      }
+      else
+      {
+        $this->error = "รหัสซ้ำ ";
+        foreach($item as $rs)
+        {
+          $this->error .= " :{$rs->code}";
+        }
+
+        echo "Error : {$this->error} | {$item_code}";
+      }
+
     }
     else
     {
@@ -2040,19 +2082,6 @@ class Orders extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'code',
-      'customer',
-      'user',
-      'reference',
-      'shipCode',
-      'channels',
-      'payment',
-      'fromDate',
-      'toDate'
-    );
-
-
-    $filter = array(
       'order_code',
       'order_customer',
       'order_user',
@@ -2077,6 +2106,9 @@ class Orders extends PS_Controller
       'state_7',
       'state_8',
       'state_9',
+      'stated',
+      'startTime',
+      'endTime'
     );
 
     clear_filter($filter);

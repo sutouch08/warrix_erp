@@ -61,7 +61,7 @@
         <th class="width-10 text-center">จำนวน</th>
         <th class="width-10 text-center">สถานะ</th>
     		<th class="width-20">โซน</th>
-        <th class="width-15 text-center"></th>
+        <th class="width-15 text-center">Action</th>
       </tr>
       <tbody>
     <?php if( !empty($data)) : ?>
@@ -76,7 +76,7 @@
     		<td class="text-center"><?php echo $rs->state_name; ?></td>
         <td> <?php echo $rs->zone_name; ?></td>
     		<td class="text-right">
-    			
+
     		</td>
       </tr>
     <?php  $no++; ?>

@@ -62,16 +62,22 @@
 						</small>
 					</a>
 				</div>
+				<?php if(! isset($_GET['nomenu'])) : ?>
+					<form id="receive-form" method="post" target="_blank" action="<?php echo base_url(); ?>inventory/invoice">
+					  <input type="hidden" name="role" value="N">
+					  <input type="hidden" name="is_valid" value="0" >
+					</form>
+					<form id="consign_tr-form" method="post" target="_blank" action="<?php echo base_url(); ?>orders/consign_tr">
+					  <input type="hidden" name="isApprove" value="0">
+					</form>
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
+
+						<?php $this->load->view('include/notification'); ?>
+
 						<li class="light-blue">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
-								<img class="nav-user-photo"
-                              src="<?php if(file_exists("assets/avatars/".get_cookie('uname').".jpg")){
-															echo base_url()."assets/avatars/".get_cookie('uname').".jpg";
-														}else{
-															echo base_url()."assets/avatars/avatar.png";
-														} ?>" alt="<?php echo get_cookie('displayName'); ?> " />
+
 								<span class="user-info">
 									<small>Welcome</small>
 									<?php echo get_cookie('displayName'); ?>
@@ -102,6 +108,8 @@
 						</li>
 					</ul>
 				</div>
+
+				<?php endif; ?>
 
 				<!-- /section:basics/navbar.dropdown -->
 			</div><!-- /.navbar-container -->

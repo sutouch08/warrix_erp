@@ -13,6 +13,9 @@ $btn_strict_no  = $STRICT_OVER_DUE == 0 ? 'btn-danger' : '';
 
 $btn_credit_yes = $CONTROL_CREDIT == 1 ? 'btn-success' : '';
 $btn_credit_no  = $CONTROL_CREDIT == 0 ? 'btn-danger' : '';
+
+$btn_show_stock_yes = $SHOW_SUM_STOCK == 1 ? 'btn-success' : '';
+$btn_show_stock_no  = $SHOW_SUM_STOCK == 0 ? 'btn-primary' : '';
 ?>
 <div class="tab-pane fade" id="order">
 <form id="orderForm" method="post" action="<?php echo $this->home; ?>/update_config">
@@ -28,6 +31,17 @@ $btn_credit_no  = $CONTROL_CREDIT == 0 ? 'btn-danger' : '';
 		<div class="col-sm-9">
 			<input type="text" class="form-control input-sm input-small text-center" name="STOCK_FILTER" required value="<?php echo $STOCK_FILTER; ?>" />
 			<span class="help-block">กำหนดจำนวนสินค้าคงเหลือสูงสุดที่จะแสดงใหเห็น ถ้าไม่ต้องการใช้กำหนดเป็น 0 </span>
+		</div>
+		<div class="divider-hidden"></div>
+
+		<div class="col-sm-3"><span class="form-control left-label">แสดงยอดรวมสต็อก</span></div>
+		<div class="col-sm-9">
+			<div class="btn-group">
+				<button type="button" class="btn btn-sm <?php echo $btn_show_stock_yes; ?>" style="width:50%;" id="btn-show-stock-yes" onClick="toggleShowStock(1)">เปิด</button>
+				<button type="button" class="btn btn-sm <?php echo $btn_show_stock_no; ?>" style="width:50%;" id="btn-show-stock-no" onClick="toggleShowStock(0)">ปิด</button>
+			</div>
+			<input type="hidden" name="SHOW_SUM_STOCK" id="show-sum-stock" value="<?php echo $SHOW_SUM_STOCK; ?>" />
+			<span class="help-block">แสดงยอดรวมสินค้าคงเหลือในหน้าออเดอร์หรือไม่ (หากเปิดไว้ระบบจะทำงานช้าลง)</span>
 		</div>
 		<div class="divider-hidden"></div>
 
@@ -126,6 +140,13 @@ $btn_credit_no  = $CONTROL_CREDIT == 0 ? 'btn-danger' : '';
     <div class="col-sm-9">
       <input type="text" class="form-control input-sm input-small text-center" name="PREFIX_SHIPPING_NUMBER" value="<?php echo $PREFIX_SHIPPING_NUMBER; ?>" />
       <span class="help-block">รหัสนำหน้าเลขที่จัดส่ง โดยใช้เลขที่ออเดอร์ของ Warrix12 แล้วเติมรหัสนี้นำหน้าและบันทึกเป็นเลขที่จัดส่งทันที ใช้ในการ import ออเดอร์จากเว็บไซต์</span>
+    </div>
+
+
+		<div class="col-sm-3"><span class="form-control left-label">รหัสรายได้ค่าจัดส่ง</span></div>
+    <div class="col-sm-9">
+      <input type="text" class="form-control input-sm input-large text-center" name="SHIPPING_ITEM_CODE" value="<?php echo $SHIPPING_ITEM_CODE; ?>" />
+      <span class="help-block">รหัสสินค้ารายได้ค่าจัดส่ง ที่จะเพิ่มเป็นรายการสินค้าให้ในออเดอร์ที่มีการคิดค่าจัดส่ง</span>
     </div>
 
 		<div class="col-sm-3"><span class="form-control left-label">น้ำหนักเหมารวม(กรัม)</span></div>

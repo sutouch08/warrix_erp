@@ -16,7 +16,9 @@ class stock_model extends CI_Model
     ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OITM', 'OIBQ.ItemCode = OITM.ItemCode', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OWHS.U_MAIN', 'Y');
+    ->where('OWHS.U_MAIN', 'Y')
+    ->where('OBIN.SysBin', 'N');
+
     if($warehouse !== NULL)
     {
       $this->ms->where('OWHS.WhsCode', $warehouse);
@@ -58,11 +60,9 @@ class stock_model extends CI_Model
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
-    ->where('OIBQ.ItemCode', $item);
-    if(empty($zone))
-    {
-      $this->ms->where('OWHS.U_MAIN', 'Y');
-    }
+    ->where('OIBQ.ItemCode', $item)
+    ->where('OBIN.SysBin', 'N')
+    ->where('OWHS.U_MAIN', 'Y');
 
     if(! empty($warehouse))
     {
@@ -75,6 +75,7 @@ class stock_model extends CI_Model
     }
 
     $rs = $this->ms->get();
+
     return intval($rs->row()->qty);
   }
 
@@ -88,7 +89,7 @@ class stock_model extends CI_Model
 
 
 
-  
+
 
   //---- ยอดสินค้าคงเหลือในแต่ละโซน
   public function get_stock_in_zone($item, $warehouse = NULL)
@@ -99,28 +100,22 @@ class stock_model extends CI_Model
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->join('OWHS', 'OWHS.WhsCode = OBIN.WhsCode', 'left')
     ->where('OWHS.U_MAIN', 'Y')
+    ->where('OBIN.SysBin', 'N')
     ->where('ItemCode', $item);
     if($warehouse !== NULL)
     {
       $this->ms->where('OWHS.WhsCode', $warehouse);
     }
-    $rs = $this->ms->get();
 
-    $result = array();
+    $rs = $this->ms->get();
 
     if($rs->num_rows() > 0)
     {
-      foreach($rs->result() as $stock)
-      {
-        $ds = new stdClass();
-        $ds->code = $stock->code;
-        $ds->name = $stock->name;
-        $ds->qty  = $stock->qty;
-        $result[] = $ds;
-      }
+
+      return $rs->result();
     }
 
-    return $result;
+    return array();
   }
 
 

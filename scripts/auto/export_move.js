@@ -9,7 +9,7 @@ $(document).ready(function() {
 
 function getData(){
   var from_date = '2019-04-01 00:00:00';
-  var to_date = '2020-04-30 23:59:59';
+  var to_date = '2020-06-30 23:59:59';
   $.ajax({
     url: HOME + "/get_move_list",
     type:'GET',

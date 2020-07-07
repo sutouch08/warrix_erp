@@ -254,7 +254,8 @@ class Qc extends PS_Controller
       'barcode_list' => $barcode_list,
       'box_list' => $this->qc_model->get_box_list($code),
       'qc_qty' => $this->qc_model->total_qc($code),
-      'all_qty' => $this->get_sum_qty($code)
+      'all_qty' => $this->get_sum_qty($code),
+      'disActive' => $order->state == 6 ? '' : 'disabled'
     );
 
     $this->load->view('inventory/qc/qc_process', $ds);

@@ -44,6 +44,8 @@ function select_sell_warehouse($se = NULL)
   $CI =& get_instance();
   $CI->load->model('masters/warehouse_model');
   $options = $CI->warehouse_model->get_sell_warehouse_list();
+  
+  $se = empty($se) ? getConfig('DEFAULT_WAREHOUSE') : $se;
 
   if(!empty($options))
   {

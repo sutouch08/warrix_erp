@@ -116,7 +116,7 @@ class Sponsor extends PS_Controller
       }
 
       $role = 'P'; //--- P = Sponsor
-
+      $warehouse = $this->input->post('warehouse');
       $ds = array(
         'date_add' => $date_add,
         'code' => $code,
@@ -125,7 +125,8 @@ class Sponsor extends PS_Controller
         'customer_code' => $this->input->post('customerCode'),
         'user' => get_cookie('uname'),
         'remark' => $this->input->post('remark'),
-        'user_ref' => $this->input->post('empName')
+        'user_ref' => $this->input->post('empName'),
+        'warehouse_code' => $warehouse
       );
 
       if($this->orders_model->add($ds) === TRUE)
@@ -165,26 +166,30 @@ class Sponsor extends PS_Controller
       $rs->total_amount  = $this->orders_model->get_order_total_amount($rs->code);
       $rs->user          = $this->user_model->get_name($rs->user);
       $rs->state_name    = get_state_name($rs->state);
-    }
 
-    $state = $this->order_state_model->get_order_state($code);
-    $ost = array();
-    if(!empty($state))
-    {
-      foreach($state as $st)
+      $state = $this->order_state_model->get_order_state($code);
+      $ost = array();
+      if(!empty($state))
       {
-        $ost[] = $st;
+        foreach($state as $st)
+        {
+          $ost[] = $st;
+        }
       }
-    }
 
-    $details = $this->orders_model->get_order_details($code);
-    $ds['state'] = $ost;
-    $ds['order'] = $rs;
-    $ds['details'] = $details;
-    $ds['allowEditDisc'] = FALSE; //getConfig('ALLOW_EDIT_DISCOUNT') == 1 ? TRUE : FALSE;
-    $ds['allowEditPrice'] = getConfig('ALLOW_EDIT_PRICE') == 1 ? TRUE : FALSE;
-    $ds['edit_order'] = TRUE; //--- ใช้เปิดปิดปุ่มแก้ไขราคาสินค้าไม่นับสต็อก
-    $this->load->view('sponsor/sponsor_edit', $ds);
+      $details = $this->orders_model->get_order_details($code);
+      $ds['state'] = $ost;
+      $ds['order'] = $rs;
+      $ds['details'] = $details;
+      $ds['allowEditDisc'] = FALSE; //getConfig('ALLOW_EDIT_DISCOUNT') == 1 ? TRUE : FALSE;
+      $ds['allowEditPrice'] = getConfig('ALLOW_EDIT_PRICE') == 1 ? TRUE : FALSE;
+      $ds['edit_order'] = TRUE; //--- ใช้เปิดปิดปุ่มแก้ไขราคาสินค้าไม่นับสต็อก
+      $this->load->view('sponsor/sponsor_edit', $ds);
+    }
+    else
+    {
+      $this->load->view('page_error');
+    }
   }
 
 
@@ -200,6 +205,7 @@ class Sponsor extends PS_Controller
         'customer_code' => $this->input->post('customer_code'),
         'date_add' => db_date($this->input->post('date_add')),
         'user_ref' => $this->input->post('user_ref'),
+        'warehouse_code' => $this->input->post('warehouse'),
         'remark' => $this->input->post('remark'),
         'status' => 0
       );

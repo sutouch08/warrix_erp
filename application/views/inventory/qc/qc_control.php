@@ -1,9 +1,8 @@
 <!--  Control -->
 <div class="row">
-
   <div class="col-sm-2 padding-5 first">
     <label>บาร์โค้ดกล่อง</label>
-    <input type="text" class="form-control input-sm text-center zone" id="barcode-box" autofocus />
+    <input type="text" class="form-control input-sm text-center zone" id="barcode-box" autofocus <?php echo $disActive; ?> />
   </div>
 
   <div class="col-sm-2 padding-5">
@@ -28,13 +27,13 @@
 
   <div class="col-sm-2">
     <label class="display-block not-show">submit</label>
-    <button type="button" class="btn btn-xs btn-success btn-block item" onclick="saveQc(0)">
+    <button type="button" class="btn btn-xs btn-success btn-block item" onclick="saveQc(0)" <?php echo $disActive; ?>>
       <i class="fa fa-save"></i> บันทึก
     </button>
   </div>
   <div class="col-sm-1 padding-5">
     <label class="display-block not-show">print</label>
-    <button type="button" class="btn btn-xs btn-primary hide" id="btn-print-address" onclick="printAddress()">พิมพ์ใบปะหน้า</button>
+    <button type="button" class="btn btn-xs btn-primary" id="btn-print-address" onclick="printAddress()">พิมพ์ใบปะหน้า</button>
   </div>
   <div class="col-sm-2">
     <div class="title middle text-center" style="height:55px; background-color:black; color:white; padding-top:20px; margin-top:0px;">

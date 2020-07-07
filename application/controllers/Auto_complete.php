@@ -91,6 +91,59 @@ public function get_style_code()
 
 
 
+public function get_prepare_style_code()
+{
+  $sc = array();
+  $this->db
+  ->select('code, old_code')
+  ->where('active', 1)
+  ->where('can_sell', 1)
+  ->where('is_deleted', 0)
+  ->group_start()
+  ->like('code', $_REQUEST['term'])
+  ->or_like('old_code', $_REQUEST['term'])
+  ->group_end()
+  ->order_by('old_code', 'ASC')
+  ->limit(20);
+  $qs = $this->db->get('product_style');
+
+  if($qs->num_rows() > 0)
+  {
+    foreach($qs->result() as $rs)
+    $sc[] = $rs->old_code .' | '.$rs->code;
+  }
+
+	echo json_encode($sc);
+}
+
+
+public function get_prepare_item_code()
+{
+  $sc = array();
+  $this->db
+  ->select('code, old_code')
+  ->where('active', 1)
+  ->where('can_sell', 1)
+  ->where('is_deleted', 0)
+  ->group_start()
+  ->like('code', $_REQUEST['term'])
+  ->or_like('old_code', $_REQUEST['term'])
+  ->group_end()
+  ->order_by('old_code', 'ASC')
+  ->limit(50);
+  $qs = $this->db->get('products');
+
+  if($qs->num_rows() > 0)
+  {
+    foreach($qs->result() as $rs)
+    $sc[] = $rs->old_code .' | '.$rs->code;
+  }
+
+	echo json_encode($sc);
+}
+
+
+
 
   public function sub_district()
   {
@@ -473,37 +526,6 @@ public function get_style_code()
   }
 
 
-  // public function get_support()
-  // {
-  //   $sc = array();
-  //   $txt = $_REQUEST['term'];
-  //   $qr  = "SELECT CardCode, CardName FROM OCRD ";
-  //   $qr .= "WHERE CardType = 'C' ";
-  //   if($txt != '*')
-  //   {
-  //     $qr .= "AND (CardCode LIKE N'%{$txt}%' OR CardName LIKE N'%{$txt}%') ";
-  //   }
-  //
-  //   $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
-  //
-  //   $sponsor = $this->ms->query($qr);
-  //
-  //   if($sponsor->num_rows() > 0)
-  //   {
-  //     foreach($sponsor->result() as $rs)
-  //     {
-  //       $sc[] = $rs->CardCode.' | '.$rs->CardName;
-  //     }
-  //   }
-  //   else
-  //   {
-  //     $sc[] = 'ไม่พบรายการ';
-  //   }
-  //
-  //   echo json_encode($sc);
-  // }
-
-
 
   public function get_employee()
   {
@@ -626,10 +648,7 @@ public function get_style_code()
         $sc[] = $pd->code;
       }
     }
-    else
-    {
-      $sc[] = 'no item found';
-    }
+
 
     echo json_encode($sc);
   }
@@ -744,7 +763,39 @@ public function get_style_code()
     }
     else
     {
-      $sc[] = "not_fount";
+      $sc[] = "not_found";
+    }
+
+    echo json_encode($sc);
+  }
+
+
+  public function get_warehouse_by_role($role = 1)
+  {
+    $txt = $_REQUEST['term'];
+    $sc = array();
+
+    $rs = $this->db
+    ->select('code, name')
+    ->where('role', $role)
+    ->group_start()
+    ->like('code', $txt)
+    ->or_like('name', $txt)
+    ->group_end()
+    ->order_by('code', 'ASC')
+    ->limit(20)
+    ->get('warehouse');
+
+    if($rs->num_rows() > 0)
+    {
+      foreach($rs->result() as $row)
+      {
+        $sc[] = $row->code .' | '. $row->name;
+      }
+    }
+    else
+    {
+      $sc[] = 'not found';
     }
 
     echo json_encode($sc);

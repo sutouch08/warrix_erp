@@ -214,7 +214,7 @@ class Zone_model extends CI_Model
     }
 
     $this->db
-    ->select('zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name, zone.old_code')
+    ->select('zone.code AS code, zone.name AS name, zone.warehouse_code, warehouse.name AS warehouse_name, zone.old_code')
     ->from('zone')
     ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left');
 

@@ -80,52 +80,76 @@
   </div>
 
 	<div class="col-sm-2 padding-5">
+		<label class="display-block">สถานะ</label>
+		<select class="form-control input-sm" name="stated">
+			<option value="">เลือกสถานะ</option>
+			<option value="3" <?php echo is_selected($stated, '3'); ?>>รอจัดสินค้า</option>
+			<option value="4" <?php echo is_selected($stated, '4'); ?>>กำลังจัดสินค้า</option>
+			<option value="5" <?php echo is_selected($stated, '5'); ?>>รอตรวจ</option>
+			<option value="6" <?php echo is_selected($stated, '6'); ?>>กำลังตรวจ</option>
+			<option value="7" <?php echo is_selected($stated, '7'); ?>>รอเปิดบิล</option>
+		</select>
+	</div>
+
+	<div class="col-sm-1 padding-5">
+		<label class="display-block">เริ่มต้น</label>
+		<select class="form-control input-sm" name="startTime">
+			<?php echo selectTime($startTime); ?>
+		</select>
+	</div>
+
+	<div class="col-sm-1 padding-5">
+		<label class="display-block">สิ้นสุด</label>
+		<select class="form-control input-sm" name="endTime">
+			<?php echo selectTime($endTime); ?>
+		</select>
+	</div>
+
+	<div class="col-sm-2 padding-5 last">
 		<label>คลัง</label>
 		<select class="form-control input-sm" name="warehouse" onchange="getSearch()">
 			<option value="">ทั้งหมด</option>
 			<?php echo select_warehouse($warehouse); ?>
 		</select>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
-		<label class="display-block not-show">btn</label>
-		<button type="button" id="btn-not-save" class="btn btn-sm btn-block <?php echo $btn['not_save']; ?>" onclick="toggleNotSave()">ไม่บันทึก</button>
-	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
-		<label class="display-block not-show">btn</label>
-		<button type="button" id="btn-expire" class="btn btn-sm btn-block <?php echo $btn['is_expire']; ?>" onclick="toggleIsExpire()">หมดอายุ</button>
-	</div>
-	<div class="col-sm-1 padding-5 last">
-		<label class="display-block not-show">btn</label>
-		<button type="button" id="btn-only-me" class="btn btn-sm btn-block <?php echo $btn['only_me']; ?>" onclick="toggleOnlyMe()">เฉพาะฉัน</button>
-	</div>
 </div>
 <div class="row margin-top-10">
-	<div class="col-sm-1 col-1-harf padding-5 first">
+	<div class="col-sm-1 padding-5 first">
 		<button type="button" id="btn-state-1" class="btn btn-sm btn-block <?php echo $btn['state_1']; ?>" onclick="toggleState(1)">รอดำเนินการ</button>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
+	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-2" class="btn btn-sm btn-block <?php echo $btn['state_2']; ?>" onclick="toggleState(2)">รอชำระเงิน</button>
 	</div>
 	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-3" class="btn btn-sm btn-block <?php echo $btn['state_3']; ?>" onclick="toggleState(3)">รอจัด</button>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
+	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-4" class="btn btn-sm btn-block <?php echo $btn['state_4']; ?>" onclick="toggleState(4)">กำลังจัด</button>
 	</div>
 	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-5" class="btn btn-sm btn-block <?php echo $btn['state_5']; ?>" onclick="toggleState(5)">รอตรวจ</button>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
+	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-6" class="btn btn-sm btn-block <?php echo $btn['state_6']; ?>" onclick="toggleState(6)">กำลังตรวจ</button>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
+	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-7" class="btn btn-sm btn-block <?php echo $btn['state_7']; ?>" onclick="toggleState(7)">รอเปิดบิล</button>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5">
+	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-8" class="btn btn-sm btn-block <?php echo $btn['state_8']; ?>" onclick="toggleState(8)">เปิดบิลแล้ว</button>
 	</div>
-	<div class="col-sm-1 padding-5 last">
+	<div class="col-sm-1 padding-5">
 		<button type="button" id="btn-state-9" class="btn btn-sm btn-block <?php echo $btn['state_9']; ?>" onclick="toggleState(9)">ยกเลิก</button>
+	</div>
+
+	<div class="col-sm-1 padding-5">
+		<button type="button" id="btn-not-save" class="btn btn-sm btn-block <?php echo $btn['not_save']; ?>" onclick="toggleNotSave()">ไม่บันทึก</button>
+	</div>
+	<div class="col-sm-1 padding-5">
+		<button type="button" id="btn-expire" class="btn btn-sm btn-block <?php echo $btn['is_expire']; ?>" onclick="toggleIsExpire()">หมดอายุ</button>
+	</div>
+	<div class="col-sm-1 padding-5 last">
+		<button type="button" id="btn-only-me" class="btn btn-sm btn-block <?php echo $btn['only_me']; ?>" onclick="toggleOnlyMe()">เฉพาะฉัน</button>
 	</div>
 
 </div>
@@ -201,5 +225,6 @@ if($can_upload == 1) :
 endif;
 ?>
 <script src="<?php echo base_url(); ?>scripts/orders/orders.js?v=1"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_list.js?v=1"></script>
 
 <?php $this->load->view('include/footer'); ?>

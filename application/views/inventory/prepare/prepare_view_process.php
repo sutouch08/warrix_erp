@@ -7,84 +7,110 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-				<button type="button" class="btn btn-sm btn-warning" onclick="clearProcessFilter()"><i class="fa fa-retweet"></i> Reset</button>
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> รอจัด</button>
 			</p>
 		</div>
 </div><!-- End Row -->
 <hr class=""/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
-<div class="row">
-  <div class="col-sm-1 col-1-harf padding-5 first">
-    <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
-  </div>
+	<div class="row">
+	  <div class="col-sm-2 padding-5 first">
+	    <label>เลขที่เอกสาร</label>
+	    <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
+	  </div>
 
-  <div class="col-sm-1 col-1-harf padding-5">
-    <label>ลูกค้า</label>
-    <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
-  </div>
+	  <div class="col-sm-2 padding-5">
+	    <label>ลูกค้า</label>
+	    <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
+	  </div>
 
-	<div class="col-sm-1 col-1-harf padding-5">
-    <label>พนักงาน</label>
-    <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
-  </div>
+		<div class="col-sm-2 padding-5">
+	    <label>พนักงาน</label>
+	    <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
+	  </div>
 
-	<div class="col-sm-1 col-1-harf padding-5">
-    <label>ช่องทางขาย</label>
-		<select class="form-control input-sm" name="channels" onchange="getSearch()">
-      <option value="">ทั้งหมด</option>
-      <?php echo select_channels($channels); ?>
-    </select>
-  </div>
-	<!-- <div class="col-sm-1 col-1-harf padding-5">
-    <label>การชำระเงิน</label>
-		<select class="form-control input-sm" name="is_term" onchange="getSearch()">
-      <option value="2">ทั้งหมด</option>
-      <option value="1" <?php echo is_selected($is_term, '1'); ?>>เครดิต</option>
-			<option value="0" <?php echo is_selected($is_term, '0'); ?>>เงินสด</option>
-    </select>
-  </div> -->
+		<div class="col-sm-2 padding-5">
+	    <label>ช่องทางขาย</label>
+			<select class="form-control input-sm" name="channels" onchange="getSearch()">
+	      <option value="">ทั้งหมด</option>
+	      <?php echo select_channels($channels); ?>
+	    </select>
+	  </div>
 
-	<div class="col-sm-1 col-1-harf padding-5">
-    <label>ออนไลน์</label>
-		<select class="form-control input-sm" name="is_online" onchange="getSearch()">
-      <option value="2">ทั้งหมด</option>
-      <option value="1" <?php echo is_selected($is_online, '1'); ?>>ออนไลน์</option>
-			<option value="0" <?php echo is_selected($is_online, '0'); ?>>ออฟไลน์</option>
-    </select>
-  </div>
+		<div class="col-sm-2 padding-5">
+	    <label>ออนไลน์</label>
+			<select class="form-control input-sm" name="is_online" onchange="getSearch()">
+	      <option value="2">ทั้งหมด</option>
+	      <option value="1" <?php echo is_selected($is_online, '1'); ?>>ออนไลน์</option>
+				<option value="0" <?php echo is_selected($is_online, '0'); ?>>ออฟไลน์</option>
+	    </select>
+	  </div>
 
-	<div class="col-sm-1 col-1-harf padding-5">
-    <label>ประเภท</label>
-		<select class="form-control input-sm" name="role" onchange="getSearch()">
-      <option value="all">ทั้งหมด</option>
-      <option value="S" <?php echo is_selected($role, 'S'); ?>>ขาย</option>
-			<option value="C" <?php echo is_selected($role, 'C'); ?>>ฝากขาย(SO)</option>
-			<option value="N" <?php echo is_selected($role, 'N'); ?>>ฝากขาย(TR)</option>
-			<option value="P" <?php echo is_selected($role, 'P'); ?>>สปอนเซอร์</option>
-			<option value="U" <?php echo is_selected($role, 'U'); ?>>อภินันท์</option>
-			<option value="Q" <?php echo is_selected($role, 'Q'); ?>>แปรสภาพ(สต็อก)</option>
-			<option value="T" <?php echo is_selected($role, 'T'); ?>>แปรสภาพ(ขาย)</option>
-			<option value="L" <?php echo is_selected($role, 'L'); ?>>ยืม</option>
-    </select>
-  </div>
+		<div class="col-sm-2 padding-5 last">
+	    <label>ประเภท</label>
+			<select class="form-control input-sm" name="role" onchange="getSearch()">
+	      <option value="all">ทั้งหมด</option>
+	      <option value="S" <?php echo is_selected($role, 'S'); ?>>ขาย</option>
+				<option value="C" <?php echo is_selected($role, 'C'); ?>>ฝากขาย(SO)</option>
+				<option value="N" <?php echo is_selected($role, 'N'); ?>>ฝากขาย(TR)</option>
+				<option value="P" <?php echo is_selected($role, 'P'); ?>>สปอนเซอร์</option>
+				<option value="U" <?php echo is_selected($role, 'U'); ?>>อภินันท์</option>
+				<option value="Q" <?php echo is_selected($role, 'Q'); ?>>แปรสภาพ(สต็อก)</option>
+				<option value="T" <?php echo is_selected($role, 'T'); ?>>แปรสภาพ(ขาย)</option>
+				<option value="L" <?php echo is_selected($role, 'L'); ?>>ยืม</option>
+	    </select>
+	  </div>
 
+		<div class="col-sm-2 padding-5 first">
+	    <label>วันที่</label>
+	    <div class="input-daterange input-group">
+	      <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
+	      <input type="text" class="form-control input-sm width-50 text-center" name="to_date" id="toDate" value="<?php echo $to_date; ?>" />
+	    </div>
 
-	<div class="col-sm-2 padding-5">
-    <label>วันที่</label>
-    <div class="input-daterange input-group">
-      <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
-      <input type="text" class="form-control input-sm width-50 text-center" name="to_date" id="toDate" value="<?php echo $to_date; ?>" />
-    </div>
+	  </div>
 
-  </div>
+		<div class="col-sm-2 padding-5">
+			<label class="display-block">สถานะ</label>
+			<select class="form-control input-sm" name="stated">
+				<option value="">เลือกสถานะ</option>
+				<option value="3" <?php echo is_selected($stated, '3'); ?>>รอจัดสินค้า</option>
+				<option value="4" <?php echo is_selected($stated, '4'); ?>>กำลังจัดสินค้า</option>
+				<option value="5" <?php echo is_selected($stated, '5'); ?>>รอตรวจ</option>
+				<option value="6" <?php echo is_selected($stated, '6'); ?>>กำลังตรวจ</option>
+				<option value="7" <?php echo is_selected($stated, '7'); ?>>รอเปิดบิล</option>
+			</select>
+		</div>
 
-  <div class="col-sm-1 padding-5 last">
-    <label class="display-block not-show">buton</label>
-    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
-  </div>
-</div>
+		<div class="col-sm-1 padding-5">
+			<label class="display-block">เริ่มต้น</label>
+			<select class="form-control input-sm" name="startTime">
+				<?php echo selectTime($startTime); ?>
+			</select>
+		</div>
+
+		<div class="col-sm-1 padding-5">
+			<label class="display-block">สิ้นสุด</label>
+			<select class="form-control input-sm" name="endTime">
+				<?php echo selectTime($endTime); ?>
+			</select>
+		</div>
+
+		<div class="col-sm-4 padding-5">
+	    <label>รหัสสินค้า</label>
+	    <input type="text" class="form-control input-sm search" name="item_code" id="item_code" value="<?php echo $item_code; ?>" />
+	  </div>
+
+	  <div class="col-sm-1 padding-5">
+	    <label class="display-block not-show">buton</label>
+	    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
+	  </div>
+		<div class="col-sm-1 padding-5 last">
+	    <label class="display-block not-show">buton</label>
+	    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearProcessFilter()"><i class="fa fa-retweet"></i> Reset</button>
+	  </div>
+
+	</div>
 <hr class="margin-top-15">
 <input type="hidden" name="order_by" id="order_by" value="<?php echo $order_by; ?>">
 <input type="hidden" name="sort_by" id="sort_by" value="<?php echo $sort_by; ?>">
@@ -144,7 +170,7 @@
 	</div>
 </div>
 
-<script src="<?php echo base_url(); ?>scripts/inventory/prepare/prepare.js"></script>
-<script src="<?php echo base_url(); ?>scripts/inventory/prepare/prepare_list.js"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/prepare/prepare.js?v=<?php echo date('YmdHis'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/prepare/prepare_list.js?v=<?php echo date('YmdHis'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

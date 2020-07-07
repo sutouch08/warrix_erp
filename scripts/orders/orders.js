@@ -21,12 +21,6 @@ function editOrder(code){
 }
 
 
-$(document).ready(function() {
-	//---	reload ทุก 5 นาที
-	setTimeout(function(){ goBack(); }, 300000);
-});
-
-
 function clearFilter(){
   var url = BASE_URL + 'orders/orders/clear_filter';
   $.get(url, function(rs){ goBack(); });

@@ -20,12 +20,28 @@
 		  <input type="text" class="form-control input-sm text-center" value="<?php echo $order->user; ?>" disabled />
 		</div>
 
-		<div class="col-sm-11 padding-5 first">
-		 	<label>หมายเหตุ</label>
-		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
-		</div>
-		<?php if($this->pm->can_add OR $this->pm->can_edit): ?>
-		<div class="col-sm-1 padding-5 last">
+		<div class="col-sm-2 col-2-harf col-xs-12 padding-5 first">
+			<label>คลัง</label>
+	    <select class="form-control input-sm edit" name="warehouse" id="warehouse" disabled>
+				<option value="">เลือกคลัง</option>
+				<?php echo select_sell_warehouse($order->warehouse_code); ?>
+			</select>
+	  </div>
+
+		<?php if($order->state < 4) : ?>
+			<div class="col-sm-7 col-xs-12 padding-5">
+			 	<label>หมายเหตุ</label>
+			  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
+			</div>
+		<?php else : ?>
+			<div class="col-sm-8 col-xs-12 padding-5 last">
+			 	<label>หมายเหตุ</label>
+			  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
+			</div>
+		<?php endif; ?>
+
+		<?php if($order->state < 4 && ($this->pm->can_add OR $this->pm->can_edit)): ?>
+		<div class="col-sm-1 col-1-harf padding-5 last">
 			<label class="display-block not-show">แก้ไข</label>
 			<button type="button" class="btn btn-xs btn-warning btn-block" id="btn-edit" onclick="getEdit()"><i class="fa fa-pencil"></i> แก้ไข</i></button>
 			<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-update" onclick="validUpdate()"><i class="fa fa-save"></i> บันทึก</i></button>

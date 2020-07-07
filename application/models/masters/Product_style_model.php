@@ -7,6 +7,7 @@ class Product_style_model extends CI_Model
   }
 
 
+
   public function add(array $ds = array())
   {
     if(!empty($ds))
@@ -44,20 +45,6 @@ class Product_style_model extends CI_Model
 
   public function count_sap_list($date_add, $date_upd)
   {
-    // $rs = $this->ms->distinct()
-    // ->select('OITM.U_MODEL')
-    // ->from('OITM')
-    // ->join('ITM1 AS ITM1', '(ITM1.ItemCode = OITM.ItemCode AND ITM1.PriceList = 13)','left')
-    // ->join('ITM1 AS ITM2', '(ITM2.ItemCode = OITM.ItemCode AND ITM2.PriceList = 11)', 'left')
-    // ->where('OITM.U_MODEL IS NOT NULL', NULL, FALSE)
-    // ->where('OITM.U_MODEL !=', '')
-    // ->where('OITM.U_MODEL !=','0')
-    // ->group_start()
-    // ->where('OITM.CreateDate >', $date_add)
-    // ->or_where('UpdateDate >', $date_upd)
-    // ->group_end()
-    // ->get();
-
     $rs = $this->ms
     ->select('U_MODEL')
     ->where('U_MODEL IS NOT NULL', NULL, FALSE)
@@ -219,6 +206,23 @@ class Product_style_model extends CI_Model
   }
 
 
+  public function get_with_old_code($code)
+  {
+    $rs = $this->db->where('code', $code)->or_where('old_code', $code)->get('product_style');
+    if($rs->num_rows() == 1)
+    {
+      return $rs->row();
+    }
+
+    if($rs->num_rows() > 1)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
 
   public function get_name($code)
   {
@@ -348,7 +352,7 @@ class Product_style_model extends CI_Model
 
     return FALSE;
   }
-  
+
 
   public function add_sap_model(array $ds = array())
   {

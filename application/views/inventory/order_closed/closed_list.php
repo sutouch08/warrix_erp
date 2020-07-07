@@ -7,7 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-
+				<button type="button" class="btn btn-sm btn-warning" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
 			</p>
 		</div>
 </div><!-- End Row -->
@@ -44,24 +44,30 @@
       <?php echo select_channels($channels); ?>
     </select>
   </div>
+
+	<div class="col-sm-1 col-1-harf padding-5">
+    <label>การยืนยัน</label>
+		<select class="form-control input-sm" name="is_valid" onchange="getSearch()">
+      <option value="">ทั้งหมด</option>
+      <option value="1" <?php echo is_selected($is_valid, '1'); ?>>ยืนยันแล้ว</option>
+			<option value="0" <?php echo is_selected($is_valid, '0'); ?>>ยังไม่ยืนยัน</option>
+    </select>
+  </div>
+
 	<div class="col-sm-2 padding-5">
     <label>วันที่</label>
     <div class="input-daterange input-group">
       <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
       <input type="text" class="form-control input-sm width-50 text-center" name="to_date" id="toDate" value="<?php echo $to_date; ?>" />
     </div>
-
   </div>
 
-  <div class="col-sm-1 padding-5">
-    <label class="display-block not-show">buton</label>
-    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
-  </div>
 	<div class="col-sm-1 padding-5 last">
-    <label class="display-block not-show">buton</label>
-    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
-  </div>
+		<label class="display-block not-show">search</label>
+		<button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
+	</div>
 </div>
+
 <hr class="margin-top-15">
 <input type="hidden" name="order_by" id="order_by" value="<?php echo $order_by; ?>">
 <input type="hidden" name="sort_by" id="sort_by" value="<?php echo $sort_by; ?>">
