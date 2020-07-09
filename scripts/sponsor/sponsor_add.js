@@ -173,7 +173,13 @@ var date;
 
 
 function getEdit(){
-  $('.edit').removeAttr('disabled');
+  let approved = $('#is_approved').val();
+  if(approved == 1){
+    $('#remark').removeAttr('disabled');
+  } else {
+    $('.edit').removeAttr('disabled');
+  }
+
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
   customer = $("#customerCode").val();

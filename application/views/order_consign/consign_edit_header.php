@@ -27,6 +27,7 @@
 				<?php echo select_sell_warehouse($order->warehouse_code); ?>
 			</select>
 	  </div>
+
 		<?php if(empty($approve_view) && ($this->pm->can_add OR $this->pm->can_edit)): ?>
 		<div class="col-sm-8 padding-5">
 		 	<label>หมายเหตุ</label>
@@ -47,5 +48,6 @@
     <input type="hidden" name="order_code" id="order_code" value="<?php echo $order->code; ?>" />
     <input type="hidden" name="customerCode" id="customerCode" value="<?php echo $order->customer_code; ?>" />
 		<input type="hidden" name="zone_code" id="zone_code" value="<?php echo $order->zone_code; ?>" />
+		<input type="hidden" id="is_approved" value="<?php echo $order->is_approved; ?>" />
 </div>
 <hr class="margin-bottom-15"/>

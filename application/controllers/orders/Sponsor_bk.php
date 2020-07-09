@@ -33,51 +33,13 @@ class Sponsor extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code' => get_filter('code', 'sponsor_code', ''),
-      'customer' => get_filter('customer', 'sponsor_customer', ''),
-      'user' => get_filter('user', 'sponsor_user', ''),
-      'zone_code' => get_filter('zone', 'sponsor_zone', ''),
-      'from_date' => get_filter('fromDate', 'sponsor_fromDate', ''),
-      'to_date' => get_filter('toDate', 'sponsor_toDate', ''),
-      'notSave' => get_filter('notSave', 'sponsor_notSave', NULL),
-      'onlyMe' => get_filter('onlyMe', 'sponsor_onlyMe', NULL),
-      'isExpire' => get_filter('isExpire', 'sponsor_isExpire', NULL),
-      'isApprove' => get_filter('isApprove', 'sponsor_isApprove', 'all')
+      'code'          => get_filter('code', 'sponsor_code', ''),
+      'customer'      => get_filter('customer', 'sponsor_customer', ''),
+      'user'          => get_filter('user', 'sponsor_user', ''),
+      'from_date'     => get_filter('fromDate', 'sponsor_fromDate', ''),
+      'to_date'       => get_filter('toDate', 'sponsor_toDate', ''),
+      'is_approve'    => get_filter('is_approve', 'sponsor_is_approve', 'all')
     );
-
-    $state = array(
-      '1' => get_filter('state_1', 'sponsor_state_1', 'N'),
-      '2' => get_filter('state_2', 'sponsor_state_2', 'N'),
-      '3' => get_filter('state_3', 'sponsor_state_3', 'N'),
-      '4' => get_filter('state_4', 'sponsor_state_4', 'N'),
-      '5' => get_filter('state_5', 'sponsor_state_5', 'N'),
-      '6' => get_filter('state_6', 'sponsor_state_6', 'N'),
-      '7' => get_filter('state_7', 'sponsor_state_7', 'N'),
-      '8' => get_filter('state_8', 'sponsor_state_8', 'N'),
-      '9' => get_filter('state_9', 'sponsor_state_9', 'N')
-    );
-
-    $state_list = array();
-
-    $button = array();
-
-    for($i =1; $i <= 9; $i++)
-    {
-    	if($state[$i] === 'Y')
-    	{
-    		$state_list[] = $i;
-    	}
-
-      $btn = 'state_'.$i;
-      $button[$btn] = $state[$i] === 'Y' ? 'btn-info' : '';
-    }
-
-    $button['not_save'] = empty($filter['notSave']) ? '' : 'btn-info';
-    $button['only_me'] = empty($filter['onlyMe']) ? '' : 'btn-info';
-    $button['is_expire'] = empty($filter['isExpire']) ? '' : 'btn-info';
-
-
-    $filter['state_list'] = empty($state_list) ? NULL : $state_list;
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_rows();
@@ -106,8 +68,6 @@ class Sponsor extends PS_Controller
     }
 
     $filter['orders'] = $ds;
-    $filter['state'] = $state;
-    $filter['btn'] = $button;
 
 		$this->pagination->initialize($init);
     $this->load->view('sponsor/sponsor_list', $filter);
@@ -368,25 +328,15 @@ class Sponsor extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'sponsor_code',
-      'sponsor_customer',
-      'sponsor_user',
-      'sponsor_zone',
-      'sponsor_fromDate',
-      'sponsor_toDate',
-      'sponsor_isApprove',
-      'sponsor_notSave',
-      'sponsor_onlyMe',
-      'sponsor_isExpire',
-      'sponsor_state_1',
-      'sponsor_state_2',
-      'sponsor_state_3',
-      'sponsor_state_4',
-      'sponsor_state_5',
-      'sponsor_state_6',
-      'sponsor_state_7',
-      'sponsor_state_8',
-      'sponsor_state_9'
+      'code',
+      'customer',
+      'user',
+      'reference',
+      'shipCode',
+      'channels',
+      'payment',
+      'fromDate',
+      'toDate'
     );
 
     clear_filter($filter);

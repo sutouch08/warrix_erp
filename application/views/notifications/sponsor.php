@@ -1,23 +1,21 @@
-
-<li class="light-blue" id="wt-result">
+<li class="red" id="ws-result">
   <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
-    ฝากขาย (TR)
-    <span class="badge badge-info">0</span>
+    สปอนเซอร์
+    <span class="badge badge-primary">0</span>
   </a>
 </li>
 
 
 
-<script id="wt-template" type="text/x-handlebarsTemplate">
+<script id="ws-template" type="text/x-handlebarsTemplate">
 <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
-  ฝากขาย (TR)
-  <span class="badge badge-info">{{rows}}</span>
+  สปอนเซอร์
+  <span class="badge badge-purple">{{rows}}</span>
 </a>
 
 <ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
   <li class="dropdown-header">
     <center>รออนุมัติ  {{rows}}  รายการ</center>
-
   </li>
 
   <li class="dropdown-content ace-scroll" style="position: relative;">
@@ -29,7 +27,7 @@
     {{#if this.data}}
       {{#each this.data}}
         <li>
-          <a href="javescript:void(0)" onclick="viewConsignTRDetail('{{code}}')">
+          <a href="javescript:void(0)" onclick="viewSponsorDetail('{{code}}')">
             <div class="clearfix">
             <b class="blue">{{code}}</b> &nbsp; {{customer}}
             </div>
@@ -39,7 +37,7 @@
     {{else}}
       <li>
         <a href="javescript:void(0)" class="clearfix">
-          No Data
+          <center><b class="blue">No Data</b></center>
         </a>
       </li>
     {{/if}}
@@ -48,7 +46,7 @@
   </li>
 
   <li class="dropdown-footer">
-    <a href="javascript:void(0)" onclick="viewAllConsignTR()">
+    <a href="javascript:void(0)" onclick="viewAllSponsor()">
       ดูรายการทั้งหมด
       <i class="ace-icon fa fa-arrow-right"></i>
     </a>
@@ -56,47 +54,46 @@
 </ul>
 </script>
 
-
 <script>
+
 $(document).ready(function(){
-  get_wt();
+  get_wc();
 });
 
-var wt = setInterval(function(){
-  get_wt();
+var wc = setInterval(function(){
+  get_wc();
 }, refresh_rate);
 
-function get_wt(){
-    $.ajax({
-      url:BASE_URL + 'orders/consign_tr/get_un_approve_list',
-      type:'GET',
-      cache:false,
-      data:{
-        'limit' : limit_rows
-      },
-      success:function(rs){
-        if(isJson(rs)){
-          let source = $('#wt-template').html();
-          let data = $.parseJSON(rs);
-          let output = $('#wt-result');
-          render(source, data, output);
-        }
+function get_wc(){
+  $.ajax({
+    url:BASE_URL + 'orders/consign_so/get_un_approve_list',
+    type:'GET',
+    cache:false,
+    data:{
+      'limit' : limit_rows
+    },
+    success:function(rs){
+      if(isJson(rs)){
+        let source = $('#wc-template').html();
+        let data = $.parseJSON(rs);
+        let output = $('#wc-result');
+        render(source, data, output);
       }
-    })
+    }
+  })
 }
 
 
-function viewConsignTRDetail(code){
+
+function viewConsignSODetail(code){
   //--- properties for print
   var center    = ($(document).width() - 900)/2;
   var prop 			= "width=900, height=900. left="+center+", scrollbars=yes";
-	var target = BASE_URL + 'orders/consign_tr/edit_order/' + code + '/approve?nomenu';
+	var target = BASE_URL + 'orders/consign_so/edit_order/' + code + '/approve?nomenu';
 	window.open(target, "_blank", prop);
 }
 
-
-function viewAllConsignTR(){
-  $('#consign_tr-form').submit();
+function viewAllConsignSO(){
+  window.open(BASE_URL + 'orders/consign_so', "_blank");
 }
-
 </script>

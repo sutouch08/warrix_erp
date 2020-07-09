@@ -78,6 +78,38 @@ function approve()
 }
 
 
+function unapprove()
+{
+  var order_code = $('#order_code').val();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/un_approve/'+order_code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          text:'ยกเลิกการอนุมัติแล้ว',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
+
+
 function change_state(){
   var order_code = $('#order_code').val();
   $.ajax({
@@ -109,4 +141,60 @@ function change_state(){
       }
     }
   });
+}
+
+
+function toggleState(state){
+  var current = $('#state_'+state).val();
+  if(current == 'Y'){
+    $('#state_'+state).val('N');
+    $('#btn-state-'+state).removeClass('btn-info');
+  }else{
+    $('#state_'+state).val('Y');
+    $('#btn-state-'+state).addClass('btn-info');
+  }
+
+  getSearch();
+}
+
+
+function toggleNotSave(){
+  var current = $('#notSave').val();
+  if(current == ''){
+    $('#notSave').val(1);
+    $('#btn-not-save').addClass('btn-info');
+  }else{
+    $('#notSave').val('');
+    $('#btn-not-save').removeClass('btn-info');
+  }
+
+  getSearch();
+}
+
+
+function toggleOnlyMe(){
+  var current = $('#onlyMe').val();
+  if(current == ''){
+    $('#onlyMe').val(1);
+    $('#btn-only-me').addClass('btn-info');
+  }else{
+    $('#onlyMe').val('');
+    $('#btn-only-me').removeClass('btn-info');
+  }
+
+  getSearch();
+}
+
+
+function toggleIsExpire(){
+  var current = $('#isExpire').val();
+  if(current == ''){
+    $('#isExpire').val(1);
+    $('#btn-expire').addClass('btn-info');
+  }else{
+    $('#isExpire').val('');
+    $('#btn-expire').removeClass('btn-info');
+  }
+
+  getSearch();
 }

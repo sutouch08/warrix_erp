@@ -24,16 +24,16 @@ class Invoice extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'inv_code', ''),
-      'customer'      => get_filter('customer', 'inv_customer', ''),
-      'user'          => get_filter('user', 'inv_user', ''),
-      'role'          => get_filter('role', 'inv_role', ''),
-      'channels'      => get_filter('channels', 'inv_channels', ''),
-      'from_date'     => get_filter('from_date', 'inv_from_date', ''),
-      'to_date'       => get_filter('to_date', 'inv_to_date', ''),
-      'order_by'      => get_filter('order_by', 'inv_order_by', ''),
-      'sort_by'       => get_filter('sort_by', 'inv_sort_by', ''),
-      'is_valid'      => get_filter('is_valid', 'inv_valid', '2')
+      'code'          => get_filter('code', 'ic_code', ''),
+      'customer'      => get_filter('customer', 'ic_customer', ''),
+      'user'          => get_filter('user', 'ic_user', ''),
+      'role'          => get_filter('role', 'ic_role', ''),
+      'channels'      => get_filter('channels', 'ic_channels', ''),
+      'from_date'     => get_filter('from_date', 'ic_from_date', ''),
+      'to_date'       => get_filter('to_date', 'ic_to_date', ''),
+      'order_by'      => get_filter('order_by', 'ic_order_by', ''),
+      'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
+      'is_valid'      => get_filter('is_valid', 'ic_valid', '2')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -110,16 +110,16 @@ class Invoice extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'inv_code',
-      'inv_customer',
-      'inv_user',
-      'inv_role',
-      'inv_channels',
-      'inv_from_date',
-      'inv_to_date',
-      'inv_order_by',
-      'inv_sort_by',
-      'inv_valid'
+      'ic_code',
+      'ic_customer',
+      'ic_user',
+      'ic_role',
+      'ic_channels',
+      'ic_from_date',
+      'ic_to_date',
+      'ic_order_by',
+      'ic_sort_by',
+      'ic_valid'
     );
     clear_filter($filter);
   }

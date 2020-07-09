@@ -233,6 +233,7 @@ class Zone_model extends CI_Model
       $this->db->where('zone.warehouse_code', $ds['warehouse']);
     }
 
+    $this->db->order_by('zone.date_upd', 'DESC');
     $this->db->order_by('zone.code', 'ASC');
 
     if(!empty($perpage))

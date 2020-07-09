@@ -1,13 +1,13 @@
 <li class="green" id="tr-result">
   <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
     TR Draft
-    <span class="badge badge-purple">0</span>
+    <span class="badge badge-success">0</span>
   </a>
 </li>
 <script id="tr-template" type="text/x-handlebarsTemplate">
 <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
   TR Draft
-  <span class="badge badge-green">{{rows}}</span>
+  <span class="badge badge-success">{{rows}}</span>
 </a>
 
 <ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">

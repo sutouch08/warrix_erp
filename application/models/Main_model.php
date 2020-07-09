@@ -19,6 +19,7 @@ class Main_model extends CI_Model
     ->join('customers AS c', 'o.customer_code = c.code', 'left')
     ->join('order_state AS s', 'o.state = s.state', 'left')
     ->where('o.state <', 8 , FALSE)
+    ->where('od.is_complete', 0)
     ->where('od.is_expired', 0)
     ->group_start()
     ->like('od.product_code', $txt)

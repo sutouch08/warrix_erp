@@ -73,7 +73,7 @@
       					<button type="button" class="btn btn-mini btn-warning" id="btn-show-price-<?php echo $rs->id; ?>" onclick="showNonCountPriceBox(<?php echo $rs->id; ?>)"><i class="fa fa-pencil"></i></button>
       					<button type="button" class="btn btn-mini btn-info hide" id="btn-update-price-<?php echo $rs->id; ?>" onclick="updateNonCountPrice(<?php echo $rs->id; ?>)"><i class="fa fa-save"></i></button>
       				<?php endif; ?>
-              <?php if( ( $order->is_paid == 0 && $order->state != 2 && $order->is_expired == 0 ) && ($edit OR $add) && $order->state < 4 ) : ?>
+              <?php if( $order->is_approved == 0 && ( $order->is_paid == 0 && $order->state != 2 && $order->is_expired == 0 ) && ($edit OR $add) && $order->state < 4 ) : ?>
               	<button type="button" class="btn btn-mini btn-danger" onclick="removeDetail(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"><i class="fa fa-trash"></i></button>
               <?php endif; ?>
               </td>
@@ -159,7 +159,7 @@
             <td class="middle text-center">{{ discount }}</td>
             <td class="middle text-right">{{ amount }}</td>
             <td class="middle text-right">
-            <?php if( $edit OR $add ) : ?>
+            <?php if( ($edit OR $add) && $order->is_approved == 0 ) : ?>
             	<button type="button" class="btn btn-xs btn-danger" onclick="removeDetail({{ id }}, '{{ productCode }}')"><i class="fa fa-trash"></i></button>
             <?php endif; ?>
             </td>

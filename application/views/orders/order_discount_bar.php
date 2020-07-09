@@ -1,5 +1,5 @@
 <?php
-if(empty($order->has_payment) && !$order->is_paid && !$order->is_expired ) :
+if(empty($order->has_payment) && !$order->is_paid && !$order->is_expired && !$order->is_approved) :
 ?>
 <hr/>
 <div class="row">

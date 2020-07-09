@@ -1546,13 +1546,74 @@ class Orders extends PS_Controller
   public function do_approve($code)
   {
     $sc = TRUE;
-    $user = get_cookie('uname');
-    $rs = $this->orders_model->update_approver($code, $user);
-    if(! $rs)
+    $this->load->model('approve_logs_model');
+    $order = $this->orders_model->get($code);
+    if(!empty($order))
+    {
+      if($order->state == 1)
+      {
+        $user = get_cookie('uname');
+        $rs = $this->orders_model->update_approver($code, $user);
+        if(! $rs)
+        {
+          $sc = FALSE;
+          $this->error = "อนุมัติไม่สำเร็จ";
+        }
+        else
+        {
+          $this->approve_logs_model->add($code, 1, $user);
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "สถานะเอกสารไม่ถูกต้อง";
+      }
+    }
+    else
     {
       $sc = FALSE;
-      $this->error = "อนุมัติไม่สำเร็จ";
+      $this->error = "ไม่พบเลขที่เอกสาร";
     }
+
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+  public function un_approve($code)
+  {
+    $sc = TRUE;
+    $this->load->model('approve_logs_model');
+    $order = $this->orders_model->get($code);
+    if(!empty($order))
+    {
+      if($order->state == 1 )
+      {
+        $user = get_cookie('uname');
+        $rs = $this->orders_model->un_approver($code, $user);
+        if(! $rs)
+        {
+          $sc = FALSE;
+          $this->error = "อนุมัติไม่สำเร็จ";
+        }
+        else
+        {
+          $this->approve_logs_model->add($code, 0, $user);
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "สถานะเอกสารไม่ถูกต้อง";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบเลขที่เอกสาร";
+    }
+
 
     echo $sc === TRUE ? 'success' : $this->error;
   }
@@ -1592,7 +1653,6 @@ class Orders extends PS_Controller
               $this->error = 'กรุณายกเลิกใบโอนสินค้าใน SAP ก่อนย้อนสถานะ';
             }
           }
-
         }
 
         //--- ถ้าเป็นยืมสินค้า
@@ -1641,9 +1701,13 @@ class Orders extends PS_Controller
           if($sc === TRUE && $order->state == 8)
           {
 
-            if($state < 8 OR $state == 9)
+            if($state < 8)
             {
               $this->roll_back_action($code, $order->role);
+            }
+            else if($state == 9)
+            {
+              $this->cancle_order($code, $order->role, $order->state);
             }
 
           }
@@ -1651,7 +1715,7 @@ class Orders extends PS_Controller
           {
             if($state == 9)
             {
-              $this->cancle_order($code, $order->role);
+              $this->cancle_order($code, $order->role, $order->state);
             }
           }
 
@@ -1778,18 +1842,88 @@ class Orders extends PS_Controller
         }
       } //--- end foreach
     } //---- end sold
+
+
+    //---- Delete Middle Temp
+    //---- ถ้าเป็นฝากขายโอนคลัง ตามไปลบ transfer draft ที่ยังไม่เอาเข้าด้วย
+    if($role == 'N')
+    {
+      $middle = $this->transfer_model->get_middle_transfer_draft($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          $this->transfer_model->drop_middle_transfer_draft($rows->DocEntry);
+        }
+      }
+    }
+    else if($role == 'T' OR $role == 'Q' OR $role == 'L')
+    {
+      $middle = $this->transfer_model->get_middle_transfer_doc($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          $this->transfer_model->drop_middle_exists_data($rows->DocEntry);
+        }
+      }
+    }
+    else
+    {
+      //---- ถ้าออเดอร์ยังไม่ถูกเอาเข้า SAP ลบออกจากถังกลางด้วย
+      $middle = $this->delivery_order_model->get_middle_delivery_order($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          $this->delivery_order_model->drop_middle_exits_data($rows->DocEntry);
+        }
+      }
+    }
   }
 
 
-  public function cancle_order($code, $role)
+  public function cancle_order($code, $role, $state)
   {
     $this->load->model('inventory/prepare_model');
     $this->load->model('inventory/qc_model');
     $this->load->model('inventory/transform_model');
+    $this->load->model('inventory/transfer_model');
+    $this->load->model('inventory/delivery_order_model');
+    $this->load->model('inventory/invoice_model');
+    $this->load->model('inventory/buffer_model');
+    $this->load->model('inventory/cancle_model');
+    $this->load->model('masters/zone_model');
+
+    if($state == 8)
+    {
+      //--- put prepared product to cancle zone
+      $prepared = $this->prepare_model->get_details($code);
+      if(!empty($prepared))
+      {
+        foreach($prepared AS $rs)
+        {
+          $zone = $this->zone_model->get($rs->zone_code);
+          $arr = array(
+            'order_code' => $rs->order_code,
+            'product_code' => $rs->product_code,
+            'warehouse_code' => empty($zone->warehouse_code) ? NULL : $zone->warehouse_code,
+            'zone_code' => $rs->zone_code,
+            'qty' => $rs->qty,
+            'user' => get_cookie('uname')
+          );
+
+          $this->cancle_model->add($arr);
+        }
+      }
+
+      //--- drop sold data
+      $this->invoice_model->drop_all_sold($code);
+    }
 
     //---- เมื่อมีการยกเลิกออเดอร์
-    //--- 1. เคลียร์ buffer เข้า cancle
-    $this->clear_buffer($code);
+    //--- 1. เคลียร์ buffer
+    $this->buffer_model->delete_all($code);
     //--- 2. ลบประวัติการจัดสินค้า
     $this->prepare_model->clear_prepare($code);
     //--- 3. ลบประวัติการตรวจสินค้า
@@ -1798,11 +1932,54 @@ class Orders extends PS_Controller
     $this->orders_model->clear_order_detail($code);
     //--- 5. ยกเลิกออเดอร์
     $this->orders_model->set_status($code, 2);
+
     //--- 6. ลบรายการที่ผู้ไว้ใน order_transform_detail (กรณีเบิกแปรสภาพ)
-    if($role == 'T')
+    if($role == 'T' OR $role == 'Q')
     {
       $this->transform_model->clear_transform_detail($code);
       $this->transform_model->close_transform($code);
+    }
+
+    //-- หากเป็นออเดอร์ยืม
+    if($role == 'L')
+    {
+      $this->lend_model->drop_backlogs_list($code);
+    }
+
+    //---- ถ้าเป็นฝากขายโอนคลัง ตามไปลบ transfer draft ที่ยังไม่เอาเข้าด้วย
+    if($role == 'N')
+    {
+      $middle = $this->transfer_model->get_middle_transfer_draft($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          $this->transfer_model->drop_middle_transfer_draft($rows->DocEntry);
+        }
+      }
+    }
+    else if($role == 'T' OR $role == 'Q' OR $role == 'L')
+    {
+      $middle = $this->transfer_model->get_middle_transfer_doc($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          $this->transfer_model->drop_middle_exits_data($rows->DocEntry);
+        }
+      }
+    }
+    else
+    {
+      //---- ถ้าออเดอร์ยังไม่ถูกเอาเข้า SAP ลบออกจากถังกลางด้วย
+      $middle = $this->delivery_order_model->get_middle_delivery_order($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          $this->delivery_order_model->drop_middle_exits_data($rows->DocEntry);
+        }
+      }
     }
 
   }
@@ -1914,6 +2091,74 @@ class Orders extends PS_Controller
 
       $this->orders_model->set_status($code, 0);
   	}
+    echo 'success';
+  }
+
+
+
+  public function update_gp()
+  {
+    $code = $this->input->post('code');
+    $gp = $this->input->post('gp');
+    $details = $this->orders_model->get_order_details($code);
+    $user = get_cookie('uname');
+    $this->load->model('orders/discount_logs_model');
+
+    if(!empty($details))
+    {
+      foreach($details as $detail)
+      {
+        //------ คำนวณส่วนลดใหม่
+        $step = explode('+', $gp);
+        $discAmount = 0;
+        $discLabel = array(0, 0, 0);
+        $price = $detail->price;
+        $i = 0;
+        foreach($step as $discText)
+        {
+          if($i < 3) //--- limit ไว้แค่ 3 เสต็ป
+          {
+            $disc = explode('%', $discText);
+            $disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
+            $discount = count($disc) == 1 ? $disc[0] : $price * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
+            $discLabel[$i] = count($disc) == 1 ? $disc[0] : $disc[0].'%';
+            $discAmount += $discount;
+            $price -= $discount;
+          }
+          $i++;
+        }
+
+        $total_discount = $detail->qty * $discAmount; //---- ส่วนลดรวม
+        $total_amount = ( $detail->qty * $detail->price ) - $total_discount; //--- ยอดรวมสุดท้าย
+
+        $arr = array(
+              "discount1" => $discLabel[0],
+              "discount2" => $discLabel[1],
+              "discount3" => $discLabel[2],
+              "discount_amount"	=> $total_discount,
+              "total_amount" => $total_amount ,
+              "id_rule"	=> NULL,
+              "update_user" => $user
+            );
+
+        $cs = $this->orders_model->update_detail($detail->id, $arr);
+        if($cs)
+        {
+          $log_data = array(
+                        "order_code"		=> $code,
+                        "product_code"	=> $detail->product_code,
+                        "old_discount"	=> discountLabel($detail->discount1, $detail->discount2, $detail->discount3),
+                        "new_discount"	=> discountLabel($discLabel[0], $discLabel[1], $discLabel[2]),
+                        "user"	=> $user,
+                        "approver"		=> get_cookie('uname')
+                        );
+          $this->discount_logs_model->logs_discount($log_data);
+        }
+      }
+
+      $this->orders_model->set_status($code, 0);
+    }
+
     echo 'success';
   }
 

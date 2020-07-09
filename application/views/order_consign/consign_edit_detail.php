@@ -30,6 +30,12 @@ $hide = $order->status == 1 ? 'hide' : '';
   	<button type="button" class="btn btn-xs btn-primary btn-block" onclick="getProductGrid()"><i class="fa fa-tags"></i> แสดงสินค้า</button>
   </div>
 
+  <div class="col-sm-2 col-sm-offset-5 last">
+    <button type="button" class="btn btn-xs btn-info btn-block" onclick="update_gp()">
+      <i class="fa fa-refresh"></i> อัพเดต GP
+    </button>
+  </div>
+
 </div>
 <hr class="margin-top-15 margin-bottom-0" />
 <!--- Category Menu ---------------------------------->
@@ -73,12 +79,13 @@ $hide = $order->status == 1 ? 'hide' : '';
 </form>
 
 <?php if($this->menu_code == 'SOCCSO') : ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_so.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php else : ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign_tr.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_tr.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php endif; ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign_add.js"></script>
-<script src="<?php echo base_url(); ?>scripts/orders/product_tab_menu.js"></script>
-<script src="<?php echo base_url(); ?>scripts/orders/order_grid.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_add.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/product_tab_menu.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_grid.js?v=<?php echo date('Ymd'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

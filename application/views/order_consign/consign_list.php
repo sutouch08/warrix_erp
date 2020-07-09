@@ -126,11 +126,12 @@
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
 					<th class="width-10 middle text-center">วันที่</th>
-					<th class="width-15 middle">เลขที่เอกสาร</th>
+					<th class="width-10 middle">เลขที่เอกสาร</th>
 					<th class="middle">ลูกค้า</th>
 					<th class="width-15 middle">โซน</th>
 					<th class="width-10 middle">ยอดเงิน</th>
 					<th class="width-10 middle">สถานะ</th>
+					<th class="width-5 middle">อนุมัติ</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -145,6 +146,9 @@
 							<td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->zone_name; ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo number($rs->total_amount, 2); ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->state_name; ?></td>
+							<td class="middle pointer text-center" onclick="editOrder('<?php echo $rs->code; ?>')">
+								<?php echo $rs->is_approved == 1 ? 'Yes' : 'No'; ?>
+							</td>
               </td>
             </tr>
             <?php $no++; ?>
@@ -156,8 +160,10 @@
 </div>
 
 <?php if($this->menu_code == 'SOCCSO') : ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_so.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php else : ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign_tr.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_tr.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php endif; ?>
+
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

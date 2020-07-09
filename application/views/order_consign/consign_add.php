@@ -72,10 +72,11 @@
 </form>
 
 <?php if($this->menu_code == 'SOCCSO') : ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_so.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php else : ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign_tr.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_tr.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php endif; ?>
-<script src="<?php echo base_url(); ?>scripts/order_consign/consign_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/order_consign/consign_add.js?v=<?php echo date('Ymd'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

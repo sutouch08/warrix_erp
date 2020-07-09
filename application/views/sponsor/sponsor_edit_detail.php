@@ -71,9 +71,9 @@ $hide = $order->status == 1 ? 'hide' : '';
 </div>
 </form>
 
-<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor.js"></script>
-<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor_add.js"></script>
-<script src="<?php echo base_url(); ?>scripts/orders/product_tab_menu.js"></script>
-<script src="<?php echo base_url(); ?>scripts/orders/order_grid.js"></script>
+<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor.js?v=<?php echo date('YmdHis'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor_add.js?v=<?php echo date('YmdHis'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/product_tab_menu.js?v=<?php echo date('YmdHis'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_grid.js?v=<?php echo date('YmdHis'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

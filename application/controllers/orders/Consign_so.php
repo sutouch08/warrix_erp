@@ -233,6 +233,8 @@ class Consign_so extends PS_Controller
 
   public function edit_order($code, $approve_view = NULL)
   {
+    $this->load->model('approve_logs_model');
+
     $ds = array();
     $rs = $this->orders_model->get($code);
     if(!empty($rs))
@@ -243,6 +245,7 @@ class Consign_so extends PS_Controller
       $rs->state_name    = get_state_name($rs->state);
       $rs->zone_name = $this->zone_model->get_name($rs->zone_code);
     }
+
     $state = $this->order_state_model->get_order_state($code);
     $ost = array();
     if(!empty($state))
@@ -253,8 +256,11 @@ class Consign_so extends PS_Controller
       }
     }
 
+    $approve_logs = $this->approve_logs_model->get($code);
+
     $details = $this->orders_model->get_order_details($code);
     $ds['approve_view'] = $approve_view;
+    $ds['approve_logs'] = $approve_logs;
     $ds['state'] = $ost;
     $ds['order'] = $rs;
     $ds['details'] = $details;

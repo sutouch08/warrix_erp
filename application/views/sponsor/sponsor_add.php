@@ -68,7 +68,7 @@
 <input type="hidden" name="customerCode" id="customerCode" value="" />
 </form>
 
-<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor.js"></script>
-<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor_add.js?v=<?php echo date('YmdHis'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/sponsor/sponsor_add.js?v=<?php echo date('Ymd'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

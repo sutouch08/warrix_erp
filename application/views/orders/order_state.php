@@ -28,9 +28,11 @@ $canSkip = ($pc->can_add + $pc->can_edit + $pc->can_delete) > 0 ? TRUE : FALSE;
 												<?php endif; ?>
 
 												<?php if($order->state != 3 && $order->role == 'S') : ?>
+
 													<?php if($order->is_paid == 1 OR $order->is_term == 1 OR $canSkip) : ?>
                         		<option value="3">รอจัดสินค้า</option>
 													<?php endif; ?>
+													
 												<?php elseif($order->state != 3 && $order->is_approved == 1) : ?>
 														<option value="3">รอจัดสินค้า</option>
 												<?php endif; ?>

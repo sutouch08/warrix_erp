@@ -25,8 +25,8 @@
 	  </div>
 
 		<div class="col-sm-2 padding-5">
-	    <label>พนักงาน</label>
-	    <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
+	    <label>พนักงาน[จัดออเดอร์]</label>
+	    <input type="text" class="form-control input-sm search" name="display_name" value="<?php echo $display_name; ?>" />
 	  </div>
 
 		<div class="col-sm-2 padding-5">
@@ -127,6 +127,7 @@
 					<th class="width-15 middle text-center sorting <?php echo $sort_date; ?>" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
 					<th class="width-15 middle sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร</th>
 					<th class="width-35 middle">ลูกค้า/ผู้เบิก</th>
+					<th class="width-10 middle text-center">จำนวน</th>
           <th class="width-10 middle">ช่องทาง</th>
 					<th class="width-15 middle">พนักงาน</th>
 					<th class="middle"></th>
@@ -148,9 +149,10 @@
 									<?php echo $customer_name; ?>
 								<?php endif; ?>
               </td>
+							<td class="middle text-center"><?php echo number($rs->qty); ?></td>
               <td class="middle"><?php echo $rs->channels_name; ?></td>
 
-							<td class="middle"><?php echo $rs->update_user; ?></td>
+							<td class="middle"><?php echo $rs->display_name;; ?></td>
               <td class="middle text-right">
           <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
                 <button type="button" class="btn btn-mini btn-info" onClick="goPrepare('<?php echo $rs->code; ?>')">จัดสินค้า</button>

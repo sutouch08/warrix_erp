@@ -914,6 +914,18 @@ class Orders_model extends CI_Model
     ->update('orders');
   }
 
+
+
+  public function un_approver($code, $user)
+  {
+    return $this->db
+    ->set('approver', NULL)
+    ->set('approve_date', now())
+    ->set('is_approved', 0)
+    ->where('code', $code)
+    ->update('orders');
+  }
+
   //---- ระบุที่อยู่จัดส่งในออเดอร์นั้นๆ
   public function set_address_id($code, $id_address)
   {

@@ -22,20 +22,20 @@ class Prepare extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'prepare_code', ''),
-      'customer'      => get_filter('customer', 'prepare_customer', ''),
-      'user'          => get_filter('user', 'prepare_user', ''),
-      'channels'      => get_filter('channels', 'prepare_channels', ''),
-      'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
-      'role'          => get_filter('role', 'prepare_role', 'all'),
-      'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
-      'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
-      'order_by'      => get_filter('order_by', 'prepare_order_by', ''),
-      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', ''),
-      'stated'        => get_filter('stated', 'prepare_stated', ''),
-      'startTime'     => get_filter('startTime', 'prepare_startTime', ''),
-      'endTime'       => get_filter('endTime', 'prepare_endTime', ''),
-      'item_code'    => get_filter('item_code', 'prepare_item_code', '')
+      'code'          => get_filter('code', 'ic_code', ''),
+      'customer'      => get_filter('customer', 'ic_customer', ''),
+      'user'          => get_filter('user', 'ic_user', ''),
+      'channels'      => get_filter('channels', 'ic_channels', ''),
+      'is_online'     => get_filter('is_online', 'ic_is_online', '2'),
+      'role'          => get_filter('role', 'ic_role', 'all'),
+      'from_date'     => get_filter('from_date', 'ic_from_date', ''),
+      'to_date'       => get_filter('to_date', 'ic_to_date', ''),
+      'order_by'      => get_filter('order_by', 'ic_order_by', ''),
+      'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
+      'stated'        => get_filter('stated', 'ic_stated', ''),
+      'startTime'     => get_filter('startTime', 'ic_startTime', ''),
+      'endTime'       => get_filter('endTime', 'ic_endTime', ''),
+      'item_code'    => get_filter('item_code', 'ic_item_code', '')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -68,7 +68,7 @@ class Prepare extends PS_Controller
     $filter = array(
       'code'          => get_filter('code', 'prepare_code', ''),
       'customer'      => get_filter('customer', 'prepare_customer', ''),
-      'user'          => get_filter('user', 'prepare_user', ''),
+      'display_name'  => get_filter('display_name', 'prepare_display_name', ''),
       'channels'      => get_filter('channels', 'prepare_channels', ''),
       'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
       'role'          => get_filter('role', 'prepare_role', 'all'),
@@ -330,44 +330,9 @@ class Prepare extends PS_Controller
       }
     }
 
-    return $sc;
+    return empty($sc) ? 'ไม่พบสินค้า' : $sc;
   }
 
-
-  // public function get_stock_in_zone($item_code, $old_code, $warehouse = NULL)
-  // {
-  //
-  //   $sc = "ไม่มีสินค้า";
-  //   $code = empty($old_code) ? $old_code : $item_code;
-  //   $pd = $this->is->select('id')->where('code', $code)->get('tbl_product');
-  //   if($pd->num_rows() == 1)
-  //   {
-  //     $id = $pd->row()->id;
-  //     $qs = $this->is
-  //     ->select('z.barcode_zone AS code, z.zone_name AS name, s.qty AS qty')
-  //     ->from('tbl_stock AS s')
-  //     ->join('tbl_zone AS z', 's.id_zone = z.id_zone')
-  //     ->join('tbl_warehouse AS w', 'z.id_warehouse = w.id')
-  //     ->where('s.id_product', $id)
-  //     ->where('w.prepare', 1)
-  //     ->where('w.active', 1)
-  //     ->get();
-  //
-  //
-  //     if($qs->num_rows() > 0)
-  //     {
-  //       $sc = "";
-  //       $stock = $qs->result();
-  //
-  //       foreach($stock as $rs)
-  //       {
-  //         $sc .= $rs->name.' : '.$rs->qty.'<br/>';
-  //       }
-  //     }
-  //   }
-  //
-  //   return $sc;
-  // }
 
 
 
@@ -498,20 +463,21 @@ class Prepare extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'prepare_code',
-      'prepare_customer',
-      'prepare_user',
-      'prepare_channels',
-      'prepare_is_online',
-      'prepare_role',
-      'prepare_from_date',
-      'prepare_to_date',
-      'prepare_order_by',
-      'prepare_sort_by',
-      'prepare_stated',
-      'prepare_startTime',
-      'prepare_endTime',
-      'prepare_item_code'
+      'ic_code',
+      'ic_customer',
+      'ic_user',
+      'ic_channels',
+      'ic_is_online',
+      'ic_role',
+      'ic_from_date',
+      'ic_to_date',
+      'ic_order_by',
+      'ic_sort_by',
+      'ic_stated',
+      'ic_startTime',
+      'ic_endTime',
+      'ic_item_code',
+      'ic_display_name'
     );
 
     clear_filter($filter);

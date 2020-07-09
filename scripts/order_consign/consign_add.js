@@ -142,9 +142,16 @@ var date;
 
 
 function getEdit(){
-  $('.edit').removeAttr('disabled');
+  let approved = $('#is_approved').val();
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
+
+  if(approved == 1){
+    $('#remark').removeAttr('disabled');
+  } else {
+    $('.edit').removeAttr('disabled');
+  }
+
   customer = $("#customerCode").val();
 	channels = $("#channels").val();
 	payment  = $("#payment").val();
@@ -528,3 +535,132 @@ function validateOrder(){
     return false;
   }
 }
+
+
+function update_gp(){
+  let gp = $('#gp').val();
+  let code = $('#order_code').val();
+  load_in();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/update_gp',
+    type:'POST',
+    cache:false,
+    data:{
+      'code' : code,
+      'gp' : gp
+    },
+    success:function(rs){
+      load_out();
+      rs = $.trim(rs);
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1200);
+
+      } else {
+        swal(rs);
+      }
+    }
+  })
+}
+
+function approve()
+{
+  var order_code = $('#order_code').val();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/do_approve/'+order_code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      if(rs === 'success'){
+        //change_state();
+        swal({
+          title:'Approved',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
+function unapprove()
+{
+  var order_code = $('#order_code').val();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/un_approve/'+order_code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      if(rs === 'success'){
+        //change_state();
+        swal({
+          title:'Success',
+          text:'ยกเลิกการอนุมัติแล้ว',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
+//--- เก็บไว้ใช้เผื่อเปลียนแปลง
+// function change_state(){
+//   var order_code = $('#order_code').val();
+//   $.ajax({
+//     url:BASE_URL + 'orders/orders/order_state_change',
+//     type:'POST',
+//     cache:false,
+//     data:{
+//       'order_code' : order_code,
+//       'state' : 3
+//     },
+//     success:function(rs){
+//       if(rs === 'success'){
+//         swal({
+//           title:'Success',
+//           text:'ปล่อยจัดสินค้าเรียบร้อยแล้ว',
+//           type:'success',
+//           timer:1000
+//         });
+//
+//         setTimeout(function(){
+//           window.location.reload();
+//         }, 1500);
+//       }else{
+//         swal({
+//           title:'Error!!',
+//           text:rs,
+//           type:'error'
+//         });
+//       }
+//     }
+//   });
+// }

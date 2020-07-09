@@ -126,14 +126,14 @@ class Qc extends PS_Controller
   {
     $this->load->helper('channels');
     $filter = array(
-      'code'          => get_filter('code', 'qc_code', ''),
-      'customer'      => get_filter('customer', 'qc_customer', ''),
-      'user'          => get_filter('user', 'qc_user', ''),
-      'channels'      => get_filter('channels', 'qc_channels', ''),
-      'from_date'     => get_filter('from_date', 'qc_from_date', ''),
-      'to_date'       => get_filter('to_date', 'qc_to_date', ''),
-      'sort_by'       => get_filter('sort_by', 'qc_sort_by', ''),
-      'order_by'      => get_filter('order_by', 'qc_order_by', '')
+      'code'          => get_filter('code', 'ic_code', ''),
+      'customer'      => get_filter('customer', 'ic_customer', ''),
+      'user'          => get_filter('user', 'ic_user', ''),
+      'channels'      => get_filter('channels', 'ic_channels', ''),
+      'from_date'     => get_filter('from_date', 'ic_from_date', ''),
+      'to_date'       => get_filter('to_date', 'ic_to_date', ''),
+      'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
+      'order_by'      => get_filter('order_by', 'ic_order_by', '')
     );
     //--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_rows();
@@ -451,7 +451,7 @@ class Qc extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('qc_code', 'qc_customer', 'qc_user', 'qc_channels', 'qc_from_date', 'qc_to_date', 'qc_sort_by', 'qc_order_by');
+    $filter = array('ic_code', 'ic_customer', 'ic_user', 'ic_channels', 'ic_from_date', 'ic_to_date', 'ic_sort_by', 'ic_order_by');
     clear_filter($filter);
   }
 

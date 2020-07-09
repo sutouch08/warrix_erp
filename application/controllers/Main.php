@@ -89,24 +89,24 @@ class Main extends PS_Controller
     			$stockLabel = '';
 
     			//--- stock in buffer
-          $bfQty = $this->buffer_model->get_sum_stock($rs->code);
+          //$bfQty = $this->buffer_model->get_sum_stock($rs->code);
 
     			//--- stock in cancle zone
-    			$cnQty = $this->cancle_model->get_sum_stock($rs->code);
+    		//	$cnQty = $this->cancle_model->get_sum_stock($rs->code);
 
     			//--- stock in moving zone
-    			$mvQty = $this->move_model->get_sum_temp_stock($rs->code);
+    		//	$mvQty = $this->move_model->get_sum_temp_stock($rs->code);
 
     			//--- stock in warehouse transfering
-    			$trQty = $this->transfer_model->get_sum_temp_stock($rs->code);
+    		//	$trQty = $this->transfer_model->get_sum_temp_stock($rs->code);
 
-    			$stockLabel .= empty($bfQty) ? '' : 'Buffer = '.number($bfQty).'<br/>';
-    			$stockLabel .= empty($cnQty) ? '' : 'Cancle = '.number($cnQty).'<br/>';
-    			$stockLabel .= empty($mvQty) ? '' : 'Moving = '.number($mvQty).'<br/>';
-    			$stockLabel .= empty($trQty) ? '' : 'Transfering = '.number($trQty).'<br/>';
+    			//$stockLabel .= empty($bfQty) ? '' : 'Buffer = '.number($bfQty).'<br/>';
+    			//$stockLabel .= empty($cnQty) ? '' : 'Cancle = '.number($cnQty).'<br/>';
+    			//$stockLabel .= empty($mvQty) ? '' : 'Moving = '.number($mvQty).'<br/>';
+    			//$stockLabel .= empty($trQty) ? '' : 'Transfering = '.number($trQty).'<br/>';
 
     			//--- จำนวนคงเหลือทั้งหมด
-    			$qty = $bfQty + $cnQty + $mvQty + $trQty;
+    			$qty = 0; //$bfQty + $cnQty + $mvQty + $trQty;
 
     			//---- get data from database
     			$stock_in_zone = $this->stock_model->get_stock_in_zone($rs->code);

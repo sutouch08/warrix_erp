@@ -1,5 +1,5 @@
 <?php
-if(!$order->is_expired ) :
+if(!$order->is_expired && !$order->is_approved) :
 ?>
 <hr/>
 <div class="row">
@@ -14,4 +14,4 @@ if(!$order->is_expired ) :
 
 <?php $this->load->view('validate_credentials'); ?>
 
-<script src="<?php echo base_url(); ?>scripts/orders/order_discount.js"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_discount.js?v=<?php echo date('Ymd'); ?>"></script>

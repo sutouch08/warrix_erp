@@ -274,10 +274,10 @@ class Import_order extends CI_Controller
                 // $date_add = db_date($date_add, TRUE);
 
                 //--- ค่าจัดส่ง
-                $shipping_fee = empty($rs['Q']) ? 0.00 : $rs['Q'];
+                $shipping_fee = 0; //empty($rs['Q']) ? 0.00 : $rs['Q'];
 
                 //--- ค่าบริการอื่นๆ
-                $service_fee = empty($rs['R']) ? 0.00 : $rs['R'];
+                $service_fee = 0; //empty($rs['R']) ? 0.00 : $rs['R'];
 
                 //---- กรณียังไม่มีออเดอร์
                 if($is_exists === FALSE)

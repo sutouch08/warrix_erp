@@ -25,7 +25,7 @@
   </div>
 
 	<div class="col-sm-2 padding-5">
-    <label>พนักงาน</label>
+    <label>พนักงาน[เปิดออเดอร์]</label>
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
@@ -127,6 +127,7 @@
 					<th class="width-15 middle text-center sorting <?php echo $sort_date; ?>" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
 					<th class="width-15 middle sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร</th>
 					<th class="width-30 middle">ลูกค้า/ผู้เบิก</th>
+					<th class="width-10 middle text-center">จำนวน</th>
           <th class="width-10 middle">ช่องทาง</th>
 					<th class="middle"></th>
 				</tr>
@@ -147,6 +148,7 @@
 									<?php echo $customer_name; ?>
 								<?php endif; ?>
 							</td>
+							<td class="middle text-center"><?php echo number($rs->qty); ?></td>
               <td class="middle"><?php echo $rs->channels_name; ?></td>
               <td class="middle text-right">
           <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>

@@ -15,5 +15,10 @@ if($this->WT->can_approve)
   $this->load->view('notifications/consign_receive');
 }
 
+if($this->WS->can_approve)
+{
+  $this->load->view('notifications/sponsor');
+}
+
 
 ?>

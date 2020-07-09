@@ -9,6 +9,20 @@ class Prepare_model extends CI_Model
   }
 
 
+  public function get_details($order_code)
+  {
+    $rs = $this->db->where('order_code', $order_code)->get('prepare');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+
+
   public function get_warehouse_code($zone_code)
   {
     $rs = $this->ms->select('WhsCode')->where('BinCode', $zone_code)->get('OBIN');
@@ -275,12 +289,25 @@ class Prepare_model extends CI_Model
 
   public function get_data(array $ds = array(), $perpage = '', $offset = '', $state = 3)
   {
-    $this->db->select('orders.*, channels.name AS channels_name, customers.name AS customer_name')
+    $this->db->select('orders.*, channels.name AS channels_name')
+    ->select('customers.name AS customer_name, user.name AS display_name')
+    ->select_sum('order_details.qty', 'qty')
     ->from('orders')
     ->join('channels', 'channels.code = orders.channels_code','left')
     ->join('customers', 'customers.code = orders.customer_code', 'left')
     ->join('order_details', 'orders.code = order_details.order_code','left')
-    ->join('products', 'order_details.product_code = products.code', 'left')
+    ->join('products', 'order_details.product_code = products.code', 'left');
+    if($state == 4)
+    {
+      $this->db->join('user', 'user.uname = orders.update_user', 'left');
+    }
+
+    if($state == 3)
+    {
+      $this->db->join('user', 'user.uname = orders.user', 'left');
+    }
+
+    $this->db
     ->where('orders.state', $state)
     ->where('orders.status', 1);
 
@@ -306,14 +333,22 @@ class Prepare_model extends CI_Model
     }
 
     //---- user name / display name
-    if(!empty($ds['user']))
+    if($state == 3 && !empty($ds['user']))
     {
-      $users = user_in($ds['user']);
       $this->db->group_start();
-      $this->db->where_in('orders.user', $users);
-      $this->db->or_like('orders.empName', $ds['user']);
+      $this->db->like('user.uname', $ds['user']);
+      $this->db->or_like('user.name', $ds['user']);
       $this->db->group_end();
     }
+
+    if($state == 4 && !empty($ds['display_name']))
+    {
+      $this->db->group_start();
+      $this->db->like('user.uname', $ds['display_name']);
+      $this->db->or_like('user.name', $ds['display_name']);
+      $this->db->group_end();
+    }
+
 
     if(!empty($ds['channels']))
     {
