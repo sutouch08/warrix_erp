@@ -5,7 +5,7 @@
 		<div class="col-xs-12 col-sm-3">
 			<input type="text" name="code" id="code" class="width-100" value="" autofocus required />
 		</div>
-		<div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
+		<div class="help-block col-xs-12 col-sm-reset inline grey" id="code-error">Now allow </div>
 	</div>
 
 	<div class="form-group">

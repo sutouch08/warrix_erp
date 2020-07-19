@@ -853,7 +853,7 @@ class Consign_order extends PS_Controller
           {
             if($sc === FALSE)
             {
-              break;
+              //break;
             }
 
             if($i > 1)
@@ -877,6 +877,8 @@ class Consign_order extends PS_Controller
                   $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 10000000;
                   $c_qty = $item->count_stock == 1 ? $this->consign_order_model->get_unsave_qty($code, $item->code) : 0;
                   $detail = $this->consign_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
+
+                  $diff = $stock - ($qty + $c_qty);
 
                   if(empty($detail))
                   {
@@ -911,7 +913,7 @@ class Consign_order extends PS_Controller
                     else
                     {
                       $sc = FALSE;
-                      $this->error = "ยอดในโซนไม่พอตัด";
+                      $this->error .= "<span>ยอดในโซนไม่พอตัด {$item->code} : {$diff} </span><br/>";
                     }
                   }
                   else
@@ -937,7 +939,7 @@ class Consign_order extends PS_Controller
                     else
                     {
                       $sc = FALSE;
-                      $this->error = "ยอดในโซนไม่พอตัด";
+                      $this->error .= "<span>ยอดในโซนไม่พอตัด {$item->code} : {$diff} </span><br/>";
                     }
                   } //--- end if empty detail
                 }

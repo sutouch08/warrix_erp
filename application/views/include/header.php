@@ -56,20 +56,14 @@
 				</button>
 				<?php endif; ?>
 				<div class="navbar-header pull-left">
-					<a href="<?php echo base_url(); ?>" class="navbar-brand">
+					<a href="<?php echo (empty($approve_view) ? base_url() : '#'); ?>" class="navbar-brand">
 						<small>
 							<?php echo getConfig('COMPANY_NAME'); ?>
 						</small>
 					</a>
 				</div>
 				<?php if(! isset($_GET['nomenu'])) : ?>
-					<form id="receive-form" method="post" target="_blank" action="<?php echo base_url(); ?>inventory/invoice">
-					  <input type="hidden" name="role" value="N">
-					  <input type="hidden" name="is_valid" value="0" >
-					</form>
-					<form id="consign_tr-form" method="post" target="_blank" action="<?php echo base_url(); ?>orders/consign_tr">
-					  <input type="hidden" name="isApprove" value="0">
-					</form>
+					<?php $this->load->view('include/approve_form'); ?>
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
 

@@ -1,6 +1,5 @@
-<?php
-if(!$order->is_expired && !$order->is_approved) :
-?>
+
+<?php if(!$order->is_expired && !$order->is_approved) : ?>
 <hr/>
 <div class="row">
 	<div class="col-sm-12 margin-top-5 margin-bottom-5">

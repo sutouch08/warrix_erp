@@ -574,7 +574,12 @@ function uploadfile(){
 			}
 			else
 			{
-				swal("Error!", rs, "error");
+        swal({
+          title:"Error",
+          text: rs,
+          html:true,
+          type:'error'
+        });
 			}
 		}
 	});

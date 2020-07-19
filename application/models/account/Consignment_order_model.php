@@ -5,6 +5,7 @@ class Consignment_order_model extends CI_Model
   public function __construct()
   {
     parent::__construct();
+
   }
 
 
@@ -245,7 +246,7 @@ class Consignment_order_model extends CI_Model
   {
     if(!empty($ds))
     {
-      $rs = $this->mc->insert('OIGE', $ds);
+      $rs = $this->mc->insert('CNOIGE', $ds);
       if($rs)
       {
         return $this->mc->insert_id();
@@ -261,7 +262,7 @@ class Consignment_order_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return  $this->mc->where('U_ECOMNO', $code)->update('OIGE', $ds);
+      return  $this->mc->where('U_ECOMNO', $code)->update('CNOIGE', $ds);
     }
 
     return FALSE;
@@ -271,7 +272,7 @@ class Consignment_order_model extends CI_Model
 
   public function get_sap_consignment_order_doc($code)
   {
-    $rs = $this->ms
+    $rs = $this->cn
     ->select('DocEntry, DocStatus')
     ->where('U_ECOMNO', $code)
     ->where('CANCELED', 'N')
@@ -287,7 +288,7 @@ class Consignment_order_model extends CI_Model
 
   public function sap_exists_details($code)
   {
-    $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('IGE1');
+    $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('CNIGE1');
     if($rs->num_rows() > 0)
     {
       return TRUE;
@@ -322,7 +323,7 @@ class Consignment_order_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->mc->insert('IGE1', $ds);
+      return $this->mc->insert('CNIGE1', $ds);
     }
 
     return FALSE;
@@ -332,7 +333,7 @@ class Consignment_order_model extends CI_Model
 
   public function drop_sap_exists_details($code)
   {
-    return $this->mc->where('U_ECOMNO', $code)->delete('IGE1');
+    return $this->mc->where('U_ECOMNO', $code)->delete('CNIGE1');
   }
 
 
@@ -340,8 +341,8 @@ class Consignment_order_model extends CI_Model
   public function drop_middle_exits_data($docEntry)
   {
     $this->mc->trans_start();
-    $this->mc->where('DocEntry', $docEntry)->delete('IGE1');
-    $this->mc->where('DocEntry', $docEntry)->delete('OIGE');
+    $this->mc->where('DocEntry', $docEntry)->delete('CNIGE1');
+    $this->mc->where('DocEntry', $docEntry)->delete('CNOIGE');
     $this->mc->trans_complete();
 
     return $this->mc->trans_status();

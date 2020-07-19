@@ -63,6 +63,7 @@ class Invoice extends PS_Controller
     $this->load->model('inventory/qc_model');
     $this->load->helper('order');
     $this->load->helper('discount');
+    $approve_view = isset($_GET['approve_view']) ? TRUE : NULL;
 
     $order = $this->orders_model->get($code);
     $order->customer_name = $this->customers_model->get_name($order->customer_code);
@@ -78,6 +79,7 @@ class Invoice extends PS_Controller
     $ds['order'] = $order;
     $ds['details'] = $details;
     $ds['box_list'] = $box_list;
+    $ds['approve_view'] = $approve_view;
     $this->load->view('inventory/order_closed/closed_detail', $ds);
   }
 

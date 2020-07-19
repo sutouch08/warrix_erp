@@ -57,26 +57,27 @@
 <script>
 
 $(document).ready(function(){
-  get_wc();
+  get_ws();
 });
 
-var wc = setInterval(function(){
-  get_wc();
+var ws = setInterval(function(){
+  get_ws();
 }, refresh_rate);
 
-function get_wc(){
+function get_ws(){
   $.ajax({
-    url:BASE_URL + 'orders/consign_so/get_un_approve_list',
+    url:BASE_URL + 'orders/orders/get_un_approve_list',
     type:'GET',
     cache:false,
     data:{
-      'limit' : limit_rows
+      'limit' : limit_rows,
+      'role' : 'P'
     },
     success:function(rs){
       if(isJson(rs)){
-        let source = $('#wc-template').html();
+        let source = $('#ws-template').html();
         let data = $.parseJSON(rs);
-        let output = $('#wc-result');
+        let output = $('#ws-result');
         render(source, data, output);
       }
     }
@@ -85,15 +86,15 @@ function get_wc(){
 
 
 
-function viewConsignSODetail(code){
+function viewSponsorDetail(code){
   //--- properties for print
-  var center    = ($(document).width() - 900)/2;
-  var prop 			= "width=900, height=900. left="+center+", scrollbars=yes";
-	var target = BASE_URL + 'orders/consign_so/edit_order/' + code + '/approve?nomenu';
+  var center    = ($(document).width() - 1000)/2;
+  var prop 			= "width=1000, height=900. left="+center+", scrollbars=yes";
+	var target = BASE_URL + 'orders/sponsor/edit_order/' + code + '/approve?nomenu';
 	window.open(target, "_blank", prop);
 }
 
-function viewAllConsignSO(){
-  window.open(BASE_URL + 'orders/consign_so', "_blank");
+function viewAllSponsor(){
+  $('#sponsor-form').submit();
 }
 </script>

@@ -53,9 +53,13 @@
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
 		</div>
 	<?php else : ?>
-		<div class="col-sm-8 col-xs-12 padding-5 last">
+		<div class="col-sm-6 col-6-harf col-xs-12 padding-5">
 		 	<label>หมายเหตุ</label>
 		  <input type="text" class="form-control input-sm edit" name="remark" id="remark" value="<?php echo $order->remark; ?>" disabled />
+		</div>
+		<div class="col-sm-1 col-1-harf col-xs-12 padding-5 last">
+		 	<label>SAP No.</label>
+		  <input type="text" class="form-control input-sm edit" value="<?php echo $order->inv_code; ?>" disabled />
 		</div>
 	<?php endif; ?>
 		<?php if($order->state < 4 && ($this->pm->can_add OR $this->pm->can_edit)): ?>

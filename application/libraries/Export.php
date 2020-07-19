@@ -1823,6 +1823,7 @@ public function export_return_lend($code)
 
 //---- Good issue
 //---- OIGE IGE1
+//---- WD
 public function export_goods_issue($code)
 {
   $sc = TRUE;

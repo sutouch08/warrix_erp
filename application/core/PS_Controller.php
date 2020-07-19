@@ -7,6 +7,7 @@ class PS_Controller extends CI_Controller
   public $home;
   public $ms;
   public $mc;
+  public $cn;
   public $close_system;
   public $WC;
   public $WT;
@@ -34,7 +35,8 @@ class PS_Controller extends CI_Controller
 
     $this->ms = $this->load->database('ms', TRUE); //--- SAP database
     $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
-    $this->is = $this->load->database('is', TRUE); //---- Ecom database
+    $this->cn = $this->load->database('cn', TRUE); //--- consign Database
+    //$this->is = $this->load->database('is', TRUE); //---- Ecom database
 
     $uid = get_cookie('uid');
 

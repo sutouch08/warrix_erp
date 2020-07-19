@@ -52,6 +52,23 @@ class stock_model extends CI_Model
   }
 
 
+  public function get_consign_stock_zone($zone_code, $pd_code)
+  {
+    $this->cn->select_sum('OIBQ.OnHandQty', 'qty')
+    ->from('OBIN')
+    ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
+    ->where('OIBQ.ItemCode', $pd_code)
+    ->where('OBIN.BinCode', $zone_code);
+    $rs = $this->ms->get();
+    if($rs->num_rows() == 1)
+    {
+      return intval($rs->row()->qty);
+    }
+
+    return 0;
+  }
+
+
   //---- ยอดรวมสินค้าในคลังที่สั่งได้ ยอดในโซน
   public function get_sell_stock($item, $warehouse = NULL, $zone = NULL)
   {
@@ -83,7 +100,13 @@ class stock_model extends CI_Model
   //--- ยอดรวมสินค้าทั้งหมดทุกคลัง (รวมฝากขาย)
   public function get_stock($item)
   {
-    $rs = $this->ms->select_sum('OnHandQty', 'qty')->where('ItemCode', $item)->get('OIBQ');
+    $rs = $this->ms
+    ->select_sum('OIBQ.OnHandQty', 'qty')
+    ->from('OIBQ')
+    ->join('OBIN', 'OIBQ.BinAbs = OBIN.AbsEntry', 'left')
+    ->where('OBIN.SysBin', 'N')
+    ->where('ItemCode', $item)
+    ->get();
     return intval($rs->row()->qty);
   }
 

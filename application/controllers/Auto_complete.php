@@ -637,6 +637,7 @@ public function get_prepare_item_code()
     $txt = $_REQUEST['term'];
     $rs = $this->db
     ->select('code')
+    ->where('active', 1)
     ->like('code', $txt)
     ->limit(20)
     ->get('products');
@@ -662,8 +663,11 @@ public function get_prepare_item_code()
     $txt = $_REQUEST['term'];
     $rs = $this->db
     ->select('code, old_code')
+    ->where('active', 1)
+    ->group_start()
     ->like('code', $txt)
     ->or_like('old_code', $txt)
+    ->group_end()
     ->limit(20)
     ->get('products');
 

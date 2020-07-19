@@ -106,10 +106,13 @@
 
 <?php 	$netAmount = ( $total_amount - $order->bDiscAmount ) + $order->shipping_fee + $order->service_fee;	?>
 			<tr class="font-size-12">
-            	<td colspan="6" rowspan="4"></td>
-                <td style="border-left:solid 1px #CCC;"><b>จำนวนรวม</b></td>
-                <td class="text-right"><b><?php echo number($total_qty); ?></b></td>
-                <td class="text-center"><b>Pcs.</b></td>
+            	<td colspan="6" rowspan="4" style="white-space:normal;">
+								หมายเหตุ :
+            		<?php echo $order->remark; ?>
+            	</td>
+              <td style="border-left:solid 1px #CCC;"><b>จำนวนรวม</b></td>
+              <td class="text-right"><b><?php echo number($total_qty); ?></b></td>
+              <td class="text-center"><b>Pcs.</b></td>
             </tr>
            <tr class="font-size-12">
                 <td style="border-left:solid 1px #CCC;"><b>มูลค่ารวม</b></td>

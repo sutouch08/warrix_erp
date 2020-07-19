@@ -134,6 +134,43 @@ class Orders extends PS_Controller
   }
 
 
+
+  //---- รายการรออนุมัติ
+  public function get_un_approve_list()
+  {
+    $role = $this->input->get('role');
+    $rows = $this->orders_model->count_un_approve_rows($role);
+    $limit = empty($this->input->get('limit')) ? 10 : intval($this->input->get('limit'));
+    $list = $this->orders_model->get_un_approve_list($role, $limit);
+
+
+    $result_rows = empty($list) ? 0 :count($list);
+
+    $ds = array();
+    if(!empty($list))
+    {
+      foreach($list as $rs)
+      {
+        $arr = array(
+          'date_add' => thai_date($rs->date_add),
+          'code' => $rs->code,
+          'customer' => $rs->customer_name
+        );
+
+        array_push($ds, $arr);
+      }
+    }
+
+    $data = array(
+      'result_rows' => $result_rows,
+      'rows' => $rows,
+      'data' => $ds
+    );
+
+    echo json_encode($data);
+  }
+
+
   public function add_new()
   {
     $this->load->view('orders/orders_add');
@@ -1793,6 +1830,9 @@ class Orders extends PS_Controller
     //---- set is_complete = 0
     $this->orders_model->un_complete($code);
 
+    //--- set inv_code to NULL
+    $this->orders_model->clear_inv_code($code);
+
     //---- move cancle product back to  buffer
     $this->cancle_model->restore_buffer($code);
 
@@ -1864,7 +1904,7 @@ class Orders extends PS_Controller
       {
         foreach($middle as $rows)
         {
-          $this->transfer_model->drop_middle_exists_data($rows->DocEntry);
+          $this->transfer_model->drop_middle_exits_data($rows->DocEntry);
         }
       }
     }
@@ -1932,6 +1972,7 @@ class Orders extends PS_Controller
     $this->orders_model->clear_order_detail($code);
     //--- 5. ยกเลิกออเดอร์
     $this->orders_model->set_status($code, 2);
+    $this->orders_model->set_report_status($code, NULL);
 
     //--- 6. ลบรายการที่ผู้ไว้ใน order_transform_detail (กรณีเบิกแปรสภาพ)
     if($role == 'T' OR $role == 'Q')

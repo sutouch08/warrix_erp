@@ -183,7 +183,7 @@ class Receive_transform_model extends CI_Model
   public function get_transform_details($order_code)
   {
     $rs = $this->db
-    ->select('order_transform_detail.*, products.name, products.price, products.barcode')
+    ->select('order_transform_detail.*, products.name, products.cost AS price, products.barcode')
     ->select_sum('order_transform_detail.sold_qty', 'sold_qty')
     ->select_sum('order_transform_detail.receive_qty', 'receive_qty')
     ->from('order_transform_detail')
@@ -346,6 +346,47 @@ class Receive_transform_model extends CI_Model
     return FALSE;
   }
 
+
+
+  public function get_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('status', 1)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->get('receive_transform');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_sap_doc_num($code)
+  {
+    $rs = $this->ms
+    ->select('DocNum')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('OIGN');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row()->DocNum;
+    }
+
+    return NULL;
+  }
+
+
+
+  public function update_inv($code, $doc_num)
+  {
+    return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('receive_transform');
+  }
 
 }
 

@@ -167,4 +167,14 @@ class Sync_data_model extends CI_Model
     return sap_date(date('Y-d-m 00:00:00'));
   }
 
+
+  public function add_logs(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->db->insert('ix_sync_logs', $ds);
+    }
+    return FALSE;
+  }
+
 }//--- end class

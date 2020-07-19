@@ -62,6 +62,14 @@
 	  </div>
 
 		<div class="col-sm-2 padding-5 first">
+	    <label>ช่องทางการชำระเงิน</label>
+			<select class="form-control input-sm" name="payment" onchange="getSearch()">
+				<option value="">ทั้งหมด</option>
+				<?php echo select_payment_method($payment); ?>
+			</select>
+	  </div>
+
+		<div class="col-sm-2 padding-5">
 	    <label>วันที่</label>
 	    <div class="input-daterange input-group">
 	      <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
@@ -96,7 +104,7 @@
 			</select>
 		</div>
 
-		<div class="col-sm-4 padding-5">
+		<div class="col-sm-2 padding-5">
 	    <label>รหัสสินค้า</label>
 	    <input type="text" class="form-control input-sm search" name="item_code" id="item_code" value="<?php echo $item_code; ?>" />
 	  </div>
@@ -124,13 +132,13 @@
 			<thead>
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
-					<th class="width-15 middle text-center sorting <?php echo $sort_date; ?>" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
+					<th class="width-10 middle text-center sorting <?php echo $sort_date; ?>" id="sort_date_add" onclick="sort('date_add')">วันที่</th>
 					<th class="width-15 middle sorting <?php echo $sort_code; ?>" id="sort_code" onclick="sort('code')">เลขที่เอกสาร</th>
-					<th class="width-35 middle">ลูกค้า/ผู้เบิก</th>
+					<th class="middle">ลูกค้า/ผู้เบิก</th>
 					<th class="width-10 middle text-center">จำนวน</th>
           <th class="width-10 middle">ช่องทาง</th>
 					<th class="width-15 middle">พนักงาน</th>
-					<th class="middle"></th>
+					<th class="width-10 middle"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -153,10 +161,12 @@
               <td class="middle"><?php echo $rs->channels_name; ?></td>
 
 							<td class="middle"><?php echo $rs->display_name;; ?></td>
-              <td class="middle text-right">
+              <td class="middle text-right no-wrap">
           <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
-                <button type="button" class="btn btn-mini btn-info" onClick="goPrepare('<?php echo $rs->code; ?>')">จัดสินค้า</button>
-								<button type="button" class="btn btn-mini btn-warning" onClick="pullBack('<?php echo $rs->code; ?>')">ดึงกลับ</button>
+                <button type="button" class="btn btn-minier btn-info" onClick="goPrepare('<?php echo $rs->code; ?>')">จัดสินค้า</button>
+					<?php endif; ?>
+					<?php if($this->pm->can_delete) : ?>
+								<button type="button" class="btn btn-minier btn-warning" onClick="pullBack('<?php echo $rs->code; ?>')">ดึงกลับ</button>
           <?php endif; ?>
               </td>
             </tr>

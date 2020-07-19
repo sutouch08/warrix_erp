@@ -7,9 +7,12 @@
     </div>
     <div class="col-sm-9">
     	<p class="pull-right" style="margin-bottom:1px;">
+				<?php if(empty($approve_view)) : ?>
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
+			<?php endif; ?>
 
 				<button type="button" class="btn btn-sm btn-default" onclick="printOrderSheet()"><i class="fa fa-print"></i> พิมพ์</button>
+				<?php if(empty($approve_view)) : ?>
 				<?php if($order->state < 4 && $this->pm->can_delete && $order->never_expire == 0) : ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="setNotExpire(1)">ยกเว้นการหมดอายุ</button>
 				<?php endif; ?>
@@ -25,6 +28,7 @@
 				<?php if($order->status == 0) : ?>
 					<button type="button" class="btn btn-sm btn-success" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
 				<?php endif; ?>
+			<?php endif; ?>
 				<?php if($order->state == 1 && $order->is_approved == 0 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
 						<button type="button" class="btn btn-sm btn-success" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
 				<?php endif; ?>
@@ -37,8 +41,10 @@
 <hr/>
 
 <?php $this->load->view('sponsor/sponsor_edit_header'); ?>
+<?php if(empty($approve_view)) : ?>
 <?php $this->load->view('orders/order_state'); ?>
 <?php $this->load->view('sponsor/sponsor_discount_bar'); ?>
+<?php endif; ?>
 <?php $this->load->view('sponsor/sponsor_detail'); ?>
 
 <?php if(!empty($approve_logs)) : ?>

@@ -1083,7 +1083,11 @@ td.one-attribute{
 }
 
 
-td {
+/* td {
+  white-space: normal;
+} */
+
+td.no-wrap{
   white-space: nowrap;
 }
 

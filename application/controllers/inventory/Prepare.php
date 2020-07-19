@@ -21,6 +21,7 @@ class Prepare extends PS_Controller
   public function index()
   {
     $this->load->helper('channels');
+    $this->load->helper('payment_method');
     $filter = array(
       'code'          => get_filter('code', 'ic_code', ''),
       'customer'      => get_filter('customer', 'ic_customer', ''),
@@ -35,7 +36,8 @@ class Prepare extends PS_Controller
       'stated'        => get_filter('stated', 'ic_stated', ''),
       'startTime'     => get_filter('startTime', 'ic_startTime', ''),
       'endTime'       => get_filter('endTime', 'ic_endTime', ''),
-      'item_code'    => get_filter('item_code', 'ic_item_code', '')
+      'item_code'    => get_filter('item_code', 'ic_item_code', ''),
+      'payment' => get_filter('payment', 'ic_payment', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -65,21 +67,23 @@ class Prepare extends PS_Controller
   public function view_process()
   {
     $this->load->helper('channels');
+    $this->load->helper('payment_method');
     $filter = array(
-      'code'          => get_filter('code', 'prepare_code', ''),
-      'customer'      => get_filter('customer', 'prepare_customer', ''),
-      'display_name'  => get_filter('display_name', 'prepare_display_name', ''),
-      'channels'      => get_filter('channels', 'prepare_channels', ''),
-      'is_online'     => get_filter('is_online', 'prepare_is_online', '2'),
-      'role'          => get_filter('role', 'prepare_role', 'all'),
-      'from_date'     => get_filter('from_date', 'prepare_from_date', ''),
-      'to_date'       => get_filter('to_date', 'prepare_to_date', ''),
-      'order_by'      => get_filter('order_by', 'prepare_order_by', ''),
-      'sort_by'       => get_filter('sort_by', 'prepare_sort_by', ''),
-      'stated'        => get_filter('stated', 'prepare_stated', ''),
-      'startTime'     => get_filter('startTime', 'prepare_startTime', ''),
-      'endTime'       => get_filter('endTime', 'prepare_endTime', ''),
-      'item_code'    => get_filter('item_code', 'prepare_item_code', '')
+      'code'          => get_filter('code', 'ic_code', ''),
+      'customer'      => get_filter('customer', 'ic_customer', ''),
+      'display_name'  => get_filter('display_name', 'ic_display_name', ''),
+      'channels'      => get_filter('channels', 'ic_channels', ''),
+      'is_online'     => get_filter('is_online', 'ic_is_online', '2'),
+      'role'          => get_filter('role', 'ic_role', 'all'),
+      'from_date'     => get_filter('from_date', 'ic_from_date', ''),
+      'to_date'       => get_filter('to_date', 'ic_to_date', ''),
+      'order_by'      => get_filter('order_by', 'ic_order_by', ''),
+      'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
+      'stated'        => get_filter('stated', 'ic_stated', ''),
+      'startTime'     => get_filter('startTime', 'ic_startTime', ''),
+      'endTime'       => get_filter('endTime', 'ic_endTime', ''),
+      'item_code'    => get_filter('item_code', 'ic_item_code', ''),
+      'payment'  => get_filter('payment', 'ic_payment', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -207,7 +211,8 @@ class Prepare extends PS_Controller
               }
               else
               {
-                $stock = 1000; //$this->get_stock_zone($zone_code, $ds->product_code);
+                $stock = $this->get_stock_zone($zone_code, $ds->product_code); //1000;
+                
                 if($stock < $qty)
                 {
                   $sc = FALSE;
@@ -360,6 +365,7 @@ class Prepare extends PS_Controller
     //--- ยอดจัดสินค้าที่จัดออกจากโซนนี้ไปแล้ว แต่ยังไม่ได้ตัด
     $prepared = $this->prepare_model->get_prepared_zone($zone_code, $item_code);
 
+
     return $stock - $prepared;
 
   }
@@ -477,7 +483,8 @@ class Prepare extends PS_Controller
       'ic_startTime',
       'ic_endTime',
       'ic_item_code',
-      'ic_display_name'
+      'ic_display_name',
+      'ic_payment'
     );
 
     clear_filter($filter);

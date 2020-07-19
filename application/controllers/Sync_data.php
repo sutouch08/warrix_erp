@@ -175,6 +175,57 @@ class Sync_data extends CI_Controller
       $message = 'not found';
     }
 
+    $logs = array(
+      'sync_item' => 'WR',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+
+
+  public function syncReceiveTransformInvCode()
+  {
+    $this->load->model('inventory/receive_transform_model');
+    $ds = $this->receive_transform_model->get_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->receive_transform_model->get_sap_doc_num($rs->code);
+
+        if(!empty($inv))
+        {
+          $this->receive_transform_model->update_inv($rs->code, $inv);
+          $update++;
+        }
+
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'RT',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
     echo $count.' | '.$update.' | '.$message;
   }
 
@@ -182,23 +233,245 @@ class Sync_data extends CI_Controller
   public function syncOrderInvCode()
   {
     $this->load->model('orders/orders_model');
-    $ds = $this->orders_model->get_non_inv_code(100);
+    $ds = $this->orders_model->get_order_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
     if(!empty($ds))
     {
       foreach($ds as $rs)
       {
+        $count++;
         $inv = $this->orders_model->get_sap_doc_num($rs->code);
         if(!empty($inv))
         {
-          $this->orders_model->update_inv($rs->code, $inv);
+          if($this->orders_model->update_inv($rs->code, $inv))
+          {
+            $this->orders_model->set_complete($rs->code);
+          }
+          $update++;
         }
       }
     }
+    else
+    {
+      $message = 'not found';
+    }
 
-    echo 'done';
+    $logs = array(
+      'sync_item' => 'WO',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
   }
 
 
+  public function syncSponsorInvCode()
+  {
+    $this->load->model('orders/orders_model');
+    $ds = $this->orders_model->get_sponsor_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->orders_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          if($this->orders_model->update_inv($rs->code, $inv))
+          {
+            $this->orders_model->set_complete($rs->code);
+          }
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WS-WU',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+
+  public function syncConsignmentInvCode()
+  {
+    $this->load->model('orders/orders_model');
+    $ds = $this->orders_model->get_consignment_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->orders_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          if($this->orders_model->update_inv($rs->code, $inv))
+          {
+            $this->orders_model->set_complete($rs->code);
+          }
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WC',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+
+
+  public function syncOrderTransferInvCode()
+  {
+    $this->load->model('orders/orders_model');
+    $this->load->model('inventory/transfer_model');
+    $ds = $this->orders_model->get_order_transfer_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->transfer_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          if($this->orders_model->update_inv($rs->code, $inv))
+          {
+            $this->orders_model->set_complete($rs->code);
+          }
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WT-WQ-WV',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+  public function syncTransferInvCode()
+  {
+    $this->load->model('inventory/transfer_model');
+    $ds = $this->transfer_model->get_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->transfer_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          $this->transfer_model->update_inv($rs->code, $inv);
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WW',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+
+  public function syncMoveInvCode()
+  {
+    $this->load->model('inventory/move_model');
+    $ds = $this->move_model->get_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->move_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          $this->move_model->update_inv($rs->code, $inv);
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'MV',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
 
 } //--- end class
 

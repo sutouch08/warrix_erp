@@ -241,6 +241,11 @@ class Prepare_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
+    if(!empty($ds['payment']) && $ds['payment'] !== 'all')
+    {
+      $this->db->where('orders.payment_code', $ds['payment']);
+    }
+
     if($ds['is_online'] != '2')
     {
       if($ds['is_online'] == 1)
@@ -368,6 +373,12 @@ class Prepare_model extends CI_Model
         ->or_where('channels.is_online IS NULL', NULL, FALSE)
         ->group_end();
       }
+    }
+
+
+    if(!empty($ds['payment']) && $ds['payment'] !== 'all')
+    {
+      $this->db->where('orders.payment_code', $ds['payment']);
     }
 
 

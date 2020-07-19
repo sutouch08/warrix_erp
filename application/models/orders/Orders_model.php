@@ -306,6 +306,11 @@ class Orders_model extends CI_Model
     return $this->db->set('is_complete', 0)->where('order_code', $code)->update('order_details');
   }
 
+  public function clear_inv_code($code)
+  {
+    return $this->db->set('inv_code', NULL)->where('code', $code)->update('orders');
+  }
+
 
   public function paid($code, $paid)
   {
@@ -650,7 +655,7 @@ class Orders_model extends CI_Model
   }
 
 
-  public function get_un_approve_list($role = 'C', $perpage = '', $offset = '')
+  public function get_un_approve_list($role = 'C', $perpage = '')
   {
     $this->db
     ->select('orders.date_add, orders.code, customers.name AS customer_name')
@@ -667,8 +672,7 @@ class Orders_model extends CI_Model
 
     if($perpage != '')
     {
-      $offset = $offset === NULL ? 0 : $offset;
-      $this->db->limit($perpage, $offset);
+      $this->db->limit($perpage);
     }
 
     $rs = $this->db->get();
@@ -903,6 +907,13 @@ class Orders_model extends CI_Model
   }
 
 
+  public function set_report_status($code, $status)
+  {
+    //--- NULL = not sent, 1 = sent, 3 = error;
+    return $this->db->set('is_report', $status)->where('code', $code)->update('orders');
+  }
+
+
 
   public function update_approver($code, $user)
   {
@@ -948,10 +959,11 @@ class Orders_model extends CI_Model
   }
 
 
-  public function get_non_inv_code($limit = 100)
+  public function get_order_non_inv_code($limit = 100)
   {
     $rs = $this->db
     ->select('code')
+    ->where_in('role', 'S')
     ->where('state', 8)
     ->where('status', 1)
     ->where('is_cancled', 0)
@@ -965,18 +977,91 @@ class Orders_model extends CI_Model
       return $rs->result();
     }
 
-    return FALSE;
+    return NULL;
+  }
+
+
+  public function get_sponsor_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where_in('role', array('P', 'U'))
+    ->where('state', 8)
+    ->where('status', 1)
+    ->where('is_cancled', 0)
+    ->where('is_expired', 0)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+
+
+  public function get_consignment_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('role', 'C')
+    ->where('state', 8)
+    ->where('status', 1)
+    ->where('is_cancled', 0)
+    ->where('is_expired', 0)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_order_transfer_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where_in('role', array('Q', 'T', 'N', 'L'))
+    ->where('state', 8)
+    ->where('status', 1)
+    ->where('is_cancled', 0)
+    ->where('is_expired', 0)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
   public function get_sap_doc_num($code)
   {
-    $rs = $this->ms->select('DocNum')->where('U_ECOMNO', $code)->get('ODLN');
-    if($rs->num_rows() === 1)
+    $rs = $this->ms
+    ->select('DocNum')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('ODLN');
+
+    if($rs->num_rows() > 0)
     {
       return $rs->row()->DocNum;
     }
 
-    return FALSE;
+    return NULL;
   }
 
 

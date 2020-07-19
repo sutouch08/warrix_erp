@@ -86,7 +86,7 @@ function viewOrderClosedDetail(code){
   //--- properties for print
   var center    = ($(document).width() - 900)/2;
   var prop 			= "width=900, height=900. left="+center+", scrollbars=yes";
-	var target = BASE_URL + 'inventory/invoice/view_detail/' + code + '?nomenu';
+	var target = BASE_URL + 'inventory/invoice/view_detail/' + code + '?nomenu&approve_view';
 	window.open(target, "_blank", prop);
 }
 

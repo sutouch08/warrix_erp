@@ -62,6 +62,14 @@
   </div>
 
 	<div class="col-sm-2 padding-5 first">
+    <label>ช่องทางการชำระเงิน</label>
+		<select class="form-control input-sm" name="payment" onchange="getSearch()">
+			<option value="">ทั้งหมด</option>
+			<?php echo select_payment_method($payment); ?>
+		</select>
+  </div>
+
+	<div class="col-sm-2 padding-5">
     <label>วันที่</label>
     <div class="input-daterange input-group">
       <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
@@ -96,7 +104,7 @@
 		</select>
 	</div>
 
-	<div class="col-sm-4 padding-5">
+	<div class="col-sm-2 padding-5">
     <label>รหัสสินค้า</label>
     <input type="text" class="form-control input-sm search" name="item_code" id="item_code" value="<?php echo $item_code; ?>" />
   </div>

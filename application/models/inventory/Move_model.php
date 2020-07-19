@@ -602,5 +602,46 @@ class Move_model extends CI_Model
   }
 
 
+  public function get_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('status', 1)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('move');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_sap_doc_num($code)
+  {
+    $rs = $this->ms
+    ->select('DocNum')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('OWTR');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row()->DocNum;
+    }
+
+    return NULL;
+  }
+
+
+  public function update_inv($code, $doc_num)
+  {
+    return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('move');
+  }
+
+
 }
  ?>

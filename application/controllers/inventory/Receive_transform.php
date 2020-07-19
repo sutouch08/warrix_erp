@@ -91,13 +91,13 @@ class Receive_transform extends PS_Controller
     $this->load->model('orders/orders_model');
 
     $doc = $this->receive_transform_model->get($code);
-    $order = $this->orders_model->get($doc->order_code);
+    //$order = $this->orders_model->get($doc->order_code);
     if(!empty($doc))
     {
       $zone = $this->zone_model->get($doc->zone_code);
       $doc->zone_name = $zone->name;
       $doc->warehouse_name = $zone->warehouse_name;
-      $doc->requester = $this->user_model->get_name($order->user);
+      //$doc->requester = $this->user_model->get_name($order->user);
       $doc->user_name = $this->user_model->get_name($doc->user);
     }
 
