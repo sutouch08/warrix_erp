@@ -7,7 +7,11 @@
     <p class="pull-right top-p">
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
       <button type="button" class="btn btn-sm btn-info" onclick="printReceived()"><i class="fa fa-print"></i> พิมพ์</button>
-			<button type="button" class="btn btn-sm btn-success" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
+			<?php if($doc->status == 1 && ! $doc->is_approve && $this->pm->can_approve) : ?>
+			<button type="button" class="btn btn-sm btn-primary" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
+		<?php elseif($doc->status == 1 && $doc->is_approve && $this->pm->can_approve) : ?>
+			<button type="button" class="btn btn-sm btn-danger" onclick="unapprove()"><i class="fa fa-times"></i> ไม่อนุมัติ</button>
+			<?php endif; ?>
     </p>
   </div>
 </div>
@@ -40,26 +44,14 @@
   	<label>ใบส่งสินค้า</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->invoice_code; ?>" disabled/>
   </div>
-	<div class="col-sm-1 col-1-harf padding-5 first">
-    <label>ใบขออนุมัติ</label>
-    <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->request_code; ?>" disabled />
-  </div>
 
-  <div class="col-sm-2 padding-5">
-    <label>รหัสโซน</label>
-    <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->zone_code; ?>" disabled />
-  </div>
-  <div class="col-sm-8 col-8-harf padding-5 last">
-  	<label>ชื่อโซน</label>
-    <input type="text" class="form-control input-sm" value="<?php echo $doc->zone_name; ?>" disabled/>
-  </div>
   <div class="col-sm-10 padding-5 first">
 		<label>หมายเหตุ</label>
 		<input type="text" class="form-control input-sm" value="<?php echo $doc->remark; ?>" disabled />
 	</div>
 	<div class="col-sm-2 padding-5 last">
-		<label>Document No. [SAP]</label>
-		<input type="text" class="form-control input-sm text-center" value="<?php echo $doc->inv_code; ?>" disabled />
+		<label>เอกสารรับเข้า</label>
+		<input type="text" class="form-control input-sm text-center" value="<?php echo $doc->receive_code; ?>" disabled />
 	</div>
   <input type="hidden" name="receive_code" id="receive_code" value="<?php echo $doc->code; ?>" />
 </div>
@@ -77,9 +69,9 @@ if($doc->status == 2)
       <thead>
       	<tr class="font-size-12">
         	<th class="width-5 text-center">ลำดับ	</th>
-          <th class="width-15 text-center">บาร์โค้ด</th>
           <th class="width-20 text-center">รหัสสินค้า</th>
           <th class="">ชื่อสินค้า</th>
+					<th class="width-10 text-right">ค้างรับ</th>
           <th class="width-10 text-right">จำนวน</th>
         </tr>
       </thead>
@@ -87,49 +79,48 @@ if($doc->status == 2)
         <?php if(!empty($details)) : ?>
           <?php $no =  1; ?>
           <?php $total_qty = 0; ?>
+					<?php $total_backlogs = 0; ?>
           <?php foreach($details as $rs) : ?>
             <tr class="font-size-12">
               <td class="middle text-center"><?php echo $no; ?></td>
-              <td class="middle"><?php echo $rs->barcode; ?></td>
               <td class="middle"><?php echo $rs->product_code; ?></td>
               <td class="middle"><?php echo $rs->product_name; ?></td>
+							<td class="middle text-right"><?php echo number($rs->backlogs); ?></td>
               <td class="middle text-right"><?php echo number($rs->qty); ?></td>
             </tr>
             <?php $no++; ?>
             <?php $total_qty += $rs->qty; ?>
+						<?php $total_backlogs += $rs->backlogs; ?>
           <?php endforeach; ?>
           <tr>
-            <td colspan="4" class="text-right"><strong>รวม</strong></td>
+            <td colspan="3" class="text-right"><strong>รวม</strong></td>
+						<td class="text-right"><strong><?php echo number($total_backlogs); ?></strong></td>
             <td class="text-right"><strong><?php echo number($total_qty); ?></strong></td>
           </tr>
         <?php endif; ?>
 			  </tbody>
       </table>
     </div>
+
+					<?php if(!empty($approve_list)) :?>
+						<?php foreach($approve_list as $appr) : ?>
+							<div class="col-sm-12 text-right">
+								<?php if($appr->approve == 1) : ?>
+									<span class="green">
+										อนุมัติโดย : <?php echo $appr->approver; ?> @ <?php echo thai_date($appr->date_upd, TRUE); ?>
+									</span>
+								<?php endif; ?>
+								<?php if($appr->approve == 0) : ?>
+									<span class="red">
+										ยกเลิกการอนุมัติโดย : <?php echo $appr->approver; ?> @ <?php echo thai_date($appr->date_upd, TRUE); ?>
+									</span>
+								<?php endif; ?>
+							</div>
+						<?php endforeach; ?>
+					<?php endif; ?>
 </div>
 
-<?php if(!empty($approve_logs)) : ?>
-	<div class="row">
-		<?php foreach($approve_logs as $logs) : ?>
-		<div class="col-sm-12 text-right padding-5 first last">
-			<?php if($logs->approve == 1) : ?>
-			  <span class="green">
-					อนุมัติโดย :
-					<?php echo $logs->approver; ?> @ <?php echo thai_date($logs->date_upd, TRUE); ?>
-				</span>
-			<?php else : ?>
-				<span class="red">
-				ยกเลิกโดย :
-				<?php echo $logs->approver; ?> @ <?php echo thai_date($logs->date_upd, TRUE); ?>
-			  </span>
-			<?php endif; ?>
-
-		</div>
-	<?php endforeach; ?>
-	</div>
-<?php endif; ?>
-
-<script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po.js"></script>
-<script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/receive_po_request/receive_po_request.js"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/receive_po_request/receive_po_request_add.js"></script>
 
 <?php $this->load->view('include/footer'); ?>

@@ -400,7 +400,14 @@ class Zone_model extends CI_Model
 
   public function get_zone_detail_in_warehouse($code, $warehouse)
   {
-    $rs = $this->db->where('warehouse_code', $warehouse)->where('code', $code)->get('zone');
+    $rs = $this->db
+    ->where('warehouse_code', $warehouse)
+    ->group_start()
+    ->where('code', $code)
+    ->or_where('old_code', $code)
+    ->group_end()
+    ->get('zone');
+    
     if($rs->num_rows() === 1)
     {
       return $rs->row();

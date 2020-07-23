@@ -17,6 +17,7 @@ class Sale_report_model extends CI_Model
     ->where('is_report IS NULL', NULL, FALSE)
     ->where('state >=', 8)
     ->where('status !=', 0)
+    ->order_by('date_add', 'ASC')
     ->limit($limit)
     ->get('orders');
 

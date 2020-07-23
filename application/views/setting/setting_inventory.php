@@ -2,6 +2,10 @@
 <?php $receive_due_no  = $RECEIVE_OVER_DUE == 0 ? 'btn-danger' : ''; ?>
 <?php $auz_no = $ALLOW_UNDER_ZERO == 0 ? 'btn-success' : ''; ?>
 <?php $auz_yes = $ALLOW_UNDER_ZERO == 1 ? 'btn-danger' : ''; ?>
+<?php $over_po_yes = $ALLOW_RECEIVE_OVER_PO == 1 ? 'btn-success' : ''; ?>
+<?php $over_po_no = $ALLOW_RECEIVE_OVER_PO == 0 ? 'btn-success' : ''; ?>
+<?php $strict_receive_yes = $STRICT_RECEIVE_PO == 1 ? 'btn-success' : ''; ?>
+<?php $strict_receive_no = $STRICT_RECEIVE_PO == 0 ? 'btn-success' : ''; ?>
 <div class="tab-pane fade" id="inventory">
 	<form id="inventoryForm" method="post" action="<?php echo $this->home; ?>/update_config">
   	<div class="row">
@@ -18,6 +22,21 @@
       </div>
       <div class="divider-hidden"></div>
 
+
+			<div class="col-sm-3">
+        <span class="form-control left-label">รับสินค้าเกินใบสั่งซื้อ</span>
+      </div>
+      <div class="col-sm-9">
+				<div class="btn-group input-medium">
+        	<button type="button" class="btn btn-sm <?php echo $over_po_yes; ?>" style="width:50%;" id="btn-ovpo-yes" onClick="toggleOverPo(1)">ได้</button>
+          <button type="button" class="btn btn-sm <?php echo $over_po_no; ?>" style="width:50%;" id="btn-ovpo-no" onClick="toggleOverPo(0)">ไม่ได้</button>
+        </div>
+        <span class="help-block">อนุญาติให้รับสินค้าเกินใบสั่งซื้อหรือไม่</span>
+        <input type="hidden" name="ALLOW_RECEIVE_OVER_PO" id="allow-receive-over-po" value="<?php echo $ALLOW_RECEIVE_OVER_PO; ?>" />
+      </div>
+      <div class="divider-hidden"></div>
+
+
     	<div class="col-sm-3">
         <span class="form-control left-label">รับสินค้าเกินไปสั่งซื้อ(%)</span>
       </div>
@@ -25,6 +44,21 @@
         <input type="text" class="form-control input-sm input-small text-center" name="RECEIVE_OVER_PO"  value="<?php echo $RECEIVE_OVER_PO; ?>" />
       </div>
       <div class="divider-hidden"></div>
+
+
+			<div class="col-sm-3">
+        <span class="form-control left-label">ต้องอนุมัติก่อนรับสินค้าทุกครั้ง</span>
+      </div>
+      <div class="col-sm-9">
+				<div class="btn-group input-medium">
+        	<button type="button" class="btn btn-sm <?php echo $strict_receive_yes; ?>" style="width:50%;" id="btn-request-yes" onClick="toggleRequest(1)">ทุกครั้ง</button>
+          <button type="button" class="btn btn-sm <?php echo $strict_receive_no; ?>" style="width:50%;" id="btn-request-no" onClick="toggleRequest(0)">ไม่ต้อง</button>
+        </div>
+        <span class="help-block">หากระบุเป็น "ทุกครั้ง" จะไม่สามารถดึงใบสั่งซื้อมารับสินค้าตรงๆได้ ต้องรับสินค้าผ่านใบขออนุมัติรับสินค้าเท่านั้นและต้องได้รับอนุมัติก่อน</span>
+        <input type="hidden" name="STRICT_RECEIVE_PO" id="strict-receive-po" value="<?php echo $STRICT_RECEIVE_PO; ?>" />
+      </div>
+      <div class="divider-hidden"></div>
+
 
 			<div class="col-sm-3">
         <span class="form-control left-label">การรับสินค้าเกิน Due</span>

@@ -69,6 +69,7 @@ class Receive_po extends PS_Controller
   {
     $this->load->model('masters/zone_model');
     $this->load->model('masters/products_model');
+    $this->load->model('approve_logs_model');
 
     $doc = $this->receive_po_model->get($code);
     if(!empty($doc))
@@ -88,7 +89,8 @@ class Receive_po extends PS_Controller
 
     $ds = array(
       'doc' => $doc,
-      'details' => $details
+      'details' => $details,
+      'approve_logs' => $this->approve_logs_model->get($doc->request_code)
     );
 
     $this->load->view('inventory/receive_po/receive_po_detail', $ds);
@@ -133,12 +135,13 @@ class Receive_po extends PS_Controller
   public function save()
   {
     $sc = TRUE;
-    $message = 'ทำรายการไม่สำเร็จ';
+
     if($this->input->post('receive_code'))
     {
       $this->load->model('masters/products_model');
       $this->load->model('masters/zone_model');
       $this->load->model('inventory/movement_model');
+      $this->load->model('inventory/receive_po_request_model');
 
       $code = $this->input->post('receive_code');
       $vendor_code = $this->input->post('vendor_code');
@@ -151,6 +154,7 @@ class Receive_po extends PS_Controller
       $backlogs = $this->input->post('backlogs');
       $prices = $this->input->post('prices');
       $approver = $this->input->post('approver') == '' ? NULL : $this->input->post('approver');
+      $request_code = get_null($this->input->post('requestCode'));
 
       $doc = $this->receive_po_model->get($code);
 
@@ -162,7 +166,8 @@ class Receive_po extends PS_Controller
         'zone_code' => $zone_code,
         'warehouse_code' => $warehouse_code,
         'update_user' => get_cookie('uname'),
-        'approver' => $approver
+        'approver' => $approver,
+        'request_code' => $request_code
       );
 
       $this->db->trans_start();
@@ -203,7 +208,7 @@ class Receive_po extends PS_Controller
                 if($this->receive_po_model->add_detail($ds) === FALSE)
                 {
                   $sc = FALSE;
-                  $message = 'Add Receive Row Fail';
+                  $this->error = 'Add Receive Row Fail';
                   break;
                 }
                 else
@@ -225,12 +230,17 @@ class Receive_po extends PS_Controller
               else
               {
                 $sc = FALSE;
-                $message = 'ไม่พบรหัสสินค้า : '.$item.' ในระบบ';
+                $this->error = 'ไม่พบรหัสสินค้า : '.$item.' ในระบบ';
               }
             }
           }
 
           $this->receive_po_model->set_status($code, 1);
+        }
+
+        if($sc === TRUE)
+        {
+          $this->receive_po_request_model->update_receive_code($request_code, $code);
         }
       }
 
@@ -244,7 +254,7 @@ class Receive_po extends PS_Controller
     else
     {
       $sc = FALSE;
-      $message = 'ไม่พบข้อมูล';
+      $this->error = 'ไม่พบข้อมูล';
     }
 
     if($sc === TRUE)
@@ -252,7 +262,7 @@ class Receive_po extends PS_Controller
       $this->export_receive($code);
     }
 
-    echo $sc === TRUE ? 'success' : $message;
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
@@ -395,10 +405,85 @@ class Receive_po extends PS_Controller
 
 
 
+  public function get_receive_request_po_detail()
+  {
+    $this->load->model('inventory/receive_po_request_model');
+    $this->load->model('masters/products_model');
+
+    $sc = '';
+    $code = $this->input->get('request_code');
+    $doc  = $this->receive_po_request_model->get($code);
+    if(!empty($doc))
+    {
+      $details = $this->receive_po_request_model->get_details($code);
+
+      $data = array(
+        'code' => $doc->code,
+        'vendor_code' => $doc->vendor_code,
+        'vendor_name' => $doc->vendor_name,
+        'invoice_code' => $doc->invoice_code,
+        'po_code' => $doc->po_code
+      );
+
+      $ds = array();
+      if(!empty($details))
+      {
+        $no = 1;
+        $totalQty = 0;
+        $totalBacklog = 0;
+
+        foreach($details as $rs)
+        {
+          $backlogs = $this->receive_po_request_model->get_backlogs($doc->po_code, $rs->product_code);
+          $arr = array(
+            'no' => $no,
+            'barcode' => $this->products_model->get_barcode($rs->product_code),
+            'pdCode' => $rs->product_code,
+            'pdName' => $rs->product_name,
+            'price' => $rs->price,
+            'qty' => number($rs->qty),
+            'limit' => $rs->qty,
+            'backlog' => number($backlogs),
+            'isOpen' => TRUE
+          );
+          array_push($ds, $arr);
+          $no++;
+          $totalQty += $rs->qty;
+          $totalBacklog += $backlogs;
+        }
+
+        $arr = array(
+          'qty' => number($totalQty),
+          'backlog' => number($totalBacklog)
+        );
+        array_push($ds, $arr);
+
+        $data['data'] = $ds;
+
+        $sc = json_encode($data);
+      }
+      else
+      {
+        $sc = 'ใบสั่งซื้อไม่ถูกต้อง หรือ ใบสั่งซื้อถูกปิดไปแล้ว';
+      }
+    }
+    else
+    {
+      $sc = "ใบขออนุมัติไม่ถูกต้อง";
+    }
+
+
+    echo $sc;
+  }
+
+
+
   public function edit($code)
   {
     $document = $this->receive_po_model->get($code);
     $ds['document'] = $document;
+    $ds['is_strict'] = getConfig('STRICT_RECEIVE_PO');
+    $ds['allow_over_po'] = getConfig('ALLOW_RECEIVE_OVER_PO');
     $this->load->view('inventory/receive_po/receive_po_edit', $ds);
   }
 

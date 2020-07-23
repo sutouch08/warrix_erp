@@ -288,6 +288,46 @@ public function get_prepare_item_code()
 
 
 
+  public function get_request_receive_po_code($vendor = NULL)
+  {
+    $sc = array();
+    $txt = $_REQUEST['term'];
+
+    $this->db
+    ->select('code, po_code')
+    ->where('status', 1)
+    ->where('valid', 0);
+
+    if(!empty($vendor))
+    {
+      $this->db->where('vendor_code', $vendor);
+    }
+
+    if($txt != '*')
+    {
+      $this->db->like('code', $txt);
+    }
+
+    $rq = $this->db->get('receive_product_request');
+
+
+    if($rq->num_rows() > 0)
+    {
+      foreach($rq->result() as $rs)
+      {
+        $sc[] = $rs->code.' | '.$rs->po_code;
+      }
+    }
+    else
+    {
+      $sc[] = 'not found';
+    }
+
+    echo json_encode($sc);
+  }
+
+
+
   public function get_valid_lend_code($empID = NULL)
   {
     $sc = array();

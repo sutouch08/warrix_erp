@@ -1,11 +1,11 @@
 <?php
 class Sales_report extends CI_Controller
 {
-  private $host = "https://report-uat.konsys.co";
+  private $host = "https://api-report.warrix.co.th";
   private $endpoint = "/api/v1/sales-report";
   private $url = "";
-  public $app_id = "UkxsaUx4bzh0WXE4Qzg3MTNlMjR3MldIcHd1NUJhVm4=";
-  public $app_secret = "bWsxaHVHNVF3Q0hOWFJhSw==";
+  public $app_id = "MkgwaFZtZjBJSTRDclNncWlXd0poQ1ZEZnA1SVJvZjY=";
+  public $app_secret = "Q213dGdRSUdmNFVWQWdyWg==";
   public $home;
 
   public function __construct()
@@ -18,6 +18,49 @@ class Sales_report extends CI_Controller
   public function index()
   {
     $this->load->view('auto/sales_report_api');
+  }
+
+  public function get_query()
+  {
+    $this->db
+    ->select('so.*')
+    ->select('cn.name AS channels')
+    ->select('pm.name AS payment')
+    ->select('co.code AS color')
+    ->select('size.name AS size')
+    ->select('pg.name AS product_group')
+    ->select('pc.name AS product_category')
+    ->select('pk.name AS product_kind')
+    ->select('pt.name AS product_type')
+    ->select('pb.name AS brand')
+    ->select('pd.year')
+    ->select('c.name AS customer_name')
+    ->select('cg.name AS customer_group')
+    ->select('ck.name AS customer_kind')
+    ->select('cc.name AS customer_class')
+    ->select('ca.name AS customer_area')
+    ->select('sale.name AS sale_name')
+    ->select('user.name AS employee_name')
+    ->from('order_sold AS so')
+    ->join('channels AS cn', 'so.channels_code = cn.code', 'left')
+    ->join('payment_method AS pm', 'so.payment_code = pm.code', 'left')
+    ->join('products AS pd', 'so.product_code = pd.code', 'left')
+    ->join('product_color AS co', 'pd.color_code = co.code', 'left')
+    ->join('product_size AS size', 'pd.size_code = size.code', 'left')
+    ->join('product_group AS pg', 'pd.group_code = pg.code', 'left')
+    ->join('product_category AS pc', 'pd.category_code = pc.code', 'left')
+    ->join('product_kind AS pk', 'pd.kind_code = pk.code', 'left')
+    ->join('product_type AS pt', 'pd.type_code = pt.code', 'left')
+    ->join('product_brand AS pb', 'pd.brand_code = pb.code', 'left')
+    ->join('customers AS c', 'so.customer_code = c.code', 'left')
+    ->join('customer_group AS cg', 'c.group_code = cg.code', 'left')
+    ->join('customer_kind AS ck', 'c.kind_code = ck.code', 'left')
+    ->join('customer_class AS cc', 'c.class_code = cc.code', 'left')
+    ->join('customer_area AS ca', 'c.area_code = ca.code', 'left')
+    ->join('saleman AS sale', 'c.sale_code = sale.id', 'left')
+    ->join('user', 'so.user = user.uname', 'left')
+    ->where('reference', $code);
+    echo $this->db->get_compiled_select();
   }
 
 

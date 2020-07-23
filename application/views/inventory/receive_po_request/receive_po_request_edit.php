@@ -44,72 +44,32 @@
 <hr class="margin-top-10 margin-bottom-10"/>
 <form id="receiveForm" method="post" action="<?php echo $this->home; ?>/save">
 <div class="row">
-		<div class="col-sm-2 padding-5 first">
-	    	<label>ผู้จำหน่าย</label>
-	        <input type="text" class="form-control input-sm" name="vendorName" id="vendorName" placeholder="ระบุผู้จำหน่าย" />
-	    </div>
-		<div class="col-sm-2 padding-5">
-	    	<label>ใบอนุมัติรับสินค้า</label>
-	        <input type="text" class="form-control input-sm text-center" name="requestCode" id="requestCode" placeholder="ค้นหาใบอนุมัติ" />
-	        <span class="help-block red" id="request-error"></span>
-	    </div>
-			<div class="col-sm-1 padding-5">
-				<label class="display-block not-show">clear</label>
-				<button type="button" class="btn btn-xs btn-info btn-block hide" id="btn-change-request" onclick="changeRequestPo()">เปลี่ยน</button>
-				<button type="button" class="btn btn-xs btn-primary btn-block" id="btn-get-request" onclick="getRequestData()">ยืนยัน</button>
-			</div>
+  <div class="col-sm-3 padding-5 first">
+    	<label>ผู้จำหน่าย</label>
+        <input type="text" class="form-control input-sm" name="vendorName" id="vendorName" placeholder="ระบุผู้จำหน่าย" />
+    </div>
 
 	<div class="col-sm-2 padding-5">
     	<label>ใบสั่งซื้อ</label>
-        <input type="text" class="form-control input-sm text-center"
-				name="poCode" id="poCode" <?php echo ($is_strict) ? 'disabled' : ''; ?>
-				placeholder="ค้นหาใบสั่งซื้อ" />
+        <input type="text" class="form-control input-sm text-center" name="poCode" id="poCode" placeholder="ค้นหาใบสั่งซื้อ" />
         <span class="help-block red" id="po-error"></span>
     </div>
-
-		<?php if(! $is_strict) : ?>
 		<div class="col-sm-1 padding-5">
 			<label class="display-block not-show">clear</label>
 			<button type="button" class="btn btn-xs btn-info btn-block hide" id="btn-change-po" onclick="changePo()">เปลี่ยน</button>
 			<button type="button" class="btn btn-xs btn-primary btn-block" id="btn-get-po" onclick="getData()">ยืนยัน</button>
 		</div>
-		<?php endif; ?>
-
     <div class="col-sm-2 padding-5">
     	<label>ใบส่งสินค้า</label>
         <input type="text" class="form-control input-sm text-center" name="invoice" id="invoice" placeholder="อ้างอิงใบส่งสินค้า" />
         <span class="help-block red" id="invoice-error"></span>
     </div>
-    <div class="col-sm-2 padding-5 last">
-    	<label>โซน</label>
-        <input type="text" class="form-control input-sm text-center zone" name="zoneName" id="zoneName" placeholder="ค้นหาชื่อโซน"  />
-        <span class="help-block red" id="zone-error"></span>
-    </div>
-
-</div>
-<hr class="margin-top-15"/>
-<div class="row">
-	<div class="col-sm-1">
-    	<label>จำนวน</label>
-        <input type="text" class="form-control input-sm text-center" id="qty" value="1.00" />
-    </div>
-    <div class="col-sm-3 ">
-    	<label>บาร์โค้ดสินค้า</label>
-        <input type="text" class="form-control input-sm text-center" id="barcode" placeholder="ยิงบาร์โค้ดเพื่อรับสินค้า" autocomplete="off"  />
-    </div>
-    <div class="col-sm-1">
-    	<label class="display-block not-show">ok</label>
-        <button type="button" class="btn btn-xs btn-primary" onclick="checkBarcode()"><i class="fa fa-check"></i> ตกลง</button>
-    </div>
-    <input type="hidden" name="zone_code" id="zone_code" />
-    <input type="hidden" name="vendor_code" id="vendor_code" />
-    <input type="hidden" name="receive_code" id="receive_code" value="<?php echo $document->code; ?>" />
-    <input type="hidden" name="approver" id="approver" value="" />
-		<input type="hidden" id="over_po" value="<?php echo $allow_over_po; ?>">
 
 </div>
 <hr class="margin-top-15 margin-bottom-15"/>
-
+<input type="hidden" name="vendor_code" id="vendor_code" />
+<input type="hidden" name="receive_code" id="receive_code" value="<?php echo $document->code; ?>" />
+<input type="hidden" name="approver" id="approver" value="" />
 
 <div class="row">
 	<div class="col-sm-12">
@@ -195,7 +155,7 @@
 <?php else : ?>
   <?php redirect($this->home.'/view_detail/'.$document->code); ?>
 <?php endif; ?>
-<script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po.js"></script>
-<script src="<?php echo base_url(); ?>scripts/inventory/receive_po/receive_po_add.js?v=1"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/receive_po_request/receive_po_request.js"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/receive_po_request/receive_po_request_add.js?v=1"></script>
 
 <?php $this->load->view('include/footer'); ?>

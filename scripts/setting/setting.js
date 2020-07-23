@@ -122,6 +122,40 @@ function toggleAuz(option)
 }
 
 
+//---- ไม่ขายสินค้าให้ลูกค้าที่มียอดค้างเกินกำหนด
+function toggleOverPo(option)
+{
+	$('#allow-receive-over-po').val(option);
+	if(option == 1){
+		$('#btn-ovpo-yes').addClass('btn-success');
+		$('#btn-ovpo-no').removeClass('btn-success');
+		return;
+	}
+	if(option == 0){
+		$('#btn-ovpo-yes').removeClass('btn-success');
+		$('#btn-ovpo-no').addClass('btn-success');
+		return;
+	}
+}
+
+
+
+function toggleRequest(option)
+{
+	$('#strict-receive-po').val(option);
+	if(option == 1){
+		$('#btn-request-yes').addClass('btn-success');
+		$('#btn-request-no').removeClass('btn-success');
+		return;
+	}
+	if(option == 0){
+		$('#btn-request-yes').removeClass('btn-success');
+		$('#btn-request-no').addClass('btn-success');
+		return;
+	}
+}
+
+
 function toggleControlCredit(option)
 {
 	$('#control-credit').val(option);

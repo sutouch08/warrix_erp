@@ -200,12 +200,14 @@ class Consign_order_model extends CI_Model
 
 
 
-  public function get_unsave_qty($code, $product_code)
+  public function get_unsave_qty($code, $product_code, $price, $discount, $input_type)
   {
     $rs = $this->db
     ->select_sum('qty')
     ->where('consign_code', $code)
     ->where('product_code', $product_code)
+    ->where('price', $price, FALSE)
+    ->where('discount', $discount)
     ->where('status', 0)
     ->get('consign_order_detail');
 

@@ -23,12 +23,15 @@ class Approve_logs_model extends CI_Model
 
   public function get($code)
   {
-    $rs = $this->db->where('order_code', $code)->get('order_approve');
-    if($rs->num_rows() > 0)
+    if(!empty($code))
     {
-      return $rs->result();
+      $rs = $this->db->where('order_code', $code)->get('order_approve');
+      if($rs->num_rows() > 0)
+      {
+        return $rs->result();
+      }
     }
-
+    
     return NULL;
   }
 

@@ -6,6 +6,7 @@ class Zone extends PS_Controller
 	public $menu_group_code = 'DB';
   public $menu_sub_group_code = 'WAREHOUSE';
 	public $title = 'เพิ่ม/แก้ไข โซน';
+  public $error;
 
   public function __construct()
   {
@@ -361,7 +362,13 @@ class Zone extends PS_Controller
       if($zone === FALSE)
       {
         $sc = FALSE;
+        $this->error = "ไม่พบโซน";
       }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "รหัสโซนหรือรหัสคลังไม่ถูกต้อง : {$code} | {$warehouse_code}";
     }
 
     echo $sc === TRUE ? json_encode($zone) : 'not_exists';
