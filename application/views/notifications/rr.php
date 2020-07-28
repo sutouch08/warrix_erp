@@ -1,16 +1,16 @@
-<li class="red" id="ws-result">
+<li class="grey" id="rr-result">
   <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
-    สปอนเซอร์
+    RR
     <span class="badge badge-primary">0</span>
   </a>
 </li>
 
 
 
-<script id="ws-template" type="text/x-handlebarsTemplate">
+<script id="rr-template" type="text/x-handlebarsTemplate">
 <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
-  สปอนเซอร์
-  <span class="badge badge-purple">{{rows}}</span>
+  RR
+  <span class="badge badge-primary">{{rows}}</span>
 </a>
 
 <ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
@@ -27,9 +27,9 @@
     {{#if this.data}}
       {{#each this.data}}
         <li>
-          <a href="javescript:void(0)" onclick="viewSponsorDetail('{{code}}')">
+          <a href="javescript:void(0)" onclick="viewRequestDetail('{{code}}')">
             <div class="clearfix">
-            <b class="blue">{{code}}</b> &nbsp; {{customer}}
+            <b class="blue">{{code}}</b> &nbsp; {{vendor_name}}
             </div>
           </a>
         </li>
@@ -46,7 +46,7 @@
   </li>
 
   <li class="dropdown-footer">
-    <a href="javascript:void(0)" onclick="viewAllSponsor()">
+    <a href="javascript:void(0)" onclick="viewAllRequest()">
       ดูรายการทั้งหมด
       <i class="ace-icon fa fa-arrow-right"></i>
     </a>
@@ -57,27 +57,26 @@
 <script>
 
 $(document).ready(function(){
-  get_ws();
+  get_rr();
 });
 
 var ws = setInterval(function(){
-  get_ws();
+  get_rr();
 }, refresh_rate);
 
-function get_ws(){
+function get_rr(){
   $.ajax({
-    url:BASE_URL + 'orders/orders/get_un_approve_list',
+    url:BASE_URL + 'inventory/receive_po_request/get_un_approve_list',
     type:'GET',
     cache:false,
     data:{
-      'limit' : limit_rows,
-      'role' : 'P'
+      'limit' : limit_rows
     },
     success:function(rs){
       if(isJson(rs)){
-        let source = $('#ws-template').html();
+        let source = $('#rr-template').html();
         let data = $.parseJSON(rs);
-        let output = $('#ws-result');
+        let output = $('#rr-result');
         render(source, data, output);
       }
     }
@@ -86,15 +85,15 @@ function get_ws(){
 
 
 
-function viewSponsorDetail(code){
+function viewRequestDetail(code){
   //--- properties for print
   var center    = ($(document).width() - 1000)/2;
   var prop 			= "width=1000, height=900. left="+center+", scrollbars=yes";
-	var target = BASE_URL + 'orders/sponsor/edit_order/' + code + '/approve?nomenu';
+	var target = BASE_URL + 'inventory/receive_po_request/view_detail/' + code + '/approve?nomenu';
 	window.open(target, "_blank", prop);
 }
 
-function viewAllSponsor(){
-  $('#sponsor-form').submit();
+function viewAllRequest(){
+  $('#rr-form').submit();
 }
 </script>

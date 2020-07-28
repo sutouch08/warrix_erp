@@ -3,6 +3,22 @@ $menuGroups = $this->menu->get_active_menu_groups();
 $menu_sub_group_code = isset($this->menu_sub_group_code) ? $this->menu_sub_group_code : NULL;
 ?>
 
+<div class="sidebar-shortcuts" id="sidebar-shortcuts">
+	<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+		<button class="btn btn-purple" onclick="go_to('view_stock')"><i class="ace-icon fa fa-cubes"></i></button>
+		<button class="btn btn-info" onclick="go_to('orders/orders')"><i class="ace-icon fa fa-shopping-cart"></i></button>
+		<button class="btn btn-warning"><i class="ace-icon fa fa-users"></i></button>
+		<button class="btn btn-danger"><i class="ace-icon fa fa-cogs"></i></button>
+	</div>
+	<div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+		<span class="btn btn-success"></span>
+		<span class="btn btn-info"></span>
+		<span class="btn btn-warning"></span>
+		<span class="btn btn-danger"></span>
+	</div>
+</div>
+
+
 <ul class="nav nav-list">
 <?php if(!empty($menuGroups)) : ?>
 <?php 	foreach($menuGroups as $menuGroup) : ?>

@@ -1,27 +1,24 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row" style="margin-top:30px;">
-  <div class="col-sm-3 col-sm-offset-2 padding-5">
+  <div class="col-sm-4 col-sm-offset-4 padding-5">
     <input type="text" class="form-control input-sm text-center" id="search-text" placeholder="พิมพ์รหัสสินค้า 4 ตัวอักษรขึ้นไป" />
   </div>
-  <div class="col-sm-1 col-1-harf padding-5">
+</div>
+<div class="divider-hidden"></div>
+<div class="row">
+  <div class="col-sm-1 col-1-harf col-sm-offset-4 col-xs-6 padding-5">
     <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getSearch()">ตรวจสอบสต็อก</button>
   </div>
-  <div class="col-sm-1 col-1-harf padding-5">
+  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
     <button type="button" class="btn btn-xs btn-info btn-block" onclick="findOrder()">ตรวจสอบออเดอร์</button>
   </div>
-
-  <div class="col-sm-1 padding-5 text-center"></div>
-
-  <div class="col-sm-1 col-1-harf padding-5">
-    <button type="button" class="btn btn-xs btn-purple btn-block" onclick="getViewStock()">
-      <i class="fa fa-external-link"></i> &nbsp; &nbsp; สต็อกคงเหลือ</button>
-  </div>
+  
 </div>
 <hr class="margin-top-15 margin-bottom-15"/>
 
 <div class="row">
   <div class="col-sm-12" id="result">
-    
+
   </div>
 </div>
 

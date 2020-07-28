@@ -456,7 +456,7 @@ function poInit(){
 
 function update_vender(po_code){
 	$.ajax({
-		url: HOME + 'get_vender_by_po/'+po_code,
+		url: BASE_URL + 'inventory/receive_po/get_vender_by_po/'+po_code,
 		type:'GET',
 		cache:false,
 		success:function(rs){

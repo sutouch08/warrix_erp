@@ -61,10 +61,12 @@
       					<?php echo number($rs->total_amount, 2); ?>
       				</td>
 
-              <td class="middle text-right">						
+              <td class="middle text-right">
+						<?php if(empty($approve_view)) : ?>
               <?php if( ( $order->is_paid == 0 && $order->state != 2 && $order->is_expired == 0 ) && ($edit OR $add) && $order->state < 4 ) : ?>
               	<button type="button" class="btn btn-mini btn-danger" onclick="removeDetail(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"><i class="fa fa-trash"></i></button>
               <?php endif; ?>
+						<?php endif; ?>
               </td>
 
           </tr>

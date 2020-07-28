@@ -20,7 +20,7 @@
 			        โหลดเอกสารกระทบยอด
 			      </button>
 					<?php endif; ?>
-					<?php if($this->pm->can_approve) : ?>
+					<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
 					<button type="button" class="btn btn-sm btn-success" onclick="saveConsign()">
 		        <i class="fa fa-save"></i> บันทึก
 		      </button>

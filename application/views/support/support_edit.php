@@ -7,9 +7,12 @@
     </div>
     <div class="col-sm-9">
     	<p class="pull-right" style="margin-bottom:1px;">
+				<?php if(empty($approve_view)) : ?>
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-
 				<button type="button" class="btn btn-sm btn-default" onclick="printOrderSheet()"><i class="fa fa-print"></i> พิมพ์</button>
+				<?php endif; ?>
+
+			<?php if(empty($approve_view)) : ?>
 				<?php if($order->state < 4 && $this->pm->can_delete && $order->never_expire == 0) : ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="setNotExpire(1)">ยกเว้นการหมดอายุ</button>
 				<?php endif; ?>
@@ -25,8 +28,13 @@
 						<button type="button" class="btn btn-sm btn-success" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
 					<?php endif; ?>
 				<?php endif; ?>
-				<?php if($order->state == 1 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
+			<?php endif; ?>
+
+				<?php if($order->state == 1 && $order->is_approved == 0 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
 						<button type="button" class="btn btn-sm btn-success" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
+				<?php endif; ?>
+				<?php if($order->state == 1 && $order->is_approved == 1 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
+						<button type="button" class="btn btn-sm btn-danger" onclick="unapprove()"><i class="fa fa-refresh"></i> ไม่อนุมัติ</button>
 				<?php endif; ?>
       </p>
     </div>
@@ -34,9 +42,36 @@
 <hr/>
 <input type="hidden" id="order_code" value="<?php echo $order->code; ?>" />
 <?php $this->load->view('support/support_edit_header'); ?>
+<?php if(empty($approve_view)) : ?>
 <?php $this->load->view('orders/order_state'); ?>
 <?php $this->load->view('support/support_discount_bar'); ?>
+<?php endif; ?>
 <?php $this->load->view('support/support_detail'); ?>
+
+
+<?php if(!empty($approve_logs)) : ?>
+	<div class="row">
+		<?php foreach($approve_logs as $logs) : ?>
+		<div class="col-sm-12 text-right padding-5 first last">
+			<?php if($logs->approve == 1) : ?>
+			  <span class="green">
+					อนุมัติโดย :
+					<?php echo $logs->approver; ?> @ <?php echo thai_date($logs->date_upd, TRUE); ?>
+				</span>
+			<?php else : ?>
+				<span class="red">
+				ยกเลิกโดย :
+				<?php echo $logs->approver; ?> @ <?php echo thai_date($logs->date_upd, TRUE); ?>
+			  </span>
+			<?php endif; ?>
+
+		</div>
+	<?php endforeach; ?>
+	</div>
+<?php endif; ?>
+
+
+
 <script src="<?php echo base_url(); ?>scripts/support/support.js"></script>
 <script src="<?php echo base_url(); ?>scripts/support/support_add.js"></script>
 <script src="<?php echo base_url(); ?>scripts/print/print_order.js"></script>

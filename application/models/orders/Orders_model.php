@@ -423,6 +423,16 @@ class Orders_model extends CI_Model
     {
       $this->db->where('orders.status', 0);
     }
+    else
+    {
+      if(isset($ds['isApprove']))
+      {
+        if($ds['isApprove'] !== 'all')
+        {
+          $this->db->where('orders.status', 1);
+        }
+      }
+    }
 
     if(!empty($ds['onlyMe']))
     {
@@ -566,6 +576,16 @@ class Orders_model extends CI_Model
     {
       $this->db->where('orders.status', 0);
     }
+    else
+    {
+      if(isset($ds['isApprove']))
+      {
+        if($ds['isApprove'] !== 'all')
+        {
+          $this->db->where('orders.status', 1);
+        }
+      }
+    }
 
     if(!empty($ds['onlyMe']))
     {
@@ -658,7 +678,7 @@ class Orders_model extends CI_Model
   public function get_un_approve_list($role = 'C', $perpage = '')
   {
     $this->db
-    ->select('orders.date_add, orders.code, customers.name AS customer_name')
+    ->select('orders.date_add, orders.code, customers.name AS customer_name, empName')
     ->from('orders')
     ->join('customers', 'orders.customer_code = customers.code', 'left')
     ->where('orders.role', $role)

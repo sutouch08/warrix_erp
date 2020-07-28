@@ -56,7 +56,7 @@
 				</button>
 				<?php endif; ?>
 				<div class="navbar-header pull-left">
-					<a href="<?php echo (empty($approve_view) ? base_url() : '#'); ?>" class="navbar-brand">
+					<a href="<?php echo ((empty($approve_view) && !isset($_GET['nomenu'])) ? base_url() : '#'); ?>" class="navbar-brand">
 						<small>
 							<?php echo getConfig('COMPANY_NAME'); ?>
 						</small>
@@ -102,7 +102,8 @@
 						</li>
 					</ul>
 				</div>
-
+			<?php else : ?>
+					<button type="button" class="close margin-top-10" onclick="window.close()"><i class="fa fa-times"></i></button>
 				<?php endif; ?>
 
 				<!-- /section:basics/navbar.dropdown -->

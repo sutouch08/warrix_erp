@@ -154,7 +154,8 @@ class Orders extends PS_Controller
         $arr = array(
           'date_add' => thai_date($rs->date_add),
           'code' => $rs->code,
-          'customer' => $rs->customer_name
+          'customer' => $rs->customer_name,
+          'empName' => $rs->empName
         );
 
         array_push($ds, $arr);
@@ -1826,6 +1827,7 @@ class Orders extends PS_Controller
     $this->load->model('inventory/cancle_model');
     $this->load->model('inventory/invoice_model');
     $this->load->model('inventory/transform_model');
+    $this->load->model('inventory/transfer_model');
     $this->load->model('inventory/lend_model');
     //---- set is_complete = 0
     $this->orders_model->un_complete($code);

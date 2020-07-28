@@ -1,9 +1,9 @@
 <div class="row">
-	<div class="col-sm-1 col-1-harf padding-5 first">
+	<div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
     	<label>เลขที่เอกสาร</label>
         <input type="text" class="form-control input-sm text-center" value="<?php echo $order->code; ?>" disabled />
     </div>
-    <div class="col-sm-1 padding-5">
+    <div class="col-sm-1 col-xs-6 padding-5">
     	<label>วันที่</label>
 			<input type="text" class="form-control input-sm text-center edit" name="date" id="date" value="<?php echo thai_date($order->date_add); ?>" disabled />
     </div>

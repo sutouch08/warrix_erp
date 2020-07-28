@@ -1,3 +1,8 @@
+function go_to(page){
+	window.location.href = BASE_URL + page;
+}
+
+
 function checkError(){
 	if($('#error').length){
 		swal({

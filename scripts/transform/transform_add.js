@@ -164,15 +164,18 @@ var date;
 
 
 function getEdit(){
-  $('.edit').removeAttr('disabled');
+  let approved = $('#is_approved').val();
+  if(approved == 1){
+    $('#remark').removeAttr('disabled');
+  } else {
+    $('.edit').removeAttr('disabled');
+  }
+
   $('#btn-edit').addClass('hide');
   $('#btn-update').removeClass('hide');
   customer = $("#customerCode").val();
-	channels = $("#channels").val();
-	payment  = $("#payment").val();
 	date = $("#date").val();
 }
-
 
 //---- เพิ่มรายการสินค้าเช้าออเดอร์
 function addToOrder(){
@@ -394,7 +397,7 @@ function updateOrder(){
   		"customer_code" : customer_code,
       "user_ref" : user_ref,
       "zone_code" : zoneCode,
-      "warehouse_code" : warehouse_code,      
+      "warehouse_code" : warehouse_code,
   		"remark" : remark,
     },
 		success: function(rs){

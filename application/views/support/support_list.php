@@ -16,29 +16,39 @@
 <hr class=""/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
 <div class="row">
-  <div class="col-sm-2 padding-5 first">
+  <div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
     <label>เลขที่เอกสาร</label>
     <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
   </div>
 
-  <div class="col-sm-2 padding-5">
+  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
     <label>ผู้เบิก</label>
     <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
     <label>ผู้รับสินค้า</label>
     <input type="text" class="form-control input-sm search" name="user_ref" value="<?php echo $user_ref; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
     <label>พนักงาน</label>
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 padding-5">
+		<label>การอนุมัติ</label>
+		<select class="form-control input-sm" name="isApprove" onchange="getSearch()">
+			<option value="all">ทั้งหมด</option>
+			<option value="0" <?php echo is_selected($isApprove, "0"); ?>>รออนุมัติ</option>
+			<option value="1" <?php echo is_selected($isApprove, "1"); ?>>อนุมัติแล้ว</option>
+		</select>
+	</div>
+
+
+	<div class="col-sm-2 col-xs-12 padding-5">
     <label>วันที่</label>
-    <div class="input-daterange input-group">
+    <div class="input-daterange input-group width-100">
       <input type="text" class="form-control input-sm width-50 from-date" name="fromDate" id="fromDate" value="<?php echo $from_date; ?>" />
       <input type="text" class="form-control input-sm width-50" name="toDate" id="toDate" value="<?php echo $to_date; ?>" />
     </div>

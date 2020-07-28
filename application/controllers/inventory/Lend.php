@@ -8,6 +8,7 @@ class Lend extends PS_Controller
   public $menu_sub_group_code = 'REQUEST';
 	public $title = 'เบิกยืมสินค้า';
   public $filter;
+  public $error;
   public function __construct()
   {
     parent::__construct();
@@ -38,7 +39,8 @@ class Lend extends PS_Controller
       'user'      => get_filter('user', 'lend_user', ''),
       'user_ref'  => get_filter('user_ref', 'lend_user_ref', ''),
       'from_date' => get_filter('fromDate', 'lend_fromDate', ''),
-      'to_date'   => get_filter('toDate', 'lend_toDate', '')
+      'to_date'   => get_filter('toDate', 'lend_toDate', ''),
+      'isApprove' => get_filter('isApprove', 'lend_isApprove', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -142,8 +144,9 @@ class Lend extends PS_Controller
 
 
 
-  public function edit_order($code)
+  public function edit_order($code, $approve_view = NULL)
   {
+    $this->load->model('approve_logs_model');
     $ds = array();
     $rs = $this->orders_model->get($code);
     if(!empty($rs))
@@ -168,6 +171,8 @@ class Lend extends PS_Controller
     $ds['state'] = $ost;
     $ds['order'] = $rs;
     $ds['details'] = $details;
+    $ds['approve_view'] = $approve_view;
+    $ds['approve_logs'] = $this->approve_logs_model->get($code);
     $this->load->view('lend/lend_edit', $ds);
   }
 
@@ -180,32 +185,49 @@ class Lend extends PS_Controller
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
-      $ds = array(
-        'empID' => $this->input->post('empID'),
-        'empName' => $this->input->post('empName'),
-        'date_add' => db_date($this->input->post('date_add')),
-        'user_ref' => $this->input->post('user_ref'),
-        'zone_code' => $this->input->post('zone_code'),
-        'remark' => $this->input->post('remark'),
-        'warehouse_code' => $this->input->post('warehouse_code'),
-        'status' => 0
-      );
+      $order = $this->orders_model->get($code);
+      if(!empty($order))
+      {
+        if($order->state > 1)
+        {
+          $ds = array(
+            'remark' => trim($this->input->post('remark'))
+          );
+        }
+        else
+        {
+          $ds = array(
+            'empID' => $this->input->post('empID'),
+            'empName' => $this->input->post('empName'),
+            'date_add' => db_date($this->input->post('date_add')),
+            'user_ref' => $this->input->post('user_ref'),
+            'zone_code' => $this->input->post('zone_code'),
+            'remark' => $this->input->post('remark'),
+            'warehouse_code' => $this->input->post('warehouse_code'),
+            'status' => 0
+          );
+        }
 
-      $rs = $this->orders_model->update($code, $ds);
+        if(! $this->orders_model->update($code, $ds))
+        {
+          $sc = FALSE;
+          $this->error = "ปรับปรุงข้อมูลไม่สำเร็จ";
+        }
 
-      if($rs === FALSE)
+      }
+      else
       {
         $sc = FALSE;
-        $message = 'ปรับปรุงข้อมูลไม่สำเร็จ';
+        $this->error = "เลขที่เอกสารไม่ถูกต้อง : {$code}";
       }
     }
     else
     {
       $sc = FALSE;
-      $message = 'ไม่พบเลขที่เอกสาร';
+      $this->error = 'ไม่พบเลขที่เอกสาร';
     }
 
-    echo $sc === TRUE ? 'success' : $message;
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
@@ -295,7 +317,8 @@ class Lend extends PS_Controller
       'lend_user',
       'lend_user_ref',
       'lend_fromDate',
-      'lend_toDate'
+      'lend_toDate',
+      'lend_isApprove'
     );
 
     clear_filter($filter);

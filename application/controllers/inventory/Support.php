@@ -33,12 +33,13 @@ class Support extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'customer'  => get_filter('customer', 'customer', ''),
-      'user'      => get_filter('user', 'user', ''),
-      'user_ref'  => get_filter('user_ref', 'user_ref', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date'   => get_filter('toDate', 'toDate', '')
+      'code'      => get_filter('code', 'support_code', ''),
+      'customer'  => get_filter('customer', 'support_customer', ''),
+      'user'      => get_filter('user', 'support_user', ''),
+      'user_ref'  => get_filter('user_ref', 'support_user_ref', ''),
+      'from_date' => get_filter('fromDate', 'support_fromDate', ''),
+      'to_date'   => get_filter('toDate', 'support_toDate', ''),
+      'isApprove' => get_filter('isApprove', 'support_isApprove', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -154,8 +155,9 @@ class Support extends PS_Controller
 
 
 
-  public function edit_order($code)
+  public function edit_order($code, $approve_view = NULL)
   {
+    $this->load->model('approve_logs_model');
     $ds = array();
     $rs = $this->orders_model->get($code);
     if(!empty($rs))
@@ -179,6 +181,8 @@ class Support extends PS_Controller
           $details = $this->orders_model->get_order_details($code);
           $ds['state'] = $ost;
           $ds['order'] = $rs;
+          $ds['approve_view'] = $approve_view;
+          $ds['approve_logs'] = $this->approve_logs_model->get($code);
           $ds['details'] = $details;
           $ds['allowEditDisc'] = FALSE; //getConfig('ALLOW_EDIT_DISCOUNT') == 1 ? TRUE : FALSE;
           $ds['allowEditPrice'] = getConfig('ALLOW_EDIT_PRICE') == 1 ? TRUE : FALSE;
@@ -327,12 +331,13 @@ class Support extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'code',
-      'customer',
-      'user',
-      'user_ref',
-      'fromDate',
-      'toDate'
+      'support_code',
+      'support_customer',
+      'support_user',
+      'support_user_ref',
+      'support_fromDate',
+      'support_toDate',
+      'support_isApprove'
     );
 
     clear_filter($filter);

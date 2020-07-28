@@ -35,12 +35,13 @@ class Transform_stock extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'customer'  => get_filter('customer', 'customer', ''),
-      'user'      => get_filter('user', 'user', ''),
-      'user_ref'  => get_filter('user_ref', 'user_ref', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date'   => get_filter('toDate', 'toDate', '')
+      'code'      => get_filter('code', 'transform_code', ''),
+      'customer'  => get_filter('customer', 'transform_customer', ''),
+      'user'      => get_filter('user', 'transform_user', ''),
+      'user_ref'  => get_filter('user_ref', 'transform_user_ref', ''),
+      'from_date' => get_filter('fromDate', 'transform_fromDate', ''),
+      'to_date'   => get_filter('toDate', 'transform_toDate', ''),
+      'isApprove' => get_filter('isApprove', 'transform_isApprove', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -498,12 +499,13 @@ class Transform_stock extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'code',
-      'customer',
-      'user',
-      'user_ref',
-      'fromDate',
-      'toDate'
+      'transform_code',
+      'transform_customer',
+      'transform_user',
+      'transform_user_ref',
+      'transform_fromDate',
+      'transform_toDate',
+      'transform_isApprove'
     );
 
     clear_filter($filter);

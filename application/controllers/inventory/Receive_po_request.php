@@ -6,7 +6,7 @@ class Receive_po_request extends PS_Controller
   public $menu_code = 'ICRQRC';
 	public $menu_group_code = 'IC';
   public $menu_sub_group_code = 'RECEIVE';
-	public $title = 'ใบขอรับสินค้าจากการซื้อ';
+	public $title = 'ใบขออนุมัติรับสินค้า';
   public $filter;
   public $error;
   public function __construct()
@@ -32,7 +32,7 @@ class Receive_po_request extends PS_Controller
       'to_date' => get_filter('to_date', 'request_to_date', ''),
       'status' => get_filter('status', 'request_status', 'all'),
       'valid' => get_filter('valid', 'request_valid', 'all'),
-      'approve' => get_filter('approve', 'request_approve', 'all')
+      'isApprove' => get_filter('isApprove', 'request_isApprove', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -65,7 +65,7 @@ class Receive_po_request extends PS_Controller
 
 
 
-  public function view_detail($code)
+  public function view_detail($code, $approve_view = NULL)
   {
     $this->load->model('masters/products_model');
     $this->load->model('approve_logs_model');
@@ -86,6 +86,7 @@ class Receive_po_request extends PS_Controller
       $ds = array(
         'doc' => $doc,
         'details' => $details,
+        'approve_view' => $approve_view,
         'approve_list' => $this->approve_logs_model->get($doc->code)
       );
 
@@ -461,6 +462,42 @@ class Receive_po_request extends PS_Controller
   }
 
 
+
+
+
+  public function get_un_approve_list()
+  {
+    $limit = empty($this->input->get('limit')) ? 10 : intval($this->input->get('limit'));
+    $rows = $this->receive_po_request_model->count_un_approve_rows();
+    $list = $this->receive_po_request_model->get_un_approve_list($limit);
+
+    $result_rows = empty($list) ? 0 :count($list);
+
+    $ds = array();
+    if(!empty($list))
+    {
+      foreach($list as $rs)
+      {
+        $arr = array(
+          'code' => $rs->code,
+          'vendor_name' => $rs->vendor_name
+        );
+
+        array_push($ds, $arr);
+      }
+    }
+
+    $data = array(
+      'result_rows' => $result_rows,
+      'rows' => $rows,
+      'data' => $ds
+    );
+
+    echo json_encode($data);
+  }
+
+
+
   public function do_approve()
   {
     $sc = TRUE;
@@ -572,7 +609,7 @@ class Receive_po_request extends PS_Controller
       'request_to_date',
       'request_status',
       'request_valid',
-      'request_approve'
+      'request_isApprove'
     );
 
     clear_filter($filter);

@@ -14,6 +14,9 @@ class PS_Controller extends CI_Controller
   public $WS;
   public $WU;
   public $WQ;
+  public $WV;
+  public $RR;
+  public $WL;
 
   public function __construct()
   {
@@ -45,6 +48,9 @@ class PS_Controller extends CI_Controller
 		$this->WS = get_permission('SOODSP', $uid);
 		$this->WU = get_permission('ICSUPP', $uid);
 		$this->WQ = get_permission('ICTRFM', $uid);
+    $this->WV = get_permission('ICTRFS', $uid);
+    $this->RR = get_permission('ICRQRC', $uid);
+    $this->WL = get_permission('ICLEND', $uid);
   }
 }
 

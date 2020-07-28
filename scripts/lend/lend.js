@@ -80,6 +80,36 @@ function approve()
   });
 }
 
+function unapprove()
+{
+  var order_code = $('#order_code').val();
+  $.ajax({
+    url:BASE_URL + 'orders/orders/un_approve/'+order_code,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          text:'ยกเลิกการอนุมัติแล้ว',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function(){
+          window.location.reload();
+        }, 1500);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  });
+}
+
 
 function change_state(){
   var order_code = $('#order_code').val();

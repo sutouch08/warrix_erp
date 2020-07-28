@@ -288,6 +288,8 @@ class Consign_order_model extends CI_Model
       ->group_end();
     }
 
+    $this->db->order_by('date_add', 'DESC');
+
     if(!empty($perpage))
     {
       $offset = $offset === NULL ? 0 : $offset;

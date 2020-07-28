@@ -5,13 +5,16 @@
 	</div>
     <div class="col-sm-6">
     <p class="pull-right top-p">
+			<?php if(empty($approve_view)) : ?>
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
       <button type="button" class="btn btn-sm btn-info" onclick="printReceived()"><i class="fa fa-print"></i> พิมพ์</button>
-			<?php if($doc->status == 1 && ! $doc->is_approve && $this->pm->can_approve) : ?>
-			<button type="button" class="btn btn-sm btn-primary" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
-		<?php elseif($doc->status == 1 && $doc->is_approve && $this->pm->can_approve) : ?>
-			<button type="button" class="btn btn-sm btn-danger" onclick="unapprove()"><i class="fa fa-times"></i> ไม่อนุมัติ</button>
 			<?php endif; ?>
+			
+			<?php if($doc->valid == 0 && $doc->status == 1 && ! $doc->is_approve && $this->pm->can_approve) : ?>
+			<button type="button" class="btn btn-sm btn-primary" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
+		<?php elseif($doc->valid == 0 && $doc->status == 1 && $doc->is_approve && $this->pm->can_approve) : ?>
+			<button type="button" class="btn btn-sm btn-danger" onclick="unapprove()"><i class="fa fa-times"></i> ไม่อนุมัติ</button>
+		<?php endif; ?>
     </p>
   </div>
 </div>

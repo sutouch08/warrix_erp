@@ -48,7 +48,7 @@
 
 				<td class="middle text-center">
 				<?php if( $order->is_expired == 0) : ?>
-				<?php  $active = $order->state < 3 ? '' : 'disabled'; ?>
+				<?php  $active = ($order->state == 1 && empty($approve_view) && $order->is_approved == 0 )  ? '' : 'disabled'; ?>
 					<input type="checkbox"
 					class="ace not-return"
 					id="chk-<?php echo $rs->id; ?>"
@@ -66,22 +66,26 @@
         <td class="middle" id="transform-box-<?php echo $rs->id; ?>">
 					<?php
 						//---	รายการสินค้าที่เชื่อมโยงแล้ว
-						echo getTransformProducts($rs->transform_product, $order->state, $order->is_expired);
+						echo getTransformProducts($rs->transform_product, $order->state, $order->is_expired, $order->is_approved);
 					 ?>
 					<!--- ยอดรวมของสินค้าที่เชื่อมโยงแล้ว -->
 					<input type="hidden" id="transform-qty-<?php echo $rs->id; ?>" value="<?php echo $rs->sum_transform_product_qty; ?>" />
 				</td>
 
         <td class="text-center" id="connect-box-<?php echo $rs->id; ?>">
-				<?php if( $order->is_expired == 0 && $rs->hasTransformProduct === TRUE && $order->state < 3 ) : ?>
+			<?php if(empty($approve_view)) : ?>
+				<?php if( $order->is_expired == 0 && $order->is_approved == 0 && $rs->hasTransformProduct === TRUE && $order->state < 3 ) : ?>
 					<button type="button" class="btn btn-xs btn-success btn-block connect" id="btn-connect-<?php echo $rs->id; ?>" onclick="addTransformProduct(<?php echo $rs->id; ?>,'<?php echo $rs->product_code; ?>')"><i class="fa fa-plus"></i> เชื่อมโยง</button>
 				<?php endif; ?>
+			<?php endif; ?>
         </td>
 
         <td class="middle text-right">
-        <?php if( $order->is_expired == 0 && ($this->pm->can_edit OR $this->pm->can_add) && $order->state < 3 ) : ?>
+			<?php if(empty($approve_view)) : ?>
+        <?php if( $order->is_expired == 0 && $order->is_approved == 0 && ($this->pm->can_edit OR $this->pm->can_add) && $order->state < 3 ) : ?>
         	<button type="button" class="btn btn-xs btn-danger" onclick="removeDetail(<?php echo $rs->id; ?>, '<?php echo $rs->product_code; ?>')"><i class="fa fa-trash"></i></button>
         <?php endif; ?>
+			<?php endif; ?>
         </td>
 			</tr>
 

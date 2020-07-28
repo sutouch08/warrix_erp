@@ -193,7 +193,7 @@ class Receive_po_request_model extends CI_Model
     }
     else
     {
-      if($ds['approve'] !== 'all')
+      if($ds['isApprove'] !== 'all')
       {
         $this->db->where('status !=', 2);
       }
@@ -204,9 +204,9 @@ class Receive_po_request_model extends CI_Model
       $this->db->where('valid', $ds['valid']);
     }
 
-    if($ds['approve'] !== 'all')
+    if($ds['isApprove'] !== 'all')
     {
-      $this->db->where('is_approve', $ds['approve']);
+      $this->db->where('is_approve', $ds['isApprove']);
     }
 
     return $this->db->count_all_results('receive_product_request');
@@ -259,15 +259,15 @@ class Receive_po_request_model extends CI_Model
     }
     else
     {
-      if($ds['approve'] !== 'all')
+      if($ds['isApprove'] !== 'all')
       {
         $this->db->where('status !=', 2);
       }
     }
 
-    if($ds['approve'] !== 'all')
+    if($ds['isApprove'] !== 'all')
     {
-      $this->db->where('is_approve', $ds['approve']);
+      $this->db->where('is_approve', $ds['isApprove']);
     }
 
     if($ds['valid'] !== 'all')
@@ -292,6 +292,41 @@ class Receive_po_request_model extends CI_Model
     }
 
     return NULL;
+  }
+
+
+
+  public function count_un_approve_rows()
+  {
+    $this->db
+    ->where('status', 1)
+    ->where('is_approve', 0);
+
+    return $this->db->count_all_results('receive_product_request');
+  }
+
+
+
+  public function get_un_approve_list($limit = NULL)
+  {
+    $this->db
+    ->select('code, vendor_name')
+    ->where('status', 1)
+    ->where('is_approve', 0);
+
+    if(! empty($limit))
+    {
+      $this->db->limit($limit);
+    }
+
+    $rs = $this->db->get('receive_product_request');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 

@@ -48,23 +48,12 @@
 
 	<div class="col-sm-1 padding-5">
     <label>การอนุมัติ</label>
-		<select name="approve" class="form-control input-sm" onchange="getSearch()">
+		<select name="isApprove" class="form-control input-sm" onchange="getSearch()">
 			<option value="all">ทั้งหมด</option>
-			<option value="0" <?php echo is_selected('0', $approve); ?>>รออนุมัติ</option>
-			<option value="1" <?php echo is_selected('1', $approve); ?>>อนุมัติแล้ว</option>
+			<option value="0" <?php echo is_selected('0', $isApprove); ?>>รออนุมัติ</option>
+			<option value="1" <?php echo is_selected('1', $isApprove); ?>>อนุมัติแล้ว</option>
 		</select>
   </div>
-
-<!--
-	<div class="col-sm-1 padding-5">
-    <label>การรับสินค้า</label>
-		<select name="valid" class="form-control input-sm" onchange="getSearch()">
-			<option value="all">ทั้งหมด</option>
-			<option value="0" <?php echo is_selected('0', $valid); ?>>ยังไม่รับ</option>
-			<option value="1" <?php echo is_selected('1', $valid); ?>>รับแล้ว</option>
-		</select>
-  </div>
--->
 
 	<div class="col-sm-2 padding-5">
     <label>วันที่</label>

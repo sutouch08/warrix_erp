@@ -35,12 +35,13 @@ class Transform extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'code', ''),
-      'customer'  => get_filter('customer', 'customer', ''),
-      'user'      => get_filter('user', 'user', ''),
-      'user_ref'  => get_filter('user_ref', 'user_ref', ''),
-      'from_date' => get_filter('fromDate', 'fromDate', ''),
-      'to_date'   => get_filter('toDate', 'toDate', '')
+      'code'      => get_filter('code', 'transform_code', ''),
+      'customer'  => get_filter('customer', 'transform_customer', ''),
+      'user'      => get_filter('user', 'transform_user', ''),
+      'user_ref'  => get_filter('user_ref', 'transform_user_ref', ''),
+      'from_date' => get_filter('fromDate', 'transform_fromDate', ''),
+      'to_date'   => get_filter('toDate', 'transform_toDate', ''),
+      'isApprove' => get_filter('isApprove', 'transform_isApprove', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -146,12 +147,13 @@ class Transform extends PS_Controller
 
 
 
-  public function edit_order($code)
+  public function edit_order($code, $approve_view = NULL)
   {
     $this->load->helper('print');
     $this->load->helper('transform');
     $this->load->model('masters/zone_model');
     $this->load->model('masters/warehouse_model');
+    $this->load->model('approve_logs_model');
 
     $ds = array();
     $rs = $this->orders_model->get($code);
@@ -189,6 +191,8 @@ class Transform extends PS_Controller
     $ds['state'] = $ost;
     $ds['order'] = $rs;
     $ds['details'] = $details;
+    $ds['approve_view'] = $approve_view;
+    $ds['approve_logs'] = $this->approve_logs_model->get($code);
     $this->load->view('transform/transform_edit', $ds);
   }
 
@@ -502,12 +506,13 @@ class Transform extends PS_Controller
   public function clear_filter()
   {
     $filter = array(
-      'code',
-      'customer',
-      'user',
-      'user_ref',
-      'fromDate',
-      'toDate'
+      'transform_code',
+      'transform_customer',
+      'transform_user',
+      'transform_user_ref',
+      'transform_fromDate',
+      'transform_toDate',
+      'transform_isApprove'
     );
 
     clear_filter($filter);

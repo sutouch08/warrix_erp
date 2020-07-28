@@ -8,6 +8,8 @@ class Sponsor extends PS_Controller
   public $menu_sub_group_code = 'ORDER';
 	public $title = 'สปอนเซอร์';
   public $filter;
+  public $error;
+
   public function __construct()
   {
     parent::__construct();
@@ -242,30 +244,47 @@ class Sponsor extends PS_Controller
     if($this->input->post('order_code'))
     {
       $code = $this->input->post('order_code');
-      $ds = array(
-        'customer_code' => $this->input->post('customer_code'),
-        'date_add' => db_date($this->input->post('date_add')),
-        'user_ref' => $this->input->post('user_ref'),
-        'warehouse_code' => $this->input->post('warehouse'),
-        'remark' => $this->input->post('remark'),
-        'status' => 0
-      );
+      $order = $this->orders_model->get($code);
 
-      $rs = $this->orders_model->update($code, $ds);
+      if(!empty($order))
+      {
+        if($order->state > 1)
+        {
+          $ds = array(
+            'remark' => $this->input->post('remark')
+          );
+        }
+        else
+        {
+          $ds = array(
+            'customer_code' => $this->input->post('customer_code'),
+            'date_add' => db_date($this->input->post('date_add')),
+            'user_ref' => $this->input->post('user_ref'),
+            'warehouse_code' => $this->input->post('warehouse'),
+            'remark' => $this->input->post('remark'),
+            'status' => 0
+          );
+        }
 
-      if($rs === FALSE)
+        if(! $this->orders_model->update($code, $ds))
+        {
+          $sc = FALSE;
+          $this->error = "ปรับปรุงเอกสารไม่สำเร็จ";
+        }
+      }
+      else
       {
         $sc = FALSE;
-        $message = 'ปรับปรุงข้อมูลไม่สำเร็จ';
+        $this->error = "เลขที่เอกสารไม่ถูกต้อง : {$code}";
       }
     }
     else
     {
       $sc = FALSE;
-      $message = 'ไม่พบเลขที่เอกสาร';
+      $this->error = 'ไม่พบเลขที่เอกสาร';
     }
 
-    echo $sc === TRUE ? 'success' : $message;
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 

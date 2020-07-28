@@ -25,13 +25,21 @@ class Approve_logs_model extends CI_Model
   {
     if(!empty($code))
     {
-      $rs = $this->db->where('order_code', $code)->get('order_approve');
+      $rs = $this->db
+      ->select('order_approve.approve')
+      ->select('order_approve.date_upd')
+      ->select('user.name AS approver')
+      ->from('order_approve')
+      ->join('user', 'order_approve.approver = user.uname', 'left')
+      ->where('order_approve.order_code', $code)
+      ->get();
+
       if($rs->num_rows() > 0)
       {
         return $rs->result();
       }
     }
-    
+
     return NULL;
   }
 
