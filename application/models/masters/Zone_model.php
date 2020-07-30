@@ -407,7 +407,7 @@ class Zone_model extends CI_Model
     ->or_where('old_code', $code)
     ->group_end()
     ->get('zone');
-    
+
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -427,10 +427,12 @@ class Zone_model extends CI_Model
 
     if($txt != '*')
     {
+      $this->db->group_start();
       $this->db->like('code', $txt)->or_like('name', $txt);
+      $this->db->group_end();
     }
 
-    $rs = $this->db->get('zone');
+    $rs = $this->db->limit($limit)->get('zone');
 
     if($rs->num_rows() > 0)
     {

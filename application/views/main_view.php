@@ -6,19 +6,19 @@
 </div>
 <div class="divider-hidden"></div>
 <div class="row">
-  <div class="col-sm-1 col-1-harf col-sm-offset-4 col-xs-6 padding-5">
+  <div class="col-sm-2 col-sm-offset-4 col-xs-6 padding-5">
     <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getSearch()">ตรวจสอบสต็อก</button>
   </div>
-  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
+  <div class="col-sm-2 col-xs-6 padding-5">
     <button type="button" class="btn btn-xs btn-info btn-block" onclick="findOrder()">ตรวจสอบออเดอร์</button>
   </div>
-  
+
 </div>
 <hr class="margin-top-15 margin-bottom-15"/>
 
 <div class="row">
   <div class="col-sm-12" id="result">
-
+    
   </div>
 </div>
 

@@ -10,6 +10,12 @@ function get_image_path($id, $size = 'default')
   {
     $image_path = base_url().$path.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
     $file = $CI->config->item('image_file_path').'products/'.$code.'/product_'.$size.'_'.$id.'.jpg';
+    
+    if(!file_exists($file) && $size == 'large')
+    {
+      $file = $CI->config->item('image_file_path').'products/'.$code.'/product_lage_'.$id.'.jpg';
+    }
+
     return file_exists($file) ? $image_path : $no_image_path;
   }
 
@@ -34,7 +40,7 @@ function delete_product_image($id, $code)
 {
   $CI =& get_instance();
   $path = $CI->config->item('image_file_path').'products/';
-  $use_size = array('mini', 'default', 'medium', 'lage');
+  $use_size = array('mini', 'default', 'medium', 'lage', 'large');
   foreach($use_size as $size)
   {
     $image_path = $path.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';

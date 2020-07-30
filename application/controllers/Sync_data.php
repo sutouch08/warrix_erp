@@ -26,6 +26,27 @@ class Sync_data extends CI_Controller
   }
 
 
+  public function clear_logs($days = 7)
+  {
+    $this->load->view('clear_old_logs_view', array('days' => $days));
+  }
+
+
+  public function clear_old_logs($days)
+  {
+    $sc = $this->sync_data_model->clear_old_logs($days);
+
+    if($sc)
+    {
+      echo 'done';
+    }
+    else
+    {
+      echo 'error';
+    }
+  }
+
+
 
   public function syncWarehouse()
   {
@@ -463,6 +484,87 @@ class Sync_data extends CI_Controller
 
     $logs = array(
       'sync_item' => 'MV',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+
+  public function syncAdjustGoodsIssueCode()
+  {
+    $this->load->model('inventory/adjust_model');
+    $ds = $this->adjust_model->get_non_issue_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->adjust_model->get_sap_issue_doc($rs->code);
+
+        if(!empty($inv))
+        {
+          $this->adjust_model->update_issue_code($rs->code, $inv->DocNum);
+          $update++;
+        }
+
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'AJ-IGE',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+  public function syncAdjustGoodsReceiveCode()
+  {
+    $this->load->model('inventory/adjust_model');
+    $ds = $this->adjust_model->get_non_receive_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->adjust_model->get_sap_receive_doc($rs->code);
+
+        if(!empty($inv))
+        {
+          $this->adjust_model->update_receive_code($rs->code, $inv->DocNum);
+          $update++;
+        }
+
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'AJ-IGN',
       'get_item' => $count,
       'update_item' => $update
     );

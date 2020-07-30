@@ -357,7 +357,7 @@ public function get_prepare_item_code()
   }
 
 
-  public function get_zone_code_and_name($warehouse = '')
+  public function get_zone_code_and_name($warehouse = NULL)
   {
     $sc = array();
     $txt = $_REQUEST['term'];
@@ -368,8 +368,15 @@ public function get_prepare_item_code()
       $this->db->where('warehouse_code', $warehouse);
     }
 
-    $this->db->like('code', $txt);
-    $this->db->or_like('name', $txt);
+    $this->db
+    ->group_start()
+    ->like('code', $txt)
+    ->or_like('old_code', $txt)
+    ->or_like('name', $txt)
+    ->group_end()
+    ->order_by('warehouse_code', 'ASC')
+    ->limit(20);
+
     $rs = $this->db->get('zone');
 
     if($rs->num_rows() > 0)

@@ -323,12 +323,17 @@ class Orders_model extends CI_Model
   public function count_rows(array $ds = array(), $role = 'S')
   {
     $this->db
-    ->select('orders.*')
     ->from('orders')
     ->join('customers', 'orders.customer_code = customers.code', 'left')
     ->join('zone', 'orders.zone_code = zone.code', 'left')
-    ->join('user', 'orders.user = user.uname', 'left')
-    ->where('role', $role);
+    ->join('user', 'orders.user = user.uname', 'left');
+
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']) && ! empty($ds['stated']))
+    {
+      $this->db->join('order_state_change AS st', 'st.order_code = orders.code', 'left');
+    }
+
+    $this->db->where('role', $role);
 
     //---- เลขที่เอกสาร
     if( ! empty($ds['code']))
@@ -397,15 +402,16 @@ class Orders_model extends CI_Model
       $this->db->like('orders.empName', $ds['empName']);
     }
 
-
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
     {
       if(!empty($ds['stated']))
       {
-        $from_date = from_date($ds['from_date']);
-        $to_date = to_date($ds['to_date']);
-        $array = $this->getOrderStateChangeIn($ds['stated'], $from_date, $to_date, $ds['startTime'], $ds['endTime'] );
-        $this->db->where_in('orders.code', $array);
+        $this->db
+        ->where('st.state', $ds['stated'])
+        ->where('st.date_upd >=', from_date($ds['from_date']))
+        ->where('st.date_upd <=', to_date($ds['to_date']))
+        ->where('st.time_upd >=', $ds['startTime'])
+        ->where('st.time_upd <=', $ds['endTime']);
       }
       else
       {
@@ -477,12 +483,19 @@ class Orders_model extends CI_Model
   public function get_data(array $ds = array(), $perpage = '', $offset = '', $role = 'S')
   {
     $this->db
+    ->distinct()
     ->select('orders.*')
     ->from('orders')
     ->join('customers', 'orders.customer_code = customers.code', 'left')
     ->join('zone', 'orders.zone_code = zone.code', 'left')
-    ->join('user', 'orders.user = user.uname', 'left')
-    ->where('role', $role);
+    ->join('user', 'orders.user = user.uname', 'left');
+
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']) && ! empty($ds['stated']))
+    {
+      $this->db->join('order_state_change AS st', 'st.order_code = orders.code', 'left');
+    }
+
+    $this->db->where('role', $role);
 
     //---- เลขที่เอกสาร
     if( ! empty($ds['code']))
@@ -555,10 +568,12 @@ class Orders_model extends CI_Model
     {
       if(!empty($ds['stated']))
       {
-        $from_date = from_date($ds['from_date']);
-        $to_date = to_date($ds['to_date']);
-        $array = $this->getOrderStateChangeIn($ds['stated'], $from_date, $to_date, $ds['startTime'], $ds['endTime'] );
-        $this->db->where_in('orders.code', $array);
+        $this->db
+        ->where('st.state', $ds['stated'])
+        ->where('st.date_upd >=', from_date($ds['from_date']))
+        ->where('st.date_upd <=', to_date($ds['to_date']))
+        ->where('st.time_upd >=', $ds['startTime'])
+        ->where('st.time_upd <=', $ds['endTime']);
       }
       else
       {

@@ -145,11 +145,12 @@ class Transform_stock extends PS_Controller
 
 
 
-  public function edit_order($code)
+  public function edit_order($code, $approve_view = NULL)
   {
     $this->load->helper('print');
     $this->load->helper('transform');
     $this->load->model('masters/zone_model');
+    $this->load->model('approve_logs_model');
 
     $ds = array();
     $rs = $this->orders_model->get($code);
@@ -186,6 +187,8 @@ class Transform_stock extends PS_Controller
     $ds['state'] = $ost;
     $ds['order'] = $rs;
     $ds['details'] = $details;
+    $ds['approve_logs'] = $this->approve_logs_model->get($code);
+    $ds['approve_view'] = $approve_view;
     $this->load->view('transform/transform_edit', $ds);
   }
 

@@ -128,7 +128,28 @@ function syncMoveInvCode(){
   $.get(BASE_URL + 'sync_data/syncMoveInvCode', function(rs){
     $('body').append('finished update MV : '+ rs + ' <br/>');
     $('body').append('============================================ <br/>');
-    $('body').append('All Done!!');
+    syncAdjustGoodsIssueCode();
+  })
+}
+
+
+//--- 9. sync OIGE (AJ-IGE)
+function syncAdjustGoodsIssueCode(){
+    $('body').append('start    updating AJ-IGE .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncAdjustGoodsIssueCode', function(rs){
+    $('body').append('finished update AJ-IGE : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
+    syncAdjustGoodsReceiveCode()
+  })
+}
+
+//--- 10. sync OIGN (AJ-IGN)
+function syncAdjustGoodsReceiveCode(){
+    $('body').append('start    updating AJ-IGN .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncAdjustGoodsReceiveCode', function(rs){
+    $('body').append('finished update AJ-IGN : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
+    $('body').append('All done!');
     window.close();
   })
 }

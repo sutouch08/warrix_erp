@@ -7,7 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-
+				<button type="button" class="btn btn-sm btn-success" onclick="export_diff()">Export ยอดต่าง</button>
 			</p>
 		</div>
 </div><!-- End Row -->
@@ -103,7 +103,7 @@
 							{
 								echo thai_date($rs->F_SapDate, TRUE);
 							}
-							?>						
+							?>
 					</td>
 					<td class="text-center">
             <?php if($rs->F_Sap === NULL) : ?>
@@ -137,6 +137,18 @@
   </div>
 </div>
 
+<form id="reportForm" method="post" action="<?php echo $this->home; ?>/export_diff">
+	<input type="hidden" id="token" name="token" value="<?php echo uniqid(); ?>">
+</form>
+
 <script src="<?php echo base_url(); ?>scripts/inventory/temp/temp_transfer_list.js?v=<?php echo date('YmdH'); ?>"></script>
+<script>
+function export_diff()
+{
+	var token = $('#token').val();
+	get_download(token);
+	$('#reportForm').submit();
+}
+</script>
 
 <?php $this->load->view('include/footer'); ?>

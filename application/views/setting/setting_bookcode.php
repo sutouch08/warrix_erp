@@ -108,6 +108,14 @@
       <div class="divider-hidden"></div>
 
 
+			<div class="col-sm-3"><span class="form-control left-label">ปรับยอดสต็อก</span></div>
+      <div class="col-sm-8">
+        <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_ADJUST" value="<?php echo $BOOK_CODE_ADJUST; ?>" />
+        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ปรับยอดสต็อก"</span>
+      </div>
+      <div class="divider-hidden"></div>
+
+
       <div class="col-sm-9 col-sm-offset-3">
 				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
       	<button type="button" class="btn btn-sm btn-success input-small" onClick="updateConfig('bookcodeForm')"><i class="fa fa-save"></i> บันทึก</button>

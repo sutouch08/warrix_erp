@@ -326,39 +326,48 @@ class Move extends PS_Controller
       $from_zone = $this->input->post('from_zone');
       $to_zone = $this->input->post('to_zone');
       $trans_products = $this->input->post('trans_products');
-      if(!empty($trans_products))
+      if($from_zone != $to_zone)
       {
-        $this->db->trans_start();
-        foreach($trans_products as $item => $qty)
+        if(!empty($trans_products))
         {
-          $id = $this->move_model->get_id($code, $item, $from_zone, $to_zone);
-          if(!empty($id))
+          $this->db->trans_start();
+          foreach($trans_products as $item => $qty)
           {
-            $this->move_model->update_qty($id, $qty);
+            $id = $this->move_model->get_id($code, $item, $from_zone, $to_zone);
+            if(!empty($id))
+            {
+              $this->move_model->update_qty($id, $qty);
+            }
+            else
+            {
+              $arr = array(
+                'move_code' => $code,
+                'product_code' => $item,
+                'product_name' => $this->products_model->get_name($item),
+                'from_zone' => $from_zone,
+                'to_zone' => $to_zone,
+                'qty' => $qty
+              );
+
+              $this->move_model->add_detail($arr);
+            }
           }
-          else
+
+          $this->db->trans_complete();
+
+          if($this->db->trans_status() === FALSE)
           {
-            $arr = array(
-              'move_code' => $code,
-              'product_code' => $item,
-              'product_name' => $this->products_model->get_name($item),
-              'from_zone' => $from_zone,
-              'to_zone' => $to_zone,
-              'qty' => $qty
-            );
-
-            $this->move_model->add_detail($arr);
+            $sc = FALSE;
+            $message = 'เพิ่มข้อมูลไม่สำเร็จ';
           }
-        }
-
-        $this->db->trans_complete();
-
-        if($this->db->trans_status() === FALSE)
-        {
-          $sc = FALSE;
-          $message = 'เพิ่มข้อมูลไม่สำเร็จ';
         }
       }
+      else
+      {
+        $sc = FALSE;
+        $message = 'โซนต้นทาง - ปลายทาง ต้องเป็นคนละโซนกัน';
+      }
+
     }
 
     echo $sc === TRUE ? 'success' : $message;
@@ -458,57 +467,71 @@ class Move extends PS_Controller
           $this->db->trans_begin();
           foreach($temp as $rs)
           {
-            if($qty > 0 && $rs->qty > 0)
+            if($sc === FALSE)
             {
-              //---- ยอดที่ต้องการย้าย น้อยกว่าหรือเท่ากับ ยอดใน temp มั้ย
-              //---- ถ้าใช่ ใช้ยอดที่ต้องการย้ายได้เลย
-              //---- แต่ถ้ายอดที่ต้องการย้ายมากว่ายอดใน temp แล้วยกยอดที่เหลือไปย้ายในรอบถัดไป(ถ้ามี)
-              $temp_qty = $qty <= $rs->qty ? $qty : $rs->qty;
-              $id = $this->move_model->get_id($code, $item->code, $rs->zone_code, $to_zone);
-              //--- ถ้าพบไอดีให้แก้ไขจำนวน
-              if(!empty($id))
+              break;
+            }
+
+            if($rs->zone_code != $to_zone)
+            {
+              if($qty > 0 && $rs->qty > 0)
               {
-                if($this->move_model->update_qty($id, $temp_qty) === FALSE)
+                //---- ยอดที่ต้องการย้าย น้อยกว่าหรือเท่ากับ ยอดใน temp มั้ย
+                //---- ถ้าใช่ ใช้ยอดที่ต้องการย้ายได้เลย
+                //---- แต่ถ้ายอดที่ต้องการย้ายมากว่ายอดใน temp แล้วยกยอดที่เหลือไปย้ายในรอบถัดไป(ถ้ามี)
+                $temp_qty = $qty <= $rs->qty ? $qty : $rs->qty;
+                $id = $this->move_model->get_id($code, $item->code, $rs->zone_code, $to_zone);
+                //--- ถ้าพบไอดีให้แก้ไขจำนวน
+                if(!empty($id))
+                {
+                  if($this->move_model->update_qty($id, $temp_qty) === FALSE)
+                  {
+                    $sc = FALSE;
+                    $message = 'แก้ไขยอดในรายการไม่สำเร็จ';
+                    break;
+                  }
+                }
+                else
+                {
+                  //--- ถ้ายังไม่มีรายการ ให้เพิ่มใหม่
+                  $ds = array(
+                    'move_code' => $code,
+                    'product_code' => $item->code,
+                    'product_name' => $item->name,
+                    'from_zone' => $rs->zone_code,
+                    'to_zone' => $to_zone,
+                    'qty' => $temp_qty
+                  );
+
+                  if($this->move_model->add_detail($ds) === FALSE)
+                  {
+                    $sc = FALSE;
+                    $message = 'เพิ่มรายการไม่สำเร็จ';
+                    break;
+                  }
+                }
+                //--- ถ้าเพิ่มหรือแก้ไข detail เสร็จแล้ว ทำการ ลดยอดใน temp ตามยอดที่เพิ่มเข้า detail
+                if($this->move_model->update_temp_qty($rs->id, ($temp_qty * -1)) === FALSE)
                 {
                   $sc = FALSE;
-                  $message = 'แก้ไขยอดในรายการไม่สำเร็จ';
+                  $message = 'แก้ไขยอดใน temp ไม่สำเร็จ';
                   break;
                 }
+
+                //--- ตัดยอดที่ต้องการย้ายออก เพื่อยกยอดไปรอบต่อไป
+                $qty -= $temp_qty;
               }
               else
               {
-                //--- ถ้ายังไม่มีรายการ ให้เพิ่มใหม่
-                $ds = array(
-                  'move_code' => $code,
-                  'product_code' => $item->code,
-                  'product_name' => $item->name,
-                  'from_zone' => $rs->zone_code,
-                  'to_zone' => $to_zone,
-                  'qty' => $temp_qty
-                );
-
-                if($this->move_model->add_detail($ds) === FALSE)
-                {
-                  $sc = FALSE;
-                  $message = 'เพิ่มรายการไม่สำเร็จ';
-                  break;
-                }
-              }
-              //--- ถ้าเพิ่มหรือแก้ไข detail เสร็จแล้ว ทำการ ลดยอดใน temp ตามยอดที่เพิ่มเข้า detail
-              if($this->move_model->update_temp_qty($rs->id, ($temp_qty * -1)) === FALSE)
-              {
-                $sc = FALSE;
-                $message = 'แก้ไขยอดใน temp ไม่สำเร็จ';
                 break;
-              }
-
-              //--- ตัดยอดที่ต้องการย้ายออก เพื่อยกยอดไปรอบต่อไป
-              $qty -= $temp_qty;
+              } //-- end if qty > 0
             }
             else
             {
-              break;
-            } //-- end if qty > 0
+              $sc = FALSE;
+              $message = 'โซนต้นทาง - ปลายทาง ต้องไม่ใช่โซนเดียวกัน';
+            }
+
 
             //--- ลบ temp ที่ยอดเป็น 0
             $this->move_model->drop_zero_temp();
@@ -675,7 +698,7 @@ class Move extends PS_Controller
 
 
 
-  public function get_move_zone($warehouse = '')
+  public function get_move_zone($warehouse = NULL)
   {
     $txt = $_REQUEST['term'];
     $sc = array();

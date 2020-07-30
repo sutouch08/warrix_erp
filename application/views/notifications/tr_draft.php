@@ -10,7 +10,7 @@
   <span class="badge badge-primary">{{rows}}</span>
 </a>
 
-<ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+<ul class="dropdown-menu-left dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
   <li class="dropdown-header">
     <center>รอยืนยัน  {{rows}}  รายการ</center>
   </li>

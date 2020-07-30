@@ -1350,6 +1350,7 @@ public function export_receive($code)
 
 
 //---- receive transform
+//--- OIGN
 public function export_receive_transform($code)
 {
   $sc = TRUE;
@@ -1932,5 +1933,289 @@ public function export_goods_issue($code)
 
   return $sc;
 }
+
+
+
+//---- Good issue
+//---- OIGE IGE1
+//---- Adjust
+public function export_adjust_goods_issue($code)
+{
+  $sc = TRUE;
+  $this->ci->load->model('inventory/adjust_model');
+  $doc = $this->ci->adjust_model->get($code);
+  if(! empty($doc) && $doc->status == 1 && $doc->is_approved == 1)
+  {
+    $sap = $this->ci->adjust_model->get_sap_issue_doc($code);
+    if(empty($sap))
+    {
+      $middle = $this->ci->adjust_model->get_middle_goods_issue($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          if($this->ci->adjust_model->drop_middle_issue_data($rows->DocEntry) === FALSE)
+          {
+            $sc = FALSE;
+            $this->error = "ลบรายการที่ค้างใน Temp ไม่สำเร็จ";
+          }
+        }
+      }
+
+      if($sc === TRUE)
+      {
+        $details = $this->ci->adjust_model->get_issue_details($code);
+        if(!empty($details))
+        {
+          $doc_total = 0;
+
+          foreach($details as $row)
+          {
+            $row->qty = $row->qty * (-1);
+            $doc_total += $row->qty * $row->cost;
+          }
+
+
+          $arr = array(
+            'U_ECOMNO' => $code,
+            'DocType' => 'I',
+            'CANCELED' => 'N',
+            'DocDate' => sap_date($doc->date_add),
+            'DocDueDate' => sap_date($doc->date_add),
+            'DocTotal' => $doc_total,
+            'DocTotalFC' => $doc_total,
+            'Comments' => limitText($doc->remark, 250),
+            'F_E_Commerce' => 'A',
+            'F_E_CommerceDate' => sap_date(now(), TRUE)
+          );
+
+          $this->ci->mc->trans_begin();
+
+          $docEntry = $this->ci->adjust_model->add_sap_goods_issue($arr);
+
+          //--- now add details
+          if($docEntry !== FALSE)
+          {
+            $line = 0;
+            foreach($details as $rs)
+            {
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              $arr = array(
+                'DocEntry' => $docEntry,
+                'U_ECOMNO' => $rs->adjust_code,
+                'LineNum' => $line,
+                'ItemCode' => $rs->product_code,
+                'Dscription' => $rs->product_name,
+                'Quantity' => $rs->qty,
+                'WhsCode' => $rs->warehouse_code,
+                'FisrtBin' => $rs->zone_code,
+                'DocDate' => sap_date($doc->date_add),
+                'F_E_Commerce' => 'A',
+                'F_E_CommerceDate' => sap_date(now(), TRUE)
+              );
+
+              if(!$this->ci->adjust_model->add_sap_goods_issue_row($arr))
+              {
+                $sc = FALSE;
+                $this->error = "Insert Goods Issue Temp Error at line {$line}, ItemCode : {$rs->product_code} ";
+              }
+
+              $line++;
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+          }
+
+          if($sc === TRUE)
+          {
+            $this->ci->mc->trans_commit();
+          }
+          else
+          {
+            $this->ci->mc->trans_rollback();
+          }
+
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบรายการสินค้า";
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เอกสาร Goods Issue ถูกนำเข้า SAP แล้วไม่อนุญาติให้แก้ไข";
+    }
+  }
+  else
+  {
+    $sc = FALSE;
+    $this->error = "ไม่พบเลขที่เอกสาร หรือ สถานะเอกสารไม่ถูกต้อง";
+  }
+
+  return $sc;
+}
+
+
+
+//---- adjust goods receive
+//---- OIGN
+public function export_adjust_goods_receive($code)
+{
+  $sc = TRUE;
+  $this->ci->load->model('inventory/adjust_model');
+  $this->ci->load->model('masters/products_model');
+  $doc = $this->ci->adjust_model->get($code);
+
+  if(!empty($doc) && $doc->status == 1 && $doc->is_approved == 1)
+  {
+    $sap = $this->ci->adjust_model->get_sap_receive_doc($code);
+    if(empty($sap))
+    {
+      $middle = $this->ci->adjust_model->get_middle_goods_receive($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          if($this->ci->adjust_model->drop_middle_receive_data($rows->DocEntry) === FALSE)
+          {
+            $sc = FALSE;
+            $this->error = "ลบรายการที่ค้างใน temp ไม่สำเร็จ";
+          }
+        }
+      }
+
+      if($sc === TRUE)
+      {
+        $details = $this->ci->adjust_model->get_receive_details($code);
+        if(!empty($details))
+        {
+          $currency = getConfig('CURRENCY');
+          $vat_rate = getConfig('PURCHASE_VAT_RATE');
+          $vat_code = getConfig('PURCHASE_VAT_CODE');
+          $doc_total = 0;
+
+          foreach($details as $row)
+          {
+            $doc_total += $row->qty * $row->cost;
+          }
+
+          $ds = array(
+            'U_ECOMNO' => $doc->code,
+            'DocType' => 'I',
+            'CANCELED' => 'N',
+            'DocDate' => $doc->date_add,
+            'DocDueDate' => $doc->date_add,
+            'DocCur' => $currency,
+            'DocRate' => 1,
+            'DocTotal' => remove_vat($doc_total),
+            'Comments' => limitText($doc->remark, 250),
+            'F_E_Commerce' => 'A',
+            'F_E_CommerceDate' => sap_date(now())
+          );
+
+          $this->ci->mc->trans_begin();
+
+          $docEntry = $this->ci->adjust_model->add_sap_goods_receive($ds);
+
+          if($docEntry !== FALSE)
+          {
+            $line = 0;
+
+            foreach($details as $rs)
+            {
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              $amount = $rs->qty * $rs->cost;
+              $arr = array(
+                'DocEntry' => $docEntry,
+                'U_ECOMNO' => $rs->adjust_code,
+                'LineNum' => $line,
+                'ItemCode' => $rs->product_code,
+                'Dscription' => $rs->product_name,
+                'Quantity' => $rs->qty,
+                'unitMsr' => $rs->unit_code,
+                'PriceBefDi' => round($rs->cost,2),
+                'LineTotal' => round($amount, 2),
+                'ShipDate' => $doc->date_add,
+                'Currency' => $currency,
+                'Rate' => 1,
+                'Price' => round(remove_vat($rs->cost), 2),
+                'TotalFrgn' => round($amount, 2),
+                'WhsCode' => $rs->warehouse_code,
+                'FisrtBin' => $rs->zone_code,
+                'TaxStatus' => 'Y',
+                'VatPrcnt' => $vat_rate,
+                'VatGroup' => $vat_code,
+                'PriceAfVAT' => $rs->cost,
+                'VatSum' => round(get_vat_amount($amount), 2),
+                'GTotal' => round($amount, 2),
+                'TaxType' => 'Y',
+                'F_E_Commerce' => 'A',
+                'F_E_CommerceDate' => sap_date(now())
+              );
+
+              if( ! $this->ci->adjust_model->add_sap_goods_receive_row($arr))
+              {
+                $sc = FALSE;
+                $this->error = 'เพิ่มรายการไม่สำเร็จ';
+              }
+
+              $line++;
+
+            } //--- end foreach
+
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+          }
+
+          if($sc === TRUE)
+          {
+            $this->ci->mc->trans_commit();
+          }
+          else
+          {
+            $this->ci->mc->trans_rollback();
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบรายการสินค้า";
+        }
+
+      }
+
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เอกสาร Goods Receive ถูกนำเข้า SAP แล้วไม่อนุญาติให้แก้ไข";
+    }
+  }
+  else
+  {
+    $sc = FALSE;
+    $this->error = "ไม่พบเลขที่เอกสาร หรือ สถานะเอกสารไม่ถูกต้อง";
+  }
+
+  return $sc;
+}
+//--- end export adjust goods receive
 
 } //--- end class

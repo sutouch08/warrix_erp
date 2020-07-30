@@ -177,4 +177,13 @@ class Sync_data_model extends CI_Model
     return FALSE;
   }
 
+
+  public function clear_old_logs($days = 7)
+  {
+
+    $date = date('Y-m-d 00:00:00', strtotime("-{$days} days"));
+
+    return $this->db->where('date_upd <', $date)->delete('ix_sync_logs');
+  }
+
 }//--- end class

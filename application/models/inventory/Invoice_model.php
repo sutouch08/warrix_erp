@@ -88,6 +88,26 @@ class Invoice_model extends CI_Model
     return FALSE;
   }
 
+
+  public function is_received($code)
+  {
+    $rs = $this->mc
+    ->select('F_Receipt')
+    ->where('U_ECOMNO', $code)
+    ->group_start()
+    ->where('F_Sap IS NULL', NULL, FALSE)
+    ->or_where('F_Sap', 'N')
+    ->group_end()
+    ->get('DFOWTR');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->F_Receipt;
+    }
+
+    return FALSE;
+  }
+
 } //--- end class
 
  ?>

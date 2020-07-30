@@ -154,6 +154,23 @@ class Temp_transfer_draft_model extends CI_Model
     return NULL;
   }
 
+
+  public function get_error_list()
+  {
+    $rs = $this->mc
+    ->select('U_ECOMNO AS code')
+    ->where('F_Sap', 'N')
+    ->order_by('U_ECOMNO', 'ASC')
+    ->get('DFOWTR');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
 } //--- end model
 
 ?>
