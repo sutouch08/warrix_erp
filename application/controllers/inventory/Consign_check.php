@@ -22,14 +22,14 @@ class Consign_check extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code' => get_filter('code', 'code', ''),
-      'customer' => get_filter('customer', 'customer', ''),
-      'zone' => get_filter('zone', 'zone', ''),
-      'from_date' => get_filter('from_date', 'from_date', ''),
-      'to_date' => get_filter('to_date', 'to_date', ''),
-      'status' => get_filter('status', 'status', 'all'),
-      'valid' => get_filter('valid', 'valid', 'all'),
-      'consign_code' => get_filter('consign_code', 'consign_code', '')
+      'code' => get_filter('code', 'check_code', ''),
+      'customer' => get_filter('customer', 'check_customer', ''),
+      'zone' => get_filter('zone', 'check_zone', ''),
+      'from_date' => get_filter('from_date', 'check_from_date', ''),
+      'to_date' => get_filter('to_date', 'check_to_date', ''),
+      'status' => get_filter('status', 'check_status', 'all'),
+      'valid' => get_filter('valid', 'check_valid', 'all'),
+      'consign_code' => get_filter('consign_code', 'check_consign_code', '')
     );
 
     //--- แสดงผลกี่รายการต่อหน้า
@@ -102,31 +102,47 @@ class Consign_check extends PS_Controller
       if($this->consign_check_model->add($arr))
       {
         //---- get stock balance in zone
-        $stocks = $this->stock_model->get_all_stock_in_zone($zone->code);
-        if(!empty($stocks))
+        $warehouse = $this->warehouse_model->get($zone->warehouse_code);
+        if(!empty($warehouse))
         {
-          foreach($stocks as $rs)
+          if($warehouse->is_consignment == 1)
           {
-            if($sc === FALSE)
+            $stocks = $this->stock_model->get_all_stock_consignment_zone($zone->code);
+          }
+          else
+          {
+            $stocks = $this->stock_model->get_all_stock_in_zone($zone->code);
+          }
+
+          if(!empty($stocks))
+          {
+            foreach($stocks as $rs)
             {
-              break;
-            }
+              if($sc === FALSE)
+              {
+                break;
+              }
 
-            $ds = array(
-            'check_code' => $code,
-            'product_code' => $rs->product_code,
-            'product_name' => $this->products_model->get_name($rs->product_code),
-            'stock_qty' => $rs->qty
-            );
+              $ds = array(
+              'check_code' => $code,
+              'product_code' => $rs->product_code,
+              'product_name' => $this->products_model->get_name($rs->product_code),
+              'stock_qty' => $rs->qty
+              );
 
-            if( ! $this->consign_check_model->add_detail($ds))
-            {
-              $sc = FALSE;
-              $this->error = "เพิ่มยอดตั้งต้นไม่สำเร็จ";
-            }
+              if( ! $this->consign_check_model->add_detail($ds))
+              {
+                $sc = FALSE;
+                $this->error = "เพิ่มยอดตั้งต้นไม่สำเร็จ";
+              }
 
-          } //-- edn foreach
-
+            } //-- edn foreach
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "คลังสินค้าไม่ถูกต้อง";
         }
       }
       else
@@ -495,54 +511,75 @@ class Consign_check extends PS_Controller
   public function reload_stock($code)
   {
     $sc = TRUE;
+    $this->load->model('masters/warehouse_model');
+
     $doc = $this->consign_check_model->get($code);
     if( ! empty($doc))
     {
-      $stocks = $this->stock_model->get_all_stock_in_zone($doc->zone_code);
-      if(!empty($stocks))
+
+      $warehouse = $this->warehouse_model->get($doc->warehouse_code);
+
+      if(!empty($warehouse))
       {
-        //---- ทำยอดตั้งต้นให้เป็น 0 ก่อน
-        //--- ตัวไหนมียอดจะถูก update ทีหลัง
-        //--- ตัวไหนไม่มียอดจะเป็น 0
-        //--- ตัวไหนที่ไม่มีรายการ จะถูกเพิ่ม
-        $this->db->trans_start();
-
-        //--- set all stock_qty = 0;
-        $this->consign_check_model->reset_stock_qty($code);
-
-        foreach($stocks as $rs)
+        if($warehouse->is_consignment == 1)
         {
-          if($sc === FALSE)
-          {
-            break;
-          }
-          $detail = $this->consign_check_model->get_detail($code, $rs->product_code);
-          if(!empty($detail))
-          {
-            $this->consign_check_model->update_stock_qty($detail->id, $rs->qty);
-          }
-          else
-          {
-            $ds = array(
-            'check_code' => $code,
-            'product_code' => $rs->product_code,
-            'product_name' => $this->products_model->get_name($rs->product_code),
-            'stock_qty' => $rs->qty
-            );
+          $stocks = $this->stock_model->get_all_stock_consignment_zone($doc->zone_code);
+        }
+        else
+        {
+          $stocks = $this->stock_model->get_all_stock_in_zone($doc->zone_code);
+        }
 
-            if( ! $this->consign_check_model->add_detail($ds))
+        if(!empty($stocks))
+        {
+          //---- ทำยอดตั้งต้นให้เป็น 0 ก่อน
+          //--- ตัวไหนมียอดจะถูก update ทีหลัง
+          //--- ตัวไหนไม่มียอดจะเป็น 0
+          //--- ตัวไหนที่ไม่มีรายการ จะถูกเพิ่ม
+          $this->db->trans_start();
+
+          //--- set all stock_qty = 0;
+          $this->consign_check_model->reset_stock_qty($code);
+
+          foreach($stocks as $rs)
+          {
+            if($sc === FALSE)
             {
-              $sc = FALSE;
-              $this->error = "เพิ่มยอดตั้งต้นไม่สำเร็จ";
+              break;
             }
-          }
+            $detail = $this->consign_check_model->get_detail($code, $rs->product_code);
+            if(!empty($detail))
+            {
+              $this->consign_check_model->update_stock_qty($detail->id, $rs->qty);
+            }
+            else
+            {
+              $ds = array(
+              'check_code' => $code,
+              'product_code' => $rs->product_code,
+              'product_name' => $this->products_model->get_name($rs->product_code),
+              'stock_qty' => $rs->qty
+              );
 
-        } //-- edn foreach
+              if( ! $this->consign_check_model->add_detail($ds))
+              {
+                $sc = FALSE;
+                $this->error = "เพิ่มยอดตั้งต้นไม่สำเร็จ";
+              }
+            }
 
-        $this->db->trans_complete();
+          } //-- edn foreach
 
-        //--- delete 0 stock_qty and 0 checked
-        $this->consign_check_model->delete_no_item_details($code);
+          $this->db->trans_complete();
+
+          //--- delete 0 stock_qty and 0 checked
+          $this->consign_check_model->delete_no_item_details($code);
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "คลังสินค้าไม่ถูกต้อง : {$doc->warehouse_code}";
       }
     }
 
@@ -709,7 +746,17 @@ class Consign_check extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'customer', 'zone', 'from_date', 'to_date', 'status', 'valid', 'consign_code' );
+    $filter = array(
+      'check_code',
+      'check_customer',
+      'check_zone',
+      'check_from_date',
+      'check_to_date',
+      'check_status',
+      'check_valid',
+      'check_consign_code'
+    );
+    
     clear_filter($filter);
   }
 

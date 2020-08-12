@@ -190,20 +190,33 @@ class Cancle_model extends CI_Model
 
   public function restore_buffer($code)
   {
+    $sc = TRUE;
+
     $rs = $this->db->where('order_code', $code)->get('cancle');
+
     if($rs->num_rows() > 0)
     {
       foreach($rs->result() as $rd)
       {
+        if($sc === FALSE)
+        {
+          break;
+        }
+
         if($this->is_buffer_exists($rd->order_code, $rd->product_code, $rd->zone_code) === TRUE)
         {
-          $qr = "UPDATE buffer
-                  SET qty = (qty + {$rs->qty})
-                  WHERE order_code = '{$rd->order_code}'
-                  AND product_code = '{$rd->product_code}'
-                  AND zone_code = '{$rd->zone_code}'
-                  AND user = '{$rd->user}'";
-          $this->db->query($qr);
+          $qs = $this->db
+          ->set("qty", "qty + {$rs->qty}", FALSE)
+          ->where('order_code', $rd->order_code)
+          ->where('product_code', $rd->product_code)
+          ->where('zone-code', $rd->zone_code)
+          ->where('user', $rd->user)
+          ->update('buffer');
+
+          if(! $qs)
+          {
+            $sc = FALSE;
+          }
         }
         else
         {
@@ -216,11 +229,23 @@ class Cancle_model extends CI_Model
             'user' => $rd->user
           );
 
-          $this->db->insert('buffer', $arr);
-          $this->delete($rd->id);
+          if(! $this->db->insert('buffer', $arr) )
+          {
+            $sc = FALSE;
+          }
+
+          if($sc === TRUE)
+          {
+            if(! $this->delete($rd->id) )
+            {
+              $sc = FALSE;
+            }
+          }
         }
-      }
+      } //--- end foreach
     }
+
+    return $sc;
   }
 
 

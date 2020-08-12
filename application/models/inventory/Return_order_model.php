@@ -76,14 +76,30 @@ class Return_order_model extends CI_Model
     ->where('U_ECOMNO', $code)
     ->where('CANCELED', 'N')
     ->get('ORDN');
-    if($rs->num_rows() === 1)
+    if($rs->num_rows() > 0)
     {
-      return $rs->row();
+      return $rs->result();
     }
 
-    return FALSE;
+    return NULL;
   }
 
+
+  public function get_sap_doc_num($code)
+  {
+    $rs = $this->ms
+    ->select('DocNum')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('ORDN');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row()->DocNum;
+    }
+
+    return NULL;
+  }
 
 
   public function get_total_return($code)
@@ -121,6 +137,12 @@ class Return_order_model extends CI_Model
   }
 
 
+  public function update_inv($code, $doc_num)
+  {
+    return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('return_order');
+  }
+
+
   public function add_detail(array $ds = array())
   {
     if(!empty($ds))
@@ -132,6 +154,22 @@ class Return_order_model extends CI_Model
   }
 
 
+
+  public function get_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('status', 1)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->get('return_order');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
 
   public function get($code)
   {
@@ -178,22 +216,43 @@ class Return_order_model extends CI_Model
 
   public function get_invoice_details($invoice)
   {
-    $rs = $this->ms
-    ->select('LineNum, ItemCode AS product_code')
-    ->select('Dscription AS product_name')
-    ->select('Quantity AS qty')
-    ->select('PriceAfVAT AS price')
-    ->select('DiscPrcnt AS discount')
-    ->where('DocEntry', $invoice)
-    ->get('INV1');
+    // $rs = $this->ms
+    // ->select('OINV.DocEntry, OINV.DocNum, OINV.NumAtCard')
+    // ->select('INV1.LineNum, INV1.ItemCode AS product_code')
+    // ->select('INV1.Dscription AS product_name')
+    // ->select('INV1.Quantity AS qty')
+    // ->select('INV1.PriceBefDi AS price')
+    // ->select('INV1.DiscPrcnt AS discount')
+    // ->from('INV1')
+    // ->join('OINV', 'INV1.DocEntry = OINV.DocEntry')
+    // ->where('OINV.DocNum', $invoice)
+    // ->get();
+    //
+    // if($rs->num_rows() > 0)
+    // {
+    //   return $rs->result();
+    // }
+    //
+    // return FALSE;
 
+    $qr = "SELECT DISTINCT ivd.DocEntry, iv.DocNum, iv.NumAtCard,
+    ivd.ItemCode AS product_code, ivd.Dscription AS product_name,
+    (SELECT SUM(Quantity) FROM INV1 WHERE DocEntry = ivd.DocEntry AND ItemCode = ivd.ItemCode) AS qty,
+    ivd.PriceBefDi AS price, ivd.DiscPrcnt AS discount
+    FROM INV1 AS ivd
+    LEFT JOIN OINV AS iv ON ivd.DocEntry = iv.DocEntry
+    WHERE iv.DocNum = '{$invoice}'";
+
+    $rs = $this->ms->query($qr);
     if($rs->num_rows() > 0)
     {
       return $rs->result();
     }
 
-    return FALSE;
+    return NULL;
   }
+
+
 
 
 
@@ -289,14 +348,19 @@ class Return_order_model extends CI_Model
   public function approve($code)
   {
     $arr = array('is_approve' => 1, 'approver' => get_cookie('uname'));
-    return $this->db->update('return_order', $arr);
+    return $this->db->where('code', $code)->update('return_order', $arr);
+  }
+
+
+  public function unapprove($code)
+  {
+    $arr = array('is_approve' => 0, 'approver' => NULL);
+    return $this->db->where('code', $code)->update('return_order', $arr);
   }
 
 
   public function count_rows(array $ds = array())
   {
-    $this->db->select('status');
-
     //---- เลขที่เอกสาร
     if(!empty($ds['code']))
     {
@@ -331,10 +395,7 @@ class Return_order_model extends CI_Model
       $this->db->where('date_add <=', to_date($ds['to_date']));
     }
 
-    $rs = $this->db->get('return_order');
-
-
-    return $rs->num_rows();
+    return $this->db->count_all_results('return_order');
   }
 
 
@@ -377,6 +438,8 @@ class Return_order_model extends CI_Model
       $this->db->where('date_add <=', to_date($ds['to_date']));
     }
 
+    $this->db->order_by('code', 'DESC');
+
     if(!empty($perpage))
     {
       $offset = $offset === NULL ? 0 : $offset;
@@ -385,7 +448,12 @@ class Return_order_model extends CI_Model
 
     $rs = $this->db->get('return_order');
 
-    return $rs->result();
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
 

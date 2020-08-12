@@ -226,6 +226,12 @@ class Prepare_model extends CI_Model
       $this->db->group_end();
     }
 
+
+    if($ds['warehouse'] !== 'all' && !empty($ds['warehouse']))
+    {
+      $this->db->where('warehouse_code', $ds['warehouse']);
+    }
+
     //---- user name / display name
     if(!empty($ds['user']))
     {
@@ -285,9 +291,9 @@ class Prepare_model extends CI_Model
 
     $this->db->group_by('orders.code');
 
-    $rs = $this->db->get();
+    //$rs = $this->db->get();
 
-    return $rs->num_rows();
+    return $this->db->count_all_results();
   }
 
 
@@ -336,6 +342,13 @@ class Prepare_model extends CI_Model
       $this->db->or_like('orders.customer_ref', $ds['customer']);
       $this->db->group_end();
     }
+
+
+    if($ds['warehouse'] !== 'all' && !empty($ds['warehouse']))
+    {
+      $this->db->where('warehouse_code', $ds['warehouse']);
+    }
+
 
     //---- user name / display name
     if($state == 3 && !empty($ds['user']))

@@ -177,7 +177,40 @@ function remove_vat($amount)
 	return round($amount, 2);
 }
 
+//---- remove discount percent return price after discount
+function get_price_after_discount($price, $disc = 0)
+{
+	$find = array('%', ' ');
+	$replace = array('', '');
+	$disc = str_replace($find, $replace, $disc);
 
+	if($disc > 0 && $disc <= 100)
+	{
+		$price = $price - ($price *($disc * 0.01));
+	}
+
+	return $price;
+}
+
+
+//--- return discount amount calculate from price and discount percentage
+function get_discount_amount($price, $disc = 0)
+{
+	$find = array('%', ' ');
+	$replace = array('', '');
+	$disc = str_replace($find, $replace, $disc);
+
+	if($disc > 0 && $disc <= 100)
+	{
+		$amount = $price * ($disc * 0.01);
+	}
+	else
+	{
+		$amount = 0;
+	}
+
+	return $amount;
+}
 
 
 

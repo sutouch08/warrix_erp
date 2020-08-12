@@ -40,12 +40,12 @@ $("#toDate").datepicker({
 });
 
 
-function get_detail(code)
+function get_detail(id)
 {
   //--- properties for print
   var prop 			= "width=1100, height=900. left="+center+", scrollbars=yes";
   var center 	= ($(document).width() - 1100)/2;
-	var target 	= HOME + 'get_detail/'+code+'?nomenu';
+	var target 	= HOME + 'get_detail/'+id+'?nomenu';
 	window.open(target, "_blank", prop );
 }
 
@@ -57,6 +57,16 @@ function getInvoice(code)
   var prop 			= "width=1100, height=900. left="+center+", scrollbars=yes";
   var center 	= ($(document).width() - 1100)/2;
 	var target 	= BASE_URL + 'inventory/invoice/view_detail/'+code+'?nomenu';
+	window.open(target, "_blank", prop );
+}
+
+
+function getConsign(code)
+{
+  //--- properties for print
+  var prop 			= "width=1100, height=900. left="+center+", scrollbars=yes";
+  var center 	= ($(document).width() - 1100)/2;
+	var target 	= BASE_URL + 'account/consign_order/view_detail/'+code+'?nomenu';
 	window.open(target, "_blank", prop );
 }
 

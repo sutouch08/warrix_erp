@@ -144,6 +144,17 @@ class Buffer_model extends CI_Model
     return 0;
   }
 
+  ///--- เอาเฉพาะสินค้าและโซน
+  public function get_buffer_zone($zone_code, $product_code)
+  {
+    $rs = $this->db
+    ->select_sum('qty')
+    ->where('zone_code', $zone_code)
+    ->where('product_code', $product_code)
+    ->get('buffer');
+
+    return $rs->row()->qty;
+  }
 
 
   public function add(array $ds = array())
@@ -159,11 +170,13 @@ class Buffer_model extends CI_Model
 
   public function update($order_code, $product_code, $zone_code, $qty)
   {
-    $qr = "UPDATE buffer SET qty = (qty + {$qty}) ";
-    $qr .= "WHERE order_code = '{$order_code}' AND product_code = '{$product_code}' ";
-    $qr .= "AND zone_code = '{$zone_code}'";
+    $this->db
+    ->set("qty", "qty + {$qty}", FALSE)
+    ->where('order_code', $order_code)
+    ->where('product_code', $product_code)
+    ->where('zone_code', $zone_code);
 
-    return $this->db->query($qr);
+    return $this->db->update('buffer');
   }
 
 

@@ -274,7 +274,7 @@ class Import_order extends CI_Controller
                 // $date_add = db_date($date_add, TRUE);
 
                 //--- ค่าจัดส่ง
-                $shipping_fee = 0; //empty($rs['Q']) ? 0.00 : $rs['Q'];
+                $shipping_fee = empty($rs['Q']) ? 0.00 : $rs['Q'];
 
                 //--- ค่าบริการอื่นๆ
                 $service_fee = 0; //empty($rs['R']) ? 0.00 : $rs['R'];
@@ -297,7 +297,7 @@ class Import_order extends CI_Controller
                     'is_paid' => 0,
                     'is_term' => $payment->has_term,
                     'shipping_code' => $shipping_code,
-                    'shipping_fee' => $shipping_fee,
+                    'shipping_fee' => 0,
                     'status' => 1,
                     'date_add' => $date_add,
                     'warehouse_code' => $warehouse_code,

@@ -4,16 +4,22 @@ function get_image_path($id, $size = 'default')
   $CI =& get_instance();
   $CI->load->model('masters/product_image_model');
   $code = $CI->product_image_model->get_style_code($id);
-  $path = $CI->config->item('image_path').'products/';
-  $no_image_path = base_url().$path.'no_image_'.$size.'.jpg';
+  $path = $CI->config->item('image_path').'products';
+  $no_image_path = base_url().$path.'/no_image_'.$size.'.jpg';
   if($code !== FALSE)
   {
     $image_path = base_url().$path.'/'.$code.'/product_'.$size.'_'.$id.'.jpg';
     $file = $CI->config->item('image_file_path').'products/'.$code.'/product_'.$size.'_'.$id.'.jpg';
-    
+
     if(!file_exists($file) && $size == 'large')
     {
-      $file = $CI->config->item('image_file_path').'products/'.$code.'/product_lage_'.$id.'.jpg';
+      $file = $CI->config->item('image_file_path').'products/'.$code.'/product_large_'.$id.'.jpg';
+      $image_path = base_url().$path.'/'.$code.'/product_large_'.$id.'.jpg';
+      if(!file_exists($file))
+      {
+        $file = $CI->config->item('image_file_path').'products/'.$code.'/product_lage_'.$id.'.jpg';
+        $image_path = base_url().$path.'/'.$code.'/product_lage_'.$id.'.jpg';
+      }
     }
 
     return file_exists($file) ? $image_path : $no_image_path;

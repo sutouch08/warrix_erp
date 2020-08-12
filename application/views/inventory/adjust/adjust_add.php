@@ -46,7 +46,7 @@
 				<?php if($manual_code == 1) : ?>
 							<button type="button" class="btn btn-xs btn-success btn-block" onclick="validateOrder()"><i class="fa fa-plus"></i> เพิ่ม</button>
 				<?php else : ?>
-							<button type="button" class="btn btn-xs btn-success btn-block" onclick="addNew()"><i class="fa fa-plus"></i> เพิ่ม</button>
+							<button type="button" class="btn btn-xs btn-success btn-block" onclick="add()"><i class="fa fa-plus"></i> เพิ่ม</button>
 				<?php endif; ?>
 			<?php	endif; ?>
 		</div>

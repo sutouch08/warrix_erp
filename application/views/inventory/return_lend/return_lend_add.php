@@ -29,7 +29,7 @@
 	<?php if($manual_code == 1) : ?>
 		<input type="text" class="form-control input-sm" name="code" id="code" value="" />
 	<?php else : ?>
-		<input type="text" class="form-control input-sm" value="" disabled />
+		<input type="text" class="form-control input-sm" id="code" value="" disabled />
 	<?php endif; ?>
 	</div>
 		<div class="col-sm-1 col-1-harf padding-5">

@@ -365,6 +365,9 @@ class Receive_transform extends PS_Controller
               }
             }
           }
+
+          //--- unclose WQ
+          $this->transform_model->unclose_transform($doc->order_code);
         }
 
         if($sc === TRUE)
@@ -449,6 +452,30 @@ class Receive_transform extends PS_Controller
     $document = $this->receive_transform_model->get($code);
     $ds['document'] = $document;
     $this->load->view('inventory/receive_transform/receive_transform_edit', $ds);
+  }
+
+
+  public function update_header(){
+    $code = $this->input->post('code');
+    $date = db_date($this->input->post('date_add'));
+    $remark = get_null($this->input->post('remark'));
+    if(!empty($code))
+    {
+
+    }
+    $arr = array(
+      'date_add' => $date,
+      'remark' => $remark
+    );
+
+    if($this->receive_transform_model->update($code, $arr))
+    {
+      echo 'success';
+    }
+    else
+    {
+      echo 'ปรับปรุงข้อมูลไม่สำเร็จ';
+    }
   }
 
 

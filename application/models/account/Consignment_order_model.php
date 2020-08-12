@@ -242,11 +242,11 @@ class Consignment_order_model extends CI_Model
 
 
   //--- add new doc
-  public function add_sap_goods_issue($ds = array())
+  public function add_sap_doc($ds = array())
   {
     if(!empty($ds))
     {
-      $rs = $this->mc->insert('CNOIGE', $ds);
+      $rs = $this->mc->insert('CNODLN', $ds);
       if($rs)
       {
         return $this->mc->insert_id();
@@ -258,11 +258,11 @@ class Consignment_order_model extends CI_Model
 
 
   //--- update doc head
-  public function update_sap_goods_issue($code, $ds = array())
+  public function update_sap_doc($code, $ds = array())
   {
     if(!empty($ds))
     {
-      return  $this->mc->where('U_ECOMNO', $code)->update('CNOIGE', $ds);
+      return  $this->mc->where('U_ECOMNO', $code)->update('CNODLN', $ds);
     }
 
     return FALSE;
@@ -276,7 +276,7 @@ class Consignment_order_model extends CI_Model
     ->select('DocEntry, DocStatus')
     ->where('U_ECOMNO', $code)
     ->where('CANCELED', 'N')
-    ->get('OIGE');
+    ->get('ODLN');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -288,7 +288,7 @@ class Consignment_order_model extends CI_Model
 
   public function sap_exists_details($code)
   {
-    $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('CNIGE1');
+    $rs = $this->mc->select('LineNum')->where('U_ECOMNO', $code)->get('CNDLN1');
     if($rs->num_rows() > 0)
     {
       return TRUE;
@@ -307,7 +307,7 @@ class Consignment_order_model extends CI_Model
     ->where('F_Sap', 'N')
     ->or_where('F_Sap IS NULL', NULL, FALSE)
     ->group_end()
-    ->get('OIGE');
+    ->get('CNODLN');
 
     if($rs->num_rows() > 0)
     {
@@ -319,11 +319,11 @@ class Consignment_order_model extends CI_Model
 
 
 
-  public function add_sap_goods_issue_row($ds = array())
+  public function add_sap_detail_row($ds = array())
   {
     if(!empty($ds))
     {
-      return $this->mc->insert('CNIGE1', $ds);
+      return $this->mc->insert('CNDLN1', $ds);
     }
 
     return FALSE;
@@ -333,7 +333,7 @@ class Consignment_order_model extends CI_Model
 
   public function drop_sap_exists_details($code)
   {
-    return $this->mc->where('U_ECOMNO', $code)->delete('CNIGE1');
+    return $this->mc->where('U_ECOMNO', $code)->delete('CNDLN1');
   }
 
 
@@ -341,8 +341,8 @@ class Consignment_order_model extends CI_Model
   public function drop_middle_exits_data($docEntry)
   {
     $this->mc->trans_start();
-    $this->mc->where('DocEntry', $docEntry)->delete('CNIGE1');
-    $this->mc->where('DocEntry', $docEntry)->delete('CNOIGE');
+    $this->mc->where('DocEntry', $docEntry)->delete('CNDLN1');
+    $this->mc->where('DocEntry', $docEntry)->delete('CNODLN');
     $this->mc->trans_complete();
 
     return $this->mc->trans_status();

@@ -43,10 +43,11 @@
 			 	<tr id="row-<?php echo $rs->barcode; ?>">
 				<td class="middle text-center no">
 					<?php echo $no; ?>
+          <input type="hidden" id="barcode_<?php echo $rs->barcode; ?>" value="<?php echo $rs->barcode; ?>">
 				</td>
-				<td class="middle">
-					<input type="hidden" id="barcode_<?php echo $rs->barcode; ?>" value="<?php echo $rs->barcode; ?>">
+				<td class="middle b-click">          
 					<?php echo $rs->barcode; ?>
+          </span>
 				</td>
 				<td class="middle"><?php echo $rs->product_code; ?></td>
 				<td class="middle text-right">

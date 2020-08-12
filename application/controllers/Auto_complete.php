@@ -365,16 +365,24 @@ public function get_prepare_item_code()
 
     if(!empty($warehouse))
     {
-      $this->db->where('warehouse_code', $warehouse);
+      $warehouse = urldecode($warehouse);
+      $arr = explode('|', $warehouse);
+      $this->db->where_in('warehouse_code', $arr);
+    }
+
+    if($txt != '*')
+    {
+      $this->db
+      ->group_start()
+      ->like('code', $txt)
+      ->or_like('old_code', $txt)
+      ->or_like('name', $txt)
+      ->group_end();
     }
 
     $this->db
-    ->group_start()
-    ->like('code', $txt)
-    ->or_like('old_code', $txt)
-    ->or_like('name', $txt)
-    ->group_end()
     ->order_by('warehouse_code', 'ASC')
+    ->order_by('code', 'ASC')
     ->limit(20);
 
     $rs = $this->db->get('zone');
@@ -403,7 +411,9 @@ public function get_prepare_item_code()
     $this->db->select('code, name');
     if($txt != '*')
     {
-      $this->db->like('code', $txt)->or_like('name', $txt);
+      $this->db->group_start();
+      $this->db->like('code', $txt)->or_like('old_code', $txt)->or_like('name', $txt);
+      $this->db->group_end();
     }
 
     $rs = $this->db->limit(20)->get('zone');
@@ -652,8 +662,10 @@ public function get_prepare_item_code()
 
       if($_REQUEST['term'] != '*')
       {
+        $this->db->group_start();
         $this->db->like('zone.code', $_REQUEST['term']);
         $this->db->or_like('zone.name', $_REQUEST['term']);
+        $this->db->group_end();
       }
 
       $this->db->limit(20);
@@ -676,6 +688,53 @@ public function get_prepare_item_code()
     }
   }
 
+
+
+  public function get_consignment_zone($customer_code = NULL)
+  {
+    if(empty($customer_code))
+    {
+      echo json_encode(array('เลือกลูกค้าก่อน'));
+    }
+    else
+    {
+      $this->db
+      ->select('zone.code, zone.name')
+      ->from('zone_customer')
+      ->join('zone', 'zone.code = zone_customer.zone_code', 'left')
+      ->join('warehouse', 'zone.warehouse_code = warehouse.code', 'left')
+      ->where('warehouse.role', 2) //--- 2 = คลังฝากขาย
+      ->where('is_consignment', 1)
+      ->where('zone_customer.customer_code', $customer_code);
+
+      if($_REQUEST['term'] != '*')
+      {
+        $this->db->group_start();
+        $this->db->like('zone.code', $_REQUEST['term']);
+        $this->db->or_like('zone.name', $_REQUEST['term']);
+        $this->db->group_end();
+      }
+
+      $this->db->limit(20);
+
+      $rs = $this->db->get();
+
+      if($rs->num_rows() > 0)
+      {
+        $ds = array();
+        foreach($rs->result() as $rd)
+        {
+          $ds[] = $rd->code.' | '.$rd->name;
+        }
+
+        echo json_encode($ds);
+      }
+      else
+      {
+        echo json_encode(array('ไม่พบโซน'));
+      }
+    }
+  }
 
 
   public function get_product_code()

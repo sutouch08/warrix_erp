@@ -180,7 +180,9 @@ class Items extends PS_Controller
                 break;
               }
 
-              $style = get_null(trim($rs['D']));
+              $code_pattern = '/[^a-zA-Z0-9_-]/';
+
+              $style = preg_replace($code_pattern, '', get_null(trim($rs['D'])));
               $old_style = get_null(trim($rs['S'])) === NULL ? $style : trim($rs['S']);
               $color_code = get_null(trim($rs['E']));
               $size_code = get_null(trim($rs['F']));
@@ -269,7 +271,7 @@ class Items extends PS_Controller
                 }
               }
 
-              $code = trim($rs['A']);
+              $code = preg_replace($code_pattern, '', trim($rs['A']));
               $old_code = get_null(trim($rs['T'])) === NULL ? $code : trim($rs['T']);
               $arr = array(
                 'code' => $code,

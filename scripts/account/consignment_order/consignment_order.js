@@ -87,6 +87,27 @@ function doExport(){
 }
 
 
+function sendToSAP(code){
+  load_in();
+  $.ajax({
+    url: HOME + 'export_consign/'+code,
+    type:'POST',
+    cache:'false',
+    success:function(rs){
+      load_out();
+      var rs = $.trim(rs);
+      if(rs == 'success'){
+        swal({
+          title:'success',
+          type:'success',
+          timer:1000
+        });
+      }
+    }
+  });
+}
+
+
 function getSearch(){
 	$("#searchForm").submit();
 }

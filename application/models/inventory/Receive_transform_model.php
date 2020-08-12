@@ -14,9 +14,9 @@ class Receive_transform_model extends CI_Model
     ->where('U_ECOMNO', $code)
     ->where('CANCELED', 'N')
     ->get('OIGN');
-    if($rs->num_rows() === 1)
+    if($rs->num_rows() > 0)
     {
-      return $rs->row();
+      return $rs->result();
     }
 
     return FALSE;

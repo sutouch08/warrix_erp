@@ -204,7 +204,7 @@ function update(){
   let code = $('#consign_code').val();
   let date = $('#date').val();
   let remark = $('#remark').val();
-  var customer_code = $('#customer_code').val();
+  var customer_code = $('#customerCode').val();
   let customer_name = $('#customer').val();
   let zone_code = $('#zone_code').val();
   let zone_name = $('#zone').val();

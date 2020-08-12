@@ -25,7 +25,7 @@
     </div>
 		<div class="col-sm-2 padding-5">
 			<label>เลขที่บิล[SAP]</label>
-			<input type="text" class="form-control input-sm text-center" name="invoice" id="invoice" value="" />
+			<input type="number" class="form-control input-sm text-center" name="invoice" id="invoice" value="" />
 		</div>
 		<div class="col-sm-4 padding-5">
 			<label>ลูกค้า</label>

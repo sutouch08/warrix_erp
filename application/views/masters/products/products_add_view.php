@@ -31,4 +31,5 @@
 
 <script src="<?php echo base_url(); ?>scripts/masters/products.js"></script>
 <script src="<?php echo base_url(); ?>scripts/masters/product_info.js"></script>
+<script src="<?php echo base_url(); ?>scripts/code_validate.js"></script>
 <?php $this->load->view('include/footer'); ?>

@@ -12,6 +12,47 @@ function editHeader(){
 	$('#btn-update').removeClass('hide');
 }
 
+function updateHeader(){
+	var code = $('#receive_code').val();
+	var date_add = $('#dateAdd').val();
+	var remark = $('#remark').val();
+	if(!isDate(date_add)){
+		swal("วันที่ไม่ถูกต้อง");
+		return false;
+	}
+
+	$.ajax({
+		url:HOME + 'update_header',
+		type:'POST',
+		cache:false,
+		data:{
+			'code' : code,
+			'date_add' : date_add,
+			'remark' : remark
+		},
+		success:function(rs){
+			var rs = $.trim(rs);
+			if(rs === 'success'){
+				swal({
+					title:'Success',
+					type:'success',
+					timer:1000
+				});
+
+				$('.header-box').attr('disabled', 'disabled');
+				$('#btn-update').addClass('hide');
+				$('#btn-edit').removeClass('hide');
+			}else{
+				swal({
+					title:'Error',
+					text:rs,
+					type:'error'
+				})
+			}
+		}
+	})
+}
+
 
 
 function receiveProduct(pdCode){

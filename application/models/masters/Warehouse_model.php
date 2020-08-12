@@ -154,6 +154,54 @@ class Warehouse_model extends CI_Model
   }
 
 
+  ///---- คลังฝากขายทั้งหมด
+  public function get_consign_warehouse_list()
+  {
+    $rs = $this->db->where('role', 2)->where('active', 1)->get('warehouse');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+  //---- เอาเฉพาะคลังฝากขายแท้
+  public function get_consign_list()
+  {
+    $rs = $this->db
+    ->where('role', 2)
+    ->group_start()
+    ->where('is_consignment IS NULL', NULL, FALSE)
+    ->or_where('is_consignment', 0)
+    ->group_end()
+    ->where('active', 1)
+    ->get('warehouse');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  //---- เอาเฉพาะคลังฝากขายเทียม
+  public function get_consignment_list()
+  {
+    $rs = $this->db
+    ->where('role', 2)
+    ->where('is_consignment', 1)
+    ->where('active', 1)
+    ->get('warehouse');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
   public function count_zone($code)
   {
     return $this->db->where('warehouse_code', $code)->count_all_results('zone');

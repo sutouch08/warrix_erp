@@ -89,7 +89,7 @@
 </div>
 <hr class="margin-top-15">
 <input type="hidden" name="consign_code" id="consign_code" value="<?php echo $doc->code; ?>">
-<input type="hidden" name="customer_code" id="customer_code" value="<?php echo $doc->customer_code; ?>">
+<input type="hidden" name="customer_code" id="customerCode" value="<?php echo $doc->customer_code; ?>">
 <input type="hidden" name="zone_code" id="zone_code" value="<?php echo $doc->zone_code; ?>" >
 <input type="hidden" name="auz" id="auz" value="<?php echo $auz; ?>">
 </form>
@@ -177,8 +177,8 @@
 </div>
 </script>
 
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_control.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_control.js?v=<?php echo date('Ymd'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

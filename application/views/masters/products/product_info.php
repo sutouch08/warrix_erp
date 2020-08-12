@@ -3,9 +3,9 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">รหัสรุ่นสินค้า</label>
 		<div class="col-xs-12 col-sm-3">
-			<input type="text" name="code" id="code" class="width-100" value="" autofocus required />
+			<input type="text" name="code" id="code" class="width-100" value="" onkeyup="validCode(this)" autofocus required />
 		</div>
-		<div class="help-block col-xs-12 col-sm-reset inline grey" id="code-error">Now allow </div>
+		<div class="help-block col-xs-12 col-sm-reset inline grey" id="code-error">Allow only [a-z, A-Z, 0-9, "-", "_" ]</div>
 	</div>
 
 	<div class="form-group">

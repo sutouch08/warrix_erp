@@ -63,7 +63,7 @@ public function doc_header($pageTitle = 'print pages')
 	$header .= "<head>";
 	$header .= "	<meta charset='utf-8'>";
 	$header .= "	<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
-	$header .= "	<link rel='icon' href='../favicon.ico' type='image/x-icon' />";
+	$header .= "	<link rel='icon' href='".base_url()."assets/img/favicon.ico' type='image/x-icon' />";
 	$header .= "	<title>". $pageTitle ."</title>";
 	$header .= "	<link href='".base_url()."assets/css/bootstrap.css' rel='stylesheet' />";
 	$header .= "	<link href='".base_url()."assets/css/template.css' rel='stylesheet' />";
@@ -203,10 +203,11 @@ public function print_header()
 	{
 		foreach($rd[$i] as $label => $value)
 		{
-			$od = ($i+1)%2;
-			$width = ($r == $v && $od == 1) ? '100%' : '50%';
+			//$od = ($i+1)%2;
+			//$width = ($r == $v && $od == 1) ? '100%' : '50%';
+			$width = '50%';
 			$header .= '<div style="width:'.$width.'; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px;">';
-			$header .= '<input type="text" class="print-row" value="'.$label.' : &nbsp;&nbsp;'.$value.'" />';
+			$header .=  $label.' : '.$value; //'<input type="text" class="print-row" value="'.$label.' : &nbsp;&nbsp;'.$value.'" />';
 			$header .= '</div>';
 
 			//$header .= "<div style='width:50%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; '>".$label." : ".$value."</div>";

@@ -22,6 +22,7 @@ class Prepare extends PS_Controller
   {
     $this->load->helper('channels');
     $this->load->helper('payment_method');
+    $this->load->helper('warehouse');
     $filter = array(
       'code'          => get_filter('code', 'ic_code', ''),
       'customer'      => get_filter('customer', 'ic_customer', ''),
@@ -37,7 +38,8 @@ class Prepare extends PS_Controller
       'startTime'     => get_filter('startTime', 'ic_startTime', ''),
       'endTime'       => get_filter('endTime', 'ic_endTime', ''),
       'item_code'    => get_filter('item_code', 'ic_item_code', ''),
-      'payment' => get_filter('payment', 'ic_payment', 'all')
+      'payment' => get_filter('payment', 'ic_payment', 'all'),
+      'warehouse' => get_filter('warehouse', 'ic_warehouse', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -55,7 +57,7 @@ class Prepare extends PS_Controller
 		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 3);
 
     $filter['orders'] = $orders;
-
+    
 		$this->pagination->initialize($init);
     $this->load->view('inventory/prepare/prepare_list', $filter);
   }
@@ -68,6 +70,7 @@ class Prepare extends PS_Controller
   {
     $this->load->helper('channels');
     $this->load->helper('payment_method');
+    $this->load->helper('warehouse');
     $filter = array(
       'code'          => get_filter('code', 'ic_code', ''),
       'customer'      => get_filter('customer', 'ic_customer', ''),
@@ -83,7 +86,8 @@ class Prepare extends PS_Controller
       'startTime'     => get_filter('startTime', 'ic_startTime', ''),
       'endTime'       => get_filter('endTime', 'ic_endTime', ''),
       'item_code'    => get_filter('item_code', 'ic_item_code', ''),
-      'payment'  => get_filter('payment', 'ic_payment', 'all')
+      'payment'  => get_filter('payment', 'ic_payment', 'all'),
+      'warehouse' => get_filter('warehouse', 'ic_warehouse', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -212,7 +216,7 @@ class Prepare extends PS_Controller
               else
               {
                 $stock = $this->get_stock_zone($zone_code, $ds->product_code); //1000;
-                
+
                 if($stock < $qty)
                 {
                   $sc = FALSE;
@@ -484,7 +488,8 @@ class Prepare extends PS_Controller
       'ic_endTime',
       'ic_item_code',
       'ic_display_name',
-      'ic_payment'
+      'ic_payment',
+      'ic_warehouse'
     );
 
     clear_filter($filter);

@@ -24,13 +24,13 @@ class Return_order extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'    => get_filter('code', 'code', ''),
-      'invoice' => get_filter('invoice', 'invoice', ''),
-      'customer_code' => get_filter('customer_code', 'customer_code', ''),
-      'from_date' => get_filter('from_date', 'from_date', ''),
-      'to_date' => get_filter('to_date', 'to_date', ''),
-      'status' => get_filter('status', 'status', 'all'),
-      'approve' => get_filter('approve', 'approve', 'all')
+      'code'    => get_filter('code', 'sm_code', ''),
+      'invoice' => get_filter('invoice', 'sm_invoice', ''),
+      'customer_code' => get_filter('customer_code', 'sm_customer_code', ''),
+      'from_date' => get_filter('from_date', 'sm_from_date', ''),
+      'to_date' => get_filter('to_date', 'sm_to_date', ''),
+      'status' => get_filter('status', 'sm_status', 'all'),
+      'approve' => get_filter('approve', 'sm_approve', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -65,11 +65,132 @@ class Return_order extends PS_Controller
 
 
 
+  // public function add_details($code)
+  // {
+  //   $sc = TRUE;
+  //
+  //   if($this->input->post('qty'))
+  //   {
+  //     $this->load->model('inventory/movement_model');
+  //     //--- start transection
+  //     $this->db->trans_begin();
+  //
+  //     $doc = $this->return_order_model->get($code);
+  //     if(!empty($doc))
+  //     {
+  //       $qtys = $this->input->post('qty');
+  //       $prices = $this->input->post('price');
+  //       $sold = $this->input->post('sold_qty');
+  //       $discount = $this->input->post('discount');
+  //       $vat = getConfig('SALE_VAT_RATE'); //--- 0.07
+  //       //--- drop old detail
+  //       $this->return_order_model->drop_details($code);
+  //
+  //       if(!empty($qtys))
+  //       {
+  //
+  //         foreach($qtys as $item => $invoice)
+  //         {
+  //           foreach($invoice as $inv => $qty)
+  //           {
+  //             $disc_amount = $qty * ($prices[$item][$inv] * ($discount[$item][$inv] * 0.01));
+  //             $amount = ($qty * $prices[$item][$inv]) - $disc_amount;
+  //             $arr = array(
+  //               'return_code' => $code,
+  //               'invoice_code' => $inv,
+  //               'product_code' => $item,
+  //               'product_name' => $this->products_model->get_name($item),
+  //               'sold_qty' => $sold[$item][$inv],
+  //               'qty' => $qty,
+  //               'price' => $prices[$item][$inv],
+  //               'discount_percent' => $discount[$item][$inv],
+  //               'amount' => $amount,
+  //               'vat_amount' => get_vat_amount($amount)
+  //             );
+  //
+  //             if($this->return_order_model->add_detail($arr) === FALSE)
+  //             {
+  //               $sc = FALSE;
+  //               $this->error = 'บันทึกรายการไม่สำเร็จ';
+  //               break;
+  //             }
+  //             else
+  //             {
+  //               $ds = array(
+  //                 'reference' => $code,
+  //                 'warehouse_code' => $doc->warehouse_code,
+  //                 'zone_code' => $doc->zone_code,
+  //                 'product_code' => $item,
+  //                 'move_in' => $qty,
+  //                 'date_add' => $doc->date_add
+  //               );
+  //
+  //               if($this->movement_model->add($ds) === FALSE)
+  //               {
+  //                 $sc = FALSE;
+  //                 $message = 'บันทึก movement ไม่สำเร็จ';
+  //               }
+  //             }
+  //           }
+  //
+  //         } //--- endforeach
+  //
+  //         $this->return_order_model->set_status($code, 1);
+  //
+  //       }
+  //       else
+  //       {
+  //         $sc = FALSE;
+  //         set_error('ไม่พบจำนวนในการรับคืน');
+  //       } //--- end if empty qty
+  //
+  //
+  //       if($this->db->trans_status() === FALSE)
+  //       {
+  //         $sc = FALSE;
+  //         set_error($this->db->error());
+  //       }
+  //
+  //       if($sc === TRUE)
+  //       {
+  //         $this->db->trans_commit();
+  //       }
+  //       else
+  //       {
+  //         $this->db->trans_rollback();
+  //       }
+  //     }
+  //     else
+  //     {
+  //       //--- empty document
+  //       $sc = FALSE;
+  //       set_error('ไม่พบเลขที่เอกสาร');
+  //     }
+  //   }
+  //   else
+  //   {
+  //     $sc = FALSE;
+  //     set_error('ไม่พบข้อมูลในฟอร์ม');
+  //   }
+  //
+  //   if($sc === TRUE)
+  //   {
+  //     set_message('Success');
+  //     redirect($this->home.'/view_detail/'.$code);
+  //   }
+  //   else
+  //   {
+  //     redirect($this->home.'/edit/'.$code);
+  //   }
+  //
+  // }
+
+
   public function add_details($code)
   {
     $sc = TRUE;
 
-    if($this->input->post('qty'))
+    if($this->input->post())
     {
       $this->load->model('inventory/movement_model');
       //--- start transection
@@ -78,78 +199,71 @@ class Return_order extends PS_Controller
       $doc = $this->return_order_model->get($code);
       if(!empty($doc))
       {
-        $qtys = $this->input->post('qty');
-        $prices = $this->input->post('price');
-        $sold = $this->input->post('sold_qty');
-        $discount = $this->input->post('discount');
+        $data = $this->input->post();
         $vat = getConfig('SALE_VAT_RATE'); //--- 0.07
         //--- drop old detail
         $this->return_order_model->drop_details($code);
 
-        if(!empty($qtys))
+        foreach($data as $invoice => $rows)
         {
-
-          foreach($qtys as $item => $invoice)
+          $qtys = $rows['qty'];
+          if(!empty($rows['qty']))
           {
-            foreach($invoice as $inv => $qty)
+            foreach($rows['qty'] as $item => $qty)
             {
-              $disc_amount = $qty * ($prices[$item][$inv] * ($discount[$item][$inv] * 0.01));
-              $amount = ($qty * $prices[$item][$inv]) - $disc_amount;
-              $arr = array(
-                'return_code' => $code,
-                'invoice_code' => $inv,
-                'product_code' => $item,
-                'product_name' => $this->products_model->get_name($item),
-                'sold_qty' => $sold[$item][$inv],
-                'qty' => $qty,
-                'price' => $prices[$item][$inv],
-                'discount_percent' => $discount[$item][$inv],
-                'amount' => $amount,
-                'vat_amount' => get_vat_amount($amount)
-              );
+              if($qty > 0)
+              {
+                $price = round($rows['price'][$item], 2);
+                $discount = $rows['discount'][$item];
 
-              if($this->return_order_model->add_detail($arr) === FALSE)
-              {
-                $sc = FALSE;
-                $this->error = 'บันทึกรายการไม่สำเร็จ';
-                break;
-              }
-              else
-              {
-                $ds = array(
-                  'reference' => $code,
-                  'warehouse_code' => $doc->warehouse_code,
-                  'zone_code' => $doc->zone_code,
+                $disc_amount = $qty * ($price * ($discount * 0.01));
+                $amount = ($qty * $price) - $disc_amount;
+
+                $arr = array(
+                  'return_code' => $code,
+                  'invoice_code' => $invoice,
                   'product_code' => $item,
-                  'move_in' => $qty,
-                  'date_add' => $doc->date_add
+                  'product_name' => $this->products_model->get_name($item),
+                  'sold_qty' => $rows['sold_qty'][$item],
+                  'qty' => $qty,
+                  'price' => $price,
+                  'discount_percent' => $discount,
+                  'amount' => $amount,
+                  'vat_amount' => get_vat_amount($amount)
                 );
 
-                if($this->movement_model->add($ds) === FALSE)
+
+                if($this->return_order_model->add_detail($arr) === FALSE)
                 {
                   $sc = FALSE;
-                  $message = 'บันทึก movement ไม่สำเร็จ';
+                  $this->error = 'บันทึกรายการไม่สำเร็จ';
+                  break;
                 }
-              }
-            }
+                else
+                {
+                  $ds = array(
+                    'reference' => $code,
+                    'warehouse_code' => $doc->warehouse_code,
+                    'zone_code' => $doc->zone_code,
+                    'product_code' => $item,
+                    'move_in' => $qty,
+                    'date_add' => $doc->date_add
+                  );
 
-          } //--- endforeach
+                  if($this->movement_model->add($ds) === FALSE)
+                  {
+                    $sc = FALSE;
+                    $message = 'บันทึก movement ไม่สำเร็จ';
+                  }
+                }
 
-          $this->return_order_model->set_status($code, 1);
+              } //--- end if $qty > 0
+            } //---- end foreach
+          } //--- end if !empty($rows['qty'])
 
-        }
-        else
-        {
-          $sc = FALSE;
-          set_error('ไม่พบจำนวนในการรับคืน');
-        } //--- end if empty qty
+        } //--- endforeach
 
-
-        if($this->db->trans_status() === FALSE)
-        {
-          $sc = FALSE;
-          set_error($this->db->error());
-        }
+        $this->return_order_model->set_status($code, 1);
 
         if($sc === TRUE)
         {
@@ -170,7 +284,7 @@ class Return_order extends PS_Controller
     else
     {
       $sc = FALSE;
-      set_error('ไม่พบข้อมูลในฟอร์ม');
+      set_error('ไม่พบจำนวนในการรับคืน');
     }
 
     if($sc === TRUE)
@@ -184,9 +298,6 @@ class Return_order extends PS_Controller
     }
 
   }
-
-
-
 
   public function delete_detail($id)
   {
@@ -230,16 +341,45 @@ class Return_order extends PS_Controller
   {
     if($this->pm->can_approve)
     {
-      $rs = $this->return_order_model->approve($code);
-      if($rs === TRUE)
+      $this->load->model('approve_logs_model');
+      if($this->return_order_model->approve($code))
       {
+        $this->approve_logs_model->add($code, 1, get_cookie('uname'));
         $export = $this->do_export($code);
-
         echo $export === TRUE ? 'success' : $this->error;
       }
       else
       {
         echo 'อนุมัติเอกสารไม่สำเร็จ';
+      }
+    }
+    else
+    {
+      echo 'คุณไม่มีสิทธิ์อนุมัติ';
+    }
+  }
+
+
+
+  public function unapprove($code)
+  {
+    if($this->pm->can_approve)
+    {
+      //--- check document in SAP
+      $sap = $this->return_order_model->get_sap_return_order($code);
+      if(!empty($sap))
+      {
+        $this->load->model('approve_logs_model');
+
+        if($this->return_order_model->unapprove($code))
+        {
+          $this->approve_logs_model->add($code, 0, get_cookie('uname'));
+          echo 'success';
+        }
+        else
+        {
+          echo 'ยกเลิกอนุมัติเอกสารไม่สำเร็จ';
+        }
       }
     }
     else
@@ -332,9 +472,7 @@ class Return_order extends PS_Controller
 
         foreach($details as $rs)
         {
-          $returned_qty = $this->return_order_model->get_returned_qty($doc->invoice, $rs->product_code);
-          $qty = $rs->qty - $returned_qty;
-          if($qty > 0)
+          if($rs->qty > 0)
           {
             $dt = new stdClass();
             $dt->id = 0;
@@ -342,11 +480,11 @@ class Return_order extends PS_Controller
             $dt->barcode = $this->products_model->get_barcode($rs->product_code);
             $dt->product_code = $rs->product_code;
             $dt->product_name = $rs->product_name;
-            $dt->sold_qty = $qty;
-            $dt->discount_percent = $rs->discount;
-            $dt->qty = 0;
-            $dt->price = $rs->price;
-            $dt->amount = 0;
+            $dt->sold_qty = round($rs->qty, 2);
+            $dt->discount_percent = round($rs->discount, 2);
+            $dt->qty = round($rs->qty, 2);
+            $dt->price = round(add_vat($rs->price), 2);
+            $dt->amount = round((get_price_after_discount($dt->price, $dt->discount_percent) * $dt->qty), 2);
 
             $detail[] = $dt;
           }
@@ -439,6 +577,7 @@ class Return_order extends PS_Controller
 
   public function view_detail($code)
   {
+    $this->load->model('approve_logs_model');
     $doc = $this->return_order_model->get($code);
     $doc->customer_name = $this->customers_model->get_name($doc->customer_code);
     $doc->warehouse_name = $this->warehouse_model->get_name($doc->warehouse_code);
@@ -468,7 +607,8 @@ class Return_order extends PS_Controller
 
     $ds = array(
       'doc' => $doc,
-      'details' => $details
+      'details' => $details,
+      'approve_list' => $this->approve_logs_model->get($code)
     );
 
     $this->load->view('inventory/return_order/return_order_view_detail', $ds);
@@ -645,7 +785,15 @@ class Return_order extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'invoice', 'customer_code', 'from_date', 'to_date');
+    $filter = array(
+      'sm_code',
+      'sm_invoice',
+      'sm_customer_code',
+      'sm_from_date',
+      'sm_to_date',
+      'sm_status',
+      'sm_approve'
+    );
     clear_filter($filter);
   }
 

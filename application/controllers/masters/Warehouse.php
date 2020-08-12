@@ -82,6 +82,7 @@ class Warehouse extends PS_Controller
           'prepare' => $this->input->post('prepare'),
           'auz' => $this->input->post('auz'),
           'active' => $this->input->post('active'),
+          'is_consignment' => get_null($this->input->post('is_consignment')),
           'update_user' => get_cookie('uname')
         );
 

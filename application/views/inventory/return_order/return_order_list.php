@@ -30,17 +30,17 @@
       <label>สถานะ</label>
       <select class="form-control input-sm" name="status" onchange="getSearch()">
   			<option value="all">ทั้งหมด</option>
-  			<option value="0" <?php if($status == '0'){ echo 'selected'; } ?>>ยังไม่บันทึก</option>
-  			<option value="1" <?php echo is_selected(1, $status); ?>>บันทึกแล้ว</option>
-  			<option value="2" <?php echo is_selected(2, $status); ?>>ยกเลิก</option>
+  			<option value="0" <?php echo is_selected('0', $status); ?>>ยังไม่บันทึก</option>
+  			<option value="1" <?php echo is_selected('1', $status); ?>>บันทึกแล้ว</option>
+  			<option value="2" <?php echo is_selected('2', $status); ?>>ยกเลิก</option>
   		</select>
     </div>
     <div class="col-sm-1 col-1-harf padding-5">
       <label>การอนุมัติ</label>
       <select class="form-control input-sm" name="approve" onchange="getSearch()">
   			<option value="all">ทั้งหมด</option>
-  			<option value="0" <?php if($approve == '0'){ echo 'selected'; } ?>>รออนุมัติ</option>
-  			<option value="1" <?php echo is_selected(1, $approve); ?>>อนุมัติแล้ว</option>
+  			<option value="0" <?php echo is_selected($approve, '0'); ?>>รออนุมัติ</option>
+  			<option value="1" <?php echo is_selected($approve, '1'); ?>>อนุมัติแล้ว</option>
   		</select>
     </div>
     <div class="col-sm-2 padding-5">

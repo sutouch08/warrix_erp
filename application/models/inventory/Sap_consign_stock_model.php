@@ -58,7 +58,7 @@ class Sap_consign_stock_model extends CI_Model
           }
         }
 
-        $rs = $this->cn->query($qr);
+        $rs = $this->ms->query($qr);
 
         if($rs->num_rows() > 0)
         {
@@ -102,7 +102,7 @@ class Sap_consign_stock_model extends CI_Model
         $qr .= "AND (OBIN.BinCode LIKE '%{$zoneCode}%' OR OBIN.Descr LIKE N'%{$zoneCode}%') ";
       }
 
-      $rs = $this->cn->query($qr);
+      $rs = $this->ms->query($qr);
 
       return $rs->row()->numrows;
     }

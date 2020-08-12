@@ -221,4 +221,10 @@ class Transform_model extends CI_Model
   }
 
 
+  public function unclose_transform($code)
+  {
+    return $this->db->set('is_closed', 0)->where('order_code', $code)->update('order_transform');
+  }
+
+
 } //--- end class

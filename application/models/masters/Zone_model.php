@@ -432,6 +432,7 @@ class Zone_model extends CI_Model
       $this->db->group_end();
     }
 
+    $this->db->order_by('code', 'ASC');
     $rs = $this->db->limit($limit)->get('zone');
 
     if($rs->num_rows() > 0)

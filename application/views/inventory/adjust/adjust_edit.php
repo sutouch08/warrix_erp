@@ -54,7 +54,7 @@
   </div>
   <div class="col-sm-1 col-1-harf pddint-5">
     <label class="display-block not-show">change</label>
-    <button type="button" class="btn btn-xs btn-yellow btn-block hide" id="btn-change-zone" onclick="change_zone()">เปลี่ยนโซน</button>
+    <button type="button" class="btn btn-xs btn-yellow btn-block hide" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
     <button type="button" class="btn btn-xs btn-info btn-block" id="btn-set-zone" onclick="set_zone()">ตกลง</button>
   </div>
   <div class="col-sm-3 padding-5">

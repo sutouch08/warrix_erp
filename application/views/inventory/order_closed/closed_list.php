@@ -48,7 +48,7 @@
 	<div class="col-sm-1 col-1-harf padding-5">
     <label>การยืนยัน</label>
 		<select class="form-control input-sm" name="is_valid" onchange="getSearch()">
-      <option value="">ทั้งหมด</option>
+      <option value="all">ทั้งหมด</option>
       <option value="1" <?php echo is_selected($is_valid, '1'); ?>>ยืนยันแล้ว</option>
 			<option value="0" <?php echo is_selected($is_valid, '0'); ?>>ยังไม่ยืนยัน</option>
     </select>

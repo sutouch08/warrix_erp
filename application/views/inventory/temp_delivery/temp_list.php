@@ -90,9 +90,15 @@
           <td class="text-center"><?php echo thai_date($rs->DocDate); ?></td>
 
           <td class="">
+						<?php if($rs->U_BOOKCODE === 'WM') : ?>
+							<a href="javascript:void(0)" onclick="getConsign('<?php echo $rs->U_ECOMNO; ?>')">
+							<?php echo $rs->U_ECOMNO; ?>
+							</a>
+						<?php else : ?>
 						<a href="javascript:void(0)" onclick="getInvoice('<?php echo $rs->U_ECOMNO; ?>')">
 						<?php echo $rs->U_ECOMNO; ?>
 						</a>
+						<?php endif; ?>
 					</td>
 
           <td class=""><?php echo $rs->CardCode; ?></td>
@@ -101,7 +107,14 @@
 
           <td class="" ><?php echo thai_date($rs->F_E_CommerceDate, TRUE); ?></td>
 
-          <td class=""><?php echo thai_date($rs->F_SapDate, TRUE); ?></td>
+          <td class="">
+						<?php
+							if(!empty($rs->F_SapDate))
+							{
+								echo thai_date($rs->F_SapDate, TRUE);
+							}
+					 	?>
+				 	</td>
 					<td class="text-center">
             <?php if($rs->F_Sap === NULL) : ?>
               <span class="blue">NC</span>
@@ -118,7 +131,7 @@
             ?>
           </td>
 					<td class="text-right">
-						<button type="button" class="btn btn-minier btn-info" onclick="get_detail('<?php echo $rs->U_ECOMNO; ?>')">
+						<button type="button" class="btn btn-minier btn-info" onclick="get_detail(<?php echo $rs->DocEntry; ?>)">
 							<i class="fa fa-eye"></i>
 					</td>
         </tr>
@@ -126,7 +139,7 @@
 <?php endforeach; ?>
 <?php else : ?>
       <tr>
-        <td colspan="9" class="text-center"><h4>ไม่พบรายการ</h4></td>
+        <td colspan="10" class="text-center"><h4>ไม่พบรายการ</h4></td>
       </tr>
 <?php endif; ?>
       </tbody>

@@ -48,15 +48,17 @@ class Temp_delivery_order extends PS_Controller
 
 
 
-  public function get_detail($code)
+  public function get_detail($id)
   {
     $this->load->model('stock/stock_model');
-    $detail = $this->temp_delivery_model->get_detail($code);
+    $detail = $this->temp_delivery_model->get_detail($id);
+    $code = "";
     if(!empty($detail))
     {
       foreach($detail as $rs)
       {
         $rs->onhand = $this->stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
+        $code = $rs->U_ECOMNO;
       }
     }
 

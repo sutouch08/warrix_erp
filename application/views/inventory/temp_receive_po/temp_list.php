@@ -76,7 +76,7 @@
           <th class="width-10">เข้า SAP</th>
           <th class="width-5 text-center">สถานะ</th>
 					<th class="width-20">หมายเหตุ</th>
-					
+
         </tr>
       </thead>
       <tbody>
@@ -97,7 +97,14 @@
 
           <td class="" ><?php echo thai_date($rs->F_E_CommerceDate, TRUE); ?></td>
 
-          <td class=""><?php echo thai_date($rs->F_SapDate, TRUE); ?></td>
+          <td class="">
+						<?php
+							if(!empty($rs->F_SapDate))
+							{
+								echo thai_date($rs->F_SapDate, TRUE);
+							}
+						 ?>
+          </td>
 					<td class="text-center">
             <?php if($rs->F_Sap === NULL) : ?>
               <span class="blue">NC</span>

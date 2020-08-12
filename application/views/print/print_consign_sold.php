@@ -109,7 +109,7 @@
 
             $total_qty += $rs->qty;
             $total_discount += $rs->discount_amount;
-            $total_price = $rs->qty * $rs->price;
+            $total_price += $rs->qty * $rs->price;
             $total_amount += $rs->amount;
           }
           else

@@ -59,7 +59,7 @@ class stock_model extends CI_Model
     ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->where('OIBQ.ItemCode', $pd_code)
     ->where('OBIN.BinCode', $zone_code);
-    $rs = $this->ms->get();
+    $rs = $this->cn->get();
     if($rs->num_rows() == 1)
     {
       return intval($rs->row()->qty);
@@ -153,6 +153,26 @@ class stock_model extends CI_Model
     ->from('OIBQ')
     ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
     ->where('OBIN.BinCode', $zone_code)
+    ->where('OIBQ.OnHandQty !=', 0)
+    ->get();
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_all_stock_consignment_zone($zone_code)
+  {
+    $rs = $this->cn
+    ->select('OIBQ.ItemCode AS product_code, OIBQ.OnHandQty AS qty')
+    ->from('OIBQ')
+    ->join('OBIN', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
+    ->where('OBIN.BinCode', $zone_code)
+    ->where('OIBQ.OnHandQty !=', 0)
     ->get();
 
     if($rs->num_rows() > 0)

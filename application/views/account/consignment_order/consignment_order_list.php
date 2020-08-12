@@ -51,8 +51,8 @@
     <select class="form-control input-sm" name="status" id="status" onchange="getSearch()">
       <option value="all" <?php echo is_selected($status, 'all'); ?>>ทั้งหมด</option>
       <option value="0" <?php echo is_selected($status, '0'); ?>>ยังไม่บันทึก</option>
-      <option value="1" <?php echo is_selected($status, 1); ?>>บันทึกแล้ว</option>
-      <option value="2" <?php echo is_selected($status, 2); ?>>ยกเลิก</option>
+      <option value="1" <?php echo is_selected($status, '1'); ?>>บันทึกแล้ว</option>
+      <option value="2" <?php echo is_selected($status, '2'); ?>>ยกเลิก</option>
     </select>
   </div>
 
@@ -134,6 +134,7 @@
           <td class="middle text-right">
             <?php if($rs->status == 1) : ?>
               <button type="button" class="btn btn-minier btn-info" onclick="viewDetail('<?php echo $rs->code; ?>')"><i class="fa fa-eye"></i></button>
+              <button type="button" class="btn btn-minier btn-success" onclick="sendToSAP('<?php echo $rs->code; ?>')"><i class="fa fa-send"></i> SAP</button>
             <?php endif; ?>
             <?php if($rs->status == 0 && $this->pm->can_edit) : ?>
               <button type="button" class="btn btn-minier btn-warning" onclick="goEdit('<?php echo $rs->code; ?>')"><i class="fa fa-pencil"></i></button>

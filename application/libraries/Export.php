@@ -1055,6 +1055,7 @@ public function export_transform($code)
 
         if($sc === TRUE)
         {
+          $transform_warehouse = getConfig('TRANSFORM_WAREHOUSE');
           $currency = getConfig('CURRENCY');
           $vat_rate = getConfig('SALE_VAT_RATE');
           $vat_code = getConfig('SALE_VAT_CODE');
@@ -1077,8 +1078,8 @@ public function export_transform($code)
             'DocRate' => 1,
             'DocTotal' => remove_vat($total_amount),
             'DocTotalFC' => remove_vat($total_amount),
-            'Filler' => empty($zone) ? NULL : $zone->warehouse_code,
-            'ToWhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
+            'Filler' => $doc->warehouse_code,
+            'ToWhsCode' => $transform_warehouse,
             'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE),
@@ -1117,7 +1118,7 @@ public function export_transform($code)
                   'Price' => round(remove_vat($rs->price),2),
                   'TotalFrgn' => round($rs->total_amount,2),
                   'FromWhsCod' => $rs->warehouse_code,
-                  'WhsCode' => empty($zone) ? NULL : $zone->warehouse_code,
+                  'WhsCode' => $transform_warehouse,
                   'FisrtBin' => $doc->zone_code, //--- zone ปลายทาง
                   'F_FROM_BIN' => $rs->zone_code, //--- โซนต้นทาง
                   'F_TO_BIN' => $doc->zone_code, //--- โซนปลายทาง
@@ -1587,7 +1588,8 @@ public function export_return($code)
                   'Price' => remove_vat($rs->price),
                   'TotalFrgn' => remove_vat($rs->amount),
                   'WhsCode' => $doc->warehouse_code,
-                  //'BinCode' => $doc->zone_code,
+                  'BinCode' => $doc->zone_code,
+                  'FisrtBin' => $doc->zone_code,
                   'TaxStatus' => 'Y',
                   'VatPrcnt' => $vat_rate,
                   'VatGroup' => $vat_code,
@@ -1822,13 +1824,16 @@ public function export_return_lend($code)
 
 
 
-//---- Good issue
-//---- OIGE IGE1
+//---- ตัดยอดฝากขายห้าง (WD)
+//---- CNODLN CNDLN1
 //---- WD
-public function export_goods_issue($code)
+public function export_consignment_order($code)
 {
   $sc = TRUE;
   $this->ci->load->model('account/consignment_order_model');
+  $this->ci->load->model('masters/products_model');
+  $this->ci->load->helper('discount');
+
   $doc = $this->ci->consignment_order_model->get($code);
   $sap = $this->ci->consignment_order_model->get_sap_consignment_order_doc($code);
   if(! empty($doc))
@@ -1851,23 +1856,35 @@ public function export_goods_issue($code)
 
       if($sc === TRUE)
       {
+        $currency = getConfig('CURRENCY');
+        $vat_rate = getConfig('SALE_VAT_RATE');
+        $vat_code = getConfig('SALE_VAT_CODE');
+
         $doc_total = $this->ci->consignment_order_model->get_sum_amount($code);
-        $arr = array(
-          'U_ECOMNO' => $code,
-          'DocType' => 'I',
-          'CANCELED' => 'N',
-          'DocDate' => sap_date($doc->date_add),
-          'DocDueDate' => sap_date($doc->date_add),
+
+        //--- header
+        $ds = array(
+          'U_ECOMNO' => $doc->code,
+          'DocType' => 'I', //--- I = item, S = Service
+          'CANCELED' => 'N', //--- Y = Yes, N = No
+          'DocDate' => sap_date($doc->date_add, TRUE), //--- วันที่เอกสาร
+          'DocDueDate' => sap_date($doc->date_add,TRUE), //--- วันที่เอกสาร
+          'CardCode' => $doc->customer_code, //--- รหัสลูกค้า
+          'CardName' => $doc->customer_name, //--- ชื่อลูกค้า
+          'DocCur' => $currency,
+          'DocRate' => 1.000000,
           'DocTotal' => $doc_total,
           'DocTotalFC' => $doc_total,
           'Comments' => limitText($doc->remark, 250),
+          'U_BOOKCODE' => $doc->bookcode,
           'F_E_Commerce' => 'A',
           'F_E_CommerceDate' => sap_date(now(), TRUE)
         );
 
+
         $this->ci->mc->trans_begin();
 
-        $docEntry = $this->ci->consignment_order_model->add_sap_goods_issue($arr);
+        $docEntry = $this->ci->consignment_order_model->add_sap_doc($ds);
 
         //--- now add details
         if($docEntry !== FALSE)
@@ -1885,14 +1902,28 @@ public function export_goods_issue($code)
                 'ItemCode' => $rs->product_code,
                 'Dscription' => $rs->product_name,
                 'Quantity' => $rs->qty,
+                'UnitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
+                'PriceBefDi' => $rs->price,  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
+                'LineTotal' => $rs->amount,
+                'Currency' => $currency,
+                'Rate' => 1.000000,
+                'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price), ///--- discount_helper
+                'Price' => remove_vat($rs->price), //--- ราคา
+                'TotalFrgn' => $rs->amount, //--- จำนวนเงินรวม By Line (Currency)
                 'WhsCode' => $doc->warehouse_code,
-                'FisrtBin' => $doc->zone_code,
-                'DocDate' => sap_date($doc->date_add),
-                'F_E_Commerce' => 'A',
+                'BinCode' => $doc->zone_code,
+                'TaxStatus' => 'Y',
+                'VatPrcnt' => $vat_rate,
+                'VatGroup' => $vat_code,
+                'PriceAfVat' => $rs->price,
+                'GTotal' => round($rs->amount, 2),
+                'VatSum' => get_vat_amount($rs->amount), //---- tool_helper
+                'TaxType' => 'Y', //--- คิดภาษีหรือไม่
+                'F_E_Commerce' => 'A', //--- A = Add , U = Update
                 'F_E_CommerceDate' => sap_date(now(), TRUE)
               );
 
-              $this->ci->consignment_order_model->add_sap_goods_issue_row($arr);
+              $this->ci->consignment_order_model->add_sap_detail_row($arr);
               $line++;
             }
           }
@@ -1933,6 +1964,121 @@ public function export_goods_issue($code)
 
   return $sc;
 }
+
+
+
+
+//---- Good issue
+//---- OIGE IGE1
+//---- WD
+// public function export_goods_issue($code)
+// {
+//   $sc = TRUE;
+//   $this->ci->load->model('account/consignment_order_model');
+//   $doc = $this->ci->consignment_order_model->get($code);
+//   $sap = $this->ci->consignment_order_model->get_sap_consignment_order_doc($code);
+//   if(! empty($doc))
+//   {
+//     if(empty($sap))
+//     {
+//       $middle = $this->ci->consignment_order_model->get_middle_consignment_order_doc($code);
+//       if(!empty($middle))
+//       {
+//         foreach($middle as $rows)
+//         {
+//           if($this->ci->consignment_order_model->drop_middle_exits_data($rows->DocEntry) === FALSE)
+//           {
+//             $sc = FALSE;
+//             $this->error = "ลบรายการที่ค้างใน Temp ไม่สำเร็จ";
+//           }
+//         }
+//       }
+//
+//
+//       if($sc === TRUE)
+//       {
+//         $doc_total = $this->ci->consignment_order_model->get_sum_amount($code);
+//         $arr = array(
+//           'U_ECOMNO' => $code,
+//           'DocType' => 'I',
+//           'CANCELED' => 'N',
+//           'DocDate' => sap_date($doc->date_add),
+//           'DocDueDate' => sap_date($doc->date_add),
+//           'DocTotal' => $doc_total,
+//           'DocTotalFC' => $doc_total,
+//           'Comments' => limitText($doc->remark, 250),
+//           'F_E_Commerce' => 'A',
+//           'F_E_CommerceDate' => sap_date(now(), TRUE)
+//         );
+//
+//         $this->ci->mc->trans_begin();
+//
+//         $docEntry = $this->ci->consignment_order_model->add_sap_goods_issue($arr);
+//
+//         //--- now add details
+//         if($docEntry !== FALSE)
+//         {
+//           $details = $this->ci->consignment_order_model->get_details($code);
+//           if(! empty($details))
+//           {
+//             $line = 0;
+//             foreach($details as $rs)
+//             {
+//               $arr = array(
+//                 'DocEntry' => $docEntry,
+//                 'U_ECOMNO' => $rs->consign_code,
+//                 'LineNum' => $line,
+//                 'ItemCode' => $rs->product_code,
+//                 'Dscription' => $rs->product_name,
+//                 'Quantity' => $rs->qty,
+//                 'WhsCode' => $doc->warehouse_code,
+//                 'FisrtBin' => $doc->zone_code,
+//                 'DocDate' => sap_date($doc->date_add),
+//                 'F_E_Commerce' => 'A',
+//                 'F_E_CommerceDate' => sap_date(now(), TRUE)
+//               );
+//
+//               $this->ci->consignment_order_model->add_sap_goods_issue_row($arr);
+//               $line++;
+//             }
+//           }
+//           else
+//           {
+//             $sc = FALSE;
+//             $this->error = "ไม่พบรายการสินค้า";
+//           }
+//         }
+//         else
+//         {
+//           $sc = FALSE;
+//           $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+//         }
+//
+//         if($sc === TRUE)
+//         {
+//           $this->ci->mc->trans_commit();
+//         }
+//         else
+//         {
+//           $this->ci->mc->trans_rollback();
+//         }
+//       }
+//
+//     }
+//     else
+//     {
+//       $sc = FALSE;
+//       $this->error = "เอกสารถูกนำเข้า SAP แล้ว หากต้องการเปลี่ยนแปลงกรุณายกเลิกเอกสารใน SAP ก่อน";
+//     }
+//   }
+//   else
+//   {
+//     $sc = FALSE;
+//     $this->error = "ไม่พบเลขที่เอกสาร";
+//   }
+//
+//   return $sc;
+// }
 
 
 

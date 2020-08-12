@@ -61,6 +61,20 @@ function getDelete(code){
   })
 }
 
+function toggleConsignment(option)
+{
+  $('#is_consignment').val(option);
+  if(option == 1){
+    $('#btn-cm-yes').addClass('btn-success');
+    $('#btn-cm-no').removeClass('btn-danger');
+  }
+  else
+  {
+    $('#btn-cm-yes').removeClass('btn-success');
+    $('#btn-cm-no').addClass('btn-danger');
+  }
+}
+
 
 function toggleSell(option)
 {

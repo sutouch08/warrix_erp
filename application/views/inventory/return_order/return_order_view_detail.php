@@ -11,11 +11,14 @@
   <?php if($doc->is_approve == 1) : ?>
 				<button type="button" class="btn btn-sm btn-info" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
 	<?php endif; ?>
-	<?php if($doc->status == 1 && $this->pm->can_edit) : ?>
+	<?php if($doc->status == 1 &&$doc->is_approve == 0 && $this->pm->can_edit) : ?>
 				<button type="button" class="btn btn-sm btn-danger" onclick="unsave()">ยกเลิกการบันทึก</button>
 	<?php endif; ?>
 	<?php if($doc->status == 1 && $doc->is_approve == 0 && $this->pm->can_approve) : ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
+	<?php endif; ?>
+	<?php if($doc->status == 1 && $doc->is_approve == 1 && $this->pm->can_approve) : ?>
+				<button type="button" class="btn btn-sm btn-danger" onclick="unapprove()"><i class="fa fa-refresh"></i> ไม่อนุมัติ</button>
 	<?php endif; ?>
 				<button type="button" class="btn btn-sm btn-info" onclick="printReturn()"><i class="fa fa-print"></i> พิมพ์</button>
       </p>
@@ -49,10 +52,15 @@
 			<label>โซน[รับคืน]</label>
 			<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" disabled />
 		</div>
-    <div class="col-sm-9 padding-5">
+    <div class="col-sm-7 padding-5">
     	<label>หมายเหตุ</label>
         <input type="text" class="form-control input-sm edit" name="remark" id="remark" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" value="<?php echo $doc->remark; ?>" disabled />
     </div>
+		<div class="col-sm-2 padding-5 last">
+			<label>SAP No.</label>
+			<input type="text" class="form-control input-sm" value="<?php echo $doc->inv_code; ?>" disabled/>
+
+		</div>
 </div>
 
 <input type="hidden" id="return_code" value="<?php echo $doc->code; ?>" />
@@ -113,6 +121,24 @@ if($doc->status == 2)
 			</tbody>
 		</table>
 	</div>
+
+	<?php if(!empty($approve_list)) :?>
+		<?php foreach($approve_list as $appr) : ?>
+			<div class="col-sm-12 text-right">
+				<?php if($appr->approve == 1) : ?>
+					<span class="green">
+						อนุมัติโดย : <?php echo $appr->approver; ?> @ <?php echo thai_date($appr->date_upd, TRUE); ?>
+					</span>
+				<?php endif; ?>
+				<?php if($appr->approve == 0) : ?>
+					<span class="red">
+						ยกเลิกการอนุมัติโดย : <?php echo $appr->approver; ?> @ <?php echo thai_date($appr->date_upd, TRUE); ?>
+					</span>
+				<?php endif; ?>
+			</div>
+		<?php endforeach; ?>
+	<?php endif; ?>
+
 </div>
 
 

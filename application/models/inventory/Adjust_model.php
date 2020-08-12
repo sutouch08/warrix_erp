@@ -115,7 +115,7 @@ class Adjust_model extends CI_Model
   {
     if(!empty($ds))
     {
-      return $this->db->update('adjust', $ds);
+      return $this->db->where('code', $code)->update('adjust', $ds);
     }
   }
 

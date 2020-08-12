@@ -33,7 +33,7 @@ class Invoice extends PS_Controller
       'to_date'       => get_filter('to_date', 'ic_to_date', ''),
       'order_by'      => get_filter('order_by', 'ic_order_by', ''),
       'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
-      'is_valid'      => get_filter('is_valid', 'ic_valid', '2')
+      'is_valid'      => get_filter('is_valid', 'ic_valid', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า

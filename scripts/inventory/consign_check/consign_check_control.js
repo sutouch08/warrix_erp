@@ -227,3 +227,14 @@ function getBoxList(){
     }
   });
 }
+
+
+$('.b-click').click(function(){
+  if(!$('#barcode').prop('disabled'))
+  {
+    var barcode = $.trim($(this).text());
+    $('#barcode').val(barcode);
+    $('#barcode').focus();
+  }
+
+});

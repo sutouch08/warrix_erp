@@ -149,6 +149,17 @@ function syncAdjustGoodsReceiveCode(){
   $.get(BASE_URL + 'sync_data/syncAdjustGoodsReceiveCode', function(rs){
     $('body').append('finished update AJ-IGN : '+ rs + ' <br/>');
     $('body').append('============================================ <br/>');
+    syncReturnOrderCode();
+  })
+}
+
+
+//--- 11. sync ORDN (SM)
+function syncTransfer(){
+    $('body').append('start    updating SM .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncReturnOrderCode', function(rs){
+    $('body').append('finished update SM : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
     $('body').append('All done!');
     window.close();
   })

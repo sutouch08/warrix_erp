@@ -113,6 +113,22 @@ class Consign_check_model extends CI_Model
   }
 
 
+  public function get_returned_details($code)
+  {
+    $rs = $this->db
+    ->select('product_code, product_name, qty')
+    ->where('check_code', $code)
+    ->where('qty !=', 0, FALSE)
+    ->get('consign_check_detail');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
   public function update_ref_code($code, $consign_code, $valid)
   {
     $this->db
@@ -121,6 +137,16 @@ class Consign_check_model extends CI_Model
     ->where('code', $code);
 
     return $this->db->update('consign_check');
+  }
+
+
+  public function update_return_code($code, $return_code, $valid)
+  {
+    return $this->db
+    ->set('return_code', $return_code)
+    ->set('cn_loaded', $valid)
+    ->where('code', $code)
+    ->update('consign_check');
   }
 
 
@@ -414,7 +440,7 @@ class Consign_check_model extends CI_Model
 
     if(!empty($ds['code']))
     {
-      $this->db->like('consign_check.code', $s['code']);
+      $this->db->like('consign_check.code', $ds['code']);
     }
 
     if(!empty($ds['customer']))
@@ -469,7 +495,7 @@ class Consign_check_model extends CI_Model
 
     if(!empty($ds['code']))
     {
-      $this->db->like('consign_check.code', $s['code']);
+      $this->db->like('consign_check.code', $ds['code']);
     }
 
     if(!empty($ds['customer']))

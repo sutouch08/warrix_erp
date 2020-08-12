@@ -139,7 +139,7 @@
 				<?php foreach($data as $rs) : ?>
 					<tr id="row-<?php echo $rs->code; ?>" class="font-size-12">
 						<td class="middle text-center"><?php echo $no; ?></td>
-						<td class="midle"><?php echo $rs->barcode; ?></td>
+						<td class="middle"><?php echo $rs->barcode; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->style_code; ?></td>
 						<td class="middle text-center"><?php echo $rs->color_code; ?></td>

@@ -61,7 +61,8 @@
 					<th class="width-5 middle text-center">จัด</th>
 					<th class="width-5 middle text-center">ติดลบ</th>
 					<th class="width-5 middle text-center">ใช้งาน</th>
-					<th class="width-15 middle text-center">แก้ไข</th>
+					<th class="width-8 middle text-center">ฝาขายเทียม</th>
+					<th class="width-10 middle text-center">แก้ไข</th>
 					<th class=""></th>
 				</tr>
 			</thead>
@@ -79,6 +80,7 @@
 						<td class="middle text-center"><?php echo is_active($rs->prepare); ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->auz); ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->active); ?></td>
+						<td class="middle text-center"><?php echo is_active($rs->is_consignment); ?></td>
 						<td class="middle text-center"><?php echo $rs->update_user; ?></td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>

@@ -7,7 +7,9 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-				<button type="button" class="btn btn-sm btn-primary" onclick="goProcess()">กำลังจัด</button>
+				<button type="submit" class="btn btn-xs btn-primary"><i class="fa fa-search"></i> Search</button>
+				<button type="button" class="btn btn-xs btn-warning" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
+				<button type="button" class="btn btn-xs btn-primary" onclick="goProcess()">กำลังจัด</button>
 			</p>
 		</div>
 </div><!-- End Row -->
@@ -109,15 +111,13 @@
     <input type="text" class="form-control input-sm search" name="item_code" id="item_code" value="<?php echo $item_code; ?>" />
   </div>
 
-  <div class="col-sm-1 padding-5">
-    <label class="display-block not-show">buton</label>
-    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
-  </div>
-	<div class="col-sm-1 padding-5 last">
-    <label class="display-block not-show">buton</label>
-    <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
-  </div>
-
+	<div class="col-sm-2 padding-5 last">
+		<label>คลัง</label>
+		<select class="form-control input-sm" name="warehouse" onchange="getSearch()">
+			<option value="all">ทั้งหมด</option>
+			<?php echo select_sell_warehouse($warehouse); ?>
+		</select>
+	</div>
 </div>
 <hr class="margin-top-15">
 <input type="hidden" name="order_by" id="order_by" value="<?php echo $order_by; ?>">

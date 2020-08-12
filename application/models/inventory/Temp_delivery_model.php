@@ -7,6 +7,17 @@ class Temp_delivery_model extends CI_Model
   }
 
 
+  public function get($docEntry)
+  {
+    $rs = $this->mc->where('DocEntry', $docEntry)->get('ODLN');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
   public function count_rows(array $ds = array())
   {
     if(!empty($ds['code']))
@@ -52,9 +63,9 @@ class Temp_delivery_model extends CI_Model
   public function get_list(array $ds = array(), $perpage = NULL, $offset = 0)
   {
     $this->mc
-    ->select('U_ECOMNO, DocDate, CardCode, CardName')
+    ->select('DocEntry, U_ECOMNO, DocDate, CardCode, CardName')
     ->select('F_E_Commerce, F_E_CommerceDate')
-    ->select('F_Sap, F_SapDate')
+    ->select('F_Sap, F_SapDate, U_BOOKCODE')
     ->select('Message');
 
     if(!empty($ds['code']))
@@ -111,11 +122,11 @@ class Temp_delivery_model extends CI_Model
 
 
 
-  public function get_detail($code)
+  public function get_detail($docEntry)
   {
     $rs = $this->mc
-    ->select('ItemCode, Dscription, Quantity, BinCode')
-    ->where('U_ECOMNO', $code)
+    ->select('U_ECOMNO, ItemCode, Dscription, Quantity, BinCode')
+    ->where('DocEntry', $docEntry)
     ->get('DLN1');
 
     if($rs->num_rows() > 0)

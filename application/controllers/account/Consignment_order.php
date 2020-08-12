@@ -543,7 +543,7 @@ class Consignment_order extends PS_Controller
 
           if(!empty($item))
           {
-            $stock = $item->count_stock == 1 ?$this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 1000000;
+            $stock = $item->count_stock == 1 ?$this->stock_model->get_consign_stock_zone($doc->zone_code, $item->code) : 1000000;
             if($rs->qty <= $stock OR $auz)
             {
               $final_price = $rs->amount/$rs->qty;
@@ -643,7 +643,7 @@ class Consignment_order extends PS_Controller
 
         if($sc === TRUE )
         {
-          $this->export_goods_issue($code);
+          $this->export_consignment_order($code);
         }
       }
     }
@@ -666,49 +666,81 @@ class Consignment_order extends PS_Controller
     $this->load->model('inventory/movement_model');
     $this->load->model('inventory/invoice_model');
     $doc = $this->consignment_order_model->get($code);
-    if($doc->status == 1)
+    if(!empty($doc))
     {
-      $this->db->trans_begin();
-
-      //--- remove movement
-      if(! $this->movement_model->drop_movement($code))
+      if($doc->status == 1)
       {
-        $sc = FALSE;
-        $this->error = "ลบ movement ไม่สำเร็จ";
-      }
-      //--- Remove sold data
-      if(!$this->invoice_model->drop_all_sold($code))
-      {
-        $sc = FALSE;
-        $this->error = "ลบยอดขาย ไม่สำเร็จ";
-      }
-
-      //--- change status details
-      if(! $this->consignment_order_model->change_all_detail_status($code, 0))
-      {
-        $sc = FALSE;
-        $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
-      }
-
-      //--- change document status
-      if($sc === TRUE)
-      {
-        if(! $this->consignment_order_model->change_status($code, 0))
+        //--- check order exists on SAP Consignment database;
+        $sap = $this->consignment_order_model->get_sap_consignment_order_doc($code);
+        if(!empty($sap))
         {
           $sc = FALSE;
-          $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+          $this->error = "กรุณายกเลิกเอกสารใน SAP ก่อนย้อนสถานะ";
+        }
+        else
+        {
+          $middle = $this->consignment_order_model->get_middle_consignment_order_doc($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              if($this->consignment_order_model->drop_middle_exits_data($rows->DocEntry) === FALSE)
+              {
+                $sc = FALSE;
+                $this->error = "ลบรายการที่ค้างใน Temp ไม่สำเร็จ";
+              }
+            }
+          }
+
+          $this->db->trans_begin();
+
+          //--- remove movement
+          if(! $this->movement_model->drop_movement($code))
+          {
+            $sc = FALSE;
+            $this->error = "ลบ movement ไม่สำเร็จ";
+          }
+          //--- Remove sold data
+          if(!$this->invoice_model->drop_all_sold($code))
+          {
+            $sc = FALSE;
+            $this->error = "ลบยอดขาย ไม่สำเร็จ";
+          }
+
+          //--- change status details
+          if(! $this->consignment_order_model->change_all_detail_status($code, 0))
+          {
+            $sc = FALSE;
+            $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
+          }
+
+          //--- change document status
+          if($sc === TRUE)
+          {
+            if(! $this->consignment_order_model->change_status($code, 0))
+            {
+              $sc = FALSE;
+              $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+            }
+          }
+
+          if($sc === TRUE)
+          {
+            $this->db->trans_commit();
+          }
+          else
+          {
+            $this->db->trans_rollback();
+          }
         }
       }
-
-      if($sc === TRUE)
-      {
-        $this->db->trans_commit();
-      }
-      else
-      {
-        $this->db->trans_rollback();
-      }
     }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เลขที่เอกสารไม่ถูกต้อง";
+    }
+
 
 
     echo $sc === TRUE ? 'success' : $this->error;
@@ -1293,7 +1325,7 @@ class Consignment_order extends PS_Controller
 
   public function export_consign($code)
   {
-    $rs = $this->export_goods_issue($code);
+    $rs = $this->export_consignment_order($code);
     if($rs === FALSE)
     {
       echo $this->error;
@@ -1358,11 +1390,11 @@ class Consignment_order extends PS_Controller
   }
 
 
-  public function export_goods_issue($code)
+  public function export_consignment_order($code)
   {
     $sc = TRUE;
     $this->load->library('export');
-    if(! $this->export->export_goods_issue($code))
+    if(! $this->export->export_consignment_order($code))
     {
       $sc = FALSE;
       $this->error = trim($this->export->error);

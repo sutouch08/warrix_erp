@@ -78,7 +78,7 @@ class Delivery_order_model extends CI_Model
 
 
 
-  public function get_data(array $ds = array(), $perpage = '', $offset = '', $state = 7)
+  public function get_data(array $ds = array(), $perpage = NULL, $offset = NULL, $state = 7)
   {
     $total_query = "(SELECT SUM(total_amount) FROM order_details WHERE order_code = orders.code) AS total_amount";
     $this->db->select("orders.*, channels.name AS channels_name, customers.name AS customer_name, {$total_query}")
@@ -116,7 +116,7 @@ class Delivery_order_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
-    if(isset($ds['is_valid']) && $ds['is_valid'] != 2)
+    if(isset($ds['is_valid']) && $ds['is_valid'] != 'all')
     {
       $this->db->where('orders.is_valid', $ds['is_valid']);
     }
@@ -138,7 +138,7 @@ class Delivery_order_model extends CI_Model
     }
 
 
-    if($perpage != '')
+    if(!empty($perpage))
     {
       $offset = $offset === NULL ? 0 : $offset;
       $this->db->limit($perpage, $offset);
@@ -305,12 +305,12 @@ class Delivery_order_model extends CI_Model
       ->where('U_ECOMNO', $code)
       ->where('CANCELED', 'N')
       ->get('ODLN');
-      if($rs->num_rows() === 1)
+      if($rs->num_rows() > 0)
       {
-        return $rs->row();
+        return $rs->result();
       }
 
-      return FALSE;
+      return NULL;
     }
 
 

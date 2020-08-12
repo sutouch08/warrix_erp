@@ -1733,7 +1733,7 @@ class Orders extends PS_Controller
 
         if($sc === TRUE)
         {
-          $this->db->trans_start();
+          $this->db->trans_begin();
 
           //--- ถ้าเปิดบิลแล้ว
           if($sc === TRUE && $order->state == 8)
@@ -1741,11 +1741,17 @@ class Orders extends PS_Controller
 
             if($state < 8)
             {
-              $this->roll_back_action($code, $order->role);
+              if(! $this->roll_back_action($code, $order->role) )
+              {
+                $sc = FALSE;
+              }
             }
             else if($state == 9)
             {
-              $this->cancle_order($code, $order->role, $order->state);
+              if(! $this->cancle_order($code, $order->role, $order->state) )
+              {
+                $sc = FALSE;
+              }
             }
 
           }
@@ -1753,7 +1759,10 @@ class Orders extends PS_Controller
           {
             if($state == 9)
             {
-              $this->cancle_order($code, $order->role, $order->state);
+              if(! $this->cancle_order($code, $order->role, $order->state) )
+              {
+                $sc = FALSE;
+              }
             }
           }
 
@@ -1769,21 +1778,34 @@ class Orders extends PS_Controller
                 'update_user' => get_cookie('uname')
               );
 
-              $this->order_state_model->add_state($arr);
-              if($this->isAPI && ! empty($order->order_id))
+              if(! $this->order_state_model->add_state($arr) )
               {
-                $this->load->library('api');
-                $this->api->update_order_status($order->order_id, $order->state, $state);
+                $sc = FALSE;
+                $this->error = "Add state failed";
               }
+              else
+              {
+                if($this->isAPI && ! empty($order->order_id))
+                {
+                  $this->load->library('api');
+                  $this->api->update_order_status($order->order_id, $order->state, $state);
+                }
+              }
+            }
+            else
+            {
+              $sc = FALSE;
+              $this->error = "เปลี่ยนสถานะไม่สำเร็จ";
             }
           }
 
-
-          $this->db->trans_complete();
-
-          if($this->db->trans_status() === FALSE)
+          if($sc === TRUE)
           {
-            $sc = FALSE;
+            $this->db->trans_commit();
+          }
+          else
+          {
+            $this->db->trans_rollback();
           }
 
           if($sc === TRUE && $order->state == 8)
@@ -1829,99 +1851,169 @@ class Orders extends PS_Controller
     $this->load->model('inventory/transform_model');
     $this->load->model('inventory/transfer_model');
     $this->load->model('inventory/lend_model');
+    $this->load->model('inventory/delivery_order_model');
+
+    $sc = TRUE;
+
     //---- set is_complete = 0
-    $this->orders_model->un_complete($code);
+    if( ! $this->orders_model->un_complete($code) )
+    {
+      $sc = FALSE;
+      $this->error = "Uncomplete details failed";
+    }
 
     //--- set inv_code to NULL
-    $this->orders_model->clear_inv_code($code);
+    if($sc === TRUE)
+    {
+      if(! $this->orders_model->clear_inv_code($code))
+      {
+        $sc = FALSE;
+        $this->error = "Clear Inv code failed";
+      }
+    }
+
 
     //---- move cancle product back to  buffer
-    $this->cancle_model->restore_buffer($code);
+    if($sc === TRUE)
+    {
+      if(! $this->cancle_model->restore_buffer($code) )
+      {
+        $sc = FALSE;
+        $this->error = "Restore cancle failed";
+      }
+    }
 
     //--- remove movement
-    $this->movement_model->drop_movement($code);
-
-    //--- restore sold product back to buffer
-    $sold = $this->invoice_model->get_details($code);
-
-    if(!empty($sold))
+    if($sc === TRUE)
     {
-      foreach($sold as $rs)
+      if(! $this->movement_model->drop_movement($code) )
       {
-        if($rs->is_count == 1)
+        $sc = FALSE;
+        $this->error = "Drop movement failed";
+      }
+    }
+
+
+    if($sc === TRUE)
+    {
+      //--- restore sold product back to buffer
+      $sold = $this->invoice_model->get_details($code);
+
+      if(!empty($sold))
+      {
+        foreach($sold as $rs)
         {
-          //---- restore_buffer
-          if($this->buffer_model->is_exists($rs->reference, $rs->product_code, $rs->zone_code) === TRUE)
+          if($sc === FALSE)
           {
-            $this->buffer_model->update($rs->reference, $rs->product_code, $rs->zone_code, $rs->qty);
+            break;
           }
-          else
+
+          if($rs->is_count == 1)
           {
-            $ds = array(
-              'order_code' => $rs->reference,
-              'product_code' => $rs->product_code,
-              'warehouse_code' => $rs->warehouse_code,
-              'zone_code' => $rs->zone_code,
-              'qty' => $rs->qty,
-              'user' => $rs->user
-            );
+            //---- restore_buffer
+            if($this->buffer_model->is_exists($rs->reference, $rs->product_code, $rs->zone_code) === TRUE)
+            {
+              if(! $this->buffer_model->update($rs->reference, $rs->product_code, $rs->zone_code, $rs->qty))
+              {
+                $sc = FALSE;
+                $this->error = "Restore buffer (update) failed";
+              }
+            }
+            else
+            {
+              $ds = array(
+                'order_code' => $rs->reference,
+                'product_code' => $rs->product_code,
+                'warehouse_code' => $rs->warehouse_code,
+                'zone_code' => $rs->zone_code,
+                'qty' => $rs->qty,
+                'user' => $rs->user
+              );
 
-            $this->buffer_model->add($ds);
+              if(! $this->buffer_model->add($ds) )
+              {
+                $sc = FALSE;
+                $this->error = "Restore buffer (add) failed";
+              }
+            }
+          }
+
+          if($sc === TRUE)
+          {
+            if( !$this->invoice_model->drop_sold($rs->id) )
+            {
+              $sc = FALSE;
+              $this->error = "Drop sold data failed";
+            }
+
+            //------ หากเป็นออเดอร์เบิกแปรสภาพ
+            if($role == 'T')
+            {
+              if( ! $this->transform_model->reset_sold_qty($code) )
+              {
+                $sc = FALSE;
+                $this->error = "Reset Transform sold qty failed";
+              }
+            }
+
+            //-- หากเป็นออเดอร์ยืม
+            if($role == 'L')
+            {
+              if(! $this->lend_model->drop_backlogs_list($code) )
+              {
+                $sc = FALSE;
+                $this->error = "Drop lend backlogs failed";
+              }
+            }
+          }
+
+        } //--- end foreach
+      } //---- end sold
+
+
+      if($sc === TRUE)
+      {
+        //---- Delete Middle Temp
+        //---- ถ้าเป็นฝากขายโอนคลัง ตามไปลบ transfer draft ที่ยังไม่เอาเข้าด้วย
+        if($role == 'N')
+        {
+          $middle = $this->transfer_model->get_middle_transfer_draft($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->transfer_model->drop_middle_transfer_draft($rows->DocEntry);
+            }
           }
         }
-
-        $this->invoice_model->drop_sold($rs->id);
-        //------ หากเป็นออเดอร์เบิกแปรสภาพ
-        if($role == 'T')
+        else if($role == 'T' OR $role == 'Q' OR $role == 'L')
         {
-          $this->transform_model->reset_sold_qty($code);
+          $middle = $this->transfer_model->get_middle_transfer_doc($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->transfer_model->drop_middle_exits_data($rows->DocEntry);
+            }
+          }
         }
-
-        //-- หากเป็นออเดอร์ยืม
-        if($role == 'L')
+        else
         {
-          $this->lend_model->drop_backlogs_list($code);
-        }
-      } //--- end foreach
-    } //---- end sold
-
-
-    //---- Delete Middle Temp
-    //---- ถ้าเป็นฝากขายโอนคลัง ตามไปลบ transfer draft ที่ยังไม่เอาเข้าด้วย
-    if($role == 'N')
-    {
-      $middle = $this->transfer_model->get_middle_transfer_draft($code);
-      if(!empty($middle))
-      {
-        foreach($middle as $rows)
-        {
-          $this->transfer_model->drop_middle_transfer_draft($rows->DocEntry);
+          //---- ถ้าออเดอร์ยังไม่ถูกเอาเข้า SAP ลบออกจากถังกลางด้วย
+          $middle = $this->delivery_order_model->get_middle_delivery_order($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->delivery_order_model->drop_middle_exits_data($rows->DocEntry);
+            }
+          }
         }
       }
+
     }
-    else if($role == 'T' OR $role == 'Q' OR $role == 'L')
-    {
-      $middle = $this->transfer_model->get_middle_transfer_doc($code);
-      if(!empty($middle))
-      {
-        foreach($middle as $rows)
-        {
-          $this->transfer_model->drop_middle_exits_data($rows->DocEntry);
-        }
-      }
-    }
-    else
-    {
-      //---- ถ้าออเดอร์ยังไม่ถูกเอาเข้า SAP ลบออกจากถังกลางด้วย
-      $middle = $this->delivery_order_model->get_middle_delivery_order($code);
-      if(!empty($middle))
-      {
-        foreach($middle as $rows)
-        {
-          $this->delivery_order_model->drop_middle_exits_data($rows->DocEntry);
-        }
-      }
-    }
+
+    return $sc;
   }
 
 
@@ -1937,7 +2029,9 @@ class Orders extends PS_Controller
     $this->load->model('inventory/cancle_model');
     $this->load->model('masters/zone_model');
 
-    if($state == 8)
+    $sc = TRUE;
+
+    if($state > 3)
     {
       //--- put prepared product to cancle zone
       $prepared = $this->prepare_model->get_details($code);
@@ -1945,6 +2039,11 @@ class Orders extends PS_Controller
       {
         foreach($prepared AS $rs)
         {
+          if($sc === FALSE)
+          {
+            break;
+          }
+
           $zone = $this->zone_model->get($rs->zone_code);
           $arr = array(
             'order_code' => $rs->order_code,
@@ -1955,76 +2054,147 @@ class Orders extends PS_Controller
             'user' => get_cookie('uname')
           );
 
-          $this->cancle_model->add($arr);
+          if( ! $this->cancle_model->add($arr) )
+          {
+            $sc = FALSE;
+            $this->error = "Move Items to Cancle failed";
+          }
         }
       }
 
       //--- drop sold data
-      $this->invoice_model->drop_all_sold($code);
-    }
-
-    //---- เมื่อมีการยกเลิกออเดอร์
-    //--- 1. เคลียร์ buffer
-    $this->buffer_model->delete_all($code);
-    //--- 2. ลบประวัติการจัดสินค้า
-    $this->prepare_model->clear_prepare($code);
-    //--- 3. ลบประวัติการตรวจสินค้า
-    $this->qc_model->clear_qc($code);
-    //--- 4. ลบรายการสั่งซื้อ
-    $this->orders_model->clear_order_detail($code);
-    //--- 5. ยกเลิกออเดอร์
-    $this->orders_model->set_status($code, 2);
-    $this->orders_model->set_report_status($code, NULL);
-
-    //--- 6. ลบรายการที่ผู้ไว้ใน order_transform_detail (กรณีเบิกแปรสภาพ)
-    if($role == 'T' OR $role == 'Q')
-    {
-      $this->transform_model->clear_transform_detail($code);
-      $this->transform_model->close_transform($code);
-    }
-
-    //-- หากเป็นออเดอร์ยืม
-    if($role == 'L')
-    {
-      $this->lend_model->drop_backlogs_list($code);
-    }
-
-    //---- ถ้าเป็นฝากขายโอนคลัง ตามไปลบ transfer draft ที่ยังไม่เอาเข้าด้วย
-    if($role == 'N')
-    {
-      $middle = $this->transfer_model->get_middle_transfer_draft($code);
-      if(!empty($middle))
+      if($sc === TRUE)
       {
-        foreach($middle as $rows)
+        if(! $this->invoice_model->drop_all_sold($code) )
         {
-          $this->transfer_model->drop_middle_transfer_draft($rows->DocEntry);
+          $sc = FALSE;
+          $this->error = "Drop sold data failed";
+        }
+      }
+
+    }
+
+    if($sc === TRUE)
+    {
+      //---- เมื่อมีการยกเลิกออเดอร์
+      //--- 1. เคลียร์ buffer
+      if(! $this->buffer_model->delete_all($code) )
+      {
+        $sc = FALSE;
+        $this->error = "Delete buffer failed";
+      }
+
+      //--- 2. ลบประวัติการจัดสินค้า
+      if($sc === TRUE)
+      {
+        if(! $this->prepare_model->clear_prepare($code) )
+        {
+          $sc = FALSE;
+          $this->error = "Delete prepared data failed";
+        }
+      }
+
+
+      //--- 3. ลบประวัติการตรวจสินค้า
+      if($sc === TRUE)
+      {
+        if(! $this->qc_model->clear_qc($code) )
+        {
+          $sc = FALSE;
+          $this->error = "Delete QC failed";
+        }
+      }
+
+
+      //--- 4. ลบรายการสั่งซื้อ
+      if($sc === TRUE)
+      {
+        if(! $this->orders_model->clear_order_detail($code) )
+        {
+          $sc = FALSE;
+          $this->error = "Delete Order details failed";
+        }
+      }
+
+
+      //--- 5. ยกเลิกออเดอร์
+      if($sc === TRUE)
+      {
+        if(! $this->orders_model->set_status($code, 2) )
+        {
+          $sc = FALSE;
+          $this->error = "Change order status failed";
+        }
+      }
+
+      if($sc === TRUE)
+      {
+        $this->orders_model->set_report_status($code, NULL);
+      }
+
+      if($sc === TRUE)
+      {
+        //--- 6. ลบรายการที่ผู้ไว้ใน order_transform_detail (กรณีเบิกแปรสภาพ)
+        if($role == 'T' OR $role == 'Q')
+        {
+          if(! $this->transform_model->clear_transform_detail($code) )
+          {
+            $sc = FALSE;
+            $this->error = "Clear Transform backlogs failed";
+          }
+
+          $this->transform_model->close_transform($code);
+        }
+
+        //-- หากเป็นออเดอร์ยืม
+        if($role == 'L')
+        {
+          if(! $this->lend_model->drop_backlogs_list($code) )
+          {
+            $sc = FALSE;
+            $this->error = "Drop Lend backlogs failed";
+          }
+        }
+
+        //---- ถ้าเป็นฝากขายโอนคลัง ตามไปลบ transfer draft ที่ยังไม่เอาเข้าด้วย
+        if($role == 'N')
+        {
+          $middle = $this->transfer_model->get_middle_transfer_draft($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->transfer_model->drop_middle_transfer_draft($rows->DocEntry);
+            }
+          }
+        }
+        else if($role == 'T' OR $role == 'Q' OR $role == 'L')
+        {
+          $middle = $this->transfer_model->get_middle_transfer_doc($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->transfer_model->drop_middle_exits_data($rows->DocEntry);
+            }
+          }
+        }
+        else
+        {
+          //---- ถ้าออเดอร์ยังไม่ถูกเอาเข้า SAP ลบออกจากถังกลางด้วย
+          $middle = $this->delivery_order_model->get_middle_delivery_order($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->delivery_order_model->drop_middle_exits_data($rows->DocEntry);
+            }
+          }
         }
       }
     }
-    else if($role == 'T' OR $role == 'Q' OR $role == 'L')
-    {
-      $middle = $this->transfer_model->get_middle_transfer_doc($code);
-      if(!empty($middle))
-      {
-        foreach($middle as $rows)
-        {
-          $this->transfer_model->drop_middle_exits_data($rows->DocEntry);
-        }
-      }
-    }
-    else
-    {
-      //---- ถ้าออเดอร์ยังไม่ถูกเอาเข้า SAP ลบออกจากถังกลางด้วย
-      $middle = $this->delivery_order_model->get_middle_delivery_order($code);
-      if(!empty($middle))
-      {
-        foreach($middle as $rows)
-        {
-          $this->delivery_order_model->drop_middle_exits_data($rows->DocEntry);
-        }
-      }
-    }
 
+    return $sc;
   }
 
 

@@ -64,7 +64,37 @@ function approve(){
 				timer: 1000
 			});
 
-			$('#btn-approve').remove();
+			setTimeout(function(){
+				window.location.reload();
+			}, 1200);
+
+		}else{
+			swal({
+				title:'Error',
+				text:rs,
+				type:'error'
+			}, function(){
+				window.location.reload();
+			})
+		}
+	});
+}
+
+
+
+function unapprove(){
+	var code = $('#return_code').val();
+	$.get(HOME+'unapprove/'+code, function(rs){
+		if(rs === 'success'){
+			swal({
+				title:'Success',
+				type:'success',
+				timer: 1000
+			});
+
+			setTimeout(function(){
+				window.location.reload();
+			}, 1200);
 		}else{
 			swal({
 				title:'Error',
@@ -90,6 +120,12 @@ function doExport(){
 			setTimeout(function(){
 				viewDetail(code);
 			}, 1500);
+		}else{
+			swal({
+				title:'Error!',
+				text:rs,
+				type:'error'
+			});
 		}
 	});
 }
@@ -261,28 +297,6 @@ $('#customer').autocomplete({
 });
 
 
-// function zoneInit(){
-// 	$('#zone_code').val('');
-// 	$('#zone').val('');
-// 	var warehouse = $('#warehouse_code').val();
-// 	if(warehouse.length > 0){
-// 		$('#zone').autocomplete({
-// 			source : BASE_URL + 'auto_complete/get_zone_code_and_name/'+warehouse,
-// 			autoFocus:true,
-// 			close:function(){
-// 				var arr = $(this).val().split(' | ');
-// 				if(arr.length == 2){
-// 					$(this).val(arr[1]);
-// 					$('#zone_code').val(arr[0]);
-// 				}else{
-// 					$(this).val('');
-// 					$('#zone_code').val('');
-// 				}
-// 			}
-// 		})
-// 	}
-// }
-
 $('#zone').autocomplete({
 	source : BASE_URL + 'auto_complete/get_zone_code_and_name',
 	autoFocus:true,
@@ -317,27 +331,9 @@ function inputQtyInit(){
 	});
 }
 
-//
-// function inputPriceInit(){
-// 	$('.input-price').keyup(function(index) {
-// 		var arr = $(this).attr('id').split('_');
-// 		var code = arr[1];
-// 		var inv = arr[2];
-// 		var price = parseFloat($('#qty_'+code+'_'+inv).val());
-// 		var qty = parseFloat($(this).val());
-// 		price = isNaN(price) ? 0 : price;
-// 		qty = isNaN(qty) ? 0 : qty;
-// 		var amount = (qty * price).toFixed(2);
-// 		$('#amount_'+code+'_'+inv).text(addCommas(amount));
-// 		recalTotal();
-// 	});
-// }
-
-
 
 $(document).ready(function(){
 	inputQtyInit();
-	//inputPriceInit();
 });
 
 function recalTotal(){
@@ -345,15 +341,18 @@ function recalTotal(){
 	var totalQty = 0;
 	$('.amount-label').each(function(){
 		let amount = removeCommas($(this).text());
-		amount = parseFloat(amount);
+		amount = parseDefault(parseFloat(amount), 0);
 		totalAmount += amount;
 	});
 
 	$('.input-qty').each(function(){
 		let qty = $(this).val();
-		qty = parseFloat(qty);
+		qty = parseDefault(parseFloat(qty), 0);
 		totalQty += qty;
 	});
+
+	totalQty = totalQty.toFixed(2);
+	totalAmount = totalAmount.toFixed(2);
 
 	$('#total-qty').text(addCommas(totalQty));
 	$('#total-amount').text(addCommas(totalAmount));
