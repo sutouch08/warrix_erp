@@ -181,6 +181,7 @@ class Items extends PS_Controller
               }
 
               $code_pattern = '/[^a-zA-Z0-9_-]/';
+              $rs['D'] = str_replace(array("\n", "\r"), '', $rs['D']); //--- เอาตัวขึ้นบรรทัดใหม่ออก
 
               $style = preg_replace($code_pattern, '', get_null(trim($rs['D'])));
               $old_style = get_null(trim($rs['S'])) === NULL ? $style : trim($rs['S']);
@@ -271,6 +272,7 @@ class Items extends PS_Controller
                 }
               }
 
+              $rs['A'] = str_replace(array("\n", "\r"), '', $rs['A']); //--- เอาตัวขึ้นบรรทัดใหม่ออก
               $code = preg_replace($code_pattern, '', trim($rs['A']));
               $old_code = get_null(trim($rs['T'])) === NULL ? $code : trim($rs['T']);
               $arr = array(

@@ -65,127 +65,6 @@ class Return_order extends PS_Controller
 
 
 
-  // public function add_details($code)
-  // {
-  //   $sc = TRUE;
-  //
-  //   if($this->input->post('qty'))
-  //   {
-  //     $this->load->model('inventory/movement_model');
-  //     //--- start transection
-  //     $this->db->trans_begin();
-  //
-  //     $doc = $this->return_order_model->get($code);
-  //     if(!empty($doc))
-  //     {
-  //       $qtys = $this->input->post('qty');
-  //       $prices = $this->input->post('price');
-  //       $sold = $this->input->post('sold_qty');
-  //       $discount = $this->input->post('discount');
-  //       $vat = getConfig('SALE_VAT_RATE'); //--- 0.07
-  //       //--- drop old detail
-  //       $this->return_order_model->drop_details($code);
-  //
-  //       if(!empty($qtys))
-  //       {
-  //
-  //         foreach($qtys as $item => $invoice)
-  //         {
-  //           foreach($invoice as $inv => $qty)
-  //           {
-  //             $disc_amount = $qty * ($prices[$item][$inv] * ($discount[$item][$inv] * 0.01));
-  //             $amount = ($qty * $prices[$item][$inv]) - $disc_amount;
-  //             $arr = array(
-  //               'return_code' => $code,
-  //               'invoice_code' => $inv,
-  //               'product_code' => $item,
-  //               'product_name' => $this->products_model->get_name($item),
-  //               'sold_qty' => $sold[$item][$inv],
-  //               'qty' => $qty,
-  //               'price' => $prices[$item][$inv],
-  //               'discount_percent' => $discount[$item][$inv],
-  //               'amount' => $amount,
-  //               'vat_amount' => get_vat_amount($amount)
-  //             );
-  //
-  //             if($this->return_order_model->add_detail($arr) === FALSE)
-  //             {
-  //               $sc = FALSE;
-  //               $this->error = 'บันทึกรายการไม่สำเร็จ';
-  //               break;
-  //             }
-  //             else
-  //             {
-  //               $ds = array(
-  //                 'reference' => $code,
-  //                 'warehouse_code' => $doc->warehouse_code,
-  //                 'zone_code' => $doc->zone_code,
-  //                 'product_code' => $item,
-  //                 'move_in' => $qty,
-  //                 'date_add' => $doc->date_add
-  //               );
-  //
-  //               if($this->movement_model->add($ds) === FALSE)
-  //               {
-  //                 $sc = FALSE;
-  //                 $message = 'บันทึก movement ไม่สำเร็จ';
-  //               }
-  //             }
-  //           }
-  //
-  //         } //--- endforeach
-  //
-  //         $this->return_order_model->set_status($code, 1);
-  //
-  //       }
-  //       else
-  //       {
-  //         $sc = FALSE;
-  //         set_error('ไม่พบจำนวนในการรับคืน');
-  //       } //--- end if empty qty
-  //
-  //
-  //       if($this->db->trans_status() === FALSE)
-  //       {
-  //         $sc = FALSE;
-  //         set_error($this->db->error());
-  //       }
-  //
-  //       if($sc === TRUE)
-  //       {
-  //         $this->db->trans_commit();
-  //       }
-  //       else
-  //       {
-  //         $this->db->trans_rollback();
-  //       }
-  //     }
-  //     else
-  //     {
-  //       //--- empty document
-  //       $sc = FALSE;
-  //       set_error('ไม่พบเลขที่เอกสาร');
-  //     }
-  //   }
-  //   else
-  //   {
-  //     $sc = FALSE;
-  //     set_error('ไม่พบข้อมูลในฟอร์ม');
-  //   }
-  //
-  //   if($sc === TRUE)
-  //   {
-  //     set_message('Success');
-  //     redirect($this->home.'/view_detail/'.$code);
-  //   }
-  //   else
-  //   {
-  //     redirect($this->home.'/edit/'.$code);
-  //   }
-  //
-  // }
-
-
   public function add_details($code)
   {
     $sc = TRUE;
@@ -450,7 +329,7 @@ class Return_order extends PS_Controller
     $doc = $this->return_order_model->get($code);
     $doc->customer_name = $this->customers_model->get_name($doc->customer_code);
     $doc->zone_name = $this->zone_model->get_name($doc->zone_code);
-
+    $doc->warehouse_name = $this->warehouse_model->get_name($doc->warehouse_code);
     $details = $this->return_order_model->get_details($code);
 
     $detail = array();
@@ -484,7 +363,7 @@ class Return_order extends PS_Controller
             $dt->discount_percent = round($rs->discount, 2);
             $dt->qty = round($rs->qty, 2);
             $dt->price = round(add_vat($rs->price), 2);
-            $dt->amount = round((get_price_after_discount($dt->price, $dt->discount_percent) * $dt->qty), 2);
+            $dt->amount = round((get_price_after_discount($dt->price, $dt->discount_percent) * $rs->qty), 2);
 
             $detail[] = $dt;
           }
@@ -508,8 +387,8 @@ class Return_order extends PS_Controller
           $dt->sold_qty = $qty;
           $dt->discount_percent = $rs->discount_percent;
           $dt->qty = $rs->qty;
-          $dt->price = $rs->price;
-          $dt->amount = $rs->qty * ($rs->price * (100 - ($rs->discount_percent * 0.01)));
+          $dt->price = round($rs->price,2);
+          $dt->amount = round($rs->amount,2);
 
           $detail[] = $dt;
         }

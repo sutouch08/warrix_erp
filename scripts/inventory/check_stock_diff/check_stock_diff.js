@@ -96,9 +96,72 @@ function change_zone(){
 }
 
 
-function cal_diff(item){
-  var zone_qty = $('#stock_'+item).val();
-  var count_qty = $('#qty_'+item).val();
+function cal_diff(no){
+  var zone_qty = $('#stock_'+no).val();
+  var count_qty = $('#qty_'+no).val();
   var diff_qty = count_qty - zone_qty;
-  $('#diff_'+item).text(addCommas(diff_qty));
+  $('#diff_'+no).text(addCommas(diff_qty));
+}
+
+
+function save_checked(no){
+  var zone_code = $('#zone-code').val();
+  var stock = $('#stock_'+no).val();
+  var count = $('#qty_'+no).val();
+  var item = $('#item_'+no).val();
+
+  $.ajax({
+    url: HOME + 'save_checked',
+    type: 'POST',
+    cache: false,
+    data:{
+      'zone_code' : zone_code,
+      'product_code' : item,
+      'stock' : stock,
+      'count' : count
+    },
+    success:function(rs){
+      var rs = $.trim(rs);
+      if(rs === 'success'){
+        var check = '<i class="fa fa-check green"></i>';
+        $('#check-no-'+no).html(check);
+        $('#qty_'+no).attr('disabled', 'disabled');
+        $('#btn-'+no).attr('disabled','disabled');
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}
+
+
+function save_all(){
+  $('#checkForm').submit();
+}
+
+
+function removeDiff(id){
+  $.ajax({
+    url:HOME + 'remove_diff/'+id,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      var rs = $.trim(rs);
+      if(rs === 'success'){
+        swal({
+          title:'Deleted',
+          text:'Diff qty has been removed',
+          type:'success',
+          timer:1000
+        });
+
+        $('#row-'+id).remove();
+        reIndex();
+      }
+    }
+  })
 }

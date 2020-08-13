@@ -54,10 +54,10 @@ class Check_stock_diff extends PS_Controller
 
 
 
-  public function check()
+  public function check($zone_code = NULL, $is_checked = NULL)
   {
     //print_r($this->input->post());
-    $zone_code = $this->input->post('zone_code');
+    $zone_code = empty($zone_code) ? $this->input->post('zone_code') : $zone_code;
     $product_code = $this->input->post('product_code');
     $zone = !empty($zone_code) ? $this->zone_model->get($zone_code) : NULL;
 
@@ -82,6 +82,7 @@ class Check_stock_diff extends PS_Controller
     $ds['product_code'] = $product_code;
     $ds['zone_name'] = !empty($zone) ? $zone->name : NULL;
     $ds['details'] = !empty($details) ? $details : NULL;
+    $ds['checked'] = $is_checked;
 
     $this->load->view('inventory/check_stock_diff/check_process', $ds);
   }
@@ -101,64 +102,214 @@ class Check_stock_diff extends PS_Controller
     }
   }
 
-  public function export()
+
+  //---- Save row checked
+  public function save_checked()
   {
-    $arr = array(
-      'item_code' => $this->input->post('item'),
-      'zone_code' => $this->input->post('zone'),
-      'show_system' => $this->input->post('system')
-    );
+    $sc = TRUE;
+    $product_code = $this->input->post('product_code');
+    $zone_code = $this->input->post('zone_code');
+    $stock = $this->input->post('stock');
+    $count = $this->input->post('count');
+    $diff = $count - $stock;
 
-    $token = $this->input->post('token');
-
-    $data = $this->check_stock_diff_model->get_list($arr);
-    if(!empty($data))
+    $item = $this->products_model->get($product_code);
+    if(empty($item))
     {
-      //--- load excel library
-      $this->load->library('excel');
-
-      $this->excel->setActiveSheetIndex(0);
-      $this->excel->getActiveSheet()->setTitle('Stock Zone (SAP)');
-
-      $this->excel->getActiveSheet()->setCellValue('A1', 'No.');
-      $this->excel->getActiveSheet()->setCellValue('B1', 'ItemCode');
-      $this->excel->getActiveSheet()->setCellValue('C1', 'OldCode');
-      $this->excel->getActiveSheet()->setCellValue('D1', 'Description');
-      $this->excel->getActiveSheet()->setCellValue('E1', 'BinCode');
-      $this->excel->getActiveSheet()->setCellValue('F1', 'Bin Description');
-      $this->excel->getActiveSheet()->setCellValue('G1', 'Qty');
-
-      $no = 1;
-      $row = 2;
-      foreach($data as $rs)
+      $sc = FALSE;
+      $this->error = "รหัสสินค้าไม่ถูกต้อง";
+    }
+    else
+    {
+      $zone = $this->zone_model->get($zone_code);
+      if(empty($zone))
       {
-        $this->excel->getActiveSheet()->setCellValue('A'.$row, $no);
-        $this->excel->getActiveSheet()->setCellValue('B'.$row, $rs->ItemCode);
-        if(!empty($rs->U_OLDCODE))
+        $sc = FALSE;
+        $this->error = "โซนไม่ถูกต้อง";
+      }
+      else
+      {
+        //--- check if active diff exists
+        $row = $this->check_stock_diff_model->get_active_diff_detail($zone_code, $product_code);
+        if(!empty($row))
         {
-          $this->excel->getActiveSheet()->setCellValue('C'.$row, $rs->U_OLDCODE);
+          if($diff != 0)
+          {
+            $arr = array(
+              'qty' => $diff
+            );
+
+            if(! $this->check_stock_diff_model->update($row->id, $arr))
+            {
+              $sc = FALSE;
+              $this->error = "Update ยอดต่างไม่สำเร็จ";
+            }
+          }
+          else
+          {
+            $this->check_stock_diff_model->delete($row->id);
+          }
+        }
+        else
+        {
+          if($diff != 0)
+          {
+            $arr = array(
+              'zone_code' => $zone_code,
+              'product_code' => $product_code,
+              'qty' => $diff,
+              'status' => 0,
+              'user' => get_cookie('uname')
+            );
+
+            if(! $this->check_stock_diff_model->add($arr))
+            {
+              $sc = FALSE;
+              $this->error = "เพิ่มรายการไม่สำเร็จ";
+            }
+          }
         }
 
-        $this->excel->getActiveSheet()->setCellValue('D'.$row, $rs->ItemName);
-        $this->excel->getActiveSheet()->setCellValue('E'.$row, $rs->BinCode);
-        $this->excel->getActiveSheet()->setCellValue('F'.$row, $rs->Descr);
-        $this->excel->getActiveSheet()->setCellValue('G'.$row, $rs->OnHandQty);
-        $no++;
-        $row++;
       }
     }
 
-    setToken($token);
-    $file_name = "StockZone(SAP).xlsx";
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
-    header('Content-Disposition: attachment;filename="'.$file_name.'"');
-    $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
-    $writer->save('php://output');
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
+
+  function save_all()
+  {
+    $sc = TRUE;
+    $zone_code = $this->input->post('zoneCode');
+    $items = $this->input->post('item');
+    $stock = $this->input->post('stock');
+    $count = $this->input->post('qty');
+
+    $zone = $this->zone_model->get($zone_code);
+    if(!empty($zone))
+    {
+      if(!empty($items))
+      {
+        if(!empty($stock))
+        {
+          if(!empty($count))
+          {
+            foreach($items as $no => $item)
+            {
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              $in_stock = $stock[$no];
+              $qty = $count[$no];
+              $diff = $qty - $in_stock;
+
+              //--- check if active diff exists
+              $row = $this->check_stock_diff_model->get_active_diff_detail($zone_code, $item);
+              if(!empty($row))
+              {
+                if($diff != 0)
+                {
+                  $arr = array(
+                    'qty' => $diff
+                  );
+
+                  if(! $this->check_stock_diff_model->update($row->id, $arr))
+                  {
+                    $sc = FALSE;
+                    $this->error = "Update ยอดต่างไม่สำเร็จ";
+                  }
+                }
+                else
+                {
+                  $this->check_stock_diff_model->delete($row->id);
+                }
+              }
+              else
+              {
+                if($diff != 0)
+                {
+                  $arr = array(
+                    'zone_code' => $zone_code,
+                    'product_code' => $item,
+                    'qty' => $diff,
+                    'status' => 0,
+                    'user' => get_cookie('uname')
+                  );
+
+                  if(! $this->check_stock_diff_model->add($arr))
+                  {
+                    $sc = FALSE;
+                    $this->error = "เพิ่มรายการไม่สำเร็จ";
+                  }
+                }
+              }
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "ไม่พบรายการตรวจนับ";
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบสต็อกคงเหลือ";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบรายการสินค้า";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "โซนไม่ถูกต้อง";
+    }
+
+    if($sc === TRUE)
+    {
+      set_message("Success");
+    }
+    else
+    {
+      set_error($this->error);
+    }
+
+    redirect("{$this->home}/check/{$zone_code}/Y");
+  }
+
+
+
+  function remove_diff($id)
+  {
+    $sc = TRUE;
+    if(! $this->check_stock_diff_model->delete($id))
+    {
+      $sc = FALSE;
+      $this->error = "ลบรายการไม่สำเร็จ";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
   function clear_filter(){
-    $filter = array('check_product_code', 'check_zone_code', 'check_from_date', 'check_to_date', 'check_status', 'check_user');
+    $filter = array(
+      'check_product_code',
+      'check_zone_code',
+      'check_from_date',
+      'check_to_date',
+      'check_status',
+      'check_user'
+    );
+
     clear_filter($filter);
     echo 'done';
   }

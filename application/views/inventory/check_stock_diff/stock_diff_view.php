@@ -30,8 +30,9 @@
     <label>สถานะ</label>
     <select class="form-control input-sm" id="status" name="status" onchange="getSearch()">
 			<option value="all">ทั้งหมด</option>
-			<option value="0" <?php echo is_selected('0', $status); ?>>ยังไม่ปรับยอด</option>
-			<option value="1" <?php echo is_selected('1', $status); ?>>ปรับยอดแล้ว</option>
+			<option value="0" <?php echo is_selected('0', $status); ?>>ยังไม่โหลด</option>
+			<option value="1" <?php echo is_selected('1', $status); ?>>โหลดแล้ว</option>
+			<option value="2" <?php echo is_selected('2', $status); ?>>ปรับยอดแล้ว</option>
 		</select>
   </div>
   <div class="col-sm-1 padding-5">
@@ -42,10 +43,11 @@
     <label class="display-block not-show">buton</label>
     <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
+	<!--
   <div class="col-sm-1 col-1-harf padding-5 last">
     <label class="display-block not-show">buton</label>
     <button type="button" class="btn btn-xs btn-purple btn-block" onclick="doExport()"><i class="fa fa-file-excel-o"></i> Download</button>
-  </div>
+  </div> -->
 </div>
 <hr class="margin-top-15">
 </form>
@@ -57,20 +59,32 @@
 </form>
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
+  <div class="col-sm-12 col-xs-12 last">
+    <p class="pull-right top-p">
+      <span>O</span><span class="margin-right-15"> = ยังไม่ถูกโหลด</span>
+      <span class="blue">L</span><span class="margin-right-15"> = โหลดเข้าเอกสารแล้ว</span>
+      <span class="green">S</span><span class=""> = ยอดต่างถูกปรับยอดแล้ว</span>
+    </p>
+  </div>
+</div>
+
+<div class="row">
   <div class="col-sm-12">
     <table class="table table-striped border-1">
       <tr>
         <th class="width-5 text-center">ลำดับ</th>
         <th class="width-25">สินค้า</th>
-        <th class="width-20">รหัสโซน</th>
-        <th class="width-40">ชื่อโซน</th>
+        <th class="width-15">รหัสโซน</th>
+        <th class="width-30">ชื่อโซน</th>
         <th class="width-10 text-center">ยอดต่าง</th>
+				<th class="width-5 text-center">สถานะ</th>
+				<th class="width-5 text-center"></th>
       </tr>
       <tbody>
     <?php if( !empty($data)) : ?>
     <?php $no = $this->uri->segment(4) + 1; ?>
     <?php foreach($data as $rs) : ?>
-      <tr class="font-size-12">
+      <tr class="font-size-12" id="row-<?php echo $rs->id; ?>">
         <td class="text-center no"><?php echo $no; ?></td>
         <td>
           <?php echo $rs->product_code; ?>
@@ -84,12 +98,26 @@
         <td><?php echo $rs->zone_code; ?></td>
         <td><?php echo $rs->zone_name; ?></td>
     		<td class="text-center"><?php echo number($rs->qty); ?></td>
+				<td class="text-center">
+					<?php if($rs->status == 1) : ?>
+						<span class="blue">L</span>
+					<?php elseif($rs->status == 2) : ?>
+						<span class="green">S</span>
+					<?php else : ?>
+						<span>O</span>
+					<?php endif; ?>
+				</td>
+				<td class="text-right">
+					<?php if($rs->status == 0 && ($this->pm->can_edit OR $this->pm->can_add)) : ?>
+						<button type="button" class="btn btn-minier btn-danger" onclick="removeDiff(<?php echo $rs->id; ?>)"><i class="fa fa-trash"></i></button>
+					<?php endif; ?>
+				</td>
       </tr>
     <?php  $no++; ?>
     <?php endforeach; ?>
     <?php else : ?>
       <tr>
-        <td colspan="5" class="text-center">--- ไม่พบข้อมูล ---</td>
+        <td colspan="7" class="text-center">--- ไม่พบข้อมูล ---</td>
       </tr>
     <?php endif; ?>
       </tbody>
@@ -98,21 +126,5 @@
 </div>
 
 <script src="<?php echo base_url(); ?>scripts/inventory/check_stock_diff/check_stock_diff.js?<?php echo date('YmdH'); ?>"></script>
-<script>
-  function doExport(){
-    var item = $('#item_code').val();
-    var zone = $('#zone_code').val();
-		var system = $('#show_system').val();
-    var token = $('#token').val();
-    if(item.length > 0 || zone.length > 0)
-    {
-      $('#item').val(item);
-      $('#zone').val(zone);
-			$('#system').val(system);
-      get_download(token);
-      $('#exportFrom').submit();
-    }
-  }
-</script>
 
 <?php $this->load->view('include/footer'); ?>

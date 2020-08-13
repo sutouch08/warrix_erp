@@ -9,6 +9,37 @@ class Check_stock_diff_model extends CI_Model
   }
 
 
+  public function add(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->db->insert('stock_diff', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+
+  public function update($id, array $ds = array())
+  {
+    if(!empty($id) && !empty($ds))
+    {
+      return $this->db->where('id', $id)->update('stock_diff', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function delete($id)
+  {
+    return $this->db->where('id', $id)->delete('stock_diff');
+  }
+
+
+
+
   public function get_list(array $ds = array(), $perpage = NULL, $offset = NULL)
   {
     $this->db
@@ -167,6 +198,23 @@ class Check_stock_diff_model extends CI_Model
     }
 
     return 0;
+  }
+
+
+  public function get_active_diff_detail($zone_code, $product_code)
+  {
+    $rs = $this->db
+    ->where('zone_code', $zone_code)
+    ->where('product_code', $product_code)
+    ->where('status', 0)
+    ->get('stock_diff');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
   }
 
 } //--- end class
