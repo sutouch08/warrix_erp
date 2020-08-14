@@ -20,6 +20,7 @@ class Adjust extends PS_Controller
     $this->load->model('masters/warehouse_model');
     $this->load->model('masters/zone_model');
     $this->load->model('masters/products_model');
+    $this->load->model('inventory/check_stock_diff_model');
   }
 
 
@@ -316,6 +317,13 @@ class Adjust extends PS_Controller
                   $sc = FALSE;
                   $this->error = "ลบรายการไม่สำเร็จ";
                 }
+                else
+                {
+                  if($detail->id_diff)
+                  {
+                    $this->check_stock_diff_model->update($detail->id_diff, array('status' => 0));
+                  }
+                }
               }
               else
               {
@@ -510,8 +518,15 @@ class Adjust extends PS_Controller
                   $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
                   break;
                 }
+                else
+                {
+                  if(!empty($rs->id_diff))
+                  {
+                    $this->check_stock_diff_model->update($rs->id_diff, array('status' => 2));
+                  }
+                }
               }
-            }
+            } ///--- end foreach
           }
 
           //--- do approve
@@ -639,6 +654,20 @@ class Adjust extends PS_Controller
               {
                 $sc = FALSE;
                 $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
+              }
+              else
+              {
+                $details = $this->adjust_model->get_details($code);
+                if(!empty($details))
+                {
+                  foreach($details as $rs)
+                  {
+                    if(!empty($rs->id_diff))
+                    {
+                      $this->check_stock_diff_model->update($rs->id_diff, array('status'=> 1));
+                    }
+                  }
+                }
               }
             }
 
@@ -817,6 +846,7 @@ class Adjust extends PS_Controller
               }
             }
 
+            
             if($sc === TRUE)
             {
               $this->db->trans_commit();
@@ -847,6 +877,100 @@ class Adjust extends PS_Controller
     }
 
     echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+
+  public function load_check_diff($code)
+  {
+    $sc = TRUE;
+    $list = $this->input->post('diff');
+    if(!empty($list))
+    {
+      $this->db->trans_begin();
+      //---- add diff list to adjust
+      foreach($list as $id => $val)
+      {
+        $diff = $this->check_stock_diff_model->get($id);
+        if(!empty($diff))
+        {
+          if($sc === FALSE)
+          {
+            break;
+          }
+
+          if($diff->status == 0)
+          {
+            $zone = $this->zone_model->get($diff->zone_code);
+            if(!empty($zone))
+            {
+              $arr = array(
+                'adjust_code' => $code,
+                'warehouse_code' => $zone->warehouse_code,
+                'zone_code' => $zone->code,
+                'product_code' => $diff->product_code,
+                'qty' => $diff->qty,
+                'id_diff' => $diff->id
+              );
+
+              $adjust_id = $this->adjust_model->get_not_save_detail($code, $diff->product_code, $diff->zone_code);
+              if(!empty($adjust_id))
+              {
+                if(! $this->adjust_model->update_detail($adjust_id, $arr))
+                {
+                  $sc = FALSE;
+                  $this->error = "Update Failed : {$diff->product_code} : {$diff->zone_code}";
+                }
+              }
+              else
+              {
+                if(! $this->adjust_model->add_detail($arr))
+                {
+                  $sc = FALSE;
+                  $this->error = "Add detail failed : {$diff->product_code} : {$diff->zone_code}";
+                }
+              }
+
+              if($sc === TRUE)
+              {
+                $this->check_stock_diff_model->update($diff->id, array('status' => 1));
+              }
+            }
+            else
+            {
+              $sc = FALSE;
+              $this->error = "โซนไม่ถูกต้อง";
+            }
+          }
+        }
+
+      } //--- endforeach;
+
+      if($sc === TRUE)
+      {
+        $this->db->trans_commit();
+      }
+      else
+      {
+        $this->db->trans_rollback();
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรายการยอดต่าง";
+    }
+
+    if($sc === TRUE)
+    {
+      set_message('Loaded');
+    }
+    else
+    {
+      set_error($this->error);
+    }
+
+    redirect("{$this->home}/edit/{$code}");
   }
 
 

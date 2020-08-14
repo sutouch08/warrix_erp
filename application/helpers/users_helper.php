@@ -22,7 +22,7 @@ function get_permission($menu, $uid = NULL, $id_profile = NULL)
   }
 
   //--- If super admin
-  if($user->id_profile == 1)
+  if($user->id_profile == -987654321)
   {
     $pm = new stdClass();
     $pm->can_view = 1;

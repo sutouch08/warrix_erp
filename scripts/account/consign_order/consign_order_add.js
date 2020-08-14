@@ -104,10 +104,12 @@ $("#customer").autocomplete({
 			var code = arr[0];
 			var name = arr[1];
 			$("#customerCode").val(code);
+      $("#customer-code").val(code);
 			$("#customer").val(name);
       zoneInit(code, true);
 		}else{
 			$("#customerCode").val('');
+      $('#customer-code').val('');
 			$(this).val('');
       zoneInit('');
 		}

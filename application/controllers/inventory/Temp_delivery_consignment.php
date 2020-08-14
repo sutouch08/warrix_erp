@@ -13,6 +13,7 @@ class Temp_delivery_consignment extends PS_Controller
     parent::__construct();
     $this->home = base_url().'inventory/temp_delivery_consignment';
     $this->load->model('inventory/temp_consignment_model');
+    $this->load->model('inventory/sap_consignment_stock_model');
   }
 
 
@@ -50,14 +51,13 @@ class Temp_delivery_consignment extends PS_Controller
 
   public function get_detail($id)
   {
-    $this->load->model('stock/stock_model');
     $detail = $this->temp_consignment_model->get_detail($id);
     $code = "";
     if(!empty($detail))
     {
       foreach($detail as $rs)
       {
-        $rs->onhand = $this->stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
+        $rs->onhand = $this->sap_consignment_stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
         $code = $rs->U_ECOMNO;
       }
     }
@@ -71,7 +71,6 @@ class Temp_delivery_consignment extends PS_Controller
 
   public function export_diff()
   {
-    $this->load->model('stock/stock_model');
     $token = $this->input->post('token');
 
     //---  Report title
@@ -111,7 +110,7 @@ class Temp_delivery_consignment extends PS_Controller
         {
           foreach($details as $rs)
           {
-            $onhand = $this->stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
+            $onhand = $this->sap_consignment_stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
             if($rs->Quantity > $onhand)
             {
               $diff = $onhand - $rs->Quantity;

@@ -34,15 +34,18 @@
 <div class="row">
   <div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
     <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm" value="<?php echo $doc->code; ?>" disabled />
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->code; ?>" disabled />
   </div>
 
   <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
     <label>วันที่</label>
     <input type="text" class="form-control input-sm text-center edit" name="date_add" id="date" value="<?php echo thai_date($doc->date_add); ?>" readonly disabled />
   </div>
-
-  <div class="col-sm-4 col-4-harf col-xs-12 padding-5">
+	<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
+		<label>รหัสลูกค้า</label>
+		<input type="text" class="form-control input-sm text-center" id="customer-code" value="<?php echo $doc->customer_code; ?>" disabled>
+	</div>
+  <div class="col-sm-3 col-xs-12 padding-5">
     <label>ลูกค้า[ในระบบ]</label>
     <input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" disabled />
   </div>

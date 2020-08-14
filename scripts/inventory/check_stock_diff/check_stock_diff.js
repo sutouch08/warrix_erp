@@ -18,7 +18,7 @@ function clearFilter()
 
 
 function clearSearch(){
-  $('#product_code').val('');
+  $('.search').val('');
   getSearch();
 }
 
@@ -28,6 +28,11 @@ function goToCheck(){
   window.location.href = HOME + 'check';
 }
 
+
+function goToAdjust(){
+  var code = $('#adjust_code').val();
+  window.location.href = BASE_URL + 'inventory/adjust/edit/'+code;
+}
 
 
 $('.search').keyup(function(e){
@@ -164,4 +169,32 @@ function removeDiff(id){
       }
     }
   })
+}
+
+
+function toggleCheckAll(el){
+  if(el.is(":checked")){
+    $('.chk').prop("checked", true);
+	}else{
+    $('.chk').prop("checked", false);
+	}
+}
+
+
+function loadDiff(){
+  var adjust_code = $('#adjust_code').val();
+  if(adjust_code.length == 0){
+    swal('Error!','ไม่พบเลขที่เอกสารปรับยอด','error');
+    return false;
+  }
+
+  var len = $('.chk:checked').length;
+  if(len == 0){
+    swal('กรุณาเลือกรายการที่ต้องการโหลด');
+    return false;
+  }
+
+  load_in();
+
+  $('#diffForm').submit();
 }

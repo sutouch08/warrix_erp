@@ -48,7 +48,7 @@
 						<td class="middle"><?php echo $rs->name; ?></td>
 						<td class="middle text-center"><?php echo number($rs->member); ?></td>
 						<td class="text-right">
-							<?php if($this->pm->can_edit) : ?>
+							<?php if($this->pm->can_edit && $rs->id > 0) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit(<?php echo $rs->id; ?>)">
 									<i class="fa fa-lock"></i> กำหนดสิทธิ์
 								</button>

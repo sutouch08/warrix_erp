@@ -33,6 +33,13 @@ function send_to_sap(){
 
 
 
+function getDiffList(){
+  load_in();
+  $('#diffForm').submit();
+}
+
+
+
 function saveAdjust(){
   let code = $('#code').val();
   load_in();

@@ -8,6 +8,18 @@ class Check_stock_diff_model extends CI_Model
     parent::__construct();
   }
 
+  public function get($id)
+  {
+    $rs = $this->db->where('id', $id)->get('stock_diff');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+
 
   public function add(array $ds = array())
   {
@@ -60,7 +72,7 @@ class Check_stock_diff_model extends CI_Model
     {
       $this->db->group_start();
       $this->db->like('diff.product_code', $ds['product_code']);
-      $this->db->or_like('pd.product_name', $ds['product_code']);
+      $this->db->or_like('pd.name', $ds['product_code']);
       $this->db->group_end();
     }
 
@@ -122,7 +134,7 @@ class Check_stock_diff_model extends CI_Model
     {
       $this->db->group_start();
       $this->db->like('diff.product_code', $ds['product_code']);
-      $this->db->or_like('pd.product_name', $ds['product_code']);
+      $this->db->or_like('pd.name', $ds['product_code']);
       $this->db->group_end();
     }
 

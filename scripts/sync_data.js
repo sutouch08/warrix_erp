@@ -155,7 +155,7 @@ function syncAdjustGoodsReceiveCode(){
 
 
 //--- 11. sync ORDN (SM)
-function syncTransfer(){
+function syncReturnOrderCode(){
     $('body').append('start    updating SM .... <br/>');
   $.get(BASE_URL + 'sync_data/syncReturnOrderCode', function(rs){
     $('body').append('finished update SM : '+ rs + ' <br/>');

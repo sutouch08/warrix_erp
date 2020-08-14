@@ -34,7 +34,11 @@
     <input type="text" class="form-control input-sm text-center" name="date_add" id="date" value="<?php echo date('d-m-Y'); ?>" readonly required />
   </div>
 
-  <div class="col-sm-4 col-4-harf col-xs-12 padding-5">
+	<div class="col-sm-1 col-1-harf padding-5">
+		<label>รหัสลูกค้า</label>
+		<input type="text" class="form-control input-sm text-center" id="customer-code" disabled>
+	</div>
+  <div class="col-sm-3 col-xs-12 padding-5">
     <label>ลูกค้า[ในระบบ]</label>
     <input type="text" class="form-control input-sm" name="customer" id="customer" value="" required />
   </div>
@@ -62,8 +66,8 @@
 <input type="hidden" name="zone_code" id="zone_code" value="" />
 </form>
 
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js?v=<?php echo date('YmdH'); ?>"></script>
 
 
 <?php $this->load->view('include/footer'); ?>

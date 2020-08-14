@@ -111,6 +111,23 @@ class Sap_consignment_stock_model extends CI_Model
   }
 
 
+  public function get_stock_zone($zone_code, $pd_code)
+  {
+    $this->cn->select_sum('OIBQ.OnHandQty', 'qty')
+    ->from('OBIN')
+    ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
+    ->where('OIBQ.ItemCode', $pd_code)
+    ->where('OBIN.BinCode', $zone_code);
+    $rs = $this->cn->get();
+    if($rs->num_rows() == 1)
+    {
+      return intval($rs->row()->qty);
+    }
+
+    return 0;
+  }
+
+
 
 
 } //--- end class

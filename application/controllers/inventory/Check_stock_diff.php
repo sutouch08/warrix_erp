@@ -52,6 +52,37 @@ class Check_stock_diff extends PS_Controller
   }
 
 
+  //---- สำหรับโหลดยอดต่างเข้าเอกสาร ปรับยอด
+  public function diff_list($adjust_code)
+  {
+    $filter = array(
+      'product_code' => get_filter('product_code', 'check_product_code', ''),
+      'zone_code' => get_filter('zone_code', 'check_zone_code', ''),
+      'status' => 0
+    );
+
+		//--- แสดงผลกี่รายการต่อหน้า
+		$perpage = get_rows();
+		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
+		if($perpage > 300)
+		{
+			$perpage = 20;
+		}
+
+		$segment  = 4; //-- url segment
+		$rows     = $this->check_stock_diff_model->count_rows($filter);
+		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
+		$init	    = pagination_config($this->home.'/diff_list/', $rows, $perpage, $segment);
+		$ds   = $this->check_stock_diff_model->get_list($filter, $perpage, $this->uri->segment($segment));
+
+    $filter['data'] = $ds;
+    $filter['adjust_code'] = $adjust_code;
+
+		$this->pagination->initialize($init);
+    $this->load->view('inventory/check_stock_diff/diff_list_view', $filter);
+  }
+
+
 
 
   public function check($zone_code = NULL, $is_checked = NULL)

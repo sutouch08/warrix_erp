@@ -93,7 +93,8 @@ class User_model extends CI_Model
   public function get_users($uname = '', $dname = '', $profile = '', $perpage = 50, $offset = 0)
   {
     $offset = $offset === NULL ? 0 : $offset;
-    $qr = "SELECT u.id AS id, u.uname AS uname, u.name AS dname, p.name AS pname, u.date_add, u.active ";
+    $qr  = "SELECT u.id AS id, u.id_profile AS id_profile, u.uname AS uname, u.name AS dname, ";
+    $qr .= "p.name AS pname, u.date_add, u.active ";
     $qr .= "FROM user AS u ";
     $qr .= "LEFT JOIN profile AS p ON u.id_profile = p.id ";
     $qr .= "WHERE u.id != 0 ";

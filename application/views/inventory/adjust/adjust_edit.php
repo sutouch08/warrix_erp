@@ -9,6 +9,7 @@
       	<p class="pull-right top-p">
 			    <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
           <?php if(($this->pm->can_add OR $this->pm->can_edit) && $doc->status == 0) : ?>
+						<button type="button" class="btn btn-sm btn-primary" onclick="getDiffList()"><i class="fa fa-archive"></i> ยอดต่าง</button>
             <button type="button" class="btn btn-sm btn-success" onclick="saveAdjust()"><i class="fa fa-save"></i> บันทึก</button>
           <?php endif; ?>
         </p>
@@ -115,7 +116,7 @@
           <?php echo $rs->zone_name; ?>
         </td>
         <td class="middle text-center" id="qty-up-<?php echo $rs->id; ?>">
-          <?php echo $rs->qty > 0 ? $rs->qty : 0 ; ?>
+          <?php echo $rs->qty > 0 ? intval($rs->qty) : 0 ; ?>
         </td>
         <td class="middle text-center" id="qty-down-<?php echo $rs->id; ?>">
           <?php echo $rs->qty < 0 ? ($rs->qty * -1) : 0 ; ?>
@@ -139,6 +140,9 @@
   </div>
 </div>
 
+<form id="diffForm" method="post" action="<?php echo base_url(); ?>inventory/check_stock_diff/diff_list/<?php echo $doc->code; ?>">
+	<input type="hidden" name="adjust_code" value="<?php echo $doc->code; ?>">
+</form>
 
 <script id="detail-template" type="text/x-handlebars-template">
 <tr class="font-size-12 rox" id="row-{{id}}">

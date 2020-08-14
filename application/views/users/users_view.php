@@ -75,7 +75,7 @@
 
 						</td>
 						<td class="text-right">
-							<?php if($this->pm->can_edit) : ?>
+							<?php if(($this->pm->can_edit && $rs->id_profile > 0) OR (get_cookie('id_profile') == -987654321)) : ?>
 								<button type="button" class="btn btn-mini btn-success <?php echo $disActive; ?>"
 									title="Click to activeate this user"
 									id="btn-active-<?php echo $rs->id; ?>"
@@ -95,7 +95,7 @@
 									<i class="fa fa-pencil"></i>
 								</button>
 							<?php endif; ?>
-							<?php if($this->pm->can_delete) : ?>
+							<?php if(($this->pm->can_delete && $rs->id_profile > 0) OR (get_cookie('id_profile') == -987654321)) : ?>
 								<button type="button" class="btn btn-mini btn-danger" onclick="getDelete(<?php echo $rs->id; ?>, '<?php echo $rs->uname; ?>')">
 									<i class="fa fa-trash"></i>
 								</button>
