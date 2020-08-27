@@ -59,7 +59,7 @@ class Authentication extends CI_Controller
 
     if($sc === TRUE)
     {
-      redirect('welcome');
+      redirect('main');
     }
     else
     {

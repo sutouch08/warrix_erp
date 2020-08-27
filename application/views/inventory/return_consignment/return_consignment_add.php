@@ -32,18 +32,23 @@
 		</div>
 		<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
 			<label>เลขที่บิล[SAP]</label>
-			<input type="number" class="form-control input-sm text-center" name="invoice" id="invoice" value="" />
+			<input type="text" class="form-control input-sm text-center" name="invoice" id="invoice" value="" />
 		</div>
 		<div class="col-sm-1 col-1-harf col-xs-6 padding-5 last">
+			<label>มูลค่าบิล</label>
+			<input type="number" class="form-control input-sm text-center" name="bill_amount" id="bill_amount" value="0" />
+		</div>
+
+		<div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
 			<label>GP(%)</label>
 			<input type="number" class="form-control input-sm text-center" name="gp" id="gp" value="" />
 		</div>
 
-		<div class="col-sm-6 col-xs-12 padding-5 first">
+		<div class="col-sm-5 col-5-harf col-xs-12 padding-5">
 			<label>โซนฝากขาย</label>
 			<input type="text" class="form-control input-sm" name="fromZone" id="fromZone" />
 		</div>
-		<div class="col-sm-6 padding-5 last">
+		<div class="col-sm-5 padding-5 last">
 			<label>โซน[รับคืน]</label>
 			<input type="text" class="form-control input-sm" name="zone" id="zone" value="" />
 		</div>

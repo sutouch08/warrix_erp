@@ -53,7 +53,7 @@
     <label>โซน</label>
     <input type="text" class="form-control input-sm text-center" id="zone" value="" autofocus />
   </div>
-  <div class="col-sm-1 col-1-harf pddint-5">
+  <div class="col-sm-1 col-1-harf padding-5">
     <label class="display-block not-show">change</label>
     <button type="button" class="btn btn-xs btn-yellow btn-block hide" id="btn-change-zone" onclick="changeZone()">เปลี่ยนโซน</button>
     <button type="button" class="btn btn-xs btn-info btn-block" id="btn-set-zone" onclick="set_zone()">ตกลง</button>
@@ -62,6 +62,10 @@
     <label>รหัสสินค้า</label>
     <input type="text" class="form-control input-sm text-center" id="pd-code" value="" disabled />
   </div>
+	<div class="col-sm-1 padding-5">
+		<label>สต็อก</label>
+		<input type="number" class="form-control input-sm text-center" id="stock-qty" value="" disabled />
+	</div>
   <div class="col-sm-1 padding-5">
     <label>เพิ่ม</label>
     <input type="number" class="form-control input-sm text-center" id="qty-up" value="" disabled />
@@ -70,7 +74,7 @@
     <label>ลด</label>
     <input type="number" class="form-control input-sm text-center" id="qty-down" value="" disabled />
   </div>
-  <div class="col-sm-1 col-1-harf padding-5">
+  <div class="col-sm-1 col-1-harf padding-5 last">
     <label class="display-block not-show">OK</label>
     <button type="button" class="btn btn-xs btn-primary btn-block" id="btn-add" onclick="add_detail()" disabled>เพิ่มรายการ</button>
   </div>
@@ -170,6 +174,6 @@
 </script>
 
 
-<script src="<?php echo base_url(); ?>scripts/inventory/adjust/adjust.js"></script>
-<script src="<?php echo base_url(); ?>scripts/inventory/adjust/adjust_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/adjust/adjust.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/inventory/adjust/adjust_add.js?v=<?php echo date('YmdH'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

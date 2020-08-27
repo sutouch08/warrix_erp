@@ -131,8 +131,11 @@
             ?>
           </td>
 					<td class="text-right">
+						<?php if($rs->F_Sap === 'N') : ?>
 						<button type="button" class="btn btn-minier btn-info" onclick="get_detail(<?php echo $rs->DocEntry; ?>)">
 							<i class="fa fa-eye"></i>
+						</button>
+						<?php endif; ?>
 					</td>
         </tr>
 <?php  $no++; ?>

@@ -152,6 +152,13 @@
     </div>
   </div>
 
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">GP(%)</label>
+    <div class="col-xs-12 col-sm-3">
+			<input type="number" name="gp" id="gp" class="width-100" value="<?php echo round($ds->gp,2); ?>" />
+    </div>
+  </div>
+
 
 	<div class="divider-hidden">
 

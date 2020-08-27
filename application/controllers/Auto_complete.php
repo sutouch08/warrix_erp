@@ -689,6 +689,48 @@ public function get_prepare_item_code()
   }
 
 
+  public function getConsignmentZone($warehouse_code = NULL)
+  {
+    $this->db
+    ->select('zone.code, zone.name')
+    ->from('zone')
+    ->join('warehouse', 'zone.warehouse_code = warehouse.code', 'left')
+    ->where('warehouse.role', 2)
+    ->where('warehouse.is_consignment', 1)
+    ->limit(20);
+
+    if($_REQUEST['term'] != '*')
+    {
+      $this->db->group_start();
+      $this->db->like('zone.code', $_REQUEST['term']);
+      $this->db->or_like('zone.name', $_REQUEST['term']);
+      $this->db->group_end();
+    }
+
+    if(!empty($warehouse_code))
+    {
+      $this->db->where('zone.warehouse_code', $warehouse_code);
+    }
+
+    $rs = $this->db->get();
+
+    if($rs->num_rows() > 0)
+    {
+      $ds = array();
+      foreach($rs->result() as $rd)
+      {
+        $ds[] = $rd->code.' | '.$rd->name;
+      }
+
+      echo json_encode($ds);
+    }
+    else
+    {
+      echo json_encode(array('ไม่พบโซน'));
+    }
+
+  }
+
 
   public function get_consignment_zone($customer_code = NULL)
   {

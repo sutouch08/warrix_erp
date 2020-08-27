@@ -153,10 +153,20 @@ class Adjust extends PS_Controller
                 {
                   //---- ถ้ามีรายการอยู่แล้ว ทำการ update
                   $qty = $up_qty - $down_qty;
-                  if(! $this->adjust_model->update_detail_qty($detail->id, $qty))
+                  $stock = $this->stock_model->get_stock_zone($zone_code, $product_code);
+                  $new_qty = $stock + ($qty + $detail->qty);
+                  if($new_qty < 0)
                   {
                     $sc = FALSE;
-                    $this->error = "ปรับปรุงรายการไม่สำเร็จ";
+                    $this->error = "ยอดคงเหลือไม่เพียงพอ มีในรายการแล้ว : {$detail->qty}";
+                  }
+                  else
+                  {
+                    if(! $this->adjust_model->update_detail_qty($detail->id, $qty))
+                    {
+                      $sc = FALSE;
+                      $this->error = "ปรับปรุงรายการไม่สำเร็จ";
+                    }
                   }
                 }
                 else
@@ -226,7 +236,7 @@ class Adjust extends PS_Controller
           'pdName' => $rs->product_name,
           'zoneCode' => $rs->zone_code,
           'zoneName' => $rs->zone_name,
-          'up' => ($rs->qty > 0 ? $rs->qty : 0),
+          'up' => round(($rs->qty > 0 ? $rs->qty : 0)),
           'down' => ($rs->qty < 0 ? ($rs->qty * -1) : 0),
           'valid' => $rs->valid
         );
@@ -846,7 +856,7 @@ class Adjust extends PS_Controller
               }
             }
 
-            
+
             if($sc === TRUE)
             {
               $this->db->trans_commit();
@@ -974,6 +984,14 @@ class Adjust extends PS_Controller
   }
 
 
+
+  public function get_stock_zone()
+  {
+    $zone_code = $this->input->get('zone_code');
+    $product_code = $this->input->get('product_code');
+    $stock = $this->stock_model->get_stock_zone($zone_code, $product_code);
+    echo $stock;
+  }
 
 
   public function do_export($code)

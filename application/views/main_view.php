@@ -1,6 +1,12 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row" style="margin-top:30px;">
-  <div class="col-sm-4 col-sm-offset-4 padding-5">
+  <div class="col-sm-2 col-sm-offset-3 col-xs-12 padding-5">
+    <select class="form-control input-sm" id="warehouse" name="warehouse">
+      <option value="">ทั้งหมด</option>
+      <?php echo select_warehouse(); ?>
+    </select>
+  </div>
+  <div class="col-sm-4 padding-5">
     <input type="text" class="form-control input-sm text-center" id="search-text" placeholder="พิมพ์รหัสสินค้า 4 ตัวอักษรขึ้นไป" />
   </div>
 </div>
@@ -18,10 +24,9 @@
 
 <div class="row">
   <div class="col-sm-12" id="result">
-    
+
   </div>
 </div>
-
 
 <script id="order-template" type="text/x-handlebarsTemplate">
 <table class="table table-bordered">
@@ -110,6 +115,7 @@ var HOME = BASE_URL + 'main/';
 //---- ค้นหาว่าสินค้าติดอยู่ที่ออเดอร์ไหนบ้าง
 function findOrder(){
 	var searchText = $.trim($('#search-text').val());
+  var warehouse = $('#warehouse').val();
 	if(searchText.length > 3){
 		load_in();
 
@@ -118,7 +124,8 @@ function findOrder(){
 			type:'POST',
 			cache:'false',
 			data:{
-				'search_text' : searchText
+				'search_text' : searchText,
+        'warehouse_code' : warehouse
 			},
 			success:function(rs){
 				load_out();
@@ -135,7 +142,7 @@ function findOrder(){
 
 function getSearch(){
 	var searchText = $.trim($('#search-text').val());
-
+  var warehouse = $('#warehouse').val();
 	if(searchText.length > 3 ){
 		load_in();
 		$.ajax({
@@ -143,7 +150,8 @@ function getSearch(){
 			type:'POST',
 			cache:'false',
 			data:{
-				'search_text' : searchText
+				'search_text' : searchText,
+        'warehouse_code' : warehouse
 			},
 			success:function(rs){
 				load_out();

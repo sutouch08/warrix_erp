@@ -45,17 +45,18 @@ class Temp_goods_issue extends PS_Controller
     $this->load->view('inventory/temp_goods_issue/temp_list', $filter);
   }
 
-
-
-  public function get_detail($code)
+  
+  public function get_detail($docEntry)
   {
     $this->load->model('stock/stock_model');
-    $detail = $this->temp_goods_issue_model->get_detail($code);
+    $detail = $this->temp_goods_issue_model->get_detail($docEntry);
+    $code = "";
     if(!empty($detail))
     {
       foreach($detail as $rs)
       {
         $rs->onhand = $this->stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
+        $code = $rs->U_ECOMNO;
       }
     }
 

@@ -13,97 +13,91 @@ $('#invoice-box').keyup(function(e){
   }
 })
 
-function doReceive(){
+
+//---- ยิงบาร์โค้ดเพื่อรับสินค้า
+//---- 1. เช็คก่อนว่ามีรายการอยู่ในตารางหน้านี้หรือไม่ ถ้ามีเพิ่มจำนวน แล้วคำนวนยอดใหม่
+//---- 2. ถ้าไม่มีรายการอยู่ เช็คสินค้าก่อนว่ามีในระบบหรือไม่
+//---- 3. ถ้ามีในระบบ เพิ่มรายการเข้าตาราง
+function doReceive()
+{
   var barcode = $('#barcode').val();
-  var qty = parseFloat($('#qty').val());
-  $('#barcode').val('');
-  $('#qty').val(1);
-  $('#barcode').focus();
-  $.ajax({
-    url:HOME + 'get_item',
-    type:'POST',
-    cache:false,
-    data:{
-      'barcode' : barcode
-    },
-    success:function(rs){
-      if(isJson(rs)){
-        var pd = $.parseJSON(rs);
-        var code = pd.code;
-        if(code.length)
-        {
-          $('.invoice').each(function(){
-            if(qty > 0)
-            {
-              var inv = $.trim($(this).text());
+  var qty = parseInt($('#qty').val());
 
-              if($('#qty_'+ code + '_'+ inv).length)
-              {
-                let c_qty = parseFloat($('#qty_'+ code + '_'+ inv).val());
-                let limit = parseFloat($('#inv_qty_'+code+'_'+inv).val());
-                diff = limit - c_qty;
-                discount = parseFloat($('#discount_'+code+'_'+inv).val()) * 0.01;
-                console.log(discount);
-                if(diff > 0){
-                  u_qty = diff <= qty ? diff : qty;
-                  sum_qty = u_qty + c_qty;
-                  price = parseFloat($('#price_'+code+'_'+inv).val());
-                  discount = sum_qty * (price * discount);
-                  amount = (sum_qty * price) - discount;
-                  amount = amount.toFixed(2);
-                  $('#qty_'+code+'_'+inv).val(sum_qty);
-                  $('#amount_'+code+'_'+inv).text(addCommas(amount));
-                  qty -= u_qty;
-                }
-              }
-            }
-          }); //-- each function
+  if(!isNaN(qty) && barcode.length > 0)
+  {
+    $('#barcode').attr('disabled', 'disabled');
 
-          reIndex();
-          inputQtyInit();
-          //inputPriceInit();
-          recalTotal();
-
-          if(qty > 0){
-            swal({
-              title:'สินค้าเกิน',
-              text: code + ' เกินใบสั่งซื้อ ' + qty + 'ชิ้น',
-              type:'warning'
-            });
-          }
-        } //-- .code.length
-        else
-        {
-          var source = $('#row-template').html();
-          var data = {
-            'barcode' : pd.barcode,
-            'code' : pd.code,
-            'name' : pd.name,
-            'qty' : qty,
-            'price' : (parseFloat(pd.price)).toFixed(2),
-            'invoice' : $('#invoice_code').val(),
-            'amount' : addCommas((parseFloat(pd.price) * parseFloat(qty)).toFixed(2))
-          }
-          var output = $('#detail-table');
-
-          render_prepend(source, data, output);
-          reIndex();
-          inputQtyInit();
-          //inputPriceInit();
-          recalTotal();
-
-        }
-
-
-      }
-      else
-      {
-        swal('ไม่พบสินค้า');
-      }
+    //---- ถ้ามีรายการนี้อยู่ในตารางแล้ว
+    if($('#barcode_'+barcode).length)
+    {
+      var no = $('#barcode_'+barcode).val();
+      var c_qty = parseDefault(parseInt($('#qty_'+no).val()), 0);
+      var new_qty = c_qty + qty;
+      $('#qty_'+no).val(new_qty);
+      recalRow($('#qty_'+qty), no);
+      $('#barcode').val('');
+      $('#qty').val(1);
+      $('#barcode').removeAttr('disabled');
+      $('#barcode').focus();
     }
-  })
-}
+    else
+    {
+      //---- ถ้าไม่มีรายการอยู่
+      //---- เช็คสินค้า แล้วเพิ่มเข้ารายการ
+      load_in();
+      $.ajax({
+        url:HOME + 'get_item',
+        type:'POST',
+        cache:false,
+        data:{
+          'barcode' : barcode
+        },
+        success:function(rs){
+          load_out();
+          if(isJson(rs)){
+            var pd = $.parseJSON(rs);
+            var code = pd.code;
+            var gp = $('#gp').val();
+            if(code.length)
+            {
+              var invoice = $('#invoice_code').val();
+              var no = $('#no').val();
+              no++;
+              $('#no').val(no);
+              var data = {
+                'no' : no,
+                'barcode' : barcode,
+                'code' : pd.code,
+                'name' : pd.name,
+                'qty' : qty,
+                'price' : pd.price,
+                'invoice' : invoice,
+                'discount' : gp,
+                'amount' : addCommas((parseFloat(pd.price) * qty).toFixed(2))
+              };
 
+              var source = $('#row-template').html();
+              var output = $('#detail-table');
+              render_append(source, data, output);
+              reIndex();
+              recalTotal();
+
+              $('#barcode').val('');
+              $('#qty').val(1);
+              $('#barcode').removeAttr('disabled');
+              $('#barcode').focus();
+            }
+          }
+          else
+          {
+            swal('ไม่พบสินค้า');
+            $('#barcode').removeAttr('disabled');
+          }
+        }//-- success
+      }); //--- ajax
+    }
+  }
+}
 
 
 function getActiveCheckList(){
@@ -132,7 +126,14 @@ function getActiveCheckList(){
 function load_invoice(){
   var code = $('#return_code').val();
   var invoice = $('#invoice-box').val();
+  var customer_code = $('#customer_code').val();
+  var no = $('#no').val();
+
   if(invoice.length == 0){
+    return false;
+  }
+
+  if(customer_code.length == 0){
     return false;
   }
 
@@ -144,9 +145,14 @@ function load_invoice(){
   }
 
   $.ajax({
-    url:HOME + 'get_invoice/' + invoice,
+    url:HOME + 'get_invoice',
     type:'GET',
     cache:false,
+    data:{
+      'invoice' : invoice,
+      'customer_code' : customer_code,
+      'no' : no
+    },
     success:function(rs){
       load_out();
       if(isJson(rs))
@@ -154,10 +160,9 @@ function load_invoice(){
         var source = $('#row-template').html();
         var data = $.parseJSON(rs);
         var output = $('#detail-table');
+        $('#no').val(data.top);
         render_append(source, data, output);
         reIndex();
-        inputQtyInit();
-        //inputPriceInit();
         recalTotal();
         $('#invoice-box').val('');
       }

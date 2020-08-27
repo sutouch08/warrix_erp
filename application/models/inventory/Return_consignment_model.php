@@ -182,7 +182,7 @@ class Return_consignment_model extends CI_Model
 
 
 
-  public function get_invoice_details($invoice)
+  public function get_invoice_details($invoice, $customer_code)
   {
     $rs = $this->ms
     ->select('OINV.DocEntry, OINV.DocNum, OINV.NumAtCard')
@@ -191,9 +191,12 @@ class Return_consignment_model extends CI_Model
     ->select('INV1.Quantity AS qty')
     ->select('INV1.PriceBefDi AS price')
     ->select('INV1.DiscPrcnt AS discount')
+    ->select('INV1.VatGroup AS vat_code')
+    ->select('INV1.VatPrcnt AS vat_rate')
     ->from('INV1')
     ->join('OINV', 'INV1.DocEntry = OINV.DocEntry')
     ->where('OINV.DocNum', $invoice)
+    ->where('OINV.CardCode', $customer_code)
     ->get();
 
     if($rs->num_rows() > 0)
@@ -202,6 +205,23 @@ class Return_consignment_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function search_invoice_code($customer_code, $txt)
+  {
+    $rs = $this->ms
+    ->select('DocNum, DocTotal')
+    ->where('CardCode', $customer_code)
+    ->like('DocNum', $txt)
+    ->get('OINV');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
 

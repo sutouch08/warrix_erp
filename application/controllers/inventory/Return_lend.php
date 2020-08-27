@@ -90,6 +90,7 @@ class Return_lend extends PS_Controller
 
       $lend = $this->lend_model->get($lend_code);
       $zone = $this->zone_model->get($zone_code);
+      $from_warehouse = $this->zone_model->get_warehouse_code($lend->zone_code);
       $isManual = getConfig('MANUAL_DOC_CODE');
 
       if($this->input->post('code'))
@@ -108,7 +109,7 @@ class Return_lend extends PS_Controller
         'bookcode' => getConfig('BOOK_CODE_RETURN_LEND'),
         'lend_code' => $lend_code,
         'empID' => $empID,
-        'from_warehouse' => $lend->warehouse_code, //--- warehouse ต้นทาง ดึงจากเอกสารยืม
+        'from_warehouse' => $from_warehouse, //--- warehouse ต้นทาง ดึงจากเอกสารยืม
         'from_zone' => $lend->zone_code, //--- zone ต้นทาง ดึงจากเอกสารยืม
         'to_warehouse' => $zone->warehouse_code,
         'to_zone' => $zone->code,

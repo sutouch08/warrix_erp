@@ -160,11 +160,36 @@ class Cancle_model extends CI_Model
 
 
 
+  public function is_exists($order_code, $product_code, $zone_code)
+  {
+    $rs = $this->db
+    ->select('id')
+    ->where('order_code', $order_code)
+    ->where('product_code', $product_code)
+    ->where('zone_code', $zone_code)
+    ->get('cancle');
+
+    if($rs->num_rows() == 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
   public function add(array $ds = array())
   {
     if(!empty($ds))
     {
-      return $this->db->insert('cancle', $ds);
+      if($this->is_exists($ds['order_code'], $ds['product_code'], $ds['zone_code']))
+      {
+        return $this->update($ds['order_code'], $ds['product_code'], $ds['zone_code'], $ds['qty']);
+      }
+      else
+      {
+        return $this->db->insert('cancle', $ds);
+      }
     }
 
     return FALSE;
@@ -174,11 +199,12 @@ class Cancle_model extends CI_Model
 
   public function update($order_code, $product_code, $zone_code, $qty)
   {
-    $qr = "UPDATE cancle SET qty = (qty + {$qty}) ";
-    $qr .= "WHERE order_code = '{$order_code}' AND product_code = '{$product_code}' ";
-    $qr .= "AND zone_code = '{$zone_code}'";
-
-    return $this->db->query($qr);
+    return $this->db
+    ->set('qty', "qty + {$qty}", FALSE)
+    ->where('order_code', $order_code)
+    ->where('product_code', $product_code)
+    ->where('zone_code', $zone_code)
+    ->update('cancle');
   }
 
 

@@ -66,6 +66,7 @@
 
 <hr class="margin-top-15"/>
 <div class="row">
+	<!--
 	<div class="col-sm-1 padding-5 first">
     	<label>จำนวน</label>
         <input type="number" class="form-control input-sm text-center" id="qty" value="1" />
@@ -78,9 +79,8 @@
     	<label class="display-block not-show">ok</label>
         <button type="button" class="btn btn-xs btn-primary" onclick="doReceive()"><i class="fa fa-check"></i> ตกลง</button>
     </div>
-
-
-		<div class="col-sm-2 col-sm-offset-5 padding-5">
+	-->
+		<div class="col-sm-2 col-sm-offset-9 padding-5">
 			<label>เพิ่มบิล[SAP]</label>
 			<input type="text" class="form-control input-sm text-center" id="invoice-box" placeholder="ดึงใบกำกับเพิ่มเติม" />
 		</div>
@@ -114,7 +114,9 @@
 <?php if(!empty($details)) : ?>
 <?php  $no = 1; ?>
 <?php  foreach($details as $rs) : ?>
-				<tr id="row_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>">
+	<?php  $line_id = $rs->product_code.'_'.$rs->invoice_code; //.'_'.$rs->LineNum; ?>
+	<?php  $line_name = "[{$rs->product_code}]"; //"[{$rs->LineNum}]"; ?>
+				<tr id="row_<?php echo $line_id; ?>">
 					<td class="middle text-center no"><?php echo $no; ?></td>
 					<td class="middle <?php echo $rs->product_code; ?>"><?php echo $rs->barcode; ?></td>
 					<td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
@@ -124,36 +126,36 @@
 					<td class="middle text-right inv_qty">
 						<?php echo round($rs->sold_qty); ?>
 						<input type="hidden"
-						name="sold_qty[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="inv_qty_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
+						name="<?php echo $rs->invoice_code; ?>[sold_qty]<?php echo $line_name; ?>"
+						id="inv_qty_<?php echo $line_id; ?>"
 						value="<?php echo round($rs->sold_qty); ?>"/>
 					</td>
 					<td class="middle text-right">
-						<?php echo round(add_vat($rs->price), 2); ?>
+						<?php echo $rs->price; ?>
 						<input type="hidden" class="input-price"
-						name="price[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="price_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round(add_vat($rs->price), 2); ?>" />
+						name="<?php echo $rs->invoice_code; ?>[price]<?php echo $line_name; ?>"
+						id="price_<?php echo $line_id; ?>"
+						value="<?php echo $rs->price; ?>" />
 					</td>
 					<td class="middle text-right">
-						<?php echo round($rs->discount_percent, 2).' %'; ?>
-						<input type="hidden" name="discount[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="discount_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round($rs->discount_percent, 2); ?>" />
+						<?php echo $rs->discount_percent.' %'; ?>
+						<input type="hidden"
+						name="<?php echo $rs->invoice_code; ?>[discount]<?php echo $line_name; ?>"
+						id="discount_<?php echo $line_id; ?>"
+						value="<?php echo $rs->discount_percent; ?>" />
 					</td>
 					<td class="middle">
 						<input
 							type="number" class="form-control input-sm text-right input-qty"
-							name="qty[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-							id="qty_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-							value="<?php echo round($rs->qty,2); ?>" />
+							name="<?php echo $rs->invoice_code; ?>[qty]<?php echo $line_name; ?>"
+							id="qty_<?php echo $line_id; ?>"
+							value="<?php echo $rs->qty; ?>" />
 					</td>
-					<td class="middle text-right amount-label" id="amount_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>">
-						<?php echo number(($rs->price * $rs->qty),2); ?>
+					<td class="middle text-right amount-label" id="amount_<?php echo $line_id; ?>">
+						<?php echo number($rs->amount, 2); ?>
 					</td>
 					<td class="middle text-center">
-						<button type="button" class="btn btn-minier btn-danger"
-						onclick="removeRow('<?php echo $rs->product_code."_".$rs->invoice_code; ?>', <?php echo $rs->id; ?>)">
+						<button type="button" class="btn btn-minier btn-danger"	onclick="removeRow('<?php echo $line_id; ?>', <?php echo $rs->id; ?>)">
 							<i class="fa fa-trash"></i>
 						</button>
 					</td>
@@ -161,7 +163,7 @@
 <?php
 				$no++;
 				$total_qty += $rs->qty;
-				$total_amount += ($rs->qty * $rs->price);
+				$total_amount += $rs->amount;
 ?>
 <?php  endforeach; ?>
 <?php endif; ?>
@@ -189,18 +191,29 @@
 		<td class="middle text-center invoice {{invoice}}">{{invoice}}</td>
 		<td class="middle text-right inv_qty">
 		{{qty}}
-		<input type="hidden" name="sold_qty[{{code}}][{{invoice}}]" id="inv_qty_{{code}}_{{invoice}}" value="{{qty}}" />
+		<input type="hidden"
+		name="{{invoice}}[sold_qty][{{code}}]"
+		id="inv_qty_{{code}}_{{invoice}}"
+		value="{{qty}}" />
 		</td>
 		<td class="middle text-right">
 			{{price}}
-			<input type="hidden" class="input-price" name="price[{{code}}][{{invoice}}]" id="price_{{code}}_{{invoice}}" value="{{price}}" />
+			<input type="hidden" class="input-price"
+			name="{{invoice}}[price][{{code}}]"
+			id="price_{{code}}_{{invoice}}"
+			value="{{price}}" />
 		</td>
 		<td class="middle text-right">
 			{{discount}} %
-			<input type="hidden" name="discount[{{code}}][{{invoice}}]" id="discount_{{code}}_{{invoice}}" value="{{discount}}" />
+			<input type="hidden" name="{{invoice}}[discount][{{code}}]"
+			id="discount_{{code}}_{{invoice}}"
+			value="{{discount}}" />
 		</td>
 		<td class="middle">
-			<input type="number" class="form-control input-sm text-right input-qty" name="qty[{{code}}][{{invoice}}]" id="qty_{{code}}_{{invoice}}" value="0" />
+			<input type="number" class="form-control input-sm text-right input-qty"
+			name="{{invoice}}[qty][{{code}}]"
+			id="qty_{{code}}_{{invoice}}"
+			value="0" />
 		</td>
 		<td class="middle text-right amount-label" id="amount_{{code}}_{{invoice}}">{{amount}}</td>
 		<td class="middle text-center">

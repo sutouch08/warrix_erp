@@ -16,19 +16,19 @@
 				<?php endif; ?>
 				<button type="button" class="btn btn-sm btn-purple" onclick="getSummary()"><i class="fa fa-bolt"></i> สรุปข้อมูล</button>
 				<button type="button" class="btn btn-sm btn-default" onclick="printOrderSheet()"><i class="fa fa-print"></i> พิมพ์</button>
-				<?php if($this->pm->can_delete &&$order->state < 4 && $order->never_expire == 0) : ?>
+				<?php if($this->pm->can_delete &&$order->state < 4 && $order->never_expire == 0 && $order->is_expired == 0) : ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="setNotExpire(1)">ยกเว้นการหมดอายุ</button>
 				<?php endif; ?>
-				<?php if($this->pm->can_delete && $order->never_expire == 1) : ?>
+				<?php if($this->pm->can_delete && $order->never_expire == 1 && $order->is_expired == 0) : ?>
 					<button type="button" class="btn btn-sm btn-info" onclick="setNotExpire(0)">ไม่ยกเว้นการหมดอายุ</button>
 				<?php endif; ?>
 				<?php if($this->pm->can_delete && $order->is_expired == 1) : ?>
 								<button type="button" class="btn btn-sm btn-warning" onclick="unExpired()">ทำให้ไม่หมดอายุ</button>
 				<?php endif; ?>
-				<?php if($order->state < 4 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
+				<?php if($order->state < 4 && $order->is_expired == 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
 				<button type="button" class="btn btn-sm btn-yellow" onclick="editDetail()"><i class="fa fa-pencil"></i> แก้ไขรายการ</button>
 				<?php endif; ?>
-				<?php if($order->status == 0) : ?>
+				<?php if($order->status == 0 && $order->is_expired == 0) : ?>
 					<button type="button" class="btn btn-sm btn-success" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
 				<?php endif; ?>
       </p>

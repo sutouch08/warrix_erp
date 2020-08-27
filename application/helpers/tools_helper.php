@@ -151,9 +151,13 @@ function getConfig($code)
 
 
 
-function get_vat_amount($amount)
+function get_vat_amount($amount, $vat = NULL)
 {
-	$vat = getConfig('SALE_VAT_RATE');
+	if($vat === NULL)
+	{
+		$vat = getConfig('SALE_VAT_RATE');
+	}
+
 	if($vat != 0)
 	{
 		$re_vat = ($amount * $vat) / (100+$vat);
@@ -165,9 +169,13 @@ function get_vat_amount($amount)
 
 
 
-function remove_vat($amount)
+function remove_vat($amount, $vat = NULL)
 {
-	$vat = getConfig('SALE_VAT_RATE'); //-- 7
+	if($vat === NULL)
+	{
+		$vat = getConfig('SALE_VAT_RATE'); //-- 7
+	}
+
 	if( $vat != 0 )
 	{
 		$re_vat	= ($vat + 100) / 100;
@@ -215,9 +223,13 @@ function get_discount_amount($price, $disc = 0)
 
 
 
-function add_vat($amount)
+function add_vat($amount, $vat = NULL)
 {
-	$vat = getConfig('SALE_VAT_RATE');
+	if($vat === NULL)
+	{
+		$vat = getConfig('SALE_VAT_RATE'); //-- 7
+	}
+	
 	if( $vat != 0 )
 	{
 		$re_vat = $vat * 0.01;

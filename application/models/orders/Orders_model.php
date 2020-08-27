@@ -279,17 +279,12 @@ class Orders_model extends CI_Model
 
   public function un_expired($code)
   {
-    $this->db->trans_start();
-    $this->db->set('is_expired', 0)->where('order_code', $code)->update('order_details');
-    $this->db->set('is_expired', 0)->where('code', $code)->update('orders');
-    $this->db->trans_complete();
+    $qr = "UPDATE orders, order_details ";
+    $qr .= "SET orders.is_expired = 0, order_details.is_expired = 0 ";
+    $qr .= "WHERE orders.code = '{$code}' ";
+    $qr .= "AND order_details.order_code = orders.code";
 
-    if($this->db->trans_status() === FALSE)
-    {
-      return FALSE;
-    }
-
-    return TRUE;
+    return $this->db->query($qr);
   }
 
 
@@ -1109,6 +1104,41 @@ class Orders_model extends CI_Model
   public function set_exported($code, $status, $error)
   {
     return $this->db->set('is_exported', $status)->set('export_error', $error)->where('code', $code)->update('orders');
+  }
+
+
+  public function get_expire_list($date)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('date_add <', $date)
+    ->where('role', 'S')
+    ->where_in('state', array(1,2,3))
+    ->where('is_paid', 0)
+    ->where('never_expire', 0)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+  public function set_expire_order($code)
+  {
+    if(!empty($code))
+    {
+      $qr = "UPDATE orders, order_details ";
+      $qr .= "SET orders.is_expired = 1, order_details.is_expired = 1 ";
+      $qr .= "WHERE orders.code = '{$code}' ";
+      $qr .= "AND order_details.order_code = orders.code";
+
+      return $this->db->query($qr);
+    }
+
+    return FALSE;
   }
 } //--- End class
 

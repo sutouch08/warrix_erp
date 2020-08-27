@@ -1223,7 +1223,7 @@ class Consignment_order extends PS_Controller
       if(!empty($item))
       {
         $gp  = $this->consignment_order_model->get_item_gp($item->code, $zone_code);
-        $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($zone_code, $item->code) : 0;
+        $stock = $item->count_stock == 1 ? $this->stock_model->get_consign_stock_zone($zone_code, $item->code) : 0;
 
         $arr = array(
           'pdCode' => $item->code,
@@ -1263,7 +1263,7 @@ class Consignment_order extends PS_Controller
       if(!empty($item))
       {
         $gp  = $this->consignment_order_model->get_item_gp($item->code, $zone_code);
-        $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($zone_code, $item->code) : 0;
+        $stock = $item->count_stock == 1 ? $this->stock_model->get_consign_stock_zone($zone_code, $item->code) : 0;
 
         $arr = array(
           'pdCode' => $item->code,

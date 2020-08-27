@@ -19,7 +19,7 @@ function get_state_name($state)
 
 function state_color($state, $is_saved = 1, $is_expired = 0)
 {
-  if($is_saved == 0)
+  if($is_saved == 0 && $is_expired == 0)
   {
     return '';
   }

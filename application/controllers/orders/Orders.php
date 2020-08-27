@@ -730,16 +730,25 @@ class Orders extends PS_Controller
       //--- ถ้าได้ style เดียว จะเป็น object ไม่ใช่ array
       if(! is_array($style))
       {
-        $warehouse = get_null($this->input->get('warehouse_code'));
-        $zone = get_null($this->input->get('zone_code'));
-      	$sc = 'not exists';
-        $view = $this->input->get('isView') == '0' ? FALSE : TRUE;
-      	$sc = $this->getOrderGrid($style->code, $view, $warehouse, $zone);
-      	$tableWidth	= $this->products_model->countAttribute($style->code) == 1 ? 600 : $this->getOrderTableWidth($style->code);
-      	$sc .= ' | ' . $tableWidth;
-      	$sc .= ' | ' . $style->code;
-      	$sc .= ' | ' . $style->old_code;
-      	echo $sc;
+        if($style->active)
+        {
+          $warehouse = get_null($this->input->get('warehouse_code'));
+          $zone = get_null($this->input->get('zone_code'));
+        	$sc = 'not exists';
+          $view = $this->input->get('isView') == '0' ? FALSE : TRUE;
+        	$sc = $this->getOrderGrid($style->code, $view, $warehouse, $zone);
+        	$tableWidth	= $this->products_model->countAttribute($style->code) == 1 ? 600 : $this->getOrderTableWidth($style->code);
+        	$sc .= ' | ' . $tableWidth;
+        	$sc .= ' | ' . $style->code;
+        	$sc .= ' | ' . $style->old_code;
+        	echo $sc;
+        }
+        else
+        {
+          $this->error = "สินค้า Inactive";
+          echo $this->error;
+        }
+
       }
       else
       {
@@ -805,17 +814,25 @@ class Orders extends PS_Controller
     $style = $this->product_style_model->get($style_code);
     if(!empty($style))
     {
-      $isVisual = $style->count_stock == 1 ? FALSE : TRUE;
-  		$attrs = $this->getAttribute($style->code);
+      if($style->active)
+      {
+        $isVisual = $style->count_stock == 1 ? FALSE : TRUE;
+    		$attrs = $this->getAttribute($style->code);
 
-  		if( count($attrs) == 1  )
-  		{
-  			$sc .= $this->orderGridOneAttribute($style, $attrs[0], $isVisual, $view, $warehouse, $zone);
-  		}
-  		else if( count( $attrs ) == 2 )
-  		{
-  			$sc .= $this->orderGridTwoAttribute($style, $isVisual, $view, $warehouse, $zone);
-  		}
+    		if( count($attrs) == 1  )
+    		{
+    			$sc .= $this->orderGridOneAttribute($style, $attrs[0], $isVisual, $view, $warehouse, $zone);
+    		}
+    		else if( count( $attrs ) == 2 )
+    		{
+    			$sc .= $this->orderGridTwoAttribute($style, $isVisual, $view, $warehouse, $zone);
+    		}
+      }
+      else
+      {
+        $sc = 'Disactive';
+      }
+
     }
     else
     {
@@ -1575,7 +1592,7 @@ class Orders extends PS_Controller
 
   public function un_expired()
   {
-    $code = $this->input->post('order_code');
+    $code = $this->input->get('order_code');
     $rs = $this->orders_model->un_expired($code);
     echo $rs === TRUE ? 'success' : 'ทำรายการไม่สำเร็จ';
   }

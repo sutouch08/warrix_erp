@@ -309,7 +309,7 @@ class Adjust_model extends CI_Model
     {
       $this->db
       ->from('adjust')
-      ->join('user', 'adjust.user = user.uname');
+      ->join('user', 'adjust.user = user.uname','left');
 
       if(!empty($ds['code']))
       {
@@ -374,7 +374,7 @@ class Adjust_model extends CI_Model
       ->select('adjust.*')
       ->select('user.name AS user_name')
       ->from('adjust')
-      ->join('user', 'adjust.user = user.uname');
+      ->join('user', 'adjust.user = user.uname', 'left');
 
       if(!empty($ds['code']))
       {

@@ -69,6 +69,7 @@
           <th class="width-15">เข้า SAP</th>
           <th class="width-5 text-center">สถานะ</th>
 					<th class="width-40">หมายเหตุ</th>
+					<th></th>
 
         </tr>
       </thead>
@@ -116,6 +117,13 @@
             }
             ?>
           </td>
+					<td class="text-right">
+						<?php if($rs->F_Sap === 'N') : ?>
+						<button type="button" class="btn btn-minier btn-info" onclick="get_detail(<?php echo $rs->DocEntry; ?>)">
+							<i class="fa fa-eye"></i>
+						</button>
+						<?php endif; ?>
+					</td>
 
         </tr>
 <?php  $no++; ?>

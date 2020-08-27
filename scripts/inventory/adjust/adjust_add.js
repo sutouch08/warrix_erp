@@ -256,14 +256,37 @@ $('#pd-code').autocomplete({
 $('#pd-code').keyup(function(e){
   if(e.keyCode === 13){
     let code = $(this).val();
+    let zone = $('#zone_code').val();
     if(code.length === 0 || code === 'not found'){
       $(this).val('');
       return false;
     }
 
+    if(zone.length === 0){
+      return false;
+    }
+
+    $.ajax({
+      url:HOME + '/get_stock_zone',
+      type:'GET',
+      cache:false,
+      data:{
+        'zone_code' : zone,
+        'product_code' : code
+      },
+      success:function(rs){
+        var stock = parseInt(rs);
+        if(isNaN(stock)){
+          swal(rs);
+        }else{
+          $('#stock-qty').val(stock);
+        }
+      }
+    })
+
     $('#qty-up').focus();
   }
-})
+});
 
 
 $('#qty-up').keyup(function(e){
@@ -290,11 +313,17 @@ $('#qty-up').keyup(function(e){
 $('#qty-down').keyup(function(e){
   let down_qty = parseFloat($(this).val());
   let up_qty = parseFloat($('#qty-up').val());
+  let stock_qty = parseDefault(parseFloat($('#stock-qty').val()), 0);
+
 
   if(isNaN(down_qty) || down_qty < 0){
     $(this).val(0);
   }else{
     $(this).val(down_qty);
+  }
+
+  if(down_qty > stock_qty){
+    $(this).val(stock_qty);
   }
 
   if(down_qty > 0 && up_qty != 0){
@@ -305,6 +334,7 @@ $('#qty-down').keyup(function(e){
     add_detail();
   }
 })
+
 
 
 function add_detail(){

@@ -103,6 +103,26 @@ class Receive_po_model extends CI_Model
   }
 
 
+
+  public function get_po_data($po_code)
+  {
+    $rs = $this->ms
+    ->select('POR1.Currency, POR1.VatGroup, POR1.VatPrcnt')
+    ->from('POR1')
+    ->join('OPOR', 'POR1.DocEntry = OPOR.DocEntry', 'left')
+    ->where('OPOR.DocNum', $po_code)
+    ->limit(1)
+    ->get();
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+
   public function get_sap_receive_doc($code)
   {
     $rs = $this->ms

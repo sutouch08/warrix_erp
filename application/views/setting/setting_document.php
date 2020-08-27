@@ -80,10 +80,16 @@
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_SUPPORT" required value="<?php echo $RUN_DIGIT_SUPPORT; ?>" /></div>
       <div class="divider-hidden"></div>
 
-      <div class="col-sm-3"><span class="form-control left-label">คืนสินค้าจากการขาย</span></div>
+      <div class="col-sm-3"><span class="form-control left-label">ลดหนี้ขาย</span></div>
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_RETURN_ORDER" required value="<?php echo $PREFIX_RETURN_ORDER; ?>" /></div>
       <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_RETURN_ORDER" required value="<?php echo $RUN_DIGIT_RETURN_ORDER; ?>" /></div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3"><span class="form-control left-label">ลดหนี้ฝากขายเทียม</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_RETURN_CONSIGNMENT" required value="<?php echo $PREFIX_RETURN_CONSIGNMENT; ?>" /></div>
+      <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_RETURN_CONSIGNMENT" required value="<?php echo $RUN_DIGIT_RETURN_CONSIGNMENT; ?>" /></div>
       <div class="divider-hidden"></div>
 
       <div class="col-sm-3"><span class="form-control left-label">คืนสินค้าจากการยืม</span></div>
@@ -115,6 +121,13 @@
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_ADJUST" required value="<?php echo $PREFIX_ADJUST; ?>" /></div>
       <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_ADJUST" required value="<?php echo $RUN_DIGIT_ADJUST; ?>" /></div>
+      <div class="divider-hidden"></div>
+
+
+			<div class="col-sm-3"><span class="form-control left-label">ปรับยอดสต็อก(ฝากขายเทียม)</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_ADJUST_CONSIGNMENT" required value="<?php echo $PREFIX_ADJUST_CONSIGNMENT; ?>" /></div>
+      <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_ADJUST_CONSIGNMENT" required value="<?php echo $RUN_DIGIT_ADJUST_CONSIGNMENT; ?>" /></div>
       <div class="divider-hidden"></div>
 
 

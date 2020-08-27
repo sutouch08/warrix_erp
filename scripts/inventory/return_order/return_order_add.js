@@ -1,3 +1,25 @@
+function toggleCheckAll(el) {
+	if (el.is(":checked")) {
+		$('.chk').prop("checked", true);
+	} else {
+		$('.chk').prop("checked", false);
+	}
+}
+
+
+function deleteChecked(){
+	var count = $('.chk:checked').length;
+	if(count > 0){
+		$('.chk:checked').each(function(){
+			var id = $(this).data('id');
+			var no = $(this).val();
+			removeRow(no, id);
+		})
+	}
+}
+
+
+
 function unsave(){
 	var code = $('#return_code').val();
 	$.ajax({
@@ -231,7 +253,6 @@ function addNew()
   var date_add = $('#dateAdd').val();
 	var invoice = $('#invoice').val();
 	var customer_code = $('#customer_code').val();
-	//var warehouse_code = $('#warehouse_code').val();
 	var zone_code = $('#zone_code').val();
 
   if(!isDate(date_add)){
@@ -313,28 +334,20 @@ $('#zone').autocomplete({
 })
 
 
-function inputQtyInit(){
-	$('.input-qty').keyup(function(index) {
-		var arr = $(this).attr('id').split('_');
-		var code = arr[1];
-		var inv = arr[2];
-		var price = parseFloat($('#price_'+code+'_'+inv).val());
-		var qty = parseFloat($(this).val());
-		var discount = parseFloat($('#discount_'+code+'_'+inv).val()) * 0.01;
-		price = isNaN(price) ? 0 : price;
-		qty = isNaN(qty) ? 0 : qty;
-		discount = qty * (price * discount);
-		var amount = (qty * price) - discount;
-		amount = amount.toFixed(2);
-		$('#amount_'+code+'_'+inv).text(addCommas(amount));
-		recalTotal();
-	});
+function recalRow(el, no) {
+	var price = parseFloat($('#price_' + no).val());
+	var qty = parseFloat(el.val());
+	var discount = parseFloat($('#discount_' + no).val()) * 0.01;
+	price = isNaN(price) ? 0 : price;
+	qty = isNaN(qty) ? 0 : qty;
+	discount = qty * (price * discount);
+	var amount = (qty * price) - discount;
+	amount = amount.toFixed(2);
+	$('#amount_' + no).text(addCommas(amount));
+	recalTotal();
 }
 
 
-$(document).ready(function(){
-	inputQtyInit();
-});
 
 function recalTotal(){
 	var totalAmount = 0;
@@ -360,15 +373,15 @@ function recalTotal(){
 
 
 
-function removeRow(rowCode, id){
-	if(id != ''){
+function removeRow(no, id){
+	if(id != '' && id != '0' && id != 0){
 		$.ajax({
 			url:HOME + 'delete_detail/'+id,
 			type:'GET',
 			cache:false,
 			success:function(rs){
 				if(rs == 'success'){
-					$('#row_' + rowCode).remove();
+					$('#row_' + no).remove();
 					reIndex();
 					recalTotal();
 				}
@@ -382,7 +395,7 @@ function removeRow(rowCode, id){
 	}
 	else
 	{
-		$('#row_'+rowCode).remove();
+		$('#row_'+no).remove();
 		reIndex();
 		recalTotal();
 	}

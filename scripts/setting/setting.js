@@ -72,6 +72,24 @@ function toggleManualCode(option)
 
 
 
+function toggleNotiBars(option)
+{
+	$('#noti-bar').val(option);
+	if(option == 1){
+		$('#btn-noti-yes').addClass('btn-success');
+		$('#btn-noti-no').removeClass('btn-danger');
+		return;
+	}
+	if(option == 0){
+		$('#btn-noti-yes').removeClass('btn-success');
+		$('#btn-noti-no').addClass('btn-danger');
+		return;
+	}
+}
+
+
+
+
 //--- เปิด/ปิด การ sync ข้อมูลระหว่างเว็บไซต์กับระบบหลัก
 function toggleWebApi(option){
 	$('#web-api').val(option);

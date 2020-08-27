@@ -68,7 +68,8 @@ class Return_order extends PS_Controller
   public function add_details($code)
   {
     $sc = TRUE;
-
+    // print_r($this->input->post());
+    // exit();
     if($this->input->post())
     {
       $this->load->model('inventory/movement_model');
@@ -78,69 +79,65 @@ class Return_order extends PS_Controller
       $doc = $this->return_order_model->get($code);
       if(!empty($doc))
       {
-        $data = $this->input->post();
+        $qtys = $this->input->post('qty');
+        $item = $this->input->post('item');
+        $sold_qtys = $this->input->post('sold_qty');
+        $prices = $this->input->post('price');
+        $discounts = $this->input->post('discount');
+
         $vat = getConfig('SALE_VAT_RATE'); //--- 0.07
         //--- drop old detail
         $this->return_order_model->drop_details($code);
 
-        foreach($data as $invoice => $rows)
+        if(count($qtys) > 0)
         {
-          $qtys = $rows['qty'];
-          if(!empty($rows['qty']))
+          foreach($qtys as $row => $qty)
           {
-            foreach($rows['qty'] as $item => $qty)
+            if($qty > 0)
             {
-              if($qty > 0)
+              $price = round($prices[$row], 2);
+              $discount = $discounts[$row];
+              $disc_amount = $discount == 0 ? 0 : $qty * ($price * ($discount * 0.01));
+              $amount = ($qty * $price) - $disc_amount;
+              $arr = array(
+                'return_code' => $code,
+                'invoice_code' => $doc->invoice,
+                'product_code' => $item[$row],
+                'product_name' => $this->products_model->get_name($item[$row]),
+                'sold_qty' => $sold_qtys[$row],
+                'qty' => $qty,
+                'price' => $price,
+                'discount_percent' => $discount,
+                'amount' => $amount,
+                'vat_amount' => get_vat_amount($amount)
+              );
+
+              if($this->return_order_model->add_detail($arr) === FALSE)
               {
-                $price = round($rows['price'][$item], 2);
-                $discount = $rows['discount'][$item];
-
-                $disc_amount = $qty * ($price * ($discount * 0.01));
-                $amount = ($qty * $price) - $disc_amount;
-
-                $arr = array(
-                  'return_code' => $code,
-                  'invoice_code' => $invoice,
-                  'product_code' => $item,
-                  'product_name' => $this->products_model->get_name($item),
-                  'sold_qty' => $rows['sold_qty'][$item],
-                  'qty' => $qty,
-                  'price' => $price,
-                  'discount_percent' => $discount,
-                  'amount' => $amount,
-                  'vat_amount' => get_vat_amount($amount)
+                $sc = FALSE;
+                $this->error = 'บันทึกรายการไม่สำเร็จ';
+                break;
+              }
+              else
+              {
+                $ds = array(
+                  'reference' => $code,
+                  'warehouse_code' => $doc->warehouse_code,
+                  'zone_code' => $doc->zone_code,
+                  'product_code' => $item[$row],
+                  'move_in' => $qty,
+                  'date_add' => $doc->date_add
                 );
 
-
-                if($this->return_order_model->add_detail($arr) === FALSE)
+                if($this->movement_model->add($ds) === FALSE)
                 {
                   $sc = FALSE;
-                  $this->error = 'บันทึกรายการไม่สำเร็จ';
-                  break;
+                  $message = 'บันทึก movement ไม่สำเร็จ';
                 }
-                else
-                {
-                  $ds = array(
-                    'reference' => $code,
-                    'warehouse_code' => $doc->warehouse_code,
-                    'zone_code' => $doc->zone_code,
-                    'product_code' => $item,
-                    'move_in' => $qty,
-                    'date_add' => $doc->date_add
-                  );
-
-                  if($this->movement_model->add($ds) === FALSE)
-                  {
-                    $sc = FALSE;
-                    $message = 'บันทึก movement ไม่สำเร็จ';
-                  }
-                }
-
-              } //--- end if $qty > 0
-            } //---- end foreach
-          } //--- end if !empty($rows['qty'])
-
-        } //--- endforeach
+              }
+            } //--- end if qty > 0
+          } //--- end foreach
+        }//-- end if count($qtys)
 
         $this->return_order_model->set_status($code, 1);
 

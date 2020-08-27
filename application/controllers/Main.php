@@ -15,6 +15,7 @@ class Main extends PS_Controller
 		$this->pm = new stdClass();
 		$this->pm->can_view = 1;
     $this->load->model('main_model');
+		$this->load->helper('warehouse');
 	}
 
 
@@ -28,12 +29,13 @@ class Main extends PS_Controller
   {
     $sc = array();
     $txt = $this->input->post('search_text');
+		$warehouse = get_null($this->input->post('warehouse_code'));
 
     if(!empty($txt))
     {
 
       $limit = 100; //--- limit result
-      $list = $this->main_model->get_search_order($txt, $limit);
+      $list = $this->main_model->get_search_order($txt, $warehouse, $limit);
 
       if(!empty($list))
       {
@@ -68,6 +70,7 @@ class Main extends PS_Controller
   {
     $sc = array();
     $txt = trim($this->input->post('search_text'));
+		$warehouse = get_null($this->input->post('warehouse_code'));
     if(!empty($txt))
     {
       $list = $this->main_model->search_items_list($txt);
@@ -88,28 +91,11 @@ class Main extends PS_Controller
           //---	stock in zone
     			$stockLabel = '';
 
-    			//--- stock in buffer
-          //$bfQty = $this->buffer_model->get_sum_stock($rs->code);
-
-    			//--- stock in cancle zone
-    		//	$cnQty = $this->cancle_model->get_sum_stock($rs->code);
-
-    			//--- stock in moving zone
-    		//	$mvQty = $this->move_model->get_sum_temp_stock($rs->code);
-
-    			//--- stock in warehouse transfering
-    		//	$trQty = $this->transfer_model->get_sum_temp_stock($rs->code);
-
-    			//$stockLabel .= empty($bfQty) ? '' : 'Buffer = '.number($bfQty).'<br/>';
-    			//$stockLabel .= empty($cnQty) ? '' : 'Cancle = '.number($cnQty).'<br/>';
-    			//$stockLabel .= empty($mvQty) ? '' : 'Moving = '.number($mvQty).'<br/>';
-    			//$stockLabel .= empty($trQty) ? '' : 'Transfering = '.number($trQty).'<br/>';
-
     			//--- จำนวนคงเหลือทั้งหมด
     			$qty = 0; //$bfQty + $cnQty + $mvQty + $trQty;
 
     			//---- get data from database
-    			$stock_in_zone = $this->stock_model->get_stock_in_zone($rs->code);
+    			$stock_in_zone = $this->stock_model->get_stock_in_zone($rs->code, $warehouse);
 
     			if(!empty($stock_in_zone))
     			{
@@ -143,8 +129,5 @@ class Main extends PS_Controller
 
     echo json_encode($sc);
   }
-
-
-
-
+	
 } //--- end class

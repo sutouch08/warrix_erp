@@ -9,6 +9,7 @@ class PS_Controller extends CI_Controller
   public $mc;
   public $cn;
   public $close_system;
+  public $notibars;
   public $WC;
   public $WT;
   public $WS;
@@ -33,6 +34,8 @@ class PS_Controller extends CI_Controller
       redirect('setting/maintenance');
     }
 
+    $this->notibars = getConfig('NOTI_BAR');
+
     //--- get permission for user
     $this->pm = get_permission($this->menu_code, get_cookie('uid'), get_cookie('id_profile'));
 
@@ -43,14 +46,18 @@ class PS_Controller extends CI_Controller
 
     $uid = get_cookie('uid');
 
-		$this->WC = get_permission('SOCCSO', $uid);
-		$this->WT = get_permission('SOCCTR', $uid);
-		$this->WS = get_permission('SOODSP', $uid);
-		$this->WU = get_permission('ICSUPP', $uid);
-		$this->WQ = get_permission('ICTRFM', $uid);
-    $this->WV = get_permission('ICTRFS', $uid);
-    $this->RR = get_permission('ICRQRC', $uid);
-    $this->WL = get_permission('ICLEND', $uid);
+    if($this->notibars == 1)
+    {
+      $this->WC = get_permission('SOCCSO', $uid);
+  		$this->WT = get_permission('SOCCTR', $uid);
+  		$this->WS = get_permission('SOODSP', $uid);
+  		$this->WU = get_permission('ICSUPP', $uid);
+  		$this->WQ = get_permission('ICTRFM', $uid);
+      $this->WV = get_permission('ICTRFS', $uid);
+      $this->RR = get_permission('ICRQRC', $uid);
+      $this->WL = get_permission('ICLEND', $uid);
+    }
+
   }
 }
 

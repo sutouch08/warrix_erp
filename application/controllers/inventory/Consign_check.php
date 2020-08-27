@@ -16,6 +16,7 @@ class Consign_check extends PS_Controller
     $this->load->model('inventory/consign_check_model');
     $this->load->model('masters/products_model');
     $this->load->model('masters/zone_model');
+    $this->load->model('masters/warehouse_model');
     $this->load->model('stock/stock_model');
   }
 
@@ -511,8 +512,7 @@ class Consign_check extends PS_Controller
   public function reload_stock($code)
   {
     $sc = TRUE;
-    $this->load->model('masters/warehouse_model');
-
+    
     $doc = $this->consign_check_model->get($code);
     if( ! empty($doc))
     {

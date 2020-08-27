@@ -93,10 +93,17 @@
       </div>
       <div class="divider-hidden"></div>
 
-      <div class="col-sm-3"><span class="form-control left-label">คืนสินค้า(ลดหนี้ขาย)</span></div>
+      <div class="col-sm-3"><span class="form-control left-label">ลดหนี้ขาย</span></div>
       <div class="col-sm-8">
         <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_RETURN_ORDER" value="<?php echo $BOOK_CODE_RETURN_ORDER; ?>" />
         <span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบลดหนี้"</span>
+      </div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3"><span class="form-control left-label">ลดหนี้ฝากขายเทียม</span></div>
+      <div class="col-sm-8">
+        <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_RETURN_CONSIGNMENT" value="<?php echo $BOOK_CODE_RETURN_CONSIGNMENT; ?>" />
+        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบลดหนี้ฝากขายเทียม"</span>
       </div>
       <div class="divider-hidden"></div>
 
@@ -111,6 +118,13 @@
 			<div class="col-sm-3"><span class="form-control left-label">ปรับยอดสต็อก</span></div>
       <div class="col-sm-8">
         <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_ADJUST" value="<?php echo $BOOK_CODE_ADJUST; ?>" />
+        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ปรับยอดสต็อก"</span>
+      </div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3"><span class="form-control left-label">ปรับยอดสต็อก(ฝากขายเทียม)</span></div>
+      <div class="col-sm-8">
+        <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_ADJUST_CONSIGNMENT" value="<?php echo $BOOK_CODE_ADJUST_CONSIGNMENT; ?>" />
         <span class="help-block">กำหนดรหัสเล่มเอกสาร "ปรับยอดสต็อก"</span>
       </div>
       <div class="divider-hidden"></div>

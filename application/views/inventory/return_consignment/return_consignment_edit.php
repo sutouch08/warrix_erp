@@ -8,20 +8,12 @@
     <div class="col-sm-6">
       <p class="pull-right top-p">
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-
-				<button type="button" class="btn btn-sm btn-default hidden-xs" onclick="getSample()">
-	        <i class="fa fa-download"></i> ไฟล์ตัวอย่าง
-	      </button>
 				<?php if(($this->pm->can_add OR $this->pm->can_edit) && $doc->status == 0) : ?>
-					<button type="button" class="btn btn-sm btn-primary hidden-xs" onclick="getUploadFile()">
-		        นำเข้าจากไฟล์ Excel
-		      </button>
 					<?php if(empty($doc->ref_code)) : ?>
 						<button type="button" class="btn btn-sm btn-info hidden-xs" onclick="getActiveCheckList()">
 			        โหลดเอกสารกระทบยอด
 			      </button>
 					<?php endif; ?>
-
 				<button type="button" class="btn btn-sm btn-success" onclick="save()"><i class="fa fa-save"></i> บันทึก</button>
 	<?php endif; ?>
 	<?php if($doc->status == 1 && $this->pm->can_approve) : ?>
@@ -86,6 +78,7 @@
 <input type="hidden" name="zone_code" id="zone_code" value="<?php echo $doc->zone_code; ?>" />
 <input type="hidden" name="from_zone_code" id="from_zone_code" value="<?php echo $doc->from_zone_code; ?>" />
 <input type="hidden" name="invoice_code" id="invoice_code" value="<?php echo $doc->invoice; ?>" />
+<input type="hidden" name="no" id="no" value="<?php echo $no; ?>" />
 
 <hr class="margin-top-15"/>
 <div class="row">
@@ -112,6 +105,12 @@
 			<button type="button" class="btn btn-xs btn-info btn-block" onclick="load_invoice()">ดึงข้อมูล</button>
 		</div>
 </div>
+<hr class="margin-top-10 margin-bottom-10"/>
+<div class="row">
+	<div class="col-sm-2 col-sm-offset-10 padding-5 last">
+		<button type="button" class="btn btn-sm btn-danger btn-block" onclick="deleteChecked()"><i class="fa fa-trash"></i> ลบรายการที่เลือก</button>
+	</div>
+</div>
 <hr class="margin-top-15 margin-bottom-15"/>
 <form id="detailsForm" method="post" action="<?php echo $this->home.'/add_details/'.$doc->code; ?>">
 <div class="row">
@@ -127,7 +126,7 @@
 					<th class="width-8 text-right">ราคา</th>
 					<th class="width-8 text-right">ส่วนลด</th>
 					<th class="width-8 text-right">คืน</th>
-					<th class="width-10 text-right">มูลค่า</th>
+					<th class="width-8 text-right">มูลค่า</th>
 					<th class="width-5"></th>
 				</tr>
 			</thead>
@@ -137,69 +136,56 @@
 <?php if(!empty($details)) : ?>
 <?php  $no = 1; ?>
 <?php  foreach($details as $rs) : ?>
-				<tr id="row_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>">
+				<tr id="row_<?php echo $rs->no; ?>">
 					<td class="middle text-center no"><?php echo $no; ?></td>
-					<td class="middle <?php echo $rs->product_code; ?>"><?php echo $rs->barcode; ?></td>
+					<td class="middle <?php echo $rs->no; ?>"><?php echo $rs->barcode; ?></td>
 					<td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
-					<td class="middle text-center invoice <?php echo $rs->invoice_code; ?>">
-						<?php echo $rs->invoice_code; ?>
-					</td>
-					<td class="middle text-right inv_qty">
-						<?php echo round($rs->sold_qty); ?>
-						<input type="hidden"
-						name="sold_qty[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="inv_qty_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round($rs->sold_qty); ?>"/>
-					</td>
-					<td class="middle text-right">
-						<?php echo round(add_vat($rs->price), 2); ?>
-						<input type="hidden" class="input-price"
-						name="price[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="price_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round(add_vat($rs->price), 2); ?>" />
-					</td>
-					<td class="middle text-right">
-						<?php echo round($rs->discount_percent, 2).' %'; ?>
-						<input type="hidden" name="discount[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-						id="discount_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-						value="<?php echo round($rs->discount_percent, 2); ?>" />
-					</td>
+					<td class="middle text-center"><?php echo $rs->invoice_code; ?>	</td>
+					<td class="middle text-right inv_qty"><?php echo round($rs->sold_qty); ?></td>
+					<td class="middle text-right"><?php echo $rs->price; ?></td>
+					<td class="middle text-right"><?php echo round($rs->discount_percent, 2).' %'; ?>	</td>
 					<td class="middle">
-						<input
-							type="number" class="form-control input-sm text-right input-qty"
-							name="qty[<?php echo $rs->product_code; ?>][<?php echo $rs->invoice_code; ?>]"
-							id="qty_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>"
-							value="<?php echo round($rs->qty,2); ?>" />
+						<input type="number"
+							class="form-control input-sm text-right input-qty"
+							name="qty[<?php echo $rs->no; ?>]"
+							id="qty_<?php echo $rs->no; ?>"
+							value="<?php echo $rs->qty; ?>"
+							onkeyup="recalRow($(this), <?php echo $rs->no; ?>)"
+						/>
 					</td>
-					<td class="middle text-right amount-label" id="amount_<?php echo $rs->product_code; ?>_<?php echo $rs->invoice_code; ?>">
-						<?php echo number(($rs->price * $rs->qty),2); ?>
+					<td class="middle text-right amount-label" id="amount_<?php echo $rs->no; ?>">
+						<?php echo number($rs->amount,2); ?>
 					</td>
 					<td class="middle text-center">
-						<button type="button" class="btn btn-minier btn-danger"
-						onclick="removeRow('<?php echo $rs->product_code."_".$rs->invoice_code; ?>', <?php echo $rs->id; ?>)">
+						<button type="button" class="btn btn-minier btn-danger"	onclick="removeRow(<?php echo $rs->no; ?>, <?php echo $rs->id; ?>)">
 							<i class="fa fa-trash"></i>
 						</button>
 					</td>
+					<input type="hidden" id="barcode_<?php echo $rs->barcode; ?>" value="<?php $no; ?>"/>
+					<input type="hidden" name="item[<?php echo $rs->no; ?>]" id="item_<?php echo $rs->no; ?>" value="<?php echo $rs->product_code; ?>"/>
+					<input type="hidden" name="sold_qty[<?php echo $rs->no; ?>]" id="inv_qty_<?php echo $rs->no; ?>" value="<?php echo round($rs->sold_qty); ?>"/>
+					<input type="hidden" class="input-price" name="price[<?php echo $rs->no; ?>]" id="price_<?php echo $rs->no; ?>" value="<?php echo $rs->price; ?>" />
+					<input type="hidden" name="discount[<?php echo $rs->no; ?>]" id="discount_<?php echo $rs->no; ?>" value="<?php echo $rs->discount_percent; ?>" />
 				</tr>
 <?php
-				$no++;
-				$total_qty += $rs->qty;
-				$total_amount += ($rs->qty * $rs->price);
+	$no++;
+	$total_qty += $rs->qty;
+	$total_amount += $rs->amount;
 ?>
 <?php  endforeach; ?>
 <?php endif; ?>
 			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="7" class="middle text-right">รวม</td>
+					<td class="middle widht-10 text-right" id="total-qty"><?php echo number($total_qty); ?></td>
+					<td class="middle width-10 text-right" id="total-amount"><?php echo number($total_amount, 2); ?></td>
+					<td class="width-5"></td>
+				</tr>
+			</tfoot>
 		</table>
 	</div>
 </div>
-<table class="table border-1">
-	<tr>
-		<td class="middle width-75 text-right">รวม</td>
-		<td class="middle widht-10 text-right" id="total-qty"><?php echo number($total_qty); ?></td>
-		<td class="middle width-10 text-right" id="total-amount"><?php echo number($total_amount, 2); ?></td>
-		<td class="width-5"></td>
-	</tr>
-</table>
 </form>
 
 
@@ -284,33 +270,35 @@
 
 
 <script type="text/x-handlebarsTemplate" id="row-template">
-{{#each this}}
-	<tr id="row_{{code}}_{{invoice}}">
+	<tr id="row_{{no}}">
 		<td class="middle text-center no"></td>
-		<td class="middle {{code}}">{{barcode}}</td>
+		<td class="middle {{no}}">{{barcode}}</td>
 		<td class="middle">{{code}} : {{name}}</td>
-		<td class="middle text-center invoice {{invoice}}">{{invoice}}</td>
-		<td class="middle text-right inv_qty">
-		{{qty}}
-		<input type="hidden" name="sold_qty[{{code}}][{{invoice}}]" id="inv_qty_{{code}}_{{invoice}}" value="{{qty}}" />
-		</td>
-		<td class="middle text-right">
-			{{price}}
-			<input type="hidden" class="input-price" name="price[{{code}}][{{invoice}}]" id="price_{{code}}_{{invoice}}" value="{{price}}" />
-		</td>
-		<td class="middle text-right">
-			{{discount}} %
-			<input type="hidden" name="discount[{{code}}][{{invoice}}]" id="discount_{{code}}_{{invoice}}" value="{{discount}}" />
-		</td>
+		<td class="middle text-center invoice">{{invoice}}</td>
+		<td class="middle text-right inv_qty">{{qty}}</td>
+		<td class="middle text-right">{{price}}</td>
+		<td class="middle text-right">{{discount}} %</td>
 		<td class="middle">
-			<input type="number" class="form-control input-sm text-right input-qty" name="qty[{{code}}][{{invoice}}]" id="qty_{{code}}_{{invoice}}" value="0" />
+			<input type="number"
+			class="form-control input-sm text-right input-qty"
+			name="qty[{{no}}]"
+			id="qty_{{no}}"
+			value="{{qty}}"
+			onkeyup="recalRow($(this), {{no}})"
+			/>
 		</td>
-		<td class="middle text-right amount-label" id="amount_{{code}}_{{invoice}}">{{amount}}</td>
+		<td class="middle text-right amount-label" id="amount_{{no}}">{{amount}}</td>
 		<td class="middle text-center">
-			<button type="button" class="btn btn-minier btn-danger" onclick="removeRow('{{code}}_{{invoice}}', '')"><i class="fa fa-trash"></i></button>
+			<button type="button" class="btn btn-minier btn-danger" onclick="removeRow({{no}}, 0)">
+			<i class="fa fa-trash"></i>
+			</button>
 		</td>
+		<input type="hidden" id="barcode_{{barcode}}" value="{{no}}"/>
+		<input type="hidden" name="item[{{no}}]" id="item_{{no}}" value="{{code}}"/>
+		<input type="hidden" name="sold_qty[{{no}}]" id="inv_qty_{{no}}" value="{{qty}}" />
+		<input type="hidden" class="input-price" name="price[{{no}}]" id="price_{{no}}" value="{{price}}" />
+		<input type="hidden" name="discount[{{no}}]" id="discount_{{no}}" value="{{discount}}" />
 	</tr>
-	{{/each}}
 </script>
 <script src="<?php echo base_url(); ?>scripts/inventory/return_consignment/return_consignment.js"></script>
 <script src="<?php echo base_url(); ?>scripts/inventory/return_consignment/return_consignment_add.js"></script>

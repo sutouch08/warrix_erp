@@ -387,6 +387,7 @@ class Customers extends PS_Controller
       $old_name = $this->input->post('customers_name');
       $code = $this->input->post('code');
       $name = $this->input->post('name');
+      $gp = $this->input->post('gp');
       $fml_code = get_null($this->input->post('old_code'));
 
       $ds = array(
@@ -404,7 +405,8 @@ class Customers extends PS_Controller
         'area_code' => get_null($this->input->post('area')),
         'sale_code' => get_null($this->input->post('sale')),
         'CreditLine' => floatval($this->input->post('CreditLine')),
-        'old_code' => $fml_code
+        'old_code' => $fml_code,
+        'gp' => $gp
       );
 
       if($sc === TRUE && $this->customers_model->is_exists($code, $old_code) === TRUE)

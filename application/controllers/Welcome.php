@@ -13,6 +13,7 @@ class Welcome extends PS_Controller
 		_check_login();
 		$this->pm = new stdClass();
 		$this->pm->can_view = 1;
+		$this->load->helper('warehouse');
 	}
 
 

@@ -333,46 +333,48 @@ class Return_consignment extends PS_Controller
     $doc->from_zone_name = $this->zone_model->get_name($doc->from_zone_code);
 
     $details = $this->return_consignment_model->get_details($code);
-
+    $no = 0;
     $detail = array();
       //--- ถ้าไม่มีรายละเอียดให้ไปดึงจากใบกำกับมา
     if(empty($details))
     {
-      $details = $this->return_consignment_model->get_invoice_details($doc->invoice);
-      if(!empty($details))
-      {
-        //--- ถ้าได้รายการ ให้ทำการเปลี่ยนรหัสลูกค้าให้ตรงกับเอกสาร
-        $cust = $this->return_consignment_model->get_customer_invoice($doc->invoice);
-        if(!empty($cust))
-        {
-          $this->return_consignment_model->update($doc->code, array('customer_code' => $cust->customer_code));
-        }
-        //--- เปลี่ยนข้อมูลที่จะแสดงให้ตรงกันด้วย
-        $doc->customer_code = $cust->customer_code;
-        $doc->customer_name = $cust->customer_name;
-
-        foreach($details as $rs)
-        {
-          $returned_qty = $this->return_consignment_model->get_returned_qty($doc->invoice, $rs->product_code);
-          $qty = $rs->qty - $returned_qty;
-          if($qty > 0)
-          {
-            $dt = new stdClass();
-            $dt->id = 0;
-            $dt->invoice_code = $doc->invoice;
-            $dt->barcode = $this->products_model->get_barcode($rs->product_code);
-            $dt->product_code = $rs->product_code;
-            $dt->product_name = $rs->product_name;
-            $dt->sold_qty = $qty;
-            $dt->discount_percent = $rs->discount;
-            $dt->qty = 0;
-            $dt->price = $rs->price;
-            $dt->amount = 0;
-
-            $detail[] = $dt;
-          }
-        }
-      }
+      $details = NULL;
+      // $details = $this->return_consignment_model->get_invoice_details($doc->invoice, $doc->customer_code);
+      // if(!empty($details))
+      // {
+      //   //--- ถ้าได้รายการ ให้ทำการเปลี่ยนรหัสลูกค้าให้ตรงกับเอกสาร
+      //   $cust = $this->return_consignment_model->get_customer_invoice($doc->invoice);
+      //   if(!empty($cust))
+      //   {
+      //     $this->return_consignment_model->update($doc->code, array('customer_code' => $cust->customer_code));
+      //     //--- เปลี่ยนข้อมูลที่จะแสดงให้ตรงกันด้วย
+      //     $doc->customer_code = $cust->customer_code;
+      //     $doc->customer_name = $cust->customer_name;
+      //   }
+      //
+      //
+      //   foreach($details as $rs)
+      //   {
+      //     if($rs->qty > 0)
+      //     {
+      //       $no++;
+      //       $dt = new stdClass();
+      //       $dt->id = 0;
+      //       $dt->invoice_code = $doc->invoice;
+      //       $dt->barcode = $this->products_model->get_barcode($rs->product_code);
+      //       $dt->product_code = $rs->product_code;
+      //       $dt->product_name = $rs->product_name;
+      //       $dt->sold_qty = round($rs->qty, 2);
+      //       $dt->discount_percent = round($rs->discount, 2);
+      //       $dt->qty = round($rs->qty, 2);
+      //       $dt->price = round(add_vat($rs->price, $rs->vat_rate), 2);
+      //       $dt->amount = round((get_price_after_discount($dt->price, $dt->discount_percent) * $rs->qty), 2);
+      //       $dt->no = $no;
+      //
+      //       $detail[] = $dt;
+      //     }
+      //   }
+      // }
     }
     else
     {
@@ -382,6 +384,7 @@ class Return_consignment extends PS_Controller
         $qty = $rs->sold_qty - ($returned_qty - $rs->qty);
         if($qty > 0)
         {
+          $no++;
           $dt = new stdClass();
           $dt->id = $rs->id;
           $dt->invoice_code = $doc->invoice;
@@ -391,8 +394,9 @@ class Return_consignment extends PS_Controller
           $dt->sold_qty = $qty;
           $dt->discount_percent = $rs->discount_percent;
           $dt->qty = $rs->qty;
-          $dt->price = $rs->price;
-          $dt->amount = $rs->qty * ($rs->price * (100 - ($rs->discount_percent * 0.01)));
+          $dt->price = round($rs->price,2);
+          $dt->amount = round($rs->amount,2);
+          $dt->no = $no;
 
           $detail[] = $dt;
         }
@@ -402,7 +406,8 @@ class Return_consignment extends PS_Controller
 
     $ds = array(
       'doc' => $doc,
-      'details' => $detail
+      'details' => $detail,
+      'no' => $no
     );
 
     if($doc->status == 0)
@@ -652,10 +657,14 @@ class Return_consignment extends PS_Controller
   }
 
 
-  public function get_invoice($invoice)
+  public function get_invoice()
   {
     $sc = TRUE;
-    $details = $this->return_consignment_model->get_invoice_details($invoice);
+    $invoice = $this->input->get('invoice');
+    $customer_code = $this->input->get('customer_code');
+    $no = empty($this->input->get('no')) ? 0 : $this->input->get('no');
+
+    $details = $this->return_consignment_model->get_invoice_details($invoice, $customer_code);
     $ds = array();
     if(empty($details))
     {
@@ -672,20 +681,59 @@ class Return_consignment extends PS_Controller
         $row = new stdClass();
         if($qty > 0)
         {
+          $no++;
           $row->barcode = $this->products_model->get_barcode($rs->product_code);
           $row->invoice = $invoice;
           $row->code = $rs->product_code;
           $row->name = $rs->product_name;
-          $row->price = round($rs->price, 2);
+          $row->price = round(add_vat($rs->price, $rs->vat_rate), 2);
           $row->discount = round($rs->discount, 2);
           $row->qty = round($qty, 2);
           $row->amount = 0;
+          $row->no = $no;
           $ds[] = $row;
+
         }
       }
     }
 
-    echo $sc === TRUE ? json_encode($ds) : $message;
+    $data = array(
+      'top' => $no,
+      'data' => $ds
+    );
+
+    echo $sc === TRUE ? json_encode($data) : $message;
+  }
+
+
+
+
+  public function search_invoice_code($customer_code = NULL)
+  {
+    $sc = array();
+    
+    if(!empty($customer_code))
+    {
+      $txt = $_REQUEST['term'];
+      $result = $this->return_consignment_model->search_invoice_code($customer_code, $txt);
+      if(!empty($result))
+      {
+        foreach($result as $rs)
+        {
+          $sc[] = $rs->DocNum.' | '.number($rs->DocTotal, 2);
+        }
+      }
+      else
+      {
+        $sc[] = 'not found';
+      }
+    }
+    else
+    {
+      $sc[] = 'กรุณาระบุลูกค้า';
+    }
+
+    echo json_encode($sc);
   }
 
 

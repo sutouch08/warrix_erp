@@ -105,7 +105,7 @@ class Temp_delivery_consignment extends PS_Controller
     {
       foreach($orders as $order)
       {
-        $details = $this->temp_consignment_model->get_detail($order->code);
+        $details = $this->temp_consignment_model->get_detail($order->DocEntry);
         if(!empty($details))
         {
           foreach($details as $rs)
