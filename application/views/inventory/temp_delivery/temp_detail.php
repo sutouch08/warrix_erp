@@ -22,8 +22,8 @@
         <?php if(!empty($details)) : ?>
           <?php $no = 1; ?>
           <?php foreach($details as $rs) : ?>
-            <?php $hilight = ($rs->Quantity > $rs->onhand) ? 'color:red;' : ''; ?>
-            <tr style="<?php echo $hilight; ?>">
+            <?php //$hilight = ($rs->Quantity > $rs->onhand) ? 'color:red;' : ''; ?>
+            <tr style="<?php echo $rs->hilight; ?>">
               <td class="middle text-center"><?php echo $no; ?></td>
               <td class="middle"><?php echo $rs->ItemCode; ?></td>
               <td class="middle"><?php echo $rs->Dscription; ?></td>

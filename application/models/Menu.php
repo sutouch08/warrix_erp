@@ -30,7 +30,7 @@ class Menu extends CI_Model{
     $rs = $this->db
     ->where('group_code', $group_code)
     ->where('active', 1)
-    //->order_by('position', 'ASC')
+    ->order_by('position', 'ASC')
     ->get('menu_sub_group');
     if($rs->num_rows() > 0)
     {

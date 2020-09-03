@@ -63,8 +63,8 @@
 <?php $this->load->view('account/consign_order/consign_order_detail'); ?>
 
 
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_control.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_add.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order_control.js?v=<?php echo date('Ymd'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

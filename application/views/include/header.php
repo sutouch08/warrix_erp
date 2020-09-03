@@ -15,7 +15,7 @@
 		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/ace-fonts.css" />
 		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/ace.css" class="ace-main-stylesheet" id="main-ace-style" />
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/jquery-ui-1.10.4.custom.min.css " />
-		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/template.css"/>
+		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/template.css?v=2"/>
 		<!-- ace settings handler -->
 		<script src="<?php echo base_url(); ?>assets/js/ace-extra.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -56,13 +56,13 @@
 				</button>
 				<?php endif; ?>
 				<div class="navbar-header pull-left">
-					<a href="<?php echo ((empty($approve_view) && !isset($_GET['nomenu'])) ? base_url() : '#'); ?>" class="navbar-brand">
+					<a href="<?php echo ((empty($approve_view) && !isset($_GET['nomenu']) && !$this->isViewer) ? base_url() : '#'); ?>" class="navbar-brand">
 						<small>
 							<?php echo getConfig('COMPANY_NAME'); ?>
 						</small>
 					</a>
 				</div>
-				<?php if(! isset($_GET['nomenu'])) : ?>
+				<?php if(! isset($_GET['nomenu']) && !$this->isViewer) : ?>
 					<?php $this->load->view('include/approve_form'); ?>
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
@@ -81,17 +81,15 @@
 							</a>
 
 							<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+								<?php if(!$this->isViewer) : ?>
 								<li>
 									<a href="JavaScript:void(0)" onclick="changeUserPwd('<?php echo get_cookie('uname'); ?>')">
 										<i class="ace-icon fa fa-keys"></i>
 										เปลี่ยนรหัสผ่าน
 									</a>
 								</li>
-
-
-
 								<li class="divider"></li>
-
+								<?php endif; ?>
 								<li>
 									<a href="<?php echo base_url(); ?>users/authentication/logout">
 										<i class="ace-icon fa fa-power-off"></i>
@@ -122,9 +120,9 @@
 					try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
 				</script>
 						<!--- side menu  ------>
-
+				<?php if($this->isViewer === FALSE) : ?>
 				<?php $this->load->view("include/side_menu"); ?>
-
+				<?php endif; ?>
 
 				<!-- #section:basics/sidebar.layout.minimize -->
 				<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse" onclick="toggle_layout()">

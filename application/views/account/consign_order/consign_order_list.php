@@ -154,5 +154,5 @@
      </table>
    </div>
  </div>
-<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consign_order/consign_order.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

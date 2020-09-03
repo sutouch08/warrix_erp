@@ -303,6 +303,7 @@ class Products extends PS_Controller
         'style'  => $style,
         'items'   => $this->products_model->get_style_items($code),
         'images'  => $this->product_image_model->get_style_images($code),
+        'sizes' => $this->products_model->get_style_sizes_cost_price($code),
         'tab'     => $tab
       );
 
@@ -383,6 +384,9 @@ class Products extends PS_Controller
       $active = $this->input->post('active');
       $user = get_cookie('uname');
 
+      $flag_cost = $this->input->post('cost_update');
+      $flag_price = $this->input->post('price_update');
+
       $tabs = $this->input->post('tabs');
 
       $ds = array(
@@ -431,8 +435,6 @@ class Products extends PS_Controller
             'type_code' => get_null($type),
             'brand_code' => get_null($brand),
             'year' => $year,
-            'cost' => ($cost === NULL ? 0.00 : $cost),
-            'price' => ($price === NULL ? 0.00 : $price),
             'unit_code' => $unit,
             'count_stock' => ($count === NULL ? 0 : 1),
             'can_sell' => ($sell === NULL ? 0 : 1),
@@ -441,6 +443,18 @@ class Products extends PS_Controller
             'update_user' => get_cookie('uname'),
             'old_style' => $old_code
           );
+
+          //--- ถ้าติกให้ updte cost มาด้วย
+          if(!empty($flag_cost))
+          {
+            $ds['cost'] = ($cost === NULL ? 0.00 : $cost);
+          }
+
+          //--- ถ้าติกให้ updte price มาด้วย
+          if(!empty($flag_price))
+          {
+            $ds['price'] = ($price === NULL ? 0.00 : $price);
+          }
 
           foreach($items as $item)
           {
@@ -531,6 +545,88 @@ class Products extends PS_Controller
 
 
 
+
+  public function update_cost_price_by_size()
+  {
+    $sc = TRUE;
+    if($this->input->post('style_code'))
+    {
+      $code = $this->input->post('style_code');
+      $size = $this->input->post('size');
+      $cost = empty($this->input->post('cost')) ? 0 : $this->input->post('cost');
+      $price = empty($this->input->post('price')) ? 0 : $this->input->post('price');
+
+      if(!empty($size))
+      {
+        $rs = $this->products_model->update_cost_price_by_size($code, $size, $cost, $price);
+        if(!$rs)
+        {
+          $sc = FALSE;
+          $this->error = "Update failed";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบไซส์";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรหัสสินค้า";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+  public function update_all_cost_price_by_size()
+  {
+    $sc = TRUE;
+    $this->error = "Update failed : ";
+    if(!empty($this->input->post('style_code')))
+    {
+      $code = $this->input->post('style_code');
+      $sizes = $this->input->post('size'); //--- array
+      $cost = $this->input->post('cost'); //--- array
+      $price = $this->input->post('price'); //--- array
+
+      if(!empty($sizes))
+      {
+        foreach($sizes as $no => $size)
+        {
+          $rs = $this->products_model->update_cost_price_by_size($code, $size, $cost[$no], $price[$no]);
+          if(!$rs)
+          {
+            $sc = FALSE;
+            $this->error .= ", {$size}";
+          }
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบไซส์";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบรหัสสินค้า";
+    }
+
+    if($sc === TRUE)
+    {
+      set_message('success');
+    }
+    else
+    {
+      set_error($this->error);
+    }
+
+    redirect($this->home.'/edit/'.$code.'/priceTab');
+  }
 
   public function toggle_can_sell($code)
   {

@@ -116,6 +116,7 @@ class Orders_model extends CI_Model
     ->where('order_code', $order_code)
     ->where('product_code', $item_code)
     ->get('order_details');
+
     if($rs->num_rows() == 1)
     {
       return $rs->row();
@@ -1107,12 +1108,12 @@ class Orders_model extends CI_Model
   }
 
 
-  public function get_expire_list($date)
+  public function get_expire_list($date, array $role = array('S'))
   {
     $rs = $this->db
     ->select('code')
     ->where('date_add <', $date)
-    ->where('role', 'S')
+    ->where_in('role', $role)
     ->where_in('state', array(1,2,3))
     ->where('is_paid', 0)
     ->where('never_expire', 0)
@@ -1130,12 +1131,23 @@ class Orders_model extends CI_Model
   {
     if(!empty($code))
     {
-      $qr = "UPDATE orders, order_details ";
-      $qr .= "SET orders.is_expired = 1, order_details.is_expired = 1 ";
-      $qr .= "WHERE orders.code = '{$code}' ";
-      $qr .= "AND order_details.order_code = orders.code";
+      return $this->db
+      ->set('is_expired', 1)
+      ->where('code', $code)
+      ->update('orders');
+    }
 
-      return $this->db->query($qr);
+    return FALSE;
+  }
+
+  public function set_expire_order_details($code)
+  {
+    if(!empty($code))
+    {
+      return $this->db
+      ->set('is_expired', 1)
+      ->where('order_code', $code)
+      ->update('order_details');
     }
 
     return FALSE;

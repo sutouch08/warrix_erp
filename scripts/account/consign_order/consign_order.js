@@ -81,6 +81,12 @@ function doExport(){
         setTimeout(function(){
           window.location.reload();
         }, 1200);
+      }else{
+        swal({
+          title:'Error!',
+          text:rs,
+          type: 'error'
+        })
       }
     }
   });

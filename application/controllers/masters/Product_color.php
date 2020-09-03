@@ -13,14 +13,19 @@ class Product_color extends PS_Controller
     parent::__construct();
     $this->home = base_url().'masters/product_color';
     $this->load->model('masters/product_color_model');
+    $this->load->helper('product_color');
   }
 
 
   public function index()
   {
-		$code = get_filter('code', 'color_code', '');
-		$name = get_filter('name', 'color_name', '');
-    $status = get_filter('status', 'color_status', 2);
+    $filter = array(
+      'code' => get_filter('code', 'color_code', ''),
+      'name' => get_filter('name', 'color_name', ''),
+      'color_group' => get_filter('color_group', 'color_group', ''),
+      'status' => get_filter('status', 'color_status', 2)
+    );
+
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_filter('set_rows', 'rows', 20);
@@ -31,37 +36,23 @@ class Product_color extends PS_Controller
 		}
 
 		$segment = 4; //-- url segment
-		$rows = $this->product_color_model->count_rows($code, $name, $status);
+		$rows = $this->product_color_model->count_rows($filter);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init	= pagination_config($this->home.'/index/', $rows, $perpage, $segment);
-		$color = $this->product_color_model->get_data($code, $name, $status, $perpage, $this->uri->segment($segment));
-
-    $data = array();
+		$color = $this->product_color_model->get_data($filter, $perpage, $this->uri->segment($segment));
 
     if(!empty($color))
     {
       foreach($color as $rs)
       {
-        $arr = new stdClass();
-        $arr->code = $rs->code;
-        $arr->name = $rs->name;
-        $arr->active = $rs->active;
-        $arr->menber = $this->product_color_model->count_members($rs->code);
-
-        $data[] = $arr;
+        $rs->member = $this->product_color_model->count_members($rs->code);
       }
     }
 
-
-    $ds = array(
-      'code' => $code,
-      'name' => $name,
-      'status' => $status,
-			'data' => $data
-    );
+    $filter['data'] = $color;
 
 		$this->pagination->initialize($init);
-    $this->load->view('masters/product_color/product_color_view', $ds);
+    $this->load->view('masters/product_color/product_color_view', $filter);
   }
 
 
@@ -88,6 +79,7 @@ class Product_color extends PS_Controller
   {
     $data['code'] = $this->session->flashdata('code');
     $data['name'] = $this->session->flashdata('name');
+    $data['id_group'] = $this->session->flashdata('id_group');
     $this->title = 'เพิ่ม สีสินค้า';
     $this->load->view('masters/product_color/product_color_add_view', $data);
   }
@@ -100,9 +92,11 @@ class Product_color extends PS_Controller
       $sc = TRUE;
       $code = $this->input->post('code');
       $name = $this->input->post('name');
+      $id_group = get_null($this->input->post('color_group'));
       $ds = array(
         'code' => $code,
-        'name' => $name
+        'name' => $name,
+        'id_group' => $id_group
       );
 
       if($this->product_color_model->is_exists($code) === TRUE)
@@ -147,12 +141,7 @@ class Product_color extends PS_Controller
   public function edit($code)
   {
     $this->title = 'แก้ไข สีสินค้า';
-    $rs = $this->product_color_model->get($code);
-    $data = array(
-      'code' => $rs->code,
-      'name' => $rs->name
-    );
-
+    $data = $this->product_color_model->get($code);
     $this->load->view('masters/product_color/product_color_edit_view', $data);
   }
 
@@ -168,10 +157,12 @@ class Product_color extends PS_Controller
       $old_name = $this->input->post('product_color_name');
       $code = $this->input->post('code');
       $name = $this->input->post('name');
+      $id_group = get_null($this->input->post('color_group'));
 
       $ds = array(
         'code' => $code,
-        'name' => $name
+        'name' => $name,
+        'id_group' => $id_group
       );
 
       if($this->product_color_model->is_exists($code, $old_code) === TRUE)
@@ -290,7 +281,7 @@ class Product_color extends PS_Controller
 
   public function clear_filter()
 	{
-    $filter = array('color_code', 'color_name', 'color_status');
+    $filter = array('color_code', 'color_name', 'color_group', 'color_status');
     clear_filter($filter);
 	}
 

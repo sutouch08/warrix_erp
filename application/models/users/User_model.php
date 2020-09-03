@@ -317,6 +317,18 @@ class User_model extends CI_Model
   }
 
 
+  public function is_viewer($uid)
+  {
+    $rs = $this->db
+    ->select('uid')
+    ->where('uid', $uid)
+    ->where('is_viewer', 1)
+    ->get('user');
+
+    return $rs->num_rows() === 1 ? TRUE : FALSE;
+  }
+
+
 
 
   public function get_user_credentials_by_skey($skey)

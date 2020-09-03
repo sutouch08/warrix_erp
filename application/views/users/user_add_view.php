@@ -114,6 +114,23 @@
     <div class="help-block col-xs-12 col-sm-reset inline red"></div>
   </div>
 
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">ดูสต็อกอย่างเดียว</label>
+    <div class="col-xs-12 col-sm-3">
+			<div class="radio">
+				<label>
+					<input type="radio" class="ace" name="is_viewer" value="1" />
+					<span class="lbl padding-5">  Yes</span>
+				</label>
+				<label>
+					<input type="radio" class="ace" name="is_viewer" value="0" checked />
+					<span class="lbl">  No</span>
+				</label>
+			</div>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline red"></div>
+  </div>
+
 	<div class="divider-hidden">
 
 	</div>

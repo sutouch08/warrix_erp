@@ -59,7 +59,15 @@ class Authentication extends CI_Controller
 
     if($sc === TRUE)
     {
-      redirect('main');
+      if($rs->is_viewer == 1)
+      {
+        redirect('view_stock');
+      }
+      else
+      {
+        redirect('main');
+      }
+
     }
     else
     {

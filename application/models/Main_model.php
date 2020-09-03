@@ -52,16 +52,31 @@ class Main_model extends CI_Model
   }
 
 
-  public function search_items_list($txt, $limit = NULL)
+  public function search_items_list($txt, $color = NULL, $color_group = NULL, $limit = NULL)
   {
     $this->db
     ->select('pd.code, pd.name')
     ->from('products AS pd')
     ->join('product_style AS style', 'pd.style_code = style.code', 'left')
+    ->join('product_color AS co', 'pd.color_code = co.code', 'left')
     ->join('product_size AS size', 'pd.size_code = size.code', 'left')
+    ->group_start()
     ->like('pd.code', $txt)
     ->or_like('pd.old_code', $txt)
     ->or_like('pd.name', $txt)
+    ->group_end();
+
+    if(!empty($color_group))
+    {
+      $this->db->where('co.id_group', $color_group);
+    }
+
+    if(!empty($color))
+    {
+      $this->db->like('pd.color_code', $color);
+    }
+
+    $this->db
     ->order_by('style.code', 'ASC')
     ->order_by('pd.color_code', 'ASC')
     ->order_by('size.position', 'ASC');

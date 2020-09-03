@@ -105,7 +105,14 @@
 
           <td class="middle hide-text"><?php echo $rs->CardName; ?></td>
 
-          <td class="middle" ><?php echo thai_date($rs->F_E_CommerceDate, TRUE); ?></td>
+          <td class="middle" >
+						<?php
+						if(!empty($rs->F_E_CommerceDate))
+						{
+							echo thai_date($rs->F_E_CommerceDate, TRUE);
+						}
+						 ?>
+					</td>
 
           <td class="middle">
 						<?php if($rs->F_SapDate !== NULL) : ?>
@@ -152,7 +159,7 @@
 <?php endforeach; ?>
 <?php else : ?>
       <tr>
-        <td colspan="10" class="text-center"><h4>ไม่พบรายการ</h4></td>
+        <td colspan="11" class="text-center"><h4>ไม่พบรายการ</h4></td>
       </tr>
 <?php endif; ?>
       </tbody>

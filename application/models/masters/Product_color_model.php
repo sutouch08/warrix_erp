@@ -37,28 +37,36 @@ class Product_color_model extends CI_Model
   }
 
 
-  public function count_rows($code = '', $name = '', $status = 2)
+  public function count_rows(array $ds = array())
   {
-    $this->db->select('code');
-
-    if($status != 2)
+    if($ds['status'] != 2)
     {
-      $this->db->where('active', $status);
+      $this->db->where('active', $ds['status']);
     }
 
-    if($code != '')
+    if(!empty($ds['code']))
     {
-      $this->db->like('code', $code);
+      $this->db->like('code', $ds['code']);
     }
 
-    if($name != '')
+    if(!empty($ds['name']))
     {
-      $this->db->like('name', $name);
+      $this->db->like('name', $ds['name']);
     }
 
-    $rs = $this->db->get('product_color');
+    if(!empty($ds['color_group']))
+    {
+      if($ds['color_group'] === 'NULL')
+      {
+        $this->db->where('id_group IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('id_group', $ds['color_group']);
+      }
+    }
 
-    return $rs->num_rows();
+    return $this->db->count_all_results('product_color');
   }
 
 
@@ -96,21 +104,39 @@ class Product_color_model extends CI_Model
 
 
 
-  public function get_data($code = '', $name = '', $status = 1, $perpage = '', $offset = '')
+  public function get_data(array $ds = array(), $perpage = '', $offset = '')
   {
-    if($status != 2)
+    $this->db
+    ->select('co.*')
+    ->select('cg.code AS group_code, cg.name AS group_name')
+    ->from('product_color AS co')
+    ->join('product_color_group AS cg', 'co.id_group = cg.id', 'left');
+
+    if(!empty($ds['status']) && $ds['status'] != 2)
     {
-      $this->db->where('active', $status);
+      $this->db->where('co.active', $ds['status']);
     }
 
-    if($code != '')
+    if(!empty($ds['code']))
     {
-      $this->db->like('code', $code);
+      $this->db->like('co.code', $ds['code']);
     }
 
-    if($name != '')
+    if(!empty($ds['name']))
     {
-      $this->db->like('name', $name);
+      $this->db->like('co.name', $ds['name']);
+    }
+
+    if(!empty($ds['color_group']))
+    {
+      if($ds['color_group'] === 'NULL')
+      {
+        $this->db->where('co.id_group IS NULL', NULL, FALSE);
+      }
+      else
+      {
+        $this->db->where('co.id_group', $ds['color_group']);
+      }
     }
 
     if($perpage != '')
@@ -119,7 +145,7 @@ class Product_color_model extends CI_Model
       $this->db->limit($perpage, $offset);
     }
 
-    $rs = $this->db->get('product_color');
+    $rs = $this->db->get();
 
     return $rs->result();
   }
@@ -175,6 +201,19 @@ class Product_color_model extends CI_Model
     $this->db->select('active')->where('color_code', $code);
     $rs = $this->db->get('products');
     return $rs->num_rows();
+  }
+
+
+
+  public function get_color_group()
+  {
+    $rs = $this->db->order_by('name', 'ASC')->get('product_color_group');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
   }
 
 

@@ -18,6 +18,7 @@ class PS_Controller extends CI_Controller
   public $WV;
   public $RR;
   public $WL;
+  public $isViewer;
 
   public function __construct()
   {
@@ -34,19 +35,21 @@ class PS_Controller extends CI_Controller
       redirect('setting/maintenance');
     }
 
+    $uid = get_cookie('uid');
+
+    $this->isViewer = $this->user_model->is_viewer($uid);
+
     $this->notibars = getConfig('NOTI_BAR');
 
     //--- get permission for user
-    $this->pm = get_permission($this->menu_code, get_cookie('uid'), get_cookie('id_profile'));
+    $this->pm = get_permission($this->menu_code, $uid, get_cookie('id_profile'));
 
     $this->ms = $this->load->database('ms', TRUE); //--- SAP database
     $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
     $this->cn = $this->load->database('cn', TRUE); //--- consign Database
     //$this->is = $this->load->database('is', TRUE); //---- Ecom database
 
-    $uid = get_cookie('uid');
-
-    if($this->notibars == 1)
+    if($this->notibars == 1 && $this->isViewer === FALSE)
     {
       $this->WC = get_permission('SOCCSO', $uid);
   		$this->WT = get_permission('SOCCTR', $uid);
@@ -57,7 +60,6 @@ class PS_Controller extends CI_Controller
       $this->RR = get_permission('ICRQRC', $uid);
       $this->WL = get_permission('ICLEND', $uid);
     }
-
   }
 }
 

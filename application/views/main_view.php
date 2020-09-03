@@ -1,25 +1,42 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row" style="margin-top:30px;">
-  <div class="col-sm-2 col-sm-offset-3 col-xs-12 padding-5">
+  <div class="col-sm-3 padding-5 first">
+    <label>รหัสสินค้า</label>
+    <input type="text" class="form-control input-sm text-center" id="search-text" placeholder="พิมพ์รหัสสินค้า 4 ตัวอักษรขึ้นไป" />
+  </div>
+
+  <div class="col-sm-1 col-1-harf padding-5">
+    <label>สี</label>
+    <input type="text" class="form-control input-sm text-center" id="color" placeholder="รหัสสี">
+  </div>
+
+  <div class="col-sm-2 padding-5">
+    <label>กลุ่มสี</label>
+    <select class="form-control input-sm" id="color_group">
+      <option value="">ทั้งหมด</option>
+      <?php echo select_color_group(); ?>
+    </select>
+  </div>
+
+  <div class="col-sm-2 col-xs-12 padding-5">
+    <label>คลัง</label>
     <select class="form-control input-sm" id="warehouse" name="warehouse">
       <option value="">ทั้งหมด</option>
       <?php echo select_warehouse(); ?>
     </select>
   </div>
-  <div class="col-sm-4 padding-5">
-    <input type="text" class="form-control input-sm text-center" id="search-text" placeholder="พิมพ์รหัสสินค้า 4 ตัวอักษรขึ้นไป" />
-  </div>
-</div>
-<div class="divider-hidden"></div>
-<div class="row">
-  <div class="col-sm-2 col-sm-offset-4 col-xs-6 padding-5">
+
+  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
+    <label class="display-block not-show">stock</label>
     <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getSearch()">ตรวจสอบสต็อก</button>
   </div>
-  <div class="col-sm-2 col-xs-6 padding-5">
+  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
+    <label class="display-block not-show">stock</label>
     <button type="button" class="btn btn-xs btn-info btn-block" onclick="findOrder()">ตรวจสอบออเดอร์</button>
   </div>
 
 </div>
+
 <hr class="margin-top-15 margin-bottom-15"/>
 
 <div class="row">
@@ -143,6 +160,9 @@ function findOrder(){
 function getSearch(){
 	var searchText = $.trim($('#search-text').val());
   var warehouse = $('#warehouse').val();
+  var color = $('#color').val();
+  var color_group = $('#color_group').val();
+
 	if(searchText.length > 3 ){
 		load_in();
 		$.ajax({
@@ -151,7 +171,9 @@ function getSearch(){
 			cache:'false',
 			data:{
 				'search_text' : searchText,
-        'warehouse_code' : warehouse
+        'warehouse_code' : warehouse,
+        'color' : color,
+        'color_group' : color_group
 			},
 			success:function(rs){
 				load_out();

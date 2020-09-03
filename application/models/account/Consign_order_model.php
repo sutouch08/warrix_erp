@@ -177,6 +177,24 @@ class Consign_order_model extends CI_Model
 
 
 
+  public function get_sum_order_qty($code, $product_code)
+  {
+    $rs = $this->db
+    ->select_sum('qty')
+    ->where('consign_code', $code)
+    ->where('product_code', $product_code)
+    ->get('consign_order_detail');
+
+    if($rs->num_rows() === 1)
+    {
+      return is_null($rs->row()->qty) ? 0 : $rs->row()->qty;
+    }
+
+    return 0;
+  }
+
+  
+
   public function get_item_gp($product_code, $zone_code)
   {
     $rs = $this->db

@@ -85,6 +85,44 @@ class Return_consignment_model extends CI_Model
   }
 
 
+  public function get_sap_invoice_amount($code)
+  {
+    $rs = $this->ms
+    ->select('DocTotal')
+    ->where('DocNum', $code)
+    ->get('OINV');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->DocTotal; //---- ยอดรวมทั้งบิลรวม vat
+    }
+
+    return 0;
+  }
+
+
+  public function add_invoice(array $ds = array())
+  {
+    if(!empty($ds))
+    {
+      return $this->db->insert('return_consignment_invoice', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_sum_invoice_amount($code)
+  {
+    $rs = $this->db->select_sum('invoice_amount')->where('return_code', $code)->get('return_consignment_invoice');
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->invoice_amount;
+    }
+
+    return 0;
+  }
+
 
   public function get_total_return($code)
   {

@@ -294,11 +294,12 @@ class Consignment_order extends PS_Controller
         $stock = $item->count_stock == 1 ? $this->stock_model->get_consign_stock_zone($doc->zone_code, $item->code) : 10000000;
         $c_qty = $item->count_stock == 1 ? $this->consignment_order_model->get_unsave_qty($code, $item->code) : 0;
         $detail = $this->consignment_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
+        $sum_qty = $qty + $c_qty;
         $id;
         if(empty($detail))
         {
           //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
-          if(($qty + $c_qty) <= $stock OR $auz === TRUE)
+          if($sum_qty <= $stock OR $auz === TRUE)
           {
             //--- add new row
             $arr = array(
@@ -328,7 +329,7 @@ class Consignment_order extends PS_Controller
           else
           {
             $sc = FALSE;
-            $this->error = "ยอดในโซนไม่พอตัด";
+            $this->error = "<span>{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$sum_qty} </span><br/>";
           }
 
         }
@@ -337,8 +338,8 @@ class Consignment_order extends PS_Controller
           //-- update new rows
           //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
           $id = $detail->id;
-          $new_qty = $qty + $c_qty;
-          if($new_qty <= $stock OR $auz === TRUE)
+          $new_qty = $qty + $detail->qty;
+          if($sum_qty <= $stock OR $auz === TRUE)
           {
             //--- add new row
             $arr = array(
@@ -357,7 +358,7 @@ class Consignment_order extends PS_Controller
           else
           {
             $sc = FALSE;
-            $this->error = "ยอดในโซนไม่พอตัด";
+            $this->error = "<span>{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$sum_qty} </span><br/>";
           }
         }
       }
@@ -422,12 +423,13 @@ class Consignment_order extends PS_Controller
           $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 10000000;
           $c_qty = $item->count_stock == 1 ? $this->consignment_order_model->get_unsave_qty($code, $item->code) : 0;
           $detail = $this->consignment_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
+          $sum_qty = $qty + $c_qty;
           $id;
 
           if(empty($detail))
           {
             //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
-            if(($qty + $c_qty) <= $stock OR $auz === TRUE)
+            if($sum_qty <= $stock OR $auz === TRUE)
             {
               //--- add new row
               $arr = array(
@@ -457,7 +459,7 @@ class Consignment_order extends PS_Controller
             else
             {
               $sc = FALSE;
-              $this->error = "ยอดในโซนไม่พอตัด";
+              $this->error .= "<span>{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$sum_qty} </span><br/>";
             }
           }
           else
@@ -465,8 +467,8 @@ class Consignment_order extends PS_Controller
             //-- update new rows
             //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
             $id = $detail->id;
-            $new_qty = $qty + $c_qty;
-            if($new_qty <= $stock OR $auz === TRUE)
+            $new_qty = $qty + $detail->qty;
+            if($sum_qty <= $stock OR $auz === TRUE)
             {
               //--- add new row
               $arr = array(
@@ -533,18 +535,14 @@ class Consignment_order extends PS_Controller
         //--- check stock and update status each row
         foreach($details as $rs)
         {
-          if($sc === FALSE)
-          {
-            break;
-          }
-
           //--- get item info
           $item = $this->products_model->get($rs->product_code);
 
           if(!empty($item))
           {
             $stock = $item->count_stock == 1 ?$this->stock_model->get_consign_stock_zone($doc->zone_code, $item->code) : 1000000;
-            if($rs->qty <= $stock OR $auz)
+            $all_qty = $this->consignment_order_model->get_sum_order_qty($doc->code, $item->code);
+            if($all_qty <= $stock OR $auz)
             {
               $final_price = $rs->amount/$rs->qty;
               //--- ข้อมูลสำหรับบันทึกยอดขาย
@@ -611,7 +609,7 @@ class Consignment_order extends PS_Controller
             else
             {
               $sc = FALSE;
-              $this->error = "{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$rs->qty}";
+              $this->error .= "<span>{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$all_qty} </span><br/>";
             }
           }
           else
@@ -872,11 +870,6 @@ class Consignment_order extends PS_Controller
 
           foreach($collection as $rs)
           {
-            if($sc === FALSE)
-            {
-              break;
-            }
-
             if($i > 1)
             {
               //--- skip hrader row
@@ -898,11 +891,11 @@ class Consignment_order extends PS_Controller
                   $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 10000000;
                   $c_qty = $item->count_stock == 1 ? $this->consignment_order_model->get_unsave_qty($code, $item->code) : 0;
                   $detail = $this->consignment_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
-
+                  $sum_qty = $qty + $c_qty;
                   if(empty($detail))
                   {
                     //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
-                    if(($qty + $c_qty) <= $stock OR $auz === TRUE)
+                    if($sum_qty <= $stock OR $auz === TRUE)
                     {
                       //--- add new row
                       $arr = array(
@@ -932,17 +925,19 @@ class Consignment_order extends PS_Controller
                     else
                     {
                       $sc = FALSE;
-                      $this->error = "ยอดในโซนไม่พอตัด";
+                      $this->error .= "<span>{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$sum_qty} </span><br/>";
+
                     }
                   }
                   else
                   {
                     //-- update new rows
                     //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
-                    $new_qty = $qty + $c_qty;
-                    if($new_qty <= $stock OR $auz === TRUE)
+                    $sum_qty = $qty + $c_qty;
+                    if($sum_qty <= $stock OR $auz === TRUE)
                     {
                       //--- add new row
+                      $new_qty = $qty + $detail->qty;
                       $arr = array(
                         'qty' => $new_qty,
                         'discount_amount' => $discount * $new_qty,
@@ -958,6 +953,7 @@ class Consignment_order extends PS_Controller
                     else
                     {
                       $sc = FALSE;
+                      $this->error .= "<span>{$item->code} ยอดในโซนไม่พอตัด  ในโซน: {$stock} ยอดตัด : {$sum_qty} </span><br/>";
                       $this->error = "ยอดในโซนไม่พอตัด";
                     }
                   } //--- end if empty detail

@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Temp_receive_po extends PS_Controller
 {
-  public $menu_code = 'ICRCCK';
-	public $menu_group_code = 'IC';
-  public $menu_sub_group_code = 'TEMP';
+  public $menu_code = 'TERCCK';
+	public $menu_group_code = 'TE';
+  public $menu_sub_group_code = 'TERECEIPT';
 	public $title = 'ตรวจสอบ รับเข้า-ถังกลาง';
   public $filter;
   public function __construct()

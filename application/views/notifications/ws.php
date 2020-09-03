@@ -27,7 +27,7 @@
     {{#if this.data}}
       {{#each this.data}}
         <li>
-          <a href="javescript:void(0)" onclick="viewSponsorDetail('{{code}}')">
+          <a href="javascript:void(0)" onclick="viewSponsorDetail('{{code}}')">
             <div class="clearfix">
             <b class="blue">{{code}}</b> &nbsp; {{customer}}
             </div>
@@ -36,7 +36,7 @@
       {{/each}}
     {{else}}
       <li>
-        <a href="javescript:void(0)" class="clearfix">
+        <a href="javascript:void(0)" class="clearfix">
           <center><b class="blue">No Data</b></center>
         </a>
       </li>

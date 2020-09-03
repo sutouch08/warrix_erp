@@ -69,13 +69,13 @@
         <tr>
           <th class="width-5 text-center">ลำดับ</th>
           <th class="width-10 text-center">วันที่</th>
-          <th class="width-10">เลขที่เอกสาร </th>
-          <th class="10">รหัสลูกค้า</th>
-          <th class="15">ชื่อลูกค้า</th>
+          <th class="width-15">เลขที่เอกสาร </th>
+          <th class="width-10">รหัสลูกค้า</th>
+          <th class="width-20">ชื่อลูกค้า</th>
           <th class="width-10">เข้าถังกลาง</th>
           <th class="width-10">เข้า SAP</th>
           <th class="width-5 text-center">สถานะ</th>
-					<th class="width-20">หมายเหตุ</th>
+					<th class="">หมายเหตุ</th>
 					<th class="width-5"></th>
         </tr>
       </thead>
@@ -85,11 +85,11 @@
 <?php   foreach($orders as $rs)  : ?>
 
         <tr class="font-size-12">
-          <td class="text-center"><?php echo $no; ?></td>
+          <td class="middle text-center"><?php echo $no; ?></td>
 
-          <td class="text-center"><?php echo thai_date($rs->DocDate); ?></td>
+          <td class="middle text-center"><?php echo thai_date($rs->DocDate); ?></td>
 
-          <td class="">
+          <td class="middle">
 						<?php if($rs->U_BOOKCODE === 'WM') : ?>
 							<a href="javascript:void(0)" onclick="getConsign('<?php echo $rs->U_ECOMNO; ?>')">
 							<?php echo $rs->U_ECOMNO; ?>
@@ -101,13 +101,13 @@
 						<?php endif; ?>
 					</td>
 
-          <td class=""><?php echo $rs->CardCode; ?></td>
+          <td class="middle"><?php echo $rs->CardCode; ?></td>
 
-          <td class="hide-text"><?php echo $rs->CardName; ?></td>
+          <td class="middle hide-text"><?php echo $rs->CardName; ?></td>
 
-          <td class="" ><?php echo thai_date($rs->F_E_CommerceDate, TRUE); ?></td>
+          <td class="middle" ><?php echo thai_date($rs->F_E_CommerceDate, TRUE); ?></td>
 
-          <td class="">
+          <td class="middle">
 						<?php
 							if(!empty($rs->F_SapDate))
 							{
@@ -115,14 +115,14 @@
 							}
 					 	?>
 				 	</td>
-					<td class="text-center">
+					<td class="middle text-center">
             <?php if($rs->F_Sap === NULL) : ?>
               <span class="blue">NC</span>
             <?php elseif($rs->F_Sap === 'N') : ?>
               <span class="red">ERROR</span>
             <?php endif; ?>
           </td>
-          <td class="">
+          <td class="middle">
             <?php
             if($rs->F_Sap === 'N')
             {
@@ -130,7 +130,7 @@
             }
             ?>
           </td>
-					<td class="text-right">
+					<td class="middle text-right">
 						<?php if($rs->F_Sap === 'N') : ?>
 						<button type="button" class="btn btn-minier btn-info" onclick="get_detail(<?php echo $rs->DocEntry; ?>)">
 							<i class="fa fa-eye"></i>

@@ -22,15 +22,21 @@
 		<div class="col-xs-12 col-sm-3">
 			<input type="text" name="old_style" id="old_style" class="width-100" value="<?php echo $style->old_code; ?>" placeholder="รหัสรุ่นเก่า (ไม่บังคับ)" />
 		</div>
-		<div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
+		<div class="help-block col-xs-12 col-sm-reset inline red" id="oldcode-error"></div>
 	</div>
 
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right">ทุน</label>
-		<div class="col-xs-12 col-sm-3">
+		<div class="col-xs-8 col-sm-3">
 			<input type="number" step="any" name="cost" id="cost" class="width-100" value="<?php echo $style->cost; ?>" />
 		</div>
-		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
+		<div class="col-sm-3 col-xs-3">
+			<label>
+				<input type="checkbox" class="ace" id="cost-update" name="cost_update" value="Y"/>
+				<span class="lbl">  อัพเดตทุนในรายการด้วย</span>
+			</label>
+		</div>
+		<div class="help-block col-xs-12 col-sm-reset inline red" id="cost-error"></div>
 	</div>
 
 	<div class="form-group">
@@ -38,7 +44,14 @@
 		<div class="col-xs-12 col-sm-3">
 			<input type="number" step="any" name="price" id="price" class="width-100" value="<?php echo $style->price; ?>" />
 		</div>
-		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
+		<div class="col-sm-3 col-xs-3">
+			<label>
+				<input type="checkbox" class="ace" id="price-update" name="price_update" value="Y"/>
+				<span class="lbl">  อัพเดตราคาในรายการด้วย</span>
+			</label>
+		</div>
+		<div class="help-block col-xs-12 col-sm-reset inline red" id="price-error"></div>
+
 	</div>
 
 	<div class="form-group">
@@ -49,7 +62,7 @@
 				<?php echo select_unit($style->unit_code); ?>
 			</select>
 		</div>
-		<div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
+		<div class="help-block col-xs-12 col-sm-reset inline red" id="unit-error"></div>
 	</div>
 
 	<div class="form-group">

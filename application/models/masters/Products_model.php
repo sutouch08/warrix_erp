@@ -712,6 +712,18 @@ class Products_model extends CI_Model
 
 
 
+  public function is_count_stock($code)
+  {
+    $rs = $this->db->where('code', $code)->where('count_stock', 1)->get('products');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+
+  }
+
 
   public function is_exists_style($style)
   {
@@ -799,6 +811,41 @@ class Products_model extends CI_Model
     if($rs->num_rows() > 0)
     {
       return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+  public function get_style_sizes_cost_price($style_code)
+  {
+    $qr = "SELECT DISTINCT s.code, p.cost, p.price FROM products AS p
+          LEFT JOIN product_size AS s ON p.size_code = s.code
+          WHERE p.style_code = '{$style_code}'
+          ORDER BY s.position ASC";
+    $rs = $this->db->query($qr);
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return FALSE;
+  }
+
+
+
+
+  public function update_cost_price_by_size($code, $size, $cost, $price)
+  {
+    if(!empty($code))
+    {
+      $this->db
+      ->set('cost', $cost)
+      ->set('price', $price)
+      ->where('style_code', $code)
+      ->where('size_code', $size);
+
+      return $this->db->update('products');
     }
 
     return FALSE;

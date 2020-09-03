@@ -38,28 +38,33 @@
 			<label>รหัสลูกค้า</label>
 			<input type="text" class="form-control input-sm text-center edit" id="customerCode" value="<?php echo $doc->customer_code; ?>" disabled />
 		</div>
-		<div class="col-sm-4 col-4-harf col-xs-12 padding-5">
+		<div class="col-sm-6 col-xs-12 padding-5">
 			<label>ลูกค้า</label>
 			<input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" disabled/>
-		</div>
-		<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
-			<label>เลขที่บิล[SAP]</label>
-			<input type="text" class="form-control input-sm text-center edit" name="invoice" id="invoice" value="<?php echo $doc->invoice; ?>" disabled />
 		</div>
 		<div class="col-sm-1 col-1-harf col-xs-6 padding-5 last">
 			<label>GP(%)</label>
 			<input type="number" class="form-control input-sm text-center edit" name="gp" id="gp" value="<?php echo $doc->gp; ?>" disabled />
 		</div>
-		<div class="col-sm-6 col-xs-12 padding-5 first">
+		<div class="col-sm-3 col-xs-6 padding-5 first">
+			<label>เลขที่บิล[SAP]</label>
+			<input type="text" class="form-control input-sm text-center edit" name="invoice" id="invoice" value="<?php echo $doc->invoice; ?>" disabled />
+		</div>
+
+		<div class="col-sm-3 col-xs-6 padding-5">
+			<label>มูลค่าบิล</label>
+			<input type="number" class="form-control input-sm text-center" name="bill_amount" id="bill_amount" value="<?php echo $doc->invoice_amount; ?>" disabled />
+		</div>
+		<div class="col-sm-6 col-xs-12 padding-5 last">
 			<label>โซนฝากขาย</label>
 			<input type="text" class="form-control input-sm edit" name="fromZone" id="fromZone" value="<?php echo $doc->from_zone_name; ?>" disabled />
 		</div>
 
-		<div class="col-sm-6 padding-5 last">
+		<div class="col-sm-5 padding-5 first">
 			<label>โซน[รับคืน]</label>
 			<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" disabled />
 		</div>
-    <div class="col-sm-11 padding-5 first">
+    <div class="col-sm-6 padding-5">
     	<label>หมายเหตุ</label>
         <input type="text" class="form-control input-sm edit" name="remark" id="remark" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" value="<?php echo $doc->remark; ?>" disabled />
     </div>

@@ -14,7 +14,7 @@
 <form class="form-horizontal" id="addForm" method="post" action="<?php echo $this->home."/update"; ?>">
 
 	<div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">Code</label>
+    <label class="col-sm-3 control-label no-padding-right">รหัส</label>
     <div class="col-xs-12 col-sm-3">
       <input type="text" name="code" id="code" class="width-100" value="<?php echo $code; ?>" autofocus required />
     </div>
@@ -24,16 +24,25 @@
 
 
   <div class="form-group">
-    <label class="col-sm-3 control-label no-padding-right">Name</label>
+    <label class="col-sm-3 control-label no-padding-right">สี</label>
     <div class="col-xs-12 col-sm-3">
 			<input type="text" name="name" id="name" class="width-100" value="<?php echo $name; ?>" required />
     </div>
     <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
   </div>
 
-	<div class="divider-hidden">
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">กลุ่มสี</label>
+    <div class="col-xs-12 col-sm-3">
+			<select class="form-control input-sm" id="color_group" name="color_group">
+				<option value="">เลือกกลุ่มสี</option>
+				<?php echo select_color_group($id_group); ?>
+			</select>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
+  </div>
 
-	</div>
+	<div class="divider-hidden"></div>
   <div class="form-group">
     <label class="col-sm-3 control-label no-padding-right"></label>
     <div class="col-xs-12 col-sm-3">

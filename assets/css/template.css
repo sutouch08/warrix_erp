@@ -1172,3 +1172,8 @@ input[type=number]::-webkit-outer-spin-button {
 .from-date {
   border-right:0px !important;
 }
+
+.modal-open .modal {
+  overflow-x: auto;
+  overflow-y: auto;
+}

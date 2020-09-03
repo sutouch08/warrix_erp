@@ -18,6 +18,7 @@
 $tab1 = $tab == 'styleTab' ? 'active in' : '';
 $tab2 = $tab == 'itemTab' ? 'active in' : '';
 $tab3 = $tab == 'imageTab' ? 'active in' : '';
+$tab4 = $tab == 'priceTab' ? 'active in' : '';
 
 ?>
 
@@ -36,6 +37,9 @@ $tab3 = $tab == 'imageTab' ? 'active in' : '';
 		<li class="li-block <?php echo $tab3; ?>" onclick="changeURL('<?php echo $style->code; ?>','imageTab')" >
 			<a href="#imageTab" data-toggle="tab" style="text-decoration:none;" >รูปภาพ</a>
 		</li>
+		<li class="li-block <?php echo $tab4; ?>" onclick="changeURL('<?php echo $style->code; ?>','priceTab')" >
+			<a href="#priceTab" data-toggle="tab" style="text-decoration:none;" >ราคา</a>
+		</li>
 	</ul>
 </div>
 
@@ -50,6 +54,9 @@ $tab3 = $tab == 'imageTab' ? 'active in' : '';
 	<div class="tab-pane fade <?php echo $tab3; ?>" id="imageTab">
 		<?php $this->load->view('masters/products/product_image'); ?>
 	</div>
+	<div class="tab-pane fade <?php echo $tab4; ?>" id="priceTab">
+		<?php $this->load->view('masters/products/product_edit_price'); ?>
+	</div>
 </div>
 </div><!--/ col-sm-9  -->
 </div><!--/ row  -->
@@ -58,4 +65,5 @@ $tab3 = $tab == 'imageTab' ? 'active in' : '';
 <script src="<?php echo base_url(); ?>scripts/masters/product_info.js"></script>
 <script src="<?php echo base_url(); ?>scripts/masters/product_image.js"></script>
 <script src="<?php echo base_url(); ?>scripts/masters/product_items.js"></script>
+<script src="<?php echo base_url(); ?>scripts/masters/product_price.js"></script>
 <?php $this->load->view('include/footer'); ?>

@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Temp_delivery_order extends PS_Controller
 {
-  public $menu_code = 'ICIVCK';
-	public $menu_group_code = 'IC';
-  public $menu_sub_group_code = 'TEMP';
+  public $menu_code = 'TEIVCK';
+	public $menu_group_code = 'TE';
+  public $menu_sub_group_code = 'TESALE';
 	public $title = 'ตรวจสอบ ออเดอร์ - ถังกลาง';
   public $filter;
   public function __construct()
@@ -51,6 +51,7 @@ class Temp_delivery_order extends PS_Controller
   public function get_detail($id)
   {
     $this->load->model('stock/stock_model');
+    $this->load->model('masters/products_model');
     $detail = $this->temp_delivery_model->get_detail($id);
     $code = "";
     if(!empty($detail))
@@ -59,6 +60,14 @@ class Temp_delivery_order extends PS_Controller
       {
         $rs->onhand = $this->stock_model->get_stock_zone($rs->BinCode, $rs->ItemCode);
         $code = $rs->U_ECOMNO;
+        $rs->hilight = NULL;
+        if($rs->Quantity > $rs->onhand)
+        {
+          if($this->products_model->is_count_stock($rs->ItemCode))
+          {
+            $rs->hilight = "color:red";
+          }
+        }
       }
     }
 

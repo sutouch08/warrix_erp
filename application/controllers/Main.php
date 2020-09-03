@@ -16,6 +16,7 @@ class Main extends PS_Controller
 		$this->pm->can_view = 1;
     $this->load->model('main_model');
 		$this->load->helper('warehouse');
+		$this->load->helper('product_color');
 	}
 
 
@@ -71,9 +72,11 @@ class Main extends PS_Controller
     $sc = array();
     $txt = trim($this->input->post('search_text'));
 		$warehouse = get_null($this->input->post('warehouse_code'));
+		$color = $this->input->post('color');
+		$color_group = $this->input->post('color_group');
     if(!empty($txt))
     {
-      $list = $this->main_model->search_items_list($txt);
+      $list = $this->main_model->search_items_list($txt, $color, $color_group);
       if(!empty($list))
       {
         $this->load->model('stock/stock_model');
@@ -129,5 +132,5 @@ class Main extends PS_Controller
 
     echo json_encode($sc);
   }
-	
+
 } //--- end class

@@ -62,8 +62,8 @@
 <input type="hidden" name="zone_code" id="zone_code" value="" />
 </form>
 
-<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order.js"></script>
-<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order.js?v=<?php echo date('Ymd'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/account/consignment_order/consignment_order_add.js?v=<?php echo date('Ymd'); ?>"></script>
 
 
 <?php $this->load->view('include/footer'); ?>

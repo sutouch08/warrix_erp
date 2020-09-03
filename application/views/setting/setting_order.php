@@ -27,6 +27,16 @@ $btn_show_stock_no  = $SHOW_SUM_STOCK == 0 ? 'btn-primary' : '';
     </div>
     <div class="divider-hidden"></div>
 
+		<div class="col-sm-3"><span class="form-control left-label">ประเภทของออเดอร์ที่หมดอายุ</span></div>
+    <div class="col-sm-9">
+      <input type="text" class="form-control input-sm input-xlarge" name="ORDER_EXPIRATION_ROLE" required value="<?php echo $ORDER_EXPIRATION_ROLE; ?>" />
+      <span class="help-block">
+				กำหนดประเภทของออเดอร์ที่ทำให้หมดอายุ <br>
+				S = ขาย, C = ฝากขายเทียม, N = ฝากขายแท้, P = สปอนเซอร์, U = อภินันท์, L = ยืม, T = แปรสภาพ(ขาย), Q = แปรสภาพ(สต็อก)
+			</span>
+    </div>
+    <div class="divider-hidden"></div>
+
 		<div class="col-sm-3"><span class="form-control left-label">การจำกัดการแสดงผลสต็อก</span></div>
 		<div class="col-sm-9">
 			<input type="text" class="form-control input-sm input-small text-center" name="STOCK_FILTER" required value="<?php echo $STOCK_FILTER; ?>" />

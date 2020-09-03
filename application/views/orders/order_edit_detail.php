@@ -23,26 +23,26 @@ $hide = $order->status == 1 ? 'hide' : '';
 
 <!--  Search Product -->
 <div class="row">
-	<div class="col-sm-2 col-2-harf padding-5 first">
+	<div class="col-sm-2 col-2-harf col-xs-12 padding-5 margin-bottom-10 first">
     <input type="text" class="form-control input-sm text-center" id="pd-box" placeholder="ค้นรหัสสินค้า" />
   </div>
-  <div class="col-sm-1 col-1-harf padding-5">
+  <div class="col-sm-1 col-1-harf col-xs-12 padding-5 margin-bottom-10">
   	<button type="button" class="btn btn-xs btn-primary btn-block" onclick="getProductGrid()"><i class="fa fa-tags"></i> แสดงสินค้า</button>
   </div>
-  <div class="col-sm-2 col-2-harf padding-5">
+  <div class="col-sm-2 col-2-harf col-xs-12 padding-5 margin-bottom-10">
     <input type="text" class="form-control input-sm text-center" id="item-code" placeholder="ค้นหารหัสสินค้า">
   </div>
-  <div class="col-sm-1 padding-5">
+  <div class="col-sm-1 col-xs-6 padding-5 margin-bottom-10">
     <input type="number" class="form-control input-sm text-center" id="stock-qty" disabled>
   </div>
-  <div class="col-sm-1 padding-5">
+  <div class="col-sm-1 col-xs-6 padding-5 margin-bottom-10">
     <input type="number" class="form-control input-sm text-center" id="input-qty">
   </div>
-  <div class="col-sm-1 padding-5">
+  <div class="col-sm-1 col-xs-12 padding-5 margin-bottom-10">
     <button type="button" class="btn btn-xs btn-primary btn-block" onclick="addItemToOrder()">เพิ่ม</button>
   </div>
 
-  <div class="col-sm-2 col-2-harf padding-5 last">
+  <div class="col-sm-2 col-2-harf col-xs-6 padding-5 margin-bottom-10 last">
     <button type="button" class="btn btn-xs btn-info btn-block" onclick="recalDiscount()">
         <i class="fa fa-calculator"></i> คำนวณส่วนลดใหม่</button>
       </button>

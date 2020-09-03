@@ -298,6 +298,25 @@ class Return_consignment extends PS_Controller
         $sc = FALSE;
         $this->error = "เพิ่มเอกสารไม่สำเร็จ";
       }
+      else
+      {
+        if(!empty($invoice))
+        {
+          $inv_amount = $this->return_consignment_model->get_sap_invoice_amount($invoice);
+          if(!empty($inv_amount))
+          {
+            $inv_arr = array(
+              'return_code' => $code,
+              'invoice_code' => $invoice,
+              'invoice_amount' => $inv_amount
+            );
+
+            $this->return_consignment_model->add_invoice($inv_arr);
+          }
+
+        }
+
+      }
     }
     else
     {
@@ -331,6 +350,7 @@ class Return_consignment extends PS_Controller
     $doc->customer_name = $this->customers_model->get_name($doc->customer_code);
     $doc->zone_name = $this->zone_model->get_name($doc->zone_code);
     $doc->from_zone_name = $this->zone_model->get_name($doc->from_zone_code);
+    $doc->invoice_amount = round($this->return_consignment_model->get_sum_invoice_amount($code), 2);
 
     $details = $this->return_consignment_model->get_details($code);
     $no = 0;
@@ -711,7 +731,7 @@ class Return_consignment extends PS_Controller
   public function search_invoice_code($customer_code = NULL)
   {
     $sc = array();
-    
+
     if(!empty($customer_code))
     {
       $txt = $_REQUEST['term'];

@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Temp_goods_issue extends PS_Controller
 {
-  public $menu_code = 'ICGICK';
-	public $menu_group_code = 'IC';
-  public $menu_sub_group_code = 'TEMP';
+  public $menu_code = 'TEGICK';
+	public $menu_group_code = 'TE';
+  public $menu_sub_group_code = 'TEADJUST';
 	public $title = 'ตรวจสอบ Goods Issue';
   public $filter;
   public function __construct()
@@ -45,7 +45,7 @@ class Temp_goods_issue extends PS_Controller
     $this->load->view('inventory/temp_goods_issue/temp_list', $filter);
   }
 
-  
+
   public function get_detail($docEntry)
   {
     $this->load->model('stock/stock_model');

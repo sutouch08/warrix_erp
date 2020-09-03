@@ -30,9 +30,19 @@
     <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
   </div>
 
-	<div class="divider-hidden">
+	<div class="divider-hidden"></div>
 
-	</div>
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">กลุ่มสี</label>
+    <div class="col-xs-12 col-sm-3">
+			<select class="form-control input-sm" id="color_group" name="color_group">
+				<option value="">เลือกกลุ่มสี</option>
+				<?php echo select_color_group($id_group); ?>
+			</select>
+    </div>
+    <div class="help-block col-xs-12 col-sm-reset inline red" id="name-error"></div>
+  </div>
+
   <div class="form-group">
     <label class="col-sm-3 control-label no-padding-right"></label>
     <div class="col-xs-12 col-sm-3">

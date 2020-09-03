@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Temp_transfer_draft extends PS_Controller
 {
-  public $menu_code = 'ICTDCK';
-	public $menu_group_code = 'IC';
-  public $menu_sub_group_code = 'TEMP';
+  public $menu_code = 'TETDCK';
+	public $menu_group_code = 'TE';
+  public $menu_sub_group_code = 'TETRANSFER';
 	public $title = 'ตรวจสอบ Transfer Draft';
   public $filter;
   public function __construct()

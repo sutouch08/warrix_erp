@@ -1,3 +1,5 @@
+var zero_qty = 0;
+
 function saveConsign(){
   var code = $('#consign_code').val();
   var details = $('.rox').length;
@@ -5,6 +7,17 @@ function saveConsign(){
     swal("ไม่พบรายการสินค้า");
     return false;
   }
+
+  check_zero();
+
+  if(zero_qty > 0){
+    swal("พบรายการที่เป็น 0");
+    return false;
+  }else{
+    $('.qty').css('color', '');
+  }
+
+  console.log(zero_qty);
   swal({
 		title: "บันทึกขายและตัดสต็อก",
 		text: "เมื่อบันทึกแล้วจะไม่สามารถแก้ไขได้ ต้องการบันทึกหรือไม่ ?",
@@ -33,13 +46,34 @@ function saveConsign(){
               viewDetail(code);
             },1500);
           }else{
-            swal('Error!', rs, 'error');
+            swal({
+              title:'Error!',
+              text: rs,
+              html:true,
+              type:'error'
+            })
           }
         }
       });
 	});
 }
 
+
+function check_zero(){
+  zero_qty = 0;
+  $('.qty').each(function(){
+    var qty = parseInt($(this).text())
+    if(qty == 0){
+      var id = $(this).attr('id');
+      var arr = id.split('-');
+      if(arr.length == 2){
+        id = arr[1];
+        $('#row-'+id).css('color','red');
+        zero_qty++;
+      }
+    }
+  })
+}
 
 function unSaveConsign(){
   var code = $('#consign_code').val();

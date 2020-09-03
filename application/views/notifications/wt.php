@@ -29,7 +29,7 @@
     {{#if this.data}}
       {{#each this.data}}
         <li>
-          <a href="javescript:void(0)" onclick="viewConsignTRDetail('{{code}}')">
+          <a href="javascript:void(0)" onclick="viewConsignTRDetail('{{code}}')">
             <div class="clearfix">
             <b class="blue">{{code}}</b> &nbsp; {{customer}}
             </div>
@@ -38,7 +38,7 @@
       {{/each}}
     {{else}}
       <li>
-        <a href="javescript:void(0)" class="clearfix">
+        <a href="javascript:void(0)" class="clearfix">
           No Data
         </a>
       </li>
