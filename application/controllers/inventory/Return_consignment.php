@@ -677,6 +677,75 @@ class Return_consignment extends PS_Controller
   }
 
 
+
+  public function add_invoice()
+  {
+    $sc = TRUE;
+    $invoice = $this->input->post('invoice');
+    $customer_code = $this->input->post('customer_code');
+    $code = $this->input->post('return_code');
+
+    //--- check invoice with customer
+    $amount = $this->return_consignment_model->get_sap_invoice_amount($invoice, $customer_code);
+    if(!empty($amount))
+    {
+      //--- check invoice in table
+      $isExists = $this->return_consignment_model->is_exists_invoice($invoice, $code);
+      if($isExists === FALSE)
+      {
+        //-- เตรียมข้อมูลเพิ่มเข้าตาราง
+        $arr = array(
+          'return_code' => $code,
+          'invoice_code' => $invoice,
+          'invoice_amount' => $amount
+        );
+
+        if($this->return_consignment_model->add_invoice($arr))
+        {
+          $inv_list = '';
+          $inv_amount = 0;
+          $invoice_list = $this->return_consignment_model->get_all_invoice($code);
+          if(!empty($invoice_list))
+          {
+            $i = 1;
+            foreach($invoice_list as $rs)
+            {
+              $inv_list .= $i === 1 ? $rs->invoice_code : ", {$rs->invoice_code}";
+              $inv_amount += $rs->invoice_amount;
+              $i++;
+            }
+          }
+
+          $ds = array(
+            'invoice' => $inv_list,
+            'amount' => $inv_amount
+          );
+
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "เพิ่มบิลไม่สำเร็จ";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "เลขที่บิลซ้ำ";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เลขที่บิลไม่ถูกต้อง";
+    }
+
+    echo $sc === FALSE ? $this->error : json_encode($ds);
+  }
+
+
+
+
   public function get_invoice()
   {
     $sc = TRUE;

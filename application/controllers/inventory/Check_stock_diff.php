@@ -14,6 +14,7 @@ class Check_stock_diff extends PS_Controller
     parent::__construct();
     $this->home = base_url().'inventory/check_stock_diff';
     $this->load->model('inventory/check_stock_diff_model');
+    $this->load->model('stock/stock_model');
     $this->load->model('inventory/buffer_model');
     $this->load->model('masters/products_model');
     $this->load->model('masters/zone_model');
@@ -100,8 +101,8 @@ class Check_stock_diff extends PS_Controller
         //---- loop and add diff qty
         foreach($details as $rs)
         {
-          $diff_qty = $this->check_stock_diff_model->get_active_diff($zone_code, $rs->ItemCode);
-          $buffer_qty = $this->buffer_model->get_buffer_zone($zone_code, $rs->ItemCode);
+          $diff_qty = $this->check_stock_diff_model->get_active_diff($zone_code, $rs->product_code);
+          $buffer_qty = $this->buffer_model->get_buffer_zone($zone_code, $rs->product_code);
           $rs->diff_qty = $diff_qty;
           $rs->count_qty = ($rs->OnHandQty - $buffer_qty) + $diff_qty;
           $rs->OnHandQty = ($rs->OnHandQty - $buffer_qty);
@@ -114,7 +115,46 @@ class Check_stock_diff extends PS_Controller
     $ds['zone_name'] = !empty($zone) ? $zone->name : NULL;
     $ds['details'] = !empty($details) ? $details : NULL;
     $ds['checked'] = $is_checked;
+    $ds['enable_search'] = TRUE;
+    $ds['enable_barcode'] = FALSE;
 
+    $this->load->view('inventory/check_stock_diff/check_process', $ds);
+  }
+
+
+  public function check_barcode($zone_code = NULL, $is_checked = NULL)
+  {
+    $zone_code = empty($zone_code) ? $this->input->post('zone_code') : $zone_code;
+    $zone = !empty($zone_code) ? $this->zone_model->get($zone_code) : NULL;
+
+    if(!empty($zone))
+    {
+      $details = $this->check_stock_diff_model->get_active_diff_zone($zone_code);
+      if(!empty($details))
+      {
+        //---- loop and add diff qty
+        foreach($details as $rs)
+        {
+          $item = $this->products_model->get($rs->product_code);
+          $rs->barcode = $item->barcode;
+          $rs->old_code = $item->old_code;
+          $diff_qty = $rs->qty;
+          $onHandQty = $this->stock_model->get_stock_zone($zone_code, $rs->product_code);
+          $buffer_qty = $this->buffer_model->get_buffer_zone($zone_code, $rs->product_code);
+          $rs->diff_qty = $diff_qty;
+          $rs->count_qty = ($onHandQty - $buffer_qty) + $diff_qty;
+          $rs->OnHandQty = ($onHandQty - $buffer_qty);
+        }
+      }
+    }
+
+    $ds['zone_code'] = !empty($zone) ? $zone->code : NULL;
+    $ds['product_code'] = NULL;
+    $ds['zone_name'] = !empty($zone) ? $zone->name : NULL;
+    $ds['details'] = !empty($details) ? $details : NULL;
+    $ds['checked'] = $is_checked;
+    $ds['enable_search'] = FALSE;
+    $ds['enable_barcode'] = TRUE;
     $this->load->view('inventory/check_stock_diff/check_process', $ds);
   }
 
@@ -217,6 +257,7 @@ class Check_stock_diff extends PS_Controller
     $items = $this->input->post('item');
     $stock = $this->input->post('stock');
     $count = $this->input->post('qty');
+    $is_barcode = $this->input->post('is_barcode');
 
     $zone = $this->zone_model->get($zone_code);
     if(!empty($zone))
@@ -312,8 +353,8 @@ class Check_stock_diff extends PS_Controller
     {
       set_error($this->error);
     }
-
-    redirect("{$this->home}/check/{$zone_code}/Y");
+    $page = $is_barcode == 1 ? 'check_barcode' : 'check';
+    redirect("{$this->home}/{$page}/{$zone_code}/Y");
   }
 
 
@@ -329,6 +370,35 @@ class Check_stock_diff extends PS_Controller
 
     echo $sc === TRUE ? 'success' : $this->error;
   }
+
+
+  public function get_item_by_barcode()
+  {
+    $barcode = $this->input->get('barcode');
+    $zone_code = $this->input->get('zone_code');
+    $qty = $this->input->get('qty');
+    $no = $this->input->get('topRow');
+    $item = $this->products_model->get_product_by_barcode($barcode);
+    if(!empty($item))
+    {
+      $arr = array(
+        'item' => (empty($item->old_code) ? $item->code : $item->code .' | '.$item->old_code),
+        'itemCode' => $item->code,
+        'onHandQty' => $this->stock_model->get_stock_zone($zone_code, $item->code),
+        'barcode' => $barcode,
+        'qty' => $qty,
+        'no' => $no
+      );
+
+      echo json_encode($arr);
+    }
+    else
+    {
+      echo 'Invalid barcode';
+    }
+  }
+
+
 
 
   function clear_filter(){

@@ -48,7 +48,7 @@
 
 	<div class="col-sm-1 padding-5">
     <label class="display-block not-show">buton</label>
-    <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
+    <button type="submit" class="btn btn-xs btn-primary btn-block" onclick="getSearch()"><i class="fa fa-search"></i> Search</button>
   </div>
 	<div class="col-sm-1 padding-5 last">
     <label class="display-block not-show">buton</label>

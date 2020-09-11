@@ -122,6 +122,52 @@ function getActiveCheckList(){
   });
 }
 
+function add_invoice()
+{
+  var code = $('#return_code').val();
+  var invoice = $('#invoice-box').val();
+  var customer_code = $('#customer_code').val();
+
+  if(invoice.length == 0){
+    return false;
+  }
+
+  if(customer_code.length == 0){
+    return false;
+  }
+
+
+  load_in();
+
+  $.ajax({
+    url:HOME + 'add_invoice',
+    type:'POST',
+    cache:false,
+    data:{
+      'invoice' : invoice,
+      'customer_code' : customer_code,
+      'return_code' : code
+    },
+    success:function(rs){
+      load_out();
+      if(isJson(rs))
+      {
+        var data = $.parseJSON(rs);
+        $('#invoice').val(data.invoice);
+        $('#bill_amount').val(data.amount);
+        $('#invoice-box').val('');
+      }
+      else
+      {
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}
 
 function load_invoice(){
   var code = $('#return_code').val();

@@ -8,7 +8,8 @@
     <div class="col-sm-6">
     	<p class="pull-right top-p">
 				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
-				<button type="button" class="btn btn-sm btn-success" onclick="goToCheck()"><i class="fa fa-plus"></i> ตรวจนับสต็อก</button>
+				<button type="button" class="btn btn-sm btn-success" onclick="goToCheck()"><i class="fa fa-tags"></i> นับสต็อก(คีย์มือ)</button>
+				<button type="button" class="btn btn-sm btn-primary" onclick="goToCheck('barcode')"><i class="fa fa-tags"></i> นับสต็อก(บาร์โค้ด)</button>
 				<?php endif; ?>
       </p>
     </div>

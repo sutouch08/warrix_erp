@@ -38,33 +38,29 @@
 			<label>รหัสลูกค้า</label>
 			<input type="text" class="form-control input-sm text-center edit" id="customerCode" value="<?php echo $doc->customer_code; ?>" disabled />
 		</div>
-		<div class="col-sm-6 col-xs-12 padding-5">
+		<div class="col-sm-5 col-xs-12 padding-5">
 			<label>ลูกค้า</label>
 			<input type="text" class="form-control input-sm edit" name="customer" id="customer" value="<?php echo $doc->customer_name; ?>" disabled/>
 		</div>
-		<div class="col-sm-1 col-1-harf col-xs-6 padding-5 last">
-			<label>GP(%)</label>
-			<input type="number" class="form-control input-sm text-center edit" name="gp" id="gp" value="<?php echo $doc->gp; ?>" disabled />
-		</div>
-		<div class="col-sm-3 col-xs-6 padding-5 first">
+		<div class="col-sm-1 col-1-harf col-xs-6 padding-5">
 			<label>เลขที่บิล[SAP]</label>
 			<input type="text" class="form-control input-sm text-center edit" name="invoice" id="invoice" value="<?php echo $doc->invoice; ?>" disabled />
 		</div>
-
-		<div class="col-sm-3 col-xs-6 padding-5">
-			<label>มูลค่าบิล</label>
-			<input type="number" class="form-control input-sm text-center" name="bill_amount" id="bill_amount" value="<?php echo $doc->invoice_amount; ?>" disabled />
+		<div class="col-sm-1 col-xs-6 padding-5 last">
+			<label>GP(%)</label>
+			<input type="number" class="form-control input-sm text-center edit" name="gp" id="gp" value="<?php echo $doc->gp; ?>" disabled />
 		</div>
-		<div class="col-sm-6 col-xs-12 padding-5 last">
+
+		<div class="col-sm-6 col-xs-12 padding-5 first">
 			<label>โซนฝากขาย</label>
 			<input type="text" class="form-control input-sm edit" name="fromZone" id="fromZone" value="<?php echo $doc->from_zone_name; ?>" disabled />
 		</div>
 
-		<div class="col-sm-5 padding-5 first">
+		<div class="col-sm-6 padding-5 last">
 			<label>โซน[รับคืน]</label>
 			<input type="text" class="form-control input-sm edit" name="zone" id="zone" value="<?php echo $doc->zone_name; ?>" disabled />
 		</div>
-    <div class="col-sm-6 padding-5">
+    <div class="col-sm-11 padding-5 first">
     	<label>หมายเหตุ</label>
         <input type="text" class="form-control input-sm edit" name="remark" id="remark" placeholder="ระบุหมายเหตุเอกสาร (ถ้ามี)" value="<?php echo $doc->remark; ?>" disabled />
     </div>
@@ -75,6 +71,8 @@
 							<button type="button" class="btn btn-xs btn-success btn-block hide" id="btn-update" onclick="updateHeader()">ปรับปรุง</button>
 			<?php	endif; ?>
 		</div>
+
+
 </div>
 
 <input type="hidden" id="return_code" value="<?php echo $doc->code; ?>" />
@@ -86,6 +84,12 @@
 <input type="hidden" name="no" id="no" value="<?php echo $no; ?>" />
 
 <hr class="margin-top-15"/>
+<div class="row">
+	<div class="col-sm-4 col-xs-12 padding-5 first">
+		<label>เลขที่บิล</label>
+		<span id="invoice_list" class="form-control input-sm" disabled><?php echo $doc->invoice; ?></span>
+	</div>
+</div>
 <div class="row">
 	<div class="col-sm-1 padding-5 first">
     	<label>จำนวน</label>
@@ -100,6 +104,10 @@
         <button type="button" class="btn btn-xs btn-primary" onclick="doReceive()"><i class="fa fa-check"></i> ตกลง</button>
     </div>
 
+		<div class="col-sm-3 col-xs-6 padding-5">
+			<label>มูลค่าบิล</label>
+			<input type="number" class="form-control input-sm text-center" name="bill_amount" id="bill_amount" value="<?php echo $doc->invoice_amount; ?>" disabled />
+		</div>
 
 		<div class="col-sm-2 col-sm-offset-5 padding-5">
 			<label>เพิ่มบิล[SAP]</label>
@@ -107,7 +115,7 @@
 		</div>
 		<div class="col-sm-1 padding-5 last">
 			<label class="display-block not-show">btn</label>
-			<button type="button" class="btn btn-xs btn-info btn-block" onclick="load_invoice()">ดึงข้อมูล</button>
+			<button type="button" class="btn btn-xs btn-info btn-block" onclick="add_invoice()">เพิ่มบิล</button>
 		</div>
 </div>
 <hr class="margin-top-10 margin-bottom-10"/>

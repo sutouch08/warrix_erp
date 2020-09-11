@@ -43,6 +43,7 @@ class Export
     $service_wh = getConfig('SERVICE_WAREHOUSE');
     $U_WhsCode = NULL;
     $U_BinCode = NULL;
+    $U_Consignment = NULL;
     if($order->role === 'C')
     {
       $zone = $this->ci->zone_model->get($order->zone_code);
@@ -50,6 +51,7 @@ class Export
       {
         $U_WhsCode = $zone->warehouse_code;
         $U_BinCode = $zone->code;
+        $U_Consignment = 'Y';
       }
     }
 
@@ -101,7 +103,8 @@ class Export
           'F_E_Commerce' => 'A',
           'F_E_CommerceDate' => sap_date(now(), TRUE),
           'U_WhsCode' => $U_WhsCode,
-          'U_BinCode' => $U_BinCode
+          'U_BinCode' => $U_BinCode,
+          'U_Consignment' => $U_Consignment
         );
 
         $this->ci->mc->trans_begin();
@@ -250,7 +253,7 @@ class Export
           'U_ECOMNO' => $order->code,
           'U_BOOKCODE' => $order->bookcode,
           'F_E_Commerce' => 'A',
-          'F_E_CommerceDate' => sap_date(now(), TRUE)
+          'F_E_CommerceDate' => sap_date(now(), TRUE),
         );
 
         $this->ci->mc->trans_begin();
@@ -602,7 +605,8 @@ public function export_transfer_draft($code)
             'F_E_CommerceDate' => sap_date(now(), TRUE),
             'U_BOOKCODE' => $doc->bookcode,
             'U_REQUESTER' => $doc->empName,
-            'U_APPROVER' => $doc->approver
+            'U_APPROVER' => $doc->approver,
+            'F_Receipt' => ($doc->is_valid == 1 ? 'Y' : NULL)
           );
 
           $this->ci->mc->trans_begin();
@@ -2103,7 +2107,7 @@ public function export_adjust_goods_issue($code)
           }
 
         }
-        
+
       }
     }
     else

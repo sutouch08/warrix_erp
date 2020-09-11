@@ -149,10 +149,7 @@ function update(){
     return false;
   }
 
-  console.log('from:'+from_warehouse);
-  console.log('old : '+old_from_wh);
-  console.log('to :' + to_warehouse);
-  console.log('old :' + old_to_wh);
+  
   //--- ตรวจสอบหากมีการเปลี่ยนคลัง ต้องเช็คก่อนว่ามีการทำรายการไปแล้วหรือยัง
   if(from_warehouse != old_from_wh || to_warehouse != old_to_wh)
   {

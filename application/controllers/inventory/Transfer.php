@@ -299,18 +299,42 @@ class Transfer extends PS_Controller
   {
     $sc = TRUE;
     $this->load->model('inventory/movement_model');
-    $this->db->trans_start();
-    //--- change state to 1
-    $this->transfer_model->set_status($code, 0);
-    $this->transfer_model->valid_all_detail($code, 0);
-    $this->movement_model->drop_movement($code);
-    $this->db->trans_complete();
-
-    if($this->db->trans_status() === FALSE)
+    //--- check Transfer doc exists in SAP
+    $doc = $this->transfer_model->get_sap_transfer_doc($code);
+    if(!empty($doc))
     {
       $sc = FALSE;
-      $message = $this->db->error();
+      $this->error = "เอกสารเข้า SAP แล้วไม่อนุญาติให้ยกเลิก";
     }
+    else
+    {
+
+      //--- check middle doc delete it if exists
+      $middle = $this->transfer_model->get_middle_transfer_doc($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rs)
+        {
+          $this->transfer_model->drop_middle_exits_data($rs->DocEntry);
+        }
+      }
+
+
+      $this->db->trans_start();
+      //--- change state to 1
+      $this->transfer_model->set_status($code, 0);
+      $this->transfer_model->valid_all_detail($code, 0);
+      $this->movement_model->drop_movement($code);
+      $this->db->trans_complete();
+
+      if($this->db->trans_status() === FALSE)
+      {
+        $sc = FALSE;
+        $this->error = $this->db->error();
+      }
+    }
+
+
 
     echo $sc === TRUE ? 'success' : $message;
   }

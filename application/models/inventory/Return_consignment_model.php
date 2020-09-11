@@ -85,11 +85,13 @@ class Return_consignment_model extends CI_Model
   }
 
 
-  public function get_sap_invoice_amount($code)
+  public function get_sap_invoice_amount($code, $card_code)
   {
     $rs = $this->ms
     ->select('DocTotal')
     ->where('DocNum', $code)
+    ->where('CardCode', $card_code)
+    ->where('CANCELED', 'N')
     ->get('OINV');
 
     if($rs->num_rows() === 1)
@@ -101,11 +103,58 @@ class Return_consignment_model extends CI_Model
   }
 
 
+
+  public function is_exists_sap_doc($code)
+  {
+    $rs = $this->ms
+    ->select('DocEntry')
+    ->where('DocNum', $code)
+    ->get('OINV');
+
+    if($rs->num_rows() === 1)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+  public function is_exists_invoice($invoice, $return_code)
+  {
+    $rs = $this->db->where('return_code', $return_code)->where('invoice_code', $invoice)->get('return_consignment_invoice');
+    if($rs->num_rows() > 0)
+    {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+
+
   public function add_invoice(array $ds = array())
   {
     if(!empty($ds))
     {
       return $this->db->insert('return_consignment_invoice', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  //--- return invoice_code, invoice_amount in return order
+  public function get_all_invoice($code)
+  {
+    $rs = $this->db
+    ->select('invoice_code, invoice_amount')
+    ->where('return_code', $code)
+    ->get('return_consignment_invoice');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
     }
 
     return FALSE;

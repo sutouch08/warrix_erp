@@ -1433,12 +1433,9 @@ class Orders extends PS_Controller
         if(! $this->address_model->update_shipping_address($id, $arr))
         {
           $sc = FALSE;
-          $message = 'แก้ไขที่อยู่ไม่สำเร็จ';
+          $this->error = 'แก้ไขที่อยู่ไม่สำเร็จ';
         }
-        else
-        {
-          //$this->export_ship_to_address($id);
-        }
+
       }
       else
       {
@@ -1462,21 +1459,18 @@ class Orders extends PS_Controller
         if($rs === FALSE)
         {
           $sc = FALSE;
-          $message = 'เพิ่มที่อยู่ไม่สำเร็จ';
+          $this->error = 'เพิ่มที่อยู่ไม่สำเร็จ';
         }
-        else
-        {
-          //$this->export_ship_to_address($rs);
-        }
+
       }
     }
     else
     {
       $sc = FALSE;
-      $message = 'ไมพบชื่อลูกค้าออนไลน์';
+      $this->error = 'ไมพบชื่อลูกค้าออนไลน์';
     }
 
-    echo $sc === TRUE ? 'success' : $message;
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 

@@ -24,8 +24,12 @@ function clearSearch(){
 
 
 
-function goToCheck(){
-  window.location.href = HOME + 'check';
+function goToCheck(barcode){
+  if(barcode !== undefined){
+    window.location.href = HOME + 'check_barcode';
+  }else{
+    window.location.href = HOME + 'check';
+  }
 }
 
 
@@ -97,7 +101,12 @@ function set_zone()
 
 function change_zone(){
   $('#zone-code').val('');
-  goToCheck();
+  var is_barcode = $('#is_barcode').val();
+  if(is_barcode == 1){
+    goToCheck('barcode');
+  }else{
+    goToCheck();
+  }
 }
 
 

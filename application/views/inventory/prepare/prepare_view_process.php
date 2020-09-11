@@ -7,7 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-				<button type="submit" class="btn btn-xs btn-primary"><i class="fa fa-search"></i> Search</button>
+				<button type="button" class="btn btn-xs btn-primary" onclick="getSearch()"><i class="fa fa-search"></i> Search</button>
 		    <button type="button" class="btn btn-xs btn-warning" onclick="clearProcessFilter()"><i class="fa fa-retweet"></i> Reset</button>
 				<button type="button" class="btn btn-xs btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> รอจัด</button>
 			</p>

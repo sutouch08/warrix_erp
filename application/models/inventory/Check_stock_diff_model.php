@@ -165,8 +165,9 @@ class Check_stock_diff_model extends CI_Model
   public function get_stock_and_diff($zone_code, $product_code = NULL)
   {
     $this->ms
-    ->select('OITM.ItemCode')
-    ->select('OITM.U_OLDCODE')
+    ->select('OITM.ItemCode AS product_code')
+    ->select('OITM.CodeBars AS barcode')
+    ->select('OITM.U_OLDCODE AS old_code')
     ->select('OIBQ.OnHandQty')
     ->from('OIBQ')
     ->join('OBIN', 'OIBQ.BinAbs = OBIN.AbsEntry', 'left')
@@ -210,6 +211,22 @@ class Check_stock_diff_model extends CI_Model
     }
 
     return 0;
+  }
+
+
+  public function get_active_diff_zone($zone_code)
+  {
+    $rs = $this->db
+    ->where('zone_code', $zone_code)
+    ->where('status', 0)
+    ->get('stock_diff');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
 
