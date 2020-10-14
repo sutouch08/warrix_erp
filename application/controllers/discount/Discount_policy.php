@@ -113,6 +113,16 @@ class Discount_policy extends PS_Controller
   }
 
 
+  public function view_policy_detail($code)
+  {
+    $this->load->helper('discount_rule');
+    $rs = $this->discount_policy_model->get_policy_by_code($code);
+    $data['policy'] = $rs;
+    $data['rules']  = $this->discount_rule_model->get_policy_rules($rs->id);
+    $this->load->view('discount/policy/policy_view_detail', $data);
+  }
+
+
 
   public function update_policy()
   {

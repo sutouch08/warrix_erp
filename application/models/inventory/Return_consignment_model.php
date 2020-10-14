@@ -68,14 +68,14 @@ class Return_consignment_model extends CI_Model
 
 
 
-  //---- ดึงข้อมูลจากถังกลางมาเช็คสถานะ
+  //---- เช็คเอกสารในก้อน consignment ว่ามีอยู่หรือยัง
   public function get_sap_return_consignment($code)
   {
-    $rs = $this->cn
+    $rs = $this->ms
     ->select('DocEntry')
     ->where('U_ECOMNO', $code)
     ->where('CANCELED', 'N')
-    ->get('CNORDN');
+    ->get('ORDN');
     if($rs->num_rows() === 1)
     {
       return $rs->row();
@@ -141,6 +141,12 @@ class Return_consignment_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function delete_invoice($code, $invoice_code)
+  {
+    return $this->db->where('return_code', $code)->where('invoice_code', $invoice_code)->delete('return_consignment_invoice');
   }
 
 

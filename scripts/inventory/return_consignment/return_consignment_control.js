@@ -9,7 +9,7 @@ $('#barcode').keyup(function(e){
 
 $('#invoice-box').keyup(function(e){
   if(e.keyCode === 13){
-    load_invoice();
+    add_invoice();
   }
 })
 
@@ -58,6 +58,11 @@ function doReceive()
             var pd = $.parseJSON(rs);
             var code = pd.code;
             var gp = $('#gp').val();
+            var price = parseFloat(pd.price).toFixed(2);
+            var discount = (parseFloat(gp) * 0.01).toFixed(2);
+            var amount = price * qty;
+            var disAmount = (price * discount) * qty;
+
             if(code.length)
             {
               var invoice = $('#invoice_code').val();
@@ -70,10 +75,10 @@ function doReceive()
                 'code' : pd.code,
                 'name' : pd.name,
                 'qty' : qty,
-                'price' : pd.price,
+                'price' : price,
                 'invoice' : invoice,
                 'discount' : gp,
-                'amount' : addCommas((parseFloat(pd.price) * qty).toFixed(2))
+                'amount' : addCommas((amount - disAmount ).toFixed(2))
               };
 
               var source = $('#row-template').html();
@@ -153,7 +158,7 @@ function add_invoice()
       if(isJson(rs))
       {
         var data = $.parseJSON(rs);
-        $('#invoice').val(data.invoice);
+        $('#invoice_list').html(data.invoice);
         $('#bill_amount').val(data.amount);
         $('#invoice-box').val('');
       }
@@ -168,6 +173,41 @@ function add_invoice()
     }
   })
 }
+
+
+
+function removeInvoice(return_code, invoice_code)
+{
+  load_in();
+  $.ajax({
+    url:HOME + 'remove_invoice',
+    type:'GET',
+    cache:false,
+    data:{
+      'return_code' : return_code,
+      'invoice_code' : invoice_code
+    },
+    success:function(rs){
+      load_out();
+      if(isJson(rs)){
+        var ds = $.parseJSON(rs);
+        $('#invoice_list').html(ds.invoice);
+        $('#bill_amount').val(ds.amount);
+      }
+      else
+      {
+        swal({
+          title:'Error!',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}
+
+
+
 
 function load_invoice(){
   var code = $('#return_code').val();

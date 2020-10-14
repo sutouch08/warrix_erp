@@ -48,7 +48,7 @@
 
 				<td class="middle text-center">
 				<?php if( $order->is_expired == 0) : ?>
-				<?php  $active = ($order->state == 1 && empty($approve_view) && $order->is_approved == 0 )  ? '' : 'disabled'; ?>
+				<?php  $active = ($this->pm->can_approve OR ($order->state == 1 && empty($approve_view) && $order->is_approved == 0 ))  ? '' : 'disabled'; ?>
 					<input type="checkbox"
 					class="ace not-return"
 					id="chk-<?php echo $rs->id; ?>"
@@ -66,7 +66,7 @@
         <td class="middle" id="transform-box-<?php echo $rs->id; ?>">
 					<?php
 						//---	รายการสินค้าที่เชื่อมโยงแล้ว
-						echo getTransformProducts($rs->transform_product, $order->state, $order->is_expired, $order->is_approved);
+						echo getTransformProducts($rs->transform_product, $order->state, $order->is_expired, $order->is_approved, $this->pm->can_approve);
 					 ?>
 					<!--- ยอดรวมของสินค้าที่เชื่อมโยงแล้ว -->
 					<input type="hidden" id="transform-qty-<?php echo $rs->id; ?>" value="<?php echo $rs->sum_transform_product_qty; ?>" />

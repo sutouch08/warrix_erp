@@ -159,6 +159,16 @@
     </div>
   </div>
 
+	<div class="form-group">
+    <label class="col-sm-3 control-label no-padding-right">Over due</label>
+    <div class="col-xs-12 col-sm-4">
+			<label class="margin-top-5">
+				<input type="checkbox" class="ace input-lg" name="skip_overdue" id="skip_overdue" value="1" <?php echo is_checked('1', $ds->skip_overdue); ?>>
+				<span class="lbl bigger-120"> ไม่ตรวจสอบยอดค้างชำระ</span>
+			</label>
+    </div>
+  </div>
+
 
 	<div class="divider-hidden">
 

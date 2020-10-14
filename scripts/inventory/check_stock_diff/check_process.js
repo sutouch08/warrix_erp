@@ -12,7 +12,7 @@ function check_barcode(){
   var barcode = $('#barcode').val();
   var qty = parseInt($('#qty').val());
   var isExists = $('[data-barcode="'+barcode+'"]').length;
-  var topRow = $('#topRow').val();
+  var topRow = parseInt($('#topRow').val());
 
   if(zone.length == 0){
     swal('กรุณาระบุโซน');
@@ -68,6 +68,7 @@ function check_barcode(){
     var c_qty = parseInt(input.val());
     var new_qty = c_qty + qty;
     input.val(new_qty);
+    $('#check_'+no).attr('checked', true);
     cal_diff(no);
   }
 

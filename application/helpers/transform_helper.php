@@ -1,5 +1,5 @@
 <?php
-function getTransformProducts($transform_product, $state = 1, $is_expired = 0, $is_approved = 0)
+function getTransformProducts($transform_product, $state = 1, $is_expired = 0, $is_approved = 0, $can_approve = 0)
 {
 	$sc = '';
 
@@ -10,18 +10,22 @@ function getTransformProducts($transform_product, $state = 1, $is_expired = 0, $
 			$sc .= '<div class="display-block">';
 			$sc .= $rs->product_code.' : '.$rs->order_qty;
 
-			//---	ถ้ายังไม่ได้รับสินค้า สามารถลบได้
-			if( $is_expired == 0 && $is_approved == 0 && $rs->receive_qty == 0 && $state < 3)
+			if($is_expired == 0 && (($is_approved == 0 && $state == 1) OR $can_approve))
 			{
-				$sc .= '<span class="red pointer" onclick="removeTransformProduct('.$rs->id_order_detail.', \''.$rs->product_code.'\')">  <i class="fa fa-times">';
-				$sc .= '</i></span>';
+				//---	ถ้ายังไม่ได้รับสินค้า สามารถลบได้
+				if($rs->receive_qty == 0)
+				{
+					$sc .= '<span class="red pointer" onclick="removeTransformProduct('.$rs->id_order_detail.', \''.$rs->product_code.'\')">  <i class="fa fa-times">';
+					$sc .= '</i></span>';
+				}
+
+				if($rs->receive_qty > 0)
+				{
+					$sc .= '<span class="red pointer" onClick="editTransformProduct('.$rs->id_order_detail.', \''.$rs->product_code.'\', '.$rs->receive_qty.', '.$rs->sold_qty.')"> <i class="fa fa-pencil">';
+					$sc .= '</i></span>';
+				}
 			}
 
-			if( $is_expired == 0 && $is_approved == 0 && $rs->receive_qty > 0 && $state < 3)
-			{
-				$sc .= '<span class="red pointer" onClick="editTransformProduct('.$rs->id_order_detail.', \''.$rs->product_code.'\', '.$rs->receive_qty.', '.$rs->sold_qty.')"> <i class="fa fa-pencil">';
-				$sc .= '</i></span>';
-			}
 
 			$sc .= '</div>';
 		}

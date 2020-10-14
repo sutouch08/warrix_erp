@@ -8,10 +8,13 @@ class Menu extends CI_Model{
     parent::__construct();
   }
 
-  public function get_active_menu_groups()
+  public function get_active_menu_groups($type = 'side')
   {
-    $this->db->order_by('position', 'ASC');
-    $rs = $this->db->where('active', 1)->get('menu_group');
+    $rs = $this->db
+    ->where('type', $type)
+    ->where('active', 1)
+    ->order_by('position', 'ASC')
+    ->get('menu_group');
     return $rs->result();
   }
 

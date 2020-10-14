@@ -52,7 +52,7 @@ class Main_model extends CI_Model
   }
 
 
-  public function search_items_list($txt, $color = NULL, $color_group = NULL, $limit = NULL)
+  public function search_items_list($txt, $limit = NULL)
   {
     $this->db
     ->select('pd.code, pd.name')
@@ -65,16 +65,6 @@ class Main_model extends CI_Model
     ->or_like('pd.old_code', $txt)
     ->or_like('pd.name', $txt)
     ->group_end();
-
-    if(!empty($color_group))
-    {
-      $this->db->where('co.id_group', $color_group);
-    }
-
-    if(!empty($color))
-    {
-      $this->db->like('pd.color_code', $color);
-    }
 
     $this->db
     ->order_by('style.code', 'ASC')

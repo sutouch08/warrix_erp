@@ -55,7 +55,7 @@ class Return_lend_model extends CI_Model
     $qr .= "AND old.product_code = rld.product_code ";
     $qr .= "WHERE rld.return_code = '{$code}'";
     $rs  = $this->db->query($qr);
-    
+
     if($rs->num_rows() > 0)
     {
       return $rs->result();
@@ -261,6 +261,8 @@ class Return_lend_model extends CI_Model
       $this->db->where('date_add >=', from_date($ds['from_date']));
       $this->db->where('date_add <=', to_date($ds['to_date']));
     }
+
+    $this->db->order_by('code', 'DESC');
 
     if(!empty($perpage))
     {

@@ -229,6 +229,14 @@ class Consign_order extends PS_Controller
       }
       else
       {
+        $this->db->trans_begin();
+        //--- if WX loaded remove and change WX status
+        if(!empty($doc->ref_code))
+        {
+          $this->load->model('inventory/consign_check_model');
+          $this->consign_check_model->update_ref_code($doc->ref_code, NULL, 0);
+        }
+
         if(! $this->consign_order_model->drop_details($code))
         {
           $sc = FALSE;
@@ -241,6 +249,15 @@ class Consign_order extends PS_Controller
             $sc = FALSE;
             $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
           }
+        }
+
+        if($sc === TRUE)
+        {
+          $this->db->trans_commit();
+        }
+        else
+        {
+          $this->db->trans_rollback();
         }
       }
     }
@@ -546,7 +563,7 @@ class Consign_order extends PS_Controller
         //--- check stock and update status each row
         foreach($details as $rs)
         {
-          
+
           //--- get item info
           $item = $this->products_model->get($rs->product_code);
 
@@ -865,78 +882,86 @@ class Consign_order extends PS_Controller
 
                 if(!empty($item))
                 {
-                  $disc = parse_discount_text($discLabel, $price);
-                  $discount = $disc['discount_amount'];
-                  $amount = ($price - $discount) * $qty;
-                  $input_type = 3;  //--- 1 = key in , 2 = load diff, 3 = excel
-                  $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 10000000;
-                  $c_qty = $item->count_stock == 1 ? $this->consign_order_model->get_unsave_qty($code, $item->code, $price, $discLabel, $input_type) : 0;
-                  $detail = $this->consign_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
-
-                  $diff = $stock - ($qty + $c_qty);
-
-                  if(empty($detail))
+                  if($item->active)
                   {
-                    //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
-                    if(($qty + $c_qty) <= $stock OR $auz === TRUE)
+                    $disc = parse_discount_text($discLabel, $price);
+                    $discount = $disc['discount_amount'];
+                    $amount = ($price - $discount) * $qty;
+                    $input_type = 3;  //--- 1 = key in , 2 = load diff, 3 = excel
+                    $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 10000000;
+                    $c_qty = $item->count_stock == 1 ? $this->consign_order_model->get_unsave_qty($code, $item->code, $price, $discLabel, $input_type) : 0;
+                    $detail = $this->consign_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
+
+                    $diff = $stock - ($qty + $c_qty);
+
+                    if(empty($detail))
                     {
-                      //--- add new row
-                      $arr = array(
-                        'consign_code' => $code,
-                        'style_code' => $item->style_code,
-                        'product_code' => $item->code,
-                        'product_name' => $item->name,
-                        'cost' => $item->cost,
-                        'price' => $price,
-                        'qty' => $qty,
-                        'discount' => discountLabel($disc['discount1'], $disc['discount2'], $disc['discount3']),
-                        'discount_amount' => $discount * $qty,
-                        'amount' => $amount,
-                        'ref_code' => NULL,
-                        'input_type' => $input_type
-                      );
+                      //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
+                      if(($qty + $c_qty) <= $stock OR $auz === TRUE)
+                      {
+                        //--- add new row
+                        $arr = array(
+                          'consign_code' => $code,
+                          'style_code' => $item->style_code,
+                          'product_code' => $item->code,
+                          'product_name' => $item->name,
+                          'cost' => $item->cost,
+                          'price' => $price,
+                          'qty' => $qty,
+                          'discount' => discountLabel($disc['discount1'], $disc['discount2'], $disc['discount3']),
+                          'discount_amount' => $discount * $qty,
+                          'amount' => $amount,
+                          'ref_code' => NULL,
+                          'input_type' => $input_type
+                        );
 
-                      $add = $this->consign_order_model->add_detail($arr); //-- return id if success
+                        $add = $this->consign_order_model->add_detail($arr); //-- return id if success
 
-                      if($add === FALSE )
+                        if($add === FALSE )
+                        {
+                          $sc = FALSE;
+                          $this->error = "เพิ่มรายการไม่สำเร็จ";
+                        }
+
+                      }
+                      else
                       {
                         $sc = FALSE;
-                        $this->error = "เพิ่มรายการไม่สำเร็จ";
+                        $this->error .= "<span>ยอดในโซนไม่พอตัด {$item->code} : {$diff} </span><br/>";
                       }
-
                     }
                     else
                     {
-                      $sc = FALSE;
-                      $this->error .= "<span>ยอดในโซนไม่พอตัด {$item->code} : {$diff} </span><br/>";
-                    }
+                      //-- update new rows
+                      //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
+                      $new_qty = $qty + $c_qty;
+                      if($new_qty <= $stock OR $auz === TRUE)
+                      {
+                        //--- add new row
+                        $arr = array(
+                          'qty' => $new_qty,
+                          'discount_amount' => $discount * $new_qty,
+                          'amount' => ($price - $discount) * $new_qty
+                        );
+
+                        if(! $this->consign_order_model->update_detail($detail->id, $arr))
+                        {
+                          $sc = FALSE;
+                          $this->error = "ปรับปรุงรายการไม่สำเร็จ";
+                        }
+                      }
+                      else
+                      {
+                        $sc = FALSE;
+                        $this->error .= "<span>ยอดในโซนไม่พอตัด {$item->code} : {$diff} </span><br/>";
+                      }
+                    } //--- end if empty detail
                   }
                   else
                   {
-                    //-- update new rows
-                    //--- ถ้าจำนวนที่ยังไม่บันทึก รวมกับจำนวนใหม่ไม่เกินยอดในโซน หรือ คลังสามารถติดลบได้
-                    $new_qty = $qty + $c_qty;
-                    if($new_qty <= $stock OR $auz === TRUE)
-                    {
-                      //--- add new row
-                      $arr = array(
-                        'qty' => $new_qty,
-                        'discount_amount' => $discount * $new_qty,
-                        'amount' => ($price - $discount) * $new_qty
-                      );
-
-                      if(! $this->consign_order_model->update_detail($detail->id, $arr))
-                      {
-                        $sc = FALSE;
-                        $this->error = "ปรับปรุงรายการไม่สำเร็จ";
-                      }
-                    }
-                    else
-                    {
-                      $sc = FALSE;
-                      $this->error .= "<span>ยอดในโซนไม่พอตัด {$item->code} : {$diff} </span><br/>";
-                    }
-                  } //--- end if empty detail
+                    $sc = FALSE;
+                    $this->error .= "<span>{$item->code} is Inactive</span><br/>";
+                  }
                 }
                 else
                 {

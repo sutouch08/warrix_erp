@@ -30,6 +30,7 @@ class Customers extends PS_Controller
     $type = get_filter('type', 'type', '');
     $class = get_filter('class', 'class', '');
     $area = get_filter('area', 'area', '');
+    $skip = get_filter('skip_overdue', 'skip_overdue', 'all');
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_rows();
@@ -388,6 +389,7 @@ class Customers extends PS_Controller
       $code = $this->input->post('code');
       $name = $this->input->post('name');
       $gp = $this->input->post('gp');
+      $skip_overdue = $this->input->post('skip_overdue');
       $fml_code = get_null($this->input->post('old_code'));
 
       $ds = array(
@@ -406,7 +408,8 @@ class Customers extends PS_Controller
         'sale_code' => get_null($this->input->post('sale')),
         'CreditLine' => floatval($this->input->post('CreditLine')),
         'old_code' => $fml_code,
-        'gp' => $gp
+        'gp' => $gp,
+        'skip_overdue' => $skip_overdue
       );
 
       if($sc === TRUE && $this->customers_model->is_exists($code, $old_code) === TRUE)

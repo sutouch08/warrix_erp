@@ -45,17 +45,6 @@
 <?php $this->load->view('setting/setting_inventory'); ?>
 
 
-<!---  ตั้งค่า Interface path ในการนำเข้าข้อมูลจาก formula  --------------------------------------------------->
-<?php //include 'include/setting/setting_import.php'; ?>
-
-<!---  ตั้งค่า path สำหรับเก็บไฟล์ที่นำเข้าข้อมูลเรียบร้อยแล้ว  --------------------------------------------------->
-<?php //include 'include/setting/setting_move.php'; ?>
-
-<!---  ตั้งค่าเอกสาร  --------------------------------------------------->
-<?php //include 'include/setting/setting_bookcode.php'; ?>
-
-
-
 </div>
 </div><!--/ col-sm-9  -->
 </div><!--/ row  -->

@@ -153,7 +153,7 @@ class Orders_model extends CI_Model
     ->order_by('products.color_code', 'ASC')
     ->order_by('product_size.position', 'ASC')
     ->get();
-    
+
     if($rs->num_rows() > 0)
     {
       return $rs->result();
@@ -290,12 +290,19 @@ class Orders_model extends CI_Model
 
   public function un_expired($code)
   {
-    $qr = "UPDATE orders, order_details ";
-    $qr .= "SET orders.is_expired = 0, order_details.is_expired = 0 ";
-    $qr .= "WHERE orders.code = '{$code}' ";
-    $qr .= "AND order_details.order_code = orders.code";
+    $this->db->trans_start();
+    $this->db->set('is_expired', 0)->where('code', $code)->update('orders');
+    $this->db->set('is_expired', 0)->where('order_code', $code)->update('order_details');
+    $this->db->trans_complete();
+    if($this->db->trans_status() === FALSE)
+    {
+      return FALSE;
+    }
+    else
+    {
+      return TRUE;
+    }
 
-    return $this->db->query($qr);
   }
 
 
@@ -1067,12 +1074,12 @@ class Orders_model extends CI_Model
     return NULL;
   }
 
-
+  //--- WT
   public function get_order_transfer_non_inv_code($limit = 100)
   {
     $rs = $this->db
     ->select('code')
-    ->where_in('role', array('Q', 'T', 'N', 'L'))
+    ->where('role', 'N')
     ->where('state', 8)
     ->where('status', 1)
     ->where('is_cancled', 0)
@@ -1088,6 +1095,54 @@ class Orders_model extends CI_Model
 
     return NULL;
   }
+
+
+  //---- WL
+  public function get_order_lend_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where('role', 'L')
+    ->where('state', 8)
+    ->where('status', 1)
+    ->where('is_cancled', 0)
+    ->where('is_expired', 0)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  //--- WQ, WV
+  public function get_order_transform_non_inv_code($limit = 100)
+  {
+    $rs = $this->db
+    ->select('code')
+    ->where_in('role', array('Q','T'))
+    ->where('state', 8)
+    ->where('status', 1)
+    ->where('is_cancled', 0)
+    ->where('is_expired', 0)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
 
   public function get_sap_doc_num($code)
   {

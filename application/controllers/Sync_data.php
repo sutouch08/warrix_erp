@@ -374,8 +374,49 @@ class Sync_data extends CI_Controller
   }
 
 
+  public function syncOrderTransformInvCode()
+  {
+    $this->load->model('orders/orders_model');
+    $this->load->model('inventory/transfer_model');
+    $ds = $this->orders_model->get_order_transform_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->transfer_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          if($this->orders_model->update_inv($rs->code, $inv))
+          {
+            $this->orders_model->set_complete($rs->code);
+          }
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WQ-WV',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
 
 
+  //---- WT
   public function syncOrderTransferInvCode()
   {
     $this->load->model('orders/orders_model');
@@ -406,7 +447,50 @@ class Sync_data extends CI_Controller
     }
 
     $logs = array(
-      'sync_item' => 'WT-WQ-WV',
+      'sync_item' => 'WT',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+  //---- WT
+  public function syncOrderLendInvCode()
+  {
+    $this->load->model('orders/orders_model');
+    $this->load->model('inventory/transfer_model');
+    $ds = $this->orders_model->get_order_lend_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->transfer_model->get_sap_doc_num($rs->code);
+        if(!empty($inv))
+        {
+          if($this->orders_model->update_inv($rs->code, $inv))
+          {
+            $this->orders_model->set_complete($rs->code);
+          }
+          $update++;
+        }
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WL',
       'get_item' => $count,
       'update_item' => $update
     );

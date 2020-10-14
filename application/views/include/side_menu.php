@@ -1,5 +1,5 @@
 <?php
-$menuGroups = $this->menu->get_active_menu_groups();
+$menuGroups = $this->menu->get_active_menu_groups('side');
 $menu_sub_group_code = isset($this->menu_sub_group_code) ? $this->menu_sub_group_code : NULL;
 ?>
 
@@ -7,7 +7,7 @@ $menu_sub_group_code = isset($this->menu_sub_group_code) ? $this->menu_sub_group
 	<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
 		<button class="btn btn-purple" onclick="go_to('view_stock')" title="สต็อกคงเหลือ"><i class="ace-icon fa fa-tags"></i></button>
 		<button class="btn btn-info" onclick="go_to('orders/orders')" title="ออเดอร์"><i class="ace-icon fa fa-shopping-basket"></i></button>
-		<button class="btn btn-warning" onclick="go_to('inventory/prepare')" title="จัดสินค้า"><i class="ace-icon fa fa-laptop"></i></button>
+		<button class="btn btn-warning" onclick="go_to('find_stock')" title="สต็อกคงเหลือ"><i class="ace-icon fa fa-laptop"></i></button>
 		<button class="btn btn-danger" onclick="go_to('setting/configs')" title="ตั้งค่า"><i class="ace-icon fa fa-cogs"></i></button>
 	</div>
 	<div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">

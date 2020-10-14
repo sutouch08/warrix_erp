@@ -229,7 +229,7 @@ function add_vat($amount, $vat = NULL)
 	{
 		$vat = getConfig('SALE_VAT_RATE'); //-- 7
 	}
-	
+
 	if( $vat != 0 )
 	{
 		$re_vat = $vat * 0.01;

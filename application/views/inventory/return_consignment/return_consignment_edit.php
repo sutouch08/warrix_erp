@@ -87,44 +87,28 @@
 <div class="row">
 	<div class="col-sm-4 col-xs-12 padding-5 first">
 		<label>เลขที่บิล</label>
-		<span id="invoice_list" class="form-control input-sm" disabled><?php echo $doc->invoice; ?></span>
+		<span id="invoice_list" class="form-control input-sm" disabled><?php echo $doc->invoice_list; ?></span>
+	</div>
+	<div class="col-sm-2 col-xs-6 padding-5">
+		<label>มูลค่าบิล</label>
+		<input type="number" class="form-control input-sm text-center" name="bill_amount" id="bill_amount" value="<?php echo $doc->invoice_amount; ?>" disabled />
+	</div>
+	<div class="col-sm-2 padding-5">
+		<label>เพิ่มบิล[SAP]</label>
+		<input type="text" class="form-control input-sm text-center" id="invoice-box" placeholder="ดึงใบกำกับเพิ่มเติม" />
+	</div>
+	<div class="col-sm-1 padding-5 last">
+		<label class="display-block not-show">btn</label>
+		<button type="button" class="btn btn-xs btn-info btn-block" onclick="add_invoice()">เพิ่มบิล</button>
 	</div>
 </div>
 <div class="row">
-	<div class="col-sm-1 padding-5 first">
-    	<label>จำนวน</label>
-        <input type="number" class="form-control input-sm text-center" id="qty" value="1" />
-    </div>
-    <div class="col-sm-2 padding-5">
-    	<label>บาร์โค้ดสินค้า</label>
-        <input type="text" class="form-control input-sm text-center" id="barcode" placeholder="ยิงบาร์โค้ดเพื่อรับสินค้า" autocomplete="off"  />
-    </div>
-    <div class="col-sm-1 padding-5">
-    	<label class="display-block not-show">ok</label>
-        <button type="button" class="btn btn-xs btn-primary" onclick="doReceive()"><i class="fa fa-check"></i> ตกลง</button>
-    </div>
 
-		<div class="col-sm-3 col-xs-6 padding-5">
-			<label>มูลค่าบิล</label>
-			<input type="number" class="form-control input-sm text-center" name="bill_amount" id="bill_amount" value="<?php echo $doc->invoice_amount; ?>" disabled />
-		</div>
 
-		<div class="col-sm-2 col-sm-offset-5 padding-5">
-			<label>เพิ่มบิล[SAP]</label>
-			<input type="text" class="form-control input-sm text-center" id="invoice-box" placeholder="ดึงใบกำกับเพิ่มเติม" />
-		</div>
-		<div class="col-sm-1 padding-5 last">
-			<label class="display-block not-show">btn</label>
-			<button type="button" class="btn btn-xs btn-info btn-block" onclick="add_invoice()">เพิ่มบิล</button>
-		</div>
 </div>
 <hr class="margin-top-10 margin-bottom-10"/>
-<div class="row">
-	<div class="col-sm-2 col-sm-offset-10 padding-5 last">
-		<button type="button" class="btn btn-sm btn-danger btn-block" onclick="deleteChecked()"><i class="fa fa-trash"></i> ลบรายการที่เลือก</button>
-	</div>
-</div>
-<hr class="margin-top-15 margin-bottom-15"/>
+<?php $this->load->view('inventory/return_consignment/return_consignment_control'); ?>
+
 <form id="detailsForm" method="post" action="<?php echo $this->home.'/add_details/'.$doc->code; ?>">
 <div class="row">
 	<div class="col-sm-12">
@@ -132,6 +116,10 @@
 			<thead>
 				<tr>
 					<th class="width-5 text-center">ลำดับ</th>
+					<th class="width-5 text-center">
+					<input type="checkbox" id="chk-all" class="ace" onchange="toggleCheckAll($(this))"/>
+					<span class="lbl"></span>
+					</th>
 					<th class="width-10">บาร์โค้ด</th>
 					<th class="">สินค้า</th>
 					<th class="width-8 text-center">อ้างอิง</th>
@@ -151,6 +139,10 @@
 <?php  foreach($details as $rs) : ?>
 				<tr id="row_<?php echo $rs->no; ?>">
 					<td class="middle text-center no"><?php echo $no; ?></td>
+					<td class="middle text-center">
+						<input type="checkbox" class="chk ace" data-id="<?php echo $rs->id; ?>" value="<?php echo $no; ?>">
+						<span class="lbl"></span>
+					</td>
 					<td class="middle <?php echo $rs->no; ?>"><?php echo $rs->barcode; ?></td>
 					<td class="middle"><?php echo $rs->product_code .' : '.$rs->product_name; ?></td>
 					<td class="middle text-center"><?php echo $rs->invoice_code; ?>	</td>
@@ -190,7 +182,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="7" class="middle text-right">รวม</td>
+					<td colspan="8" class="middle text-right">รวม</td>
 					<td class="middle widht-10 text-right" id="total-qty"><?php echo number($total_qty); ?></td>
 					<td class="middle width-10 text-right" id="total-amount"><?php echo number($total_amount, 2); ?></td>
 					<td class="width-5"></td>
@@ -285,6 +277,10 @@
 <script type="text/x-handlebarsTemplate" id="row-template">
 	<tr id="row_{{no}}">
 		<td class="middle text-center no"></td>
+		<td class="middle text-center">
+			<input type="checkbox" class="chk ace" data-id="" value="{{no}}">
+			<span class="lbl"></span>
+		</td>
 		<td class="middle {{no}}">{{barcode}}</td>
 		<td class="middle">{{code}} : {{name}}</td>
 		<td class="middle text-center invoice">{{invoice}}</td>

@@ -198,15 +198,16 @@ public function print_header()
 	$height = ($this->header_rows * $this->row_height) +1;
 	$i	= 0;
 	$v  = 1;
+	$x = 1;
 	$header = "<div style='width:".$this->content_width."mm; min-height:".$height."mm; margin:auto; margin-bottom:2mm; border:solid 2px #ccc; border-radius: 10px;' >";
 	while(	$i < $r)
 	{
+		$od = ($x)%2;
+		$width = ( $od == 1) ? '60%' : '40%';
 		foreach($rd[$i] as $label => $value)
 		{
-			//$od = ($i+1)%2;
-			//$width = ($r == $v && $od == 1) ? '100%' : '50%';
-			$width = '50%';
-			$header .= '<div style="width:'.$width.'; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px;">';
+			//$width = '50%';
+			$header .= '<div style="font-size:12px; width:'.$width.'; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px;">';
 			$header .=  $label.' : '.$value; //'<input type="text" class="print-row" value="'.$label.' : &nbsp;&nbsp;'.$value.'" />';
 			$header .= '</div>';
 
@@ -218,7 +219,9 @@ public function print_header()
 			// $header .= '<div style="width:40%; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:5px; font-size:12px;">';
 			// $header .= '<input type="text" class="print-row" value="'.$value.'" />';
 			// $header .= '</div>';
+
 		}
+		$x++;
 		$i++;
 		$v++;
 	}

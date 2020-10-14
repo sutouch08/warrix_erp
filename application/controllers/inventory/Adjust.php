@@ -320,25 +320,17 @@ class Adjust extends PS_Controller
           {
             if($doc->status == 0)
             {
-              if($detail->valid == 0)
+              if( ! $this->adjust_model->delete_detail($id))
               {
-                if( ! $this->adjust_model->delete_detail($id))
-                {
-                  $sc = FALSE;
-                  $this->error = "ลบรายการไม่สำเร็จ";
-                }
-                else
-                {
-                  if($detail->id_diff)
-                  {
-                    $this->check_stock_diff_model->update($detail->id_diff, array('status' => 0));
-                  }
-                }
+                $sc = FALSE;
+                $this->error = "ลบรายการไม่สำเร็จ";
               }
               else
               {
-                $sc = FALSE;
-                $this->error = "รายการถูกปรับยอดแล้วไม่สามารถแก้ไขได้";
+                if($detail->id_diff)
+                {
+                  $this->check_stock_diff_model->update($detail->id_diff, array('status' => 0));
+                }
               }
             }
             else

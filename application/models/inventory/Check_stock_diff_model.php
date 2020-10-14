@@ -214,6 +214,32 @@ class Check_stock_diff_model extends CI_Model
   }
 
 
+
+  public function get_active_diff_not_in_stock($zone_code, array $pd_in = array(), $pd_code = NULL)
+  {
+    if(!empty($pd_in))
+    {
+      $this->db
+      ->where('zone_code', $zone_code)
+      ->where_not_in('product_code', $pd_in)
+      ->where('status', 0);
+      if(!empty($pd_code))
+      {
+        $this->db->like('product_code', $pd_code);
+      }
+
+      $rs = $this->db->get('stock_diff');
+
+      if($rs->num_rows() > 0)
+      {
+        return $rs->result();
+      }
+    }
+
+    return FALSE;
+  }
+
+
   public function get_active_diff_zone($zone_code)
   {
     $rs = $this->db

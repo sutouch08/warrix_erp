@@ -158,6 +158,12 @@ class Products_model extends CI_Model
         }
       }
 
+
+      if(!empty($ds['color_group']))
+      {
+        $this->db->where('product_color.id_group', $ds['color_group']);
+      }
+
       if(!empty($ds['size']))
       {
         if($ds['size'] === 'NULL')
@@ -166,9 +172,7 @@ class Products_model extends CI_Model
         }
         else
         {
-          $this->db->group_start();
-          $this->db->like('product_size.code', $ds['size'])->or_like('product_size.name', $ds['size']);
-          $this->db->group_end();
+          $this->db->where('product_size.code', $ds['size']);
         }
       }
 
@@ -256,6 +260,11 @@ class Products_model extends CI_Model
         }
       }
 
+      if(!empty($ds['color_group']))
+      {
+        $this->db->where('product_color.id_group', $ds['color_group']);
+      }
+
       if(!empty($ds['size']))
       {
         if($ds['size'] === 'NULL')
@@ -264,11 +273,25 @@ class Products_model extends CI_Model
         }
         else
         {
-          $this->db->group_start();
-          $this->db->like('product_size.code', $ds['size'])->or_like('product_size.name', $ds['size']);
-          $this->db->group_end();
+          $this->db->where('product_size.code', $ds['size']);
         }
       }
+
+      if(!empty($ds['price']))
+      {
+        $operater = !empty($ds['operater']) ? $ds['operater'] : 'less_than';
+
+        if($operater === 'more_than')
+        {
+          $this->db->where('products.price >=', $ds['price'], FALSE);
+        }
+        else
+        {
+          $this->db->where('products.price <=', $ds['price'], FALSE);
+        }
+      }
+
+
 
       if(!empty($ds['group']))
       {

@@ -33,9 +33,6 @@ class Stock_balance extends PS_Controller
     $allWhouse = $this->input->get('allWhouse');
     $warehouse = $this->input->get('warehouse');
 
-    $currentDate = $this->input->get('currentDate');
-    $date = $this->input->get('date');
-
     $wh_list = '';
     if(!empty($warehouse))
     {
@@ -48,19 +45,12 @@ class Stock_balance extends PS_Controller
     }
 
     //---  Report title
-    $sc['reportDate'] = $currentDate == 0 ? thai_date($date,FALSE, '/') : thai_date(date('Y-m-d'),FALSE, '/');
+    $sc['reportDate'] = thai_date(date('Y-m-d'),FALSE, '/');
     $sc['whList']   = $allWhouse == 1 ? 'ทั้งหมด' : $wh_list;
     $sc['productList']   = $allProduct == 1 ? 'ทั้งหมด' : '('.$pdFrom.') - ('.$pdTo.')';
 
 
-    if($currentDate == 1)
-    {
-      $result = $this->inventory_report_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
-    }
-    else
-    {
-      $result = $this->inventory_report_model->get_stock_balance_prev_date($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse, $date);
-    }
+    $result = $this->inventory_report_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
 
     $bs = array();
 
@@ -126,8 +116,6 @@ class Stock_balance extends PS_Controller
     $allWhouse = $this->input->post('allWhouse');
     $warehouse = $this->input->post('warehouse');
 
-    $currentDate = $this->input->post('currentDate');
-    $date = $this->input->post('date');
 
     $wh_list = '';
     if(!empty($warehouse))
@@ -142,18 +130,11 @@ class Stock_balance extends PS_Controller
 
 
     //---  Report title
-    $report_title = 'รายงานสินค้าคงเหลือ ณ วันที่  '.thai_date(date('Y-m-d'), '/').'      (  วันที่พิมพ์รายงาน : '.date('d/m/Y').'  เวลา : '.date('H:i:s').' )';
+    $report_title = 'รายงานสินค้าคงเหลือ ณ วันที่  '.thai_date(date('Y-m-d'), '/');
     $wh_title     = 'คลัง :  '. ($allWhouse == 1 ? 'ทั้งหมด' : $wh_list);
     $pd_title     = 'สินค้า :  '. ($allProduct == 1 ? 'ทั้งหมด' : '('.$pdFrom.') - ('.$pdTo.')');
 
-    if($currentDate == 1)
-    {
-      $result = $this->stock_balance_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
-    }
-    else
-    {
-      $result = $this->stock_balance_model->get_stock_balance_prev_date($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse, $date);
-    }
+    $result = $this->inventory_report_model->get_current_stock_balance($allProduct, $pdFrom, $pdTo, $allWhouse, $warehouse);
 
     //--- load excel library
     $this->load->library('excel');
@@ -184,15 +165,19 @@ class Stock_balance extends PS_Controller
       $no = 1;
       foreach($result as $rs)
       {
-        $this->excel->getActiveSheet()->setCellValue('A'.$row, $no);
-        $this->excel->getActiveSheet()->setCellValue('B'.$row, $rs->barcode);
-        $this->excel->getActiveSheet()->setCellValue('C'.$row, $rs->code);
-        $this->excel->getActiveSheet()->setCellValue('D'.$row, $rs->name);
-        $this->excel->getActiveSheet()->setCellValue('E'.$row, $rs->cost);
-        $this->excel->getActiveSheet()->setCellValue('F'.$row, $rs->qty);
-        $this->excel->getActiveSheet()->setCellValue('G'.$row, '=E'.$row.'*F'.$row);
-        $no++;
-        $row++;
+        $item = $this->products_model->get($rs->product_code);
+        if(!empty($item))
+        {
+          $this->excel->getActiveSheet()->setCellValue('A'.$row, $no);
+          $this->excel->getActiveSheet()->setCellValue('B'.$row, $item->barcode);
+          $this->excel->getActiveSheet()->setCellValue('C'.$row, $item->code);
+          $this->excel->getActiveSheet()->setCellValue('D'.$row, $item->name);
+          $this->excel->getActiveSheet()->setCellValue('E'.$row, $item->cost);
+          $this->excel->getActiveSheet()->setCellValue('F'.$row, $rs->qty);
+          $this->excel->getActiveSheet()->setCellValue('G'.$row, ($item->cost * $rs->qty));
+          $no++;
+          $row++;
+        }
       }
 
       $res = $row -1;

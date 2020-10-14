@@ -74,7 +74,7 @@
 <div class="row">
 	<div class="col-sm-12">
 		<p  class="pull-right top-p">
-			ว่างๆ = ปกติ, &nbsp; <span class="blue">NC</span> = ยังไม่บันทึก
+			ว่างๆ = ปกติ, &nbsp; <span class="blue">NC</span> = ยังไม่บันทึก, &nbsp; <span class="red">CN</span> = ยกเลิก
 		</p>
 		<table class="table table-striped table-hover border-1">
 			<thead>
@@ -109,14 +109,16 @@
 								<?php endif; ?>
 							</td>
 							<td class="middle text-right">
+								<!--
 								<?php if($rs->status == 1 && $rs->date_add >= '2019-10-01 00:00:00') : ?>
 									<button type="button" class="btn btn-minier btn-primary" onclick="export_to_sap('<?php echo $rs->code; ?>')"><i class="fa fa-send"></i> SAP</button>
 								<?php endif; ?>
+							-->
 								<button type="button" class="btn btn-minier btn-info" onclick="goDetail('<?php echo $rs->code; ?>')"><i class="fa fa-eye"></i></button>
 								<?php if($rs->status == 0 && $this->pm->can_edit) : ?>
 									<button type="button" class="btn btn-minier btn-warning" onclick="goEdit('<?php echo $rs->code; ?>')"><i class="fa fa-pencil"></i></button>
 								<?php endif; ?>
-								<?php if($rs->status == 0 && $this->pm->can_delete) : ?>
+								<?php if($rs->status != 2 && empty($rs->inv_code) && $this->pm->can_delete) : ?>
 									<button type="button" class="btn btn-minier btn-danger" onclick="goDelete('<?php echo $rs->code; ?>', <?php echo $rs->status; ?>)"><i class="fa fa-trash"></i></button>
 								<?php endif; ?>
 							</td>

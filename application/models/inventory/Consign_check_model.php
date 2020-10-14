@@ -536,6 +536,8 @@ class Consign_check_model extends CI_Model
       ->where('date_add <=', to_date($ds['to_date']));
     }
 
+    $this->db->order_by('code', 'DESC');
+
     if(!empty($perpage))
     {
       $offset = $offset === NULL ? 0 : $offset;

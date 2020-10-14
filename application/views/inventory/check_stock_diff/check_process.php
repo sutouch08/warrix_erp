@@ -110,8 +110,16 @@
 						onkeyup="cal_diff(<?php echo $no; ?>)">
 					</td>
 					<td class="middle text-center" id="check-no-<?php echo $no; ?>">
-						<?php if($rs->diff_qty != 0 OR !empty($checked)) : ?>
-							<i class="fa fa-check green"></i>
+						<?php if($enable_barcode) : ?>
+							<?php if(!empty($checked)) : ?>
+								<span><i class="fa fa-check green"></i></span>
+							<?php else :  ?>
+							<input type="checkbox" class="check-no" id="check_<?php echo $no; ?>" value="1" <?php echo ($rs->count_qty > 0 ? 'checked' : ''); ?> />
+							<?php endif; ?>
+						<?php else : ?>
+							<?php if(!empty($checked) OR $rs->diff_qty != 0) : ?>
+								<span><i class="fa fa-check green"></i></span>
+							<?php endif; ?>
 						<?php endif; ?>
 					</td>
 					<td class="middle text-center">
@@ -156,7 +164,9 @@
 		value="{{qty}}"
 		onkeyup="cal_diff({{no}})" readonly>
 	</td>
-	<td class="middle text-center" id="check-no-{{no}}"></td>
+	<td class="middle text-center" id="check-no-{{no}}">
+		<input type="checkbox" class="check-no" id="check_{{no}}" value="1" checked />
+	</td>
 	<td class="middle text-center">
 		<span id="diff_{{no}}">
 		{{qty}}

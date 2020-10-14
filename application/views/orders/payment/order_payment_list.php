@@ -24,7 +24,15 @@
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 padding-5">
+    <label>ช่องทาง</label>
+    <select class="form-control input-sm" name="channels" onchange="getSearch()">
+			<option value="all">ทั้งหมด</option>
+			<?php echo select_channels($channels); ?>
+		</select>
+  </div>
+
+	<div class="col-sm-1 col-1-harf padding-5">
     <label>เลขที่บัญชี</label>
 		<select class="form-control input-sm" name="account" onchange="getSearch()">
       <option value="">ทั้งหมด</option>
@@ -40,11 +48,11 @@
 
   </div>
 
-  <div class="col-sm-1 col-1-harf padding-5">
+  <div class="col-sm-1 padding-5">
     <label>สถานะ</label>
 		<select class="form-control input-sm" name="valid" onchange="getSearch()">
-      <option value="0" <?php echo is_selected($valid, 0); ?>>รอตรวจสอบ</option>
-      <option value="1" <?php echo is_selected($valid, 1); ?>>ยืนยันแล้ว</option>
+      <option value="0" <?php echo is_selected($valid, '0'); ?>>รอตรวจสอบ</option>
+      <option value="1" <?php echo is_selected($valid, '1'); ?>>ยืนยันแล้ว</option>
     </select>
   </div>
 
@@ -66,13 +74,15 @@
 			<thead>
 				<tr>
 					<th class="width-5 middle text-center">ลำดับ</th>
-					<th class="width-15 middle">เลขที่เอกสาร</th>
+					<th class="width-10 middle">เลขที่เอกสาร</th>
           <th class="width-10 middle">ช่องทาง</th>
-					<th class="width-20 middle">ลูกค้า</th>
-          <th class="width-15 middle hidden-md">พนักงาน</th>
+					<th class="width-15 middle">ลูกค้า</th>
+          <th class="middle hidden-md">พนักงาน</th>
+					<th class="width-8 middle text-center">วันที่</th>
+					<th class="width-8 middle text-center">เวลา</th>
 					<th class="width-10 middle text-right">ยอดเงิน</th>
-					<th class="width-15 middle text-center">เลขที่บัญชี</th>
-					<th class="width-10 middle"></th>
+					<th class="width-10 middle text-center">เลขที่บัญชี</th>
+					<th class="width-10"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -86,12 +96,14 @@
               <td class="middle" style="font-size:12px;"><?php echo $rs->channels; ?></td>
               <td class="middle" style="font-size:12px;"><?php echo $customer_name; ?></td>
               <td class="middle hidden-md" style="font-size:12px;"><?php echo $rs->user; ?></td>
+							<td class="middle text-center" style="font-size:12px;"><?php echo date('d-m-Y', strtotime($rs->pay_date)); ?></td>
+							<td class="middle text-center" style="font-size:12px;"><?php echo date('H:i:s', strtotime($rs->pay_date)); ?></td>
               <td class="middle text-right" style="font-size:12px;"><?php echo number($rs->pay_amount,2); ?></td>
               <td class="middle text-center" style="font-size:12px;"><?php echo $rs->acc_no; ?></td>
               <td class="middle text-right">
-                <button type="button" class="btn btn-xs btn-info" onClick="viewDetail(<?php echo $rs->id; ?>)"><i class="fa fa-eye"></i></button>
+                <button type="button" class="btn btn-minier btn-info" onClick="viewDetail(<?php echo $rs->id; ?>)"><i class="fa fa-eye"></i></button>
           <?php if($this->pm->can_delete) : ?>
-                <button type="button" class="btn btn-xs btn-danger" onClick="removePayment(<?php echo $rs->id; ?>, '<?php echo $rs->order_code; ?>')"><i class="fa fa-trash"></i></button>
+                <button type="button" class="btn btn-minier btn-danger" onClick="removePayment(<?php echo $rs->id; ?>, '<?php echo $rs->order_code; ?>')"><i class="fa fa-trash"></i></button>
           <?php endif; ?>
               </td>
             </tr>
@@ -183,6 +195,8 @@
 <td align="center"> {{ channels }}</td>
 <td>{{ customer }}</td>
 <td>{{ employee }}</td>
+<td align="center">{{ payDate }}</td>
+<td align="center">{{ payTime }}</td>
 <td align="center">{{ orderAmount }}</td>
 <td align="center">{{ payAmount }}</td>
 <td align="center">{{ accNo }}</td>

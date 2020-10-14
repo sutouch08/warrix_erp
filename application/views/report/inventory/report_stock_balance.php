@@ -39,21 +39,9 @@
       <button type="button" class="btn btn-sm width-50" id="btn-wh-range" onclick="toggleAllWarehouse(0)">เลือก</button>
     </div>
   </div>
-  <div class="col-sm-2 padding-5">
-    <label class="display-block">วันที่</label>
-    <div class="btn-group width-100">
-      <button type="button" class="btn btn-sm btn-primary width-50" id="btn-date-now" onclick="toggleDate(1)">ปัจจุบัน</button>
-      <button type="button" class="btn btn-sm width-50" id="btn-date-range" onclick="toggleDate(0)">ณ วันที่</button>
-    </div>
-  </div>
-  <div class="col-sm-2 padding-5 last">
-    <label class="display-block not-show">start</label>
-    <input type="text" class="form-control input-sm text-center" id="date" name="date" readonly disabled>
-  </div>
 
   <input type="hidden" id="allProduct" name="allProduct" value="1">
   <input type="hidden" id="allWarehouse" name="allWhouse" value="1">
-  <input type="hidden" id="currentDate" name="currentDate" value="1">
 </div>
 
 

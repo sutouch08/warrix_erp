@@ -209,9 +209,10 @@ class Orders extends PS_Controller
         $code = $this->get_new_code($date_add);
       }
 
+      $customer = $this->customers_model->get($this->input->post('customerCode'));
       $role = 'S'; //--- S = ขาย
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment'));
-      $sale_code = $this->customers_model->get_sale_code($this->input->post('customerCode'));
+      $sale_code = $customer->sale_code;//$this->customers_model->get_sale_code($this->input->post('customerCode'));
 
       //--- check over due
       $is_strict = getConfig('STRICT_OVER_DUE') == 1 ? TRUE : FALSE;
@@ -219,7 +220,7 @@ class Orders extends PS_Controller
 
       //--- ถ้ามียอดค้างชำระ และ เป็นออเดอร์แบบเครดิต
       //--- ไม่ให้เพิ่มออเดอร์
-      if($overDue && $has_term)
+      if($overDue && $has_term && !($customer->skip_overdue))
       {
         set_error('มียอดค้างชำระเกินกำหนดไม่อนุญาติให้ขาย');
         redirect($this->home.'/add_new');
@@ -628,7 +629,7 @@ class Orders extends PS_Controller
     $sc = TRUE;
     $order = $this->orders_model->get($code);
     //--- ถ้าออเดอร์เป็นแบบเครดิต
-    if($order->is_term == 1)
+    if($order->is_term == 1 && $order->role === 'S')
     {
       //---- check credit balance
       $amount = $this->orders_model->get_order_total_amount($code);

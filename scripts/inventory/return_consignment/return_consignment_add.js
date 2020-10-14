@@ -379,6 +379,7 @@ $('#zone').autocomplete({
 })
 
 
+
 function recalRow(el, no) {
 	var price = parseFloat($('#price_' + no).val());
 	var qty = parseFloat(el.val());

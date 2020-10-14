@@ -93,12 +93,16 @@ class Permission extends PS_Controller{
           $item = array();
           foreach($menus as $menu)
           {
-            $arr = array(
-              'menu_code' => $menu->code,
-              'menu_name' => $menu->name,
-              'permission' => $this->permission_model->get_permission($menu->code, $id)
-            );
-            array_push($item, $arr);
+						if($menu->valid)
+						{
+							$arr = array(
+	              'menu_code' => $menu->code,
+	              'menu_name' => $menu->name,
+	              'permission' => $this->permission_model->get_permission($menu->code, $id)
+	            );
+	            array_push($item, $arr);
+						}
+
           }
 
           $ds['menu'] = $item;

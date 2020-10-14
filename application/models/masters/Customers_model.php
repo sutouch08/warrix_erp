@@ -53,7 +53,8 @@ class Customers_model extends CI_Model
     ->get('OCRD');
     if($rs->num_rows() === 1)
     {
-      $balance = $rs->row()->CreditLine - ($rs->row()->Balance + $rs->row()->DNotesBal + $rs->row()->OrdersBal);
+      //$balance = $rs->row()->CreditLine - ($rs->row()->Balance + $rs->row()->DNotesBal + $rs->row()->OrdersBal);
+      $balance = $rs->row()->CreditLine - ($rs->row()->Balance + $rs->row()->DNotesBal);
       return $balance;
     }
 

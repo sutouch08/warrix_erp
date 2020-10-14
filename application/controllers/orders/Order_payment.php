@@ -16,6 +16,7 @@ class Order_payment extends PS_Controller
     $this->load->model('masters/bank_model');
     $this->load->helper('bank');
     $this->load->helper('order');
+    $this->load->helper('channels');
   }
 
 
@@ -27,6 +28,7 @@ class Order_payment extends PS_Controller
       'customer' => get_filter('customer', 'customer', ''),
       'account' => get_filter('account', 'account', ''),
       'user'  => get_filter('user', 'user', ''),
+      'channels' => get_filter('channels', 'channels', 'all'),
       'from_date' => get_filter('from_date', 'from_date', ''),
       'to_date'  => get_filter('to_date', 'to_date', ''),
       'valid' => get_filter('valid', 'valid', 0)
@@ -257,7 +259,7 @@ class Order_payment extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('code', 'account', 'user', 'from_date', 'to_date', 'customer', 'valid');
+    $filter = array('code', 'account', 'user', 'channels','from_date', 'to_date', 'customer', 'valid');
     clear_filter($filter);
   }
 } //--- end class

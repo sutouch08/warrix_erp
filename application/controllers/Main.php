@@ -22,7 +22,15 @@ class Main extends PS_Controller
 
 	public function index()
 	{
-		$this->load->view('main_view');
+		if($this->isViewer)
+		{
+			redirect('view_stock');
+		}
+		else
+		{
+			$this->load->view('main_view');
+		}
+
 	}
 
 
@@ -72,11 +80,9 @@ class Main extends PS_Controller
     $sc = array();
     $txt = trim($this->input->post('search_text'));
 		$warehouse = get_null($this->input->post('warehouse_code'));
-		$color = $this->input->post('color');
-		$color_group = $this->input->post('color_group');
     if(!empty($txt))
     {
-      $list = $this->main_model->search_items_list($txt, $color, $color_group);
+      $list = $this->main_model->search_items_list($txt);
       if(!empty($list))
       {
         $this->load->model('stock/stock_model');

@@ -127,7 +127,7 @@ class Export
                 'U_ECOMNO' => $rs->reference,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'UnitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                 'PriceBefDi' => $rs->price,  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
@@ -276,7 +276,7 @@ class Export
                 'U_ECOMNO' => $rs->reference,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'UnitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                 'PriceBefDi' => $rs->price,  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
@@ -339,7 +339,7 @@ class Export
 
 
 
-  //---- WL เบิก ยืมสินค้า
+
   //---- OWTR WTR1
   public function export_transfer_order($code)
   {
@@ -425,9 +425,9 @@ class Export
 
             $this->ci->mc->trans_begin();
 
-            $cs = $this->ci->transfer_model->add_sap_transfer_doc($ds);
+            $docEntry = $this->ci->transfer_model->add_sap_transfer_doc($ds);
 
-            if($cs)
+            if($docEntry)
             {
               $drop = $middle === TRUE ? $this->ci->transfer_model->drop_sap_exists_details($code) : TRUE;
 
@@ -439,10 +439,11 @@ class Export
                 foreach($details as $rs)
                 {
                   $arr = array(
+                    'DocEntry' => $docEntry,
                     'U_ECOMNO' => $rs->reference,
                     'LineNum' => $line,
                     'ItemCode' => $rs->product_code,
-                    'Dscription' => $rs->product_name,
+                    'Dscription' => limitText($rs->product_name, 95),
                     'Quantity' => $rs->qty,
                     'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                     'PriceBefDi' => round($rs->price,2),
@@ -627,7 +628,7 @@ public function export_transfer_draft($code)
                   'U_ECOMNO' => $rs->reference,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => round($rs->price,2),
@@ -792,7 +793,7 @@ public function export_transfer($code)
                   'U_ECOMNO' => $rs->transfer_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => NULL,
                   'PriceBefDi' => 0.000000,
@@ -953,7 +954,7 @@ public function export_move($code)
                   'U_ECOMNO' => $rs->move_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => NULL,
                   'PriceBefDi' => 0.000000,
@@ -1124,7 +1125,7 @@ public function export_transform($code)
                   'U_ECOMNO' => $rs->reference,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => round($rs->price,2),
@@ -1450,7 +1451,7 @@ public function export_receive_transform($code)
                   'U_ECOMNO' => $rs->receive_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => round($rs->price,2),
@@ -1608,7 +1609,7 @@ public function export_return($code)
                   'U_ECOMNO' => $rs->return_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => remove_vat($rs->price),
@@ -1634,6 +1635,169 @@ public function export_return($code)
                 );
 
                 if( ! $this->ci->return_order_model->add_sap_return_detail($arr))
+                {
+                  $sc = FALSE;
+                  $this->error = 'เพิ่มรายการไม่สำเร็จ';
+                }
+
+                $line++;
+              }
+            }
+            else
+            {
+              $sc = FALSE;
+              $this->error = "ไม่พบรายการรับคืน";
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+          }
+
+
+
+          if($sc === TRUE)
+          {
+            $this->ci->mc->trans_commit();
+          }
+          else
+          {
+            $this->ci->mc->trans_rollback();
+          }
+        }
+
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "{$code} ยังไม่ได้รับการอนุมัติ";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เอกสารถูกนำเข้า SAP แล้ว หากต้องการเปลี่ยนแปลงกรุณายกเลิกเอกสารใน SAP ก่อน";
+    }
+
+  }
+  else
+  {
+    $sc = FALSE;
+    $this->error = "ไม่พบเอกสาร {$code}";
+  }
+
+  return $sc;
+}
+
+
+
+//---- export return consignment
+//---- CNORDN, CNRDN1
+public function export_return_consignment($code)
+{
+  $sc = TRUE;
+  $this->ci->load->model('inventory/return_consignment_model');
+  $this->ci->load->model('masters/customers_model');
+  $this->ci->load->model('masters/products_model');
+  $this->ci->load->helper('return_consignment');
+  $doc = $this->ci->return_consignment_model->get($code);
+  $cust = $this->ci->customers_model->get($doc->customer_code);
+  $or = $this->ci->return_consignment_model->get_sap_return_consignment($code);
+  if(!empty($doc))
+  {
+    if(empty($or))
+    {
+      if($doc->is_approve == 1 && $doc->status == 1)
+      {
+        $middle = $this->ci->return_consignment_model->get_middle_return_doc($code);
+        if(!empty($middle))
+        {
+          foreach($middle as $rows)
+          {
+            if($this->ci->return_consignment_model->drop_middle_exits_data($rows->DocEntry) === FALSE)
+            {
+              $sc = FALSE;
+              $this->error = "ลบรายการที่ค้างใน temp ไม่สำเร็จ";
+            }
+          }
+        }
+
+        if($sc === TRUE)
+        {
+          $currency = getConfig('CURRENCY');
+          $vat_rate = getConfig('SALE_VAT_RATE');
+          $vat_code = getConfig('SALE_VAT_CODE');
+          $total_amount = $this->ci->return_consignment_model->get_total_return($code);
+          $invoice = $this->ci->return_consignment_model->get_all_invoice($code);
+          $ds = array(
+            'DocType' => 'I',
+            'CANCELED' => 'N',
+            'DocDate' => $doc->date_add,
+            'DocDueDate' => $doc->date_add,
+            'CardCode' => $cust->code,
+            'CardName' => $cust->name,
+            'VatSum' => $this->ci->return_consignment_model->get_total_return_vat($code),
+            'DocCur' => $currency,
+            'DocRate' => 1,
+            'DocTotal' => $total_amount,
+            'DocTotalFC' => $total_amount,
+            'Comments' => limitText($doc->remark, 250),
+            'GroupNum' => $cust->GroupNum,
+            'SlpCode' => $cust->sale_code,
+            'ToWhsCode' => $doc->warehouse_code,
+            'U_ECOMNO' => $doc->code,
+            'U_BOOKCODE' => $doc->bookcode,
+            'F_E_Commerce' => 'A',
+            'F_E_CommerceDate' => now(),
+            'U_OLDINV' => getAllInvoiceText($invoice)
+          );
+
+          $this->ci->mc->trans_begin();
+
+          $docEntry = $this->ci->return_consignment_model->add_sap_return_consignment($ds);
+
+          if($docEntry !== FALSE)
+          {
+            $details = $this->ci->return_consignment_model->get_details($code);
+
+            if( ! empty($details))
+            {
+              $line = 0;
+              //--- insert detail to RDN1
+              foreach($details as $rs)
+              {
+                $arr = array(
+                  'DocEntry' => $docEntry,
+                  'U_ECOMNO' => $rs->return_code,
+                  'LineNum' => $line,
+                  'ItemCode' => $rs->product_code,
+                  'Dscription' => limitText($rs->product_name, 95),
+                  'Quantity' => $rs->qty,
+                  'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
+                  'PriceBefDi' => remove_vat($rs->price),
+                  'LineTotal' => remove_vat($rs->amount),
+                  'ShipDate' => $doc->date_add,
+                  'Currency' => $currency,
+                  'Rate' => 1,
+                  'DiscPrcnt' => $rs->discount_percent,
+                  'Price' => remove_vat($rs->price),
+                  'TotalFrgn' => remove_vat($rs->amount),
+                  'WhsCode' => $doc->warehouse_code,
+                  'BinCode' => $doc->zone_code,
+                  'FisrtBin' => $doc->zone_code,
+                  'TaxStatus' => 'Y',
+                  'VatPrcnt' => $vat_rate,
+                  'VatGroup' => $vat_code,
+                  'PriceAfVAT' => $rs->price,
+                  'VatSum' => $rs->vat_amount,
+                  'TaxType' => 'Y',
+                  'F_E_Commerce' => 'A',
+                  'F_E_CommerceDate' => now(),
+                  'U_OLDINV' => $rs->invoice_code
+                );
+
+                if( ! $this->ci->return_consignment_model->add_sap_return_detail($arr))
                 {
                   $sc = FALSE;
                   $this->error = 'เพิ่มรายการไม่สำเร็จ';
@@ -1775,7 +1939,7 @@ public function export_return_lend($code)
                   'U_ECOMNO' => $rs->return_code,
                   'LineNum' => $line,
                   'ItemCode' => $rs->product_code,
-                  'Dscription' => $rs->product_name,
+                  'Dscription' => limitText($rs->product_name, 95),
                   'Quantity' => $rs->qty,
                   'unitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                   'PriceBefDi' => round(remove_vat($rs->price),6),
@@ -1932,7 +2096,7 @@ public function export_consignment_order($code)
                 'U_ECOMNO' => $rs->consign_code,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'UnitMsr' => $this->ci->products_model->get_unit_code($rs->product_code),
                 'PriceBefDi' => $rs->price,  //---มูลค่าต่อหน่วยก่อนภาษี/ก่อนส่วนลด
@@ -2073,7 +2237,7 @@ public function export_adjust_goods_issue($code)
                 'U_ECOMNO' => $rs->adjust_code,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'WhsCode' => $rs->warehouse_code,
                 'FisrtBin' => $rs->zone_code,
@@ -2204,7 +2368,7 @@ public function export_adjust_goods_receive($code)
                 'U_ECOMNO' => $rs->adjust_code,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'unitMsr' => $rs->unit_code,
                 'PriceBefDi' => round($rs->cost,2),
@@ -2348,7 +2512,7 @@ public function export_adjust_consignment_goods_issue($code)
                 'U_ECOMNO' => $rs->adjust_code,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'WhsCode' => $rs->warehouse_code,
                 'FisrtBin' => $rs->zone_code,
@@ -2480,7 +2644,7 @@ public function export_adjust_consignment_goods_receive($code)
                 'U_ECOMNO' => $rs->adjust_code,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
-                'Dscription' => $rs->product_name,
+                'Dscription' => limitText($rs->product_name, 95),
                 'Quantity' => $rs->qty,
                 'unitMsr' => $rs->unit_code,
                 'PriceBefDi' => round($rs->cost,2),

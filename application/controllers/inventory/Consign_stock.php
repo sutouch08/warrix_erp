@@ -57,7 +57,7 @@ class Consign_stock extends PS_Controller
 
     $token = $this->input->post('token');
 
-    $data = $this->sap_stock_model->get_list($arr);
+    $data = $this->sap_consign_stock_model->get_list($arr);
     if(!empty($data))
     {
       //--- load excel library

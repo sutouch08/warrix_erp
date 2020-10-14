@@ -14,7 +14,7 @@ class Return_order extends PS_Controller
     parent::__construct();
     $this->home = base_url().'inventory/return_order';
     $this->load->model('inventory/return_order_model');
-    $this->load->model('inventory/warehouse_model');
+    $this->load->model('masters/warehouse_model');
     $this->load->model('masters/zone_model');
     $this->load->model('masters/customers_model');
     $this->load->model('masters/products_model');

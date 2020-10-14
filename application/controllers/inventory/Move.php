@@ -818,7 +818,8 @@ class Move extends PS_Controller
     $move = $this->move_model->get($code);
     if(!empty($move))
     {
-      if($move->status == 0)
+      $docNum = $this->move_model->get_sap_doc_num($code);
+      if(empty($move->inv_code) && empty($docNum))
       {
         $this->db->trans_begin();
         //--- clear temp
@@ -834,8 +835,8 @@ class Move extends PS_Controller
           $this->error = "ลบรายการไม่สำเร็จ";
         }
 
-        //--- Delete Doc
-        if(! $this->move_model->delete($code))
+        //--- Mare as Cancled
+        if(! $this->move_model->set_status($code, 2))
         {
           $sc = FALSE;
           $this->error = "ลบเอกสารไม่สำเร็จ";
@@ -849,11 +850,24 @@ class Move extends PS_Controller
         {
           $this->db->trans_rollback();
         }
+
+        if($sc === TRUE)
+        {
+          //---- delete middle
+          $middle = $this->move_model->get_middle_move_doc($code);
+          if(!empty($middle))
+          {
+            foreach($middle as $rows)
+            {
+              $this->move_model->drop_middle_exits_data($rows->DocEntry);
+            }
+          }
+        }
       }
       else
       {
         $sc = FALSE;
-        $this->error = "ไม่สามารถลบเอกสารที่มีการบันทึกแล้วได้";
+        $this->error = "เอกสารเข้า SAP แล้วไม่สามารถยกเลิกได้";
       }
 
     }

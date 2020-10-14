@@ -154,7 +154,13 @@ function save_checked(no){
 
 
 function save_all(){
-  $('#checkForm').submit();
+  var uncheck = $('.check-no:not(:checked)').length;
+  if(uncheck > 0){
+    swal("กรุณาตรวจสอบ","พบรายการที่ไม่ได้ตรวจนับ "+ uncheck + " รายการ", "warning");
+  }else{
+    $('#checkForm').submit();
+  }
+
 }
 
 

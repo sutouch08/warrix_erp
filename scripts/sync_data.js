@@ -95,16 +95,38 @@ function syncDeliveryConsignment(){
   $.get(BASE_URL + 'sync_data/syncConsignmentInvCode', function(rs){
     $('body').append('finished update WC '+ rs +' <br/>');
     $('body').append('============================================ <br/>');
+    syncOrderTransform();
+  })
+}
+
+
+//--- 6.1 sync OWTR (WQ, WV)
+function syncOrderTransform(){
+  $('body').append('start    updating WQ, WV .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncOrderTransformInvCode', function(rs){
+    $('body').append('finished update WQ, WV : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
     syncOrderTransfer();
   })
 }
 
 
-//--- 6. sync OWTR (WT, WQ, WV)
+//--- 6.2 sync OWTR (WT)
 function syncOrderTransfer(){
-  $('body').append('start    updating WT, WQ, WV .... <br/>');
+  $('body').append('start    updating WT .... <br/>');
   $.get(BASE_URL + 'sync_data/syncOrderTransferInvCode', function(rs){
-    $('body').append('finished update WT, WQ, WV : '+ rs + ' <br/>');
+    $('body').append('finished update WT : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
+    syncOrderLend();
+  })
+}
+
+
+//--- 6.3 sync OWTR (WL)
+function syncOrderLend(){
+  $('body').append('start    updating WL .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncOrderLendInvCode', function(rs){
+    $('body').append('finished update WL : '+ rs + ' <br/>');
     $('body').append('============================================ <br/>');
     syncTransfer();
   })

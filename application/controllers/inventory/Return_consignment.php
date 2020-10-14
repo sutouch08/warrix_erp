@@ -14,7 +14,7 @@ class Return_consignment extends PS_Controller
     parent::__construct();
     $this->home = base_url().'inventory/return_consignment';
     $this->load->model('inventory/return_consignment_model');
-    $this->load->model('inventory/warehouse_model');
+    $this->load->model('masters/warehouse_model');
     $this->load->model('masters/zone_model');
     $this->load->model('masters/customers_model');
     $this->load->model('masters/products_model');
@@ -78,6 +78,7 @@ class Return_consignment extends PS_Controller
       $doc = $this->return_consignment_model->get($code);
       if(!empty($doc))
       {
+        $items = $this->input->post('item');
         $qtys = $this->input->post('qty');
         $prices = $this->input->post('price');
         $sold = $this->input->post('sold_qty');
@@ -88,22 +89,21 @@ class Return_consignment extends PS_Controller
 
         if(!empty($qtys))
         {
-
-          foreach($qtys as $item => $invoice)
+          foreach($qtys as $no => $qty)
           {
-            foreach($invoice as $inv => $qty)
+            if($qty > 0)
             {
-              $disc_amount = $qty * ($prices[$item][$inv] * ($discount[$item][$inv] * 0.01));
-              $amount = ($qty * $prices[$item][$inv]) - $disc_amount;
+              $disc_amount = $qty * ($prices[$no] * ($discount[$no] * 0.01));
+              $amount = ($qty * $prices[$no]) - $disc_amount;
               $arr = array(
                 'return_code' => $code,
-                'invoice_code' => $inv,
-                'product_code' => $item,
-                'product_name' => $this->products_model->get_name($item),
-                'sold_qty' => $sold[$item][$inv],
+                'invoice_code' => $doc->invoice,
+                'product_code' => $items[$no],
+                'product_name' => $this->products_model->get_name($items[$no]),
+                'sold_qty' => $sold[$no],
                 'qty' => $qty,
-                'price' => $prices[$item][$inv],
-                'discount_percent' => $discount[$item][$inv],
+                'price' => $prices[$no],
+                'discount_percent' => $discount[$no],
                 'amount' => $amount,
                 'vat_amount' => get_vat_amount($amount)
               );
@@ -120,7 +120,7 @@ class Return_consignment extends PS_Controller
                   'reference' => $code,
                   'warehouse_code' => $doc->warehouse_code,
                   'zone_code' => $doc->zone_code,
-                  'product_code' => $item,
+                  'product_code' => $items[$no],
                   'move_in' => $qty,
                   'date_add' => $doc->date_add
                 );
@@ -188,10 +188,18 @@ class Return_consignment extends PS_Controller
 
 
 
-  public function delete_detail($id)
+  public function delete_detail($id = NULL)
   {
-    $rs = $this->return_consignment_model->delete_detail($id);
-    echo $rs === TRUE ? 'success' : 'ลบรายการไม่สำเร็จ';
+    if($id === NULL)
+    {
+      echo 'success';
+    }
+    else
+    {
+      $rs = $this->return_consignment_model->delete_detail($id);
+      echo $rs === TRUE ? 'success' : 'ลบรายการไม่สำเร็จ';
+    }
+
   }
 
 
@@ -346,11 +354,15 @@ class Return_consignment extends PS_Controller
 
   public function edit($code)
   {
+    $this->load->helper('return_consignment');
     $doc = $this->return_consignment_model->get($code);
     $doc->customer_name = $this->customers_model->get_name($doc->customer_code);
     $doc->zone_name = $this->zone_model->get_name($doc->zone_code);
     $doc->from_zone_name = $this->zone_model->get_name($doc->from_zone_code);
+
+    $invoice_list = $this->return_consignment_model->get_all_invoice($code);
     $doc->invoice_amount = round($this->return_consignment_model->get_sum_invoice_amount($code), 2);
+    $doc->invoice_list = getInvoiceList($code, $invoice_list, $doc->status);
 
     $details = $this->return_consignment_model->get_details($code);
     $no = 0;
@@ -359,42 +371,6 @@ class Return_consignment extends PS_Controller
     if(empty($details))
     {
       $details = NULL;
-      // $details = $this->return_consignment_model->get_invoice_details($doc->invoice, $doc->customer_code);
-      // if(!empty($details))
-      // {
-      //   //--- ถ้าได้รายการ ให้ทำการเปลี่ยนรหัสลูกค้าให้ตรงกับเอกสาร
-      //   $cust = $this->return_consignment_model->get_customer_invoice($doc->invoice);
-      //   if(!empty($cust))
-      //   {
-      //     $this->return_consignment_model->update($doc->code, array('customer_code' => $cust->customer_code));
-      //     //--- เปลี่ยนข้อมูลที่จะแสดงให้ตรงกันด้วย
-      //     $doc->customer_code = $cust->customer_code;
-      //     $doc->customer_name = $cust->customer_name;
-      //   }
-      //
-      //
-      //   foreach($details as $rs)
-      //   {
-      //     if($rs->qty > 0)
-      //     {
-      //       $no++;
-      //       $dt = new stdClass();
-      //       $dt->id = 0;
-      //       $dt->invoice_code = $doc->invoice;
-      //       $dt->barcode = $this->products_model->get_barcode($rs->product_code);
-      //       $dt->product_code = $rs->product_code;
-      //       $dt->product_name = $rs->product_name;
-      //       $dt->sold_qty = round($rs->qty, 2);
-      //       $dt->discount_percent = round($rs->discount, 2);
-      //       $dt->qty = round($rs->qty, 2);
-      //       $dt->price = round(add_vat($rs->price, $rs->vat_rate), 2);
-      //       $dt->amount = round((get_price_after_discount($dt->price, $dt->discount_percent) * $rs->qty), 2);
-      //       $dt->no = $no;
-      //
-      //       $detail[] = $dt;
-      //     }
-      //   }
-      // }
     }
     else
     {
@@ -439,6 +415,34 @@ class Return_consignment extends PS_Controller
       $this->load->view('inventory/return_consignment/return_consignment_view_detail', $ds);
     }
 
+  }
+
+
+  public function get_invoice_list($code)
+  {
+    $arr = array(
+      'invoice_list' => '',
+      'amount' => 0
+    );
+
+    $invoice = $this->return_consignment_model->get_all_invoice($code);
+    if(!empty($invoice))
+    {
+      $list = "";
+      $amount = 0;
+      $i = 1;
+      foreach($invoice as $rs)
+      {
+        $list .= $i === 1 ? $rs->invoice_code : ", {$rs->invoice_code}";
+        $amount += $rs->invoice_amount;
+        $i++;
+      }
+
+      $arr['invoice_list'] = $list;
+      $arr['amount'] = $amount;
+    }
+
+    return $arr;
   }
 
 
@@ -681,68 +685,113 @@ class Return_consignment extends PS_Controller
   public function add_invoice()
   {
     $sc = TRUE;
+    $this->load->helper('return_consignment');
     $invoice = $this->input->post('invoice');
     $customer_code = $this->input->post('customer_code');
     $code = $this->input->post('return_code');
+    $doc = $this->return_consignment_model->get($code);
 
-    //--- check invoice with customer
-    $amount = $this->return_consignment_model->get_sap_invoice_amount($invoice, $customer_code);
-    if(!empty($amount))
+    if(!empty($doc))
     {
-      //--- check invoice in table
-      $isExists = $this->return_consignment_model->is_exists_invoice($invoice, $code);
-      if($isExists === FALSE)
+      //--- check invoice with customer
+      $amount = $this->return_consignment_model->get_sap_invoice_amount($invoice, $customer_code);
+      if(!empty($amount))
       {
-        //-- เตรียมข้อมูลเพิ่มเข้าตาราง
-        $arr = array(
-          'return_code' => $code,
-          'invoice_code' => $invoice,
-          'invoice_amount' => $amount
-        );
-
-        if($this->return_consignment_model->add_invoice($arr))
+        //--- check invoice in table
+        $isExists = $this->return_consignment_model->is_exists_invoice($invoice, $code);
+        if($isExists === FALSE)
         {
-          $inv_list = '';
-          $inv_amount = 0;
-          $invoice_list = $this->return_consignment_model->get_all_invoice($code);
-          if(!empty($invoice_list))
-          {
-            $i = 1;
-            foreach($invoice_list as $rs)
-            {
-              $inv_list .= $i === 1 ? $rs->invoice_code : ", {$rs->invoice_code}";
-              $inv_amount += $rs->invoice_amount;
-              $i++;
-            }
-          }
-
-          $ds = array(
-            'invoice' => $inv_list,
-            'amount' => $inv_amount
+          //-- เตรียมข้อมูลเพิ่มเข้าตาราง
+          $arr = array(
+            'return_code' => $code,
+            'invoice_code' => $invoice,
+            'invoice_amount' => $amount
           );
 
+          if($this->return_consignment_model->add_invoice($arr))
+          {
+            $invoice_list = $this->return_consignment_model->get_all_invoice($code);
+            $amount = $this->return_consignment_model->get_sum_invoice_amount($code);
+
+            $ds = array(
+              'invoice' => getInvoiceList($code,$invoice_list, $doc->status),
+              'amount' => $amount
+            );
+
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "เพิ่มบิลไม่สำเร็จ";
+          }
         }
         else
         {
           $sc = FALSE;
-          $this->error = "เพิ่มบิลไม่สำเร็จ";
+          $this->error = "เลขที่บิลซ้ำ";
         }
       }
       else
       {
         $sc = FALSE;
-        $this->error = "เลขที่บิลซ้ำ";
+        $this->error = "เลขที่บิลไม่ถูกต้อง";
       }
     }
     else
     {
       $sc = FALSE;
-      $this->error = "เลขที่บิลไม่ถูกต้อง";
+      $this->error = "เลขที่เอกสารไม่ถูกต้อง";
     }
 
     echo $sc === FALSE ? $this->error : json_encode($ds);
   }
 
+
+
+
+  function remove_invoice()
+  {
+    $this->load->helper('return_consignment');
+    $sc = TRUE;
+    $code = $this->input->get('return_code');
+    $invoice_code = $this->input->get('invoice_code');
+    $doc = $this->return_consignment_model->get($code);
+
+    if(!empty($doc))
+    {
+      if(!empty($invoice_code))
+      {
+        if($this->return_consignment_model->delete_invoice($code, $invoice_code))
+        {
+          $amount = $this->return_consignment_model->get_sum_invoice_amount($code);
+          $invoice_list = $this->return_consignment_model->get_all_invoice($code);
+
+          $arr = array(
+            'invoice' => getInvoiceList($code, $invoice_list, $doc->status),
+            'amount' => $amount
+          );
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ลบ Invoice ไม่สำเร็จ";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "ไม่พบเลขที่ invoice";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "ไม่พบเลขที่เอกสาร";
+    }
+
+
+    echo $sc === TRUE ? json_encode($arr) : $this->error;
+  }
 
 
 
@@ -831,7 +880,9 @@ class Return_consignment extends PS_Controller
   public function print_detail($code)
   {
     $this->load->library('printer');
+    $this->load->helper('return_consignment');
     $doc = $this->return_consignment_model->get($code);
+    $doc->invoice_text = getAllInvoiceText($this->return_consignment_model->get_all_invoice($code));
     $doc->customer_name = $this->customers_model->get_name($doc->customer_code);
     $doc->warehouse_name = $this->warehouse_model->get_name($doc->warehouse_code);
     $doc->zone_name = $this->zone_model->get_name($doc->zone_code);
@@ -849,7 +900,7 @@ class Return_consignment extends PS_Controller
       'details' => $details
     );
 
-    $this->load->view('print/print_return', $ds);
+    $this->load->view('print/print_return_consignment', $ds);
   }
 
 
@@ -907,7 +958,7 @@ class Return_consignment extends PS_Controller
   {
     $sc = TRUE;
     $this->load->library('export');
-    if(! $this->export->export_return($code))
+    if(! $this->export->export_return_consignment($code))
     {
       $sc = FALSE;
       $this->error = trim($this->export->error);

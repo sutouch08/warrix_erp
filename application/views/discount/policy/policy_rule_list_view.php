@@ -34,10 +34,12 @@
           <td class="middle text-center"><?php echo ($rs->all_payment == 1 ? 'ทั้งหมด' : 'กำหนดค่า'); ?></td>
           <td class="middle text-center"><?php echo ($rs->qty > 0 ? $rs->qty.' pcs' : ($rs->amount > 0 ? $rs->amount.' '.getConfig('CURRENTCY') : 'No')); ?></td>
           <td class="middle text-right">
+            <?php if(empty($view_detail)) : ?>
             <button type="button" class="btn btn-xs btn-info" onclick="viewRuleDetail('<?php echo $rs->id; ?>')"><i class="fa fa-eye"></i></button>
             <?php if($this->pm->can_edit) : ?>
             <button type="button" class="btn btn-xs btn-danger" onclick="unlinkRule(<?php echo $rs->id; ?>, '<?php echo $rs->code; ?>')"><i class="fa fa-trash"></i></button>
             <?php endif; ?>
+          <?php endif; ?>
           </td>
         </tr>
   <?php   $no++; ?>

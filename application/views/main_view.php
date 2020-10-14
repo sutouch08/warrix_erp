@@ -1,38 +1,42 @@
 <?php $this->load->view('include/header'); ?>
+<?php if(!$this->isViewer && $this->notibars) : ?>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="navbar-buttons navbar-header pull-right" role="navigation">
+      <ul class="nav ace-nav">
+        <?php $this->load->view('include/notification'); ?>
+      </ul>
+    </div>
+  </div>
+
+</div>
+<hr/>
+<?php endif; ?>
 <div class="row" style="margin-top:30px;">
-  <div class="col-sm-3 padding-5 first">
-    <label>รหัสสินค้า</label>
-    <input type="text" class="form-control input-sm text-center" id="search-text" placeholder="พิมพ์รหัสสินค้า 4 ตัวอักษรขึ้นไป" />
-  </div>
+  <div class="col-sm-12">
+    <div class="row">
+      <div class="col-sm-3 padding-5 first">
+        <label>รหัสสินค้า</label>
+        <input type="text" class="form-control input-sm text-center" id="search-text" placeholder="พิมพ์รหัสสินค้า 4 ตัวอักษรขึ้นไป" />
+      </div>
 
-  <div class="col-sm-1 col-1-harf padding-5">
-    <label>สี</label>
-    <input type="text" class="form-control input-sm text-center" id="color" placeholder="รหัสสี">
-  </div>
+      <div class="col-sm-2 col-xs-12 padding-5">
+        <label>คลัง</label>
+        <select class="form-control input-sm" id="warehouse" name="warehouse">
+          <option value="">ทั้งหมด</option>
+          <?php echo select_warehouse(); ?>
+        </select>
+      </div>
 
-  <div class="col-sm-2 padding-5">
-    <label>กลุ่มสี</label>
-    <select class="form-control input-sm" id="color_group">
-      <option value="">ทั้งหมด</option>
-      <?php echo select_color_group(); ?>
-    </select>
-  </div>
-
-  <div class="col-sm-2 col-xs-12 padding-5">
-    <label>คลัง</label>
-    <select class="form-control input-sm" id="warehouse" name="warehouse">
-      <option value="">ทั้งหมด</option>
-      <?php echo select_warehouse(); ?>
-    </select>
-  </div>
-
-  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
-    <label class="display-block not-show">stock</label>
-    <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getSearch()">ตรวจสอบสต็อก</button>
-  </div>
-  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
-    <label class="display-block not-show">stock</label>
-    <button type="button" class="btn btn-xs btn-info btn-block" onclick="findOrder()">ตรวจสอบออเดอร์</button>
+      <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
+        <label class="display-block not-show">stock</label>
+        <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getSearch()">ตรวจสอบสต็อก</button>
+      </div>
+      <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
+        <label class="display-block not-show">stock</label>
+        <button type="button" class="btn btn-xs btn-info btn-block" onclick="findOrder()">ตรวจสอบออเดอร์</button>
+      </div>
+    </div>
   </div>
 
 </div>

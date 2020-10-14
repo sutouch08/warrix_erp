@@ -62,13 +62,19 @@
 						</small>
 					</a>
 				</div>
-				<?php if(! isset($_GET['nomenu']) && !$this->isViewer) : ?>
-					<?php $this->load->view('include/approve_form'); ?>
+				<?php if(! isset($_GET['nomenu'])) : ?>
+					<?php
+
+					if(!$this->isViewer)
+					{
+						$this->load->view('include/approve_form');
+						$this->load->view('include/top_menu');
+					}
+					 ?>
+
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
-
-						<?php $this->load->view('include/notification'); ?>
-
+						
 						<li class="light-blue">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 

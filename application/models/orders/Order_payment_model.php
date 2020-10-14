@@ -17,19 +17,27 @@ class Order_payment_model extends CI_Model
 
 
     //---- เลขที่เอกสาร
-    if($ds['code'] != '')
+    if(!empty($ds['code']))
     {
-      $this->db->like('order_code', $ds['code']);
+      $this->db->like('order_payment.order_code', $ds['code']);
     }
 
-    if($ds['customer'] != '')
+
+    if(!empty($ds['channels']) && $ds['channels'] !== 'all')
     {
+      $this->db->where('orders.channels_code', $ds['channels']);
+    }
+
+    if(!empty($ds['customer']))
+    {
+      $this->db->group_start();
       $this->db->like('customers.name', $ds['customer']);
       $this->db->or_like('orders.customer_ref', $ds['customer']);
+      $this->db->group_end();
     }
 
     //--- รหัส/ชื่อ ลูกค้า
-    if($ds['account'] != '')
+    if(!empty($ds['account']))
     {
       $this->db->where('id_account', $ds['account']);
     }
@@ -67,35 +75,47 @@ class Order_payment_model extends CI_Model
     ->where('valid', $ds['valid']);
 
     //---- เลขที่เอกสาร
-    if($ds['code'] != '')
+    if(!empty($ds['code']))
     {
       $this->db->like('order_payment.order_code', $ds['code']);
     }
 
-    if($ds['customer'] != '')
+
+    if(!empty($ds['channels']) && $ds['channels'] != 'all')
     {
+      $this->db->where('orders.channels_code', $ds['channels']);
+    }
+
+
+    if(!empty($ds['customer']))
+    {
+      $this->db->group_start();
       $this->db->like('customers.name', $ds['customer']);
       $this->db->or_like('orders.customer_ref', $ds['customer']);
+      $this->db->group_end();
     }
 
     //--- รหัส/ชื่อ ลูกค้า
-    if($ds['account'] != '')
+    if(!empty($ds['account']))
     {
       $this->db->where('order_payment.id_account', $ds['account']);
     }
 
     //---- user name / display name
-    if($ds['user'] != '')
+    if(!empty($ds['user']))
     {
       $users = user_in($ds['user']);
       $this->db->where_in('order_payment.user', $users);
     }
 
-    if($ds['from_date'] != '' && $ds['to_date'] != '')
+
+    if(!empty($ds['from_date']) && !empty($ds['to_date']))
     {
       $this->db->where('order_payment.pay_date >=', from_date($ds['from_date']));
       $this->db->where('order_payment.pay_date <=', to_date($ds['to_date']));
     }
+
+    $this->db->order_by('order_payment.order_code', 'ASC');
 
     if($perpage != '')
     {
