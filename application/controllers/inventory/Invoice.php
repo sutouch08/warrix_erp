@@ -23,6 +23,7 @@ class Invoice extends PS_Controller
   public function index()
   {
     $this->load->helper('channels');
+    $this->load->helper('warehouse');
     $filter = array(
       'code'          => get_filter('code', 'ic_code', ''),
       'customer'      => get_filter('customer', 'ic_customer', ''),
@@ -33,7 +34,8 @@ class Invoice extends PS_Controller
       'to_date'       => get_filter('to_date', 'ic_to_date', ''),
       'order_by'      => get_filter('order_by', 'ic_order_by', ''),
       'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
-      'is_valid'      => get_filter('is_valid', 'ic_valid', 'all')
+      'is_valid'      => get_filter('is_valid', 'ic_valid', 'all'),
+      'warehouse'     => get_filter('warehouse', 'ic_warehouse', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -126,7 +128,8 @@ class Invoice extends PS_Controller
       'ic_to_date',
       'ic_order_by',
       'ic_sort_by',
-      'ic_valid'
+      'ic_valid',
+      'ic_warehouse'
     );
     clear_filter($filter);
   }

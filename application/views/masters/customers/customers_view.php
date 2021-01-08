@@ -97,7 +97,8 @@
 					<th class="width-10 middle">กลุ่ม</th>
 					<th class="width-10 middle">ประเภท</th>
 					<th class="width-10 middle">ชนิด</th>
-					<th class="width-10 middle">เกรด</th>
+					<th class="width-5 middle">เกรด</th>
+					<th class="width-5 middle text-center">active</th>
 					<th class="width-10"></th>
 				</tr>
 			</thead>
@@ -118,6 +119,9 @@
 						<td class="middle"><?php echo $rs->kind; ?></td>
 						<td class="middle"><?php echo $rs->type; ?></td>
 						<td class="middle"><?php echo $rs->class; ?></td>
+						<td class="middle text-center">
+							<?php echo is_active($rs->active); ?>
+						</td>
 						<td class="text-right">
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-mini btn-warning" onclick="getEdit('<?php echo $rs->code; ?>')">

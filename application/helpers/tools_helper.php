@@ -316,5 +316,4 @@ function convert($txt)
 	return $txt;
 }
 
-
  ?>

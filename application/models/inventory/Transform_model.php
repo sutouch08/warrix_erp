@@ -6,6 +6,19 @@ class Transform_model extends CI_Model
     parent::__construct();
   }
 
+  public function get($order_code)
+  {
+    $rs = $this->db->where('order_code', $order_code)->get('order_transform');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+
 
   public function add($order_code)
   {
@@ -147,6 +160,12 @@ class Transform_model extends CI_Model
   }
 
 
+  public function update_reference($code, $reference)
+  {
+    return $this->db->set('reference', $reference)->where('order_code', $code)->update('order_transform');
+  }
+
+
 
   public function update_sold_qty($id, $qty)
   {
@@ -224,6 +243,41 @@ class Transform_model extends CI_Model
   public function unclose_transform($code)
   {
     return $this->db->set('is_closed', 0)->where('order_code', $code)->update('order_transform');
+  }
+
+
+  public function get_closed_transform_order($code, $limit = 50)
+  {
+    $sc = array();
+
+    $this->db
+    ->select('tf.order_code')
+    ->from('order_transform AS tf')
+    ->join('orders AS od', 'tf.order_code = od.code', 'left')
+    ->where('tf.is_closed', 1)
+    ->where('od.state', 8)
+    ->where('od.is_cancled', 0)
+    ->where('od.is_expired', 0);
+    ->where('tf.reference IS NULL', NULL, FALSE);
+
+    if($code !== '*')
+    {
+      $this->db->like('tf.order_code', $code);
+    }
+
+    $rs = $this->db->limit($limit)->get();
+
+    if($rs->num_rows() > 0)
+    {
+
+      foreach($rs->result() as $rm)
+      {
+        $sc[] = $rm->order_code;
+      }
+
+    }
+
+    return json_encode($sc);
   }
 
 

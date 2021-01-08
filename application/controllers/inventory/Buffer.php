@@ -48,6 +48,29 @@ class Buffer extends PS_Controller
   }
 
 
+
+	public function delete_buffer()
+	{
+		$sc = TRUE;
+		$id = trim($this->input->post('id'));
+		if(!empty($id))
+		{
+			$rs = $this->buffer_model->delete($id);
+			if(!$rs)
+			{
+				$sc = FALSE;
+				$this->error = "ลบรายการไม่สำเร็จ";
+			}
+		}
+		else
+		{
+			$sc = FALSE;
+			$this->error = "Missing required parameter : id";
+		}
+
+		echo $sc === TRUE ? 'success' : $this->error;
+	}
+
   function clear_filter(){
     $filter = array('order_code', 'pd_code', 'zone_code', 'from_date', 'to_date');
     clear_filter($filter);

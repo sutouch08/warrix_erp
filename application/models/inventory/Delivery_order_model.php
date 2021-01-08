@@ -62,6 +62,11 @@ class Delivery_order_model extends CI_Model
       $this->db->where('orders.channels_code', $ds['channels']);
     }
 
+    if(!empty($ds['warehouse']) && $ds['warehouse'] != 'all')
+    {
+      $this->db->where('orders.warehouse_code', $ds['warehouse']);
+    }
+
     if(isset($ds['is_valid']) && $ds['is_valid'] != 2)
     {
       $this->db->where('orders.is_valid', $ds['is_valid']);
@@ -119,6 +124,13 @@ class Delivery_order_model extends CI_Model
     {
       $this->db->where('orders.channels_code', $ds['channels']);
     }
+
+
+    if(!empty($ds['warehouse']) && $ds['warehouse'] != 'all')
+    {
+      $this->db->where('orders.warehouse_code', $ds['warehouse']);
+    }
+
 
     if(isset($ds['is_valid']) && $ds['is_valid'] != 'all')
     {
@@ -315,6 +327,21 @@ class Delivery_order_model extends CI_Model
       }
 
       return NULL;
+    }
+
+
+		public function exists_sap_delivery_order($code)
+    {
+      $rs = $this->ms
+      ->where('U_ECOMNO', $code)
+      ->where('CANCELED', 'N')
+      ->count_all_results('ODLN');
+      if($rs > 0)
+      {
+        return TRUE;
+      }
+
+      return FALSE;
     }
 
 

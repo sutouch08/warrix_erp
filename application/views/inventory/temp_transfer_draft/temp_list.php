@@ -29,6 +29,7 @@
     <select class="form-control input-sm" name="status" onchange="getSearch()">
       <option value="all">ทั้งหมด</option>
       <option value="Y" <?php echo is_selected('Y', $status); ?>>เข้าแล้ว</option>
+			<option value="D" <?php echo is_selected('D', $status); ?>>ดราฟท์</option>
       <option value="N" <?php echo is_selected('N', $status); ?>>ยังไม่เข้า</option>
       <option value="E" <?php echo is_selected('E', $status); ?>>Error</option>
     </select>
@@ -124,6 +125,8 @@
               <span class="blue">NC</span>
             <?php elseif($rs->F_Sap === 'N') : ?>
               <span class="red">ERROR</span>
+						<?php elseif($rs->F_Sap === 'D') : ?>
+							<span class="blue">Draft</span>
             <?php endif; ?>
           </td>
 					<td class="middle text-center">

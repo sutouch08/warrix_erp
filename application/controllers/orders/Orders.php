@@ -525,12 +525,16 @@ class Orders extends PS_Controller
       $recal = $this->input->post('recal');
       $has_term = $this->payment_methods_model->has_term($this->input->post('payment_code'));
       $sale_code = $this->customers_model->get_sale_code($this->input->post('customer_code'));
+
+      $customer = $this->customers_model->get($this->input->post('customerCode'));
+
       //--- check over due
-      $overDue = $this->invoice_model->is_over_due($this->input->post('customer_code'));
+      $is_strict = getConfig('STRICT_OVER_DUE') == 1 ? TRUE : FALSE;
+      $overDue = $is_strict ? $this->invoice_model->is_over_due($this->input->post('customerCode')) : FALSE;
 
       //--- ถ้ามียอดค้างชำระ และ เป็นออเดอร์แบบเครดิต
       //--- ไม่ให้เพิ่มออเดอร์
-      if($overDue && $has_term)
+      if($overDue && $has_term && !($customer->skip_overdue))
       {
         $sc = FALSE;
         $message = 'มียอดค้างชำระเกินกำหนดไม่อนุญาติให้แก้ไขการชำระเงิน';
@@ -2273,10 +2277,12 @@ class Orders extends PS_Controller
   					{
   						if($i < 3) //--- limit ไว้แค่ 3 เสต็ป
   						{
+                $discText = str_replace(' ', '', $discText);
+                $discText = str_replace('๔', '%', $discText);
   							$disc = explode('%', $discText);
   							$disc[0] = trim($disc[0]); //--- ตัดช่องว่างออก
-  							$discount = count($disc) == 1 ? $disc[0] : $price * ($disc[0] * 0.01); //--- ส่วนลดต่อชิ้น
-  							$discLabel[$i] = count($disc) == 1 ? $disc[0] : $disc[0].'%';
+  							$discount = count($disc) == 1 ? floatval($disc[0]) : $price * (floatval($disc[0]) * 0.01); //--- ส่วนลดต่อชิ้น
+  							$discLabel[$i] = count($disc) == 1 ? $disc[0] : number($disc[0], 2).'%';
   							$discAmount += $discount;
   							$price -= $discount;
   						}

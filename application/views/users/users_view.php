@@ -75,7 +75,7 @@
 
 						</td>
 						<td class="text-right">
-							<?php if(($this->pm->can_edit && $rs->id_profile > 0) OR (get_cookie('id_profile') == -987654321)) : ?>
+							<?php if(($this->pm->can_edit && $rs->id_profile >= 0) OR (get_cookie('id_profile') == -987654321)) : ?>
 								<button type="button" class="btn btn-mini btn-success <?php echo $disActive; ?>"
 									title="Click to activeate this user"
 									id="btn-active-<?php echo $rs->id; ?>"

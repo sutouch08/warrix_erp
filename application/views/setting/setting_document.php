@@ -131,6 +131,13 @@
       <div class="divider-hidden"></div>
 
 
+			<div class="col-sm-3"><span class="form-control left-label">ตัดยอดแปรสภาพ(Goods Issue)</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_ADJUST_TRANSFORM" required value="<?php echo $PREFIX_ADJUST_TRANSFORM; ?>" /></div>
+      <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>
+      <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center digit" name="RUN_DIGIT_ADJUST_TRANSFORM" required value="<?php echo $RUN_DIGIT_ADJUST_TRANSFORM; ?>" /></div>
+      <div class="divider-hidden"></div>
+
+
       <div class="col-sm-3"><span class="form-control left-label">นโยบายส่วนลด</span></div>
       <div class="col-sm-2"><input type="text" class="form-control input-sm input-small text-center prefix" name="PREFIX_POLICY" required value="<?php echo $PREFIX_POLICY; ?>" /></div>
       <div class="col-sm-1 col-1-harf padding-5"><span class="form-control left-label width-100 text-right">Run digit</span></div>

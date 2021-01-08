@@ -98,7 +98,7 @@ class Transfer_model extends CI_Model
     $rs = $this->mc
     ->where('U_ECOMNO', $code)
     ->group_start()
-    ->where('F_Sap', 'N')
+    ->where_in('F_Sap', array('N', 'D'))
     ->or_where('F_Sap IS NULL', NULL, FALSE)
     ->group_end()
     ->get('DFOWTR');

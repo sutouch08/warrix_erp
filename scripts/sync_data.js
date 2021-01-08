@@ -182,6 +182,37 @@ function syncReturnOrderCode(){
   $.get(BASE_URL + 'sync_data/syncReturnOrderCode', function(rs){
     $('body').append('finished update SM : '+ rs + ' <br/>');
     $('body').append('============================================ <br/>');
+    syncTransformGoodsIssueCode();
+  })
+}
+
+
+//--- 12. sync OIGE (WG)
+function syncTransformGoodsIssueCode(){
+    $('body').append('start    updating WG .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncTransformGoodsIssueCode', function(rs){
+    $('body').append('finished update WG : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
+    syncConsignSoldInvCode();
+  })
+}
+
+//--- 13. sync ODLN (WM)
+function syncConsignSoldInvCode(){
+    $('body').append('start    updating WM .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncConsignSoldInvCode', function(rs){
+    $('body').append('finished update WM : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
+    syncConsignmentSoldInvCode();
+  })
+}
+
+//--- 14. sync ODLN (CN.WD) //-- ก้อน consignment
+function syncConsignmentSoldInvCode(){
+    $('body').append('start    updating WD .... <br/>');
+  $.get(BASE_URL + 'sync_data/syncConsignmentSoldInvCode', function(rs){
+    $('body').append('finished update WD : '+ rs + ' <br/>');
+    $('body').append('============================================ <br/>');
     $('body').append('All done!');
     window.close();
   })

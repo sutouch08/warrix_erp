@@ -218,48 +218,78 @@ class Consign_order extends PS_Controller
   public function cancle($code)
   {
     $sc = TRUE;
+		$this->load->model('inventory/delivery_order_model');
     if($this->pm->can_delete)
     {
-      $doc = $this->consign_order_model->get($code);
-      //--- check status
-      if($doc->status == 1)
-      {
-        $sc = FALSE;
-        $this->error = "คุณต้องยกเลิกการบันทึกก่อนยกเลิกเอกสาร";
-      }
-      else
-      {
-        $this->db->trans_begin();
-        //--- if WX loaded remove and change WX status
-        if(!empty($doc->ref_code))
-        {
-          $this->load->model('inventory/consign_check_model');
-          $this->consign_check_model->update_ref_code($doc->ref_code, NULL, 0);
-        }
+			$do = $this->delivery_order_model->get_sap_delivery_order($code);
+			if(empty($do))
+			{
+				$doc = $this->consign_order_model->get($code);
+	      //--- check status
+	      if($doc->status == 1)
+	      {
+	        $sc = FALSE;
+	        $this->error = "คุณต้องยกเลิกการบันทึกก่อนยกเลิกเอกสาร";
+	      }
+	      else
+	      {
+	        $this->db->trans_begin();
+	        //--- if WX loaded remove and change WX status
+	        if(!empty($doc->ref_code))
+	        {
+	          $this->load->model('inventory/consign_check_model');
+	          $this->consign_check_model->update_ref_code($doc->ref_code, NULL, 0);
+	        }
 
-        if(! $this->consign_order_model->drop_details($code))
-        {
-          $sc = FALSE;
-          $this->error = "ลบรายการไม่สำเร็จ";
-        }
-        else
-        {
-          if(! $this->consign_order_model->change_status($code, 2))
-          {
-            $sc = FALSE;
-            $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
-          }
-        }
+	        if(! $this->consign_order_model->drop_details($code))
+	        {
+	          $sc = FALSE;
+	          $this->error = "ลบรายการไม่สำเร็จ";
+	        }
+	        else
+	        {
+	          if(! $this->consign_order_model->change_status($code, 2))
+	          {
+	            $sc = FALSE;
+	            $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+	          }
+	        }
 
-        if($sc === TRUE)
-        {
-          $this->db->trans_commit();
-        }
-        else
-        {
-          $this->db->trans_rollback();
-        }
-      }
+
+	        if($sc === TRUE)
+	        {
+	          $this->db->trans_commit();
+	        }
+	        else
+	        {
+	          $this->db->trans_rollback();
+	        }
+
+					if($sc === TRUE)
+					{
+						//---- drop middle details
+						$middle = $this->delivery_order_model->get_middle_delivery_order($code);
+			      if(!empty($middle))
+			      {
+			        foreach($middle as $rows)
+			        {
+			          if($this->delivery_order_model->drop_middle_exits_data($rows->DocEntry) === FALSE)
+			          {
+			            $sc = FALSE;
+			            $this->error = "ลบรายการที่ค้างใน Temp ไม่สำเร็จ";
+			          }
+			        }
+			      }
+					}
+	      }
+
+			}
+			else
+			{
+				$sc = FALSE;
+				$this->error = "เอกสารเข้า SAP แล้วไม่อนุญาติให้แก้ไข";
+			}
+
     }
     else
     {
@@ -274,9 +304,12 @@ class Consign_order extends PS_Controller
 
   public function view_detail($code)
   {
+		$this->load->model('inventory/delivery_order_model');
     $this->load->helper('print');
     $doc = $this->consign_order_model->get($code);
     $details = $this->consign_order_model->get_details($code);
+		$do = $this->delivery_order_model->exists_sap_delivery_order($code);
+
     if(!empty($details))
     {
       foreach($details as $rs)
@@ -287,7 +320,8 @@ class Consign_order extends PS_Controller
 
     $ds = array(
       'doc' => $doc,
-      'details' => $details
+      'details' => $details,
+			'in_sap' => empty($do) ? FALSE : TRUE
     );
 
     $this->load->view('account/consign_order/consign_order_view_detail', $ds);
@@ -692,49 +726,78 @@ class Consign_order extends PS_Controller
     $this->load->model("masters/warehouse_model");
     $this->load->model('inventory/movement_model');
     $this->load->model('inventory/invoice_model');
+		$this->load->model('inventory/delivery_order_model');
+
     $doc = $this->consign_order_model->get($code);
     if($doc->status == 1)
     {
-      $this->db->trans_begin();
+			$do = $this->delivery_order_model->get_sap_delivery_order($code);
+			if(empty($do))
+			{
+				$this->db->trans_begin();
 
-      //--- remove movement
-      if(! $this->movement_model->drop_movement($code))
-      {
-        $sc = FALSE;
-        $this->error = "ลบ movement ไม่สำเร็จ";
-      }
-      //--- Remove sold data
-      if(!$this->invoice_model->drop_all_sold($code))
-      {
-        $sc = FALSE;
-        $this->error = "ลบยอดขาย ไม่สำเร็จ";
-      }
+	      //--- remove movement
+	      if(! $this->movement_model->drop_movement($code))
+	      {
+	        $sc = FALSE;
+	        $this->error = "ลบ movement ไม่สำเร็จ";
+	      }
+	      //--- Remove sold data
+	      if(!$this->invoice_model->drop_all_sold($code))
+	      {
+	        $sc = FALSE;
+	        $this->error = "ลบยอดขาย ไม่สำเร็จ";
+	      }
 
-      //--- change status details
-      if(! $this->consign_order_model->change_all_detail_status($code, 0))
-      {
-        $sc = FALSE;
-        $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
-      }
+	      //--- change status details
+	      if(! $this->consign_order_model->change_all_detail_status($code, 0))
+	      {
+	        $sc = FALSE;
+	        $this->error = "เปลี่ยนสถานะรายการไม่สำเร็จ";
+	      }
 
-      //--- change document status
-      if($sc === TRUE)
-      {
-        if(! $this->consign_order_model->change_status($code, 0))
-        {
-          $sc = FALSE;
-          $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
-        }
-      }
+	      //--- change document status
+	      if($sc === TRUE)
+	      {
+	        if(! $this->consign_order_model->change_status($code, 0))
+	        {
+	          $sc = FALSE;
+	          $this->error = "เปลี่ยนสถานะเอกสารไม่สำเร็จ";
+	        }
+	      }
 
-      if($sc === TRUE)
-      {
-        $this->db->trans_commit();
-      }
-      else
-      {
-        $this->db->trans_rollback();
-      }
+	      if($sc === TRUE)
+	      {
+	        $this->db->trans_commit();
+	      }
+	      else
+	      {
+	        $this->db->trans_rollback();
+	      }
+
+				if($sc === TRUE)
+				{
+					//--- drop middle details
+					$middle = $this->delivery_order_model->get_middle_delivery_order($code);
+		      if(!empty($middle))
+		      {
+		        foreach($middle as $rows)
+		        {
+		          if($this->delivery_order_model->drop_middle_exits_data($rows->DocEntry) === FALSE)
+		          {
+		            $sc = FALSE;
+		            $this->error = "ลบรายการที่ค้างใน Temp ไม่สำเร็จ";
+		          }
+		        }
+		      }
+				}
+			}
+			else
+			{
+				$sc = FALSE;
+				$this->error = "ยกเลิกเอกสารใน SAP ก่อนย้อนสถานะ";
+			}
+
     }
 
 

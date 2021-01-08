@@ -1,4 +1,4 @@
-<?php $this->load->view('include/header');  ?>
+
 <div class="row">
 	<div class="col-sm-12">
     	<center><h1><i class="fa fa-frown-o"></i></h1></center>
@@ -12,4 +12,3 @@
 		window.location.href = "<?php echo $this->home; ?>";
 	}
 </script>
-<?php $this->load->view('include/footer'); ?>

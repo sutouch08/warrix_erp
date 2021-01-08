@@ -93,6 +93,13 @@
       </div>
       <div class="divider-hidden"></div>
 
+			<div class="col-sm-3"><span class="form-control left-label">ตัดยอดแปรสภาพ</span></div>
+      <div class="col-sm-8">
+        <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_ADJUST_TRANSFORM" value="<?php echo $BOOK_CODE_ADJUST_TRANSFORM; ?>" />
+        <span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบตัดยอดสินค้าแปรสภาพ"</span>
+      </div>
+      <div class="divider-hidden"></div>
+
       <div class="col-sm-3"><span class="form-control left-label">ลดหนี้ขาย</span></div>
       <div class="col-sm-8">
         <input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_RETURN_ORDER" value="<?php echo $BOOK_CODE_RETURN_ORDER; ?>" />

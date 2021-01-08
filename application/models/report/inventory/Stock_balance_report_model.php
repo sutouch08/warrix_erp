@@ -39,9 +39,10 @@ class Stock_balance_report_model extends CI_Model
       $this->ms->where('OBIN.BinCode', $zoneCode);
     }
 
+		 $this->ms->order_by('OITM.ItemCode', 'ASC');
     $this->ms->order_by('OBIN.WhsCode', 'ASC');
     $this->ms->order_by('OBIN.BinCode', 'ASC');
-    $this->ms->order_by('OITM.ItemCode', 'ASC');
+
 
     $rs = $this->ms->get();
 

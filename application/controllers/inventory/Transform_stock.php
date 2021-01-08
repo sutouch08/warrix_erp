@@ -316,8 +316,8 @@ class Transform_stock extends PS_Controller
       $arr = array(
         'order_code' => $order_code,
         'id_order_detail' => $id_order_detail,
-        'original_code' => $original_product,
-        'product_code' => $transform_product,
+        'original_code' => trim($original_product),
+        'product_code' => trim($transform_product),
         'order_qty' => $qty,
         'sold_qty' => $sold_qty,
         'valid' => $valid

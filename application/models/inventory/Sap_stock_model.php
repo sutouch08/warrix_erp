@@ -33,12 +33,12 @@ class Sap_stock_model extends CI_Model
 
       if(!empty($ds['item_code']))
       {
-        $qr .= "AND (OITM.ItemCode LIKE '%{$itemCode}%' OR OITM.U_OLDCODE LIKE '%{$itemCode}%') ";
+        $qr .= "AND (OITM.ItemCode LIKE N'%{$itemCode}%' OR OITM.U_OLDCODE LIKE N'%{$itemCode}%') ";
       }
 
       if(!empty($ds['zone_code']))
       {
-        $qr .= "AND (OBIN.BinCode LIKE '%{$zoneCode}%' OR OBIN.Descr LIKE N'%{$zoneCode}%') ";
+        $qr .= "AND (OBIN.BinCode LIKE N'%{$this->ms->escape_str($zoneCode)}%' OR OBIN.Descr LIKE N'%{$this->ms->escape_str($zoneCode)}%') ";
       }
 
       $qr .= "ORDER BY OIBQ.ItemCode ASC, OBIN.BinCode ASC ";
@@ -90,12 +90,12 @@ class Sap_stock_model extends CI_Model
 
       if(!empty($ds['item_code']))
       {
-        $qr .= "AND (OITM.ItemCode LIKE '%{$itemCode}%' OR OITM.U_OLDCODE LIKE '%{$itemCode}%') ";
+        $qr .= "AND (OITM.ItemCode LIKE N'%{$itemCode}%' OR OITM.U_OLDCODE LIKE N'%{$itemCode}%') ";
       }
 
       if(!empty($ds['zone_code']))
       {
-        $qr .= "AND (OBIN.BinCode LIKE '%{$zoneCode}%' OR OBIN.Descr LIKE N'%{$zoneCode}%') ";
+        $qr .= "AND (OBIN.BinCode LIKE N'%{$this->ms->escape_str($zoneCode)}%' OR OBIN.Descr LIKE N'%{$this->ms->escape_str($zoneCode)}%') ";
       }
 
       $rs = $this->ms->query($qr);

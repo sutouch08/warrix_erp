@@ -161,17 +161,20 @@ function addToMove(){
 		{'name' : 'to_zone', 'value' : to_zone}
 	);
 
-
+	no = 0;
+	var items = [];
 	$('.input-qty').each(function(index, element) {
 	    var qty = $(this).val();
-			var pd_code  = $(this).attr('id')
-			var name = "trans_products["+pd_code+"]";
 			if( qty != '' && qty != 0 ){
-				ds.push(
-					{ "name" : name, "value" : qty }
-				);
+				var pd_code  = $(this).data('products')
+				item = {"code" : pd_code, "qty" : qty };
+				items.push(item);
 			}
     });
+
+		ds.push({"name" : "items", "value" : JSON.stringify(items)});
+		console.log(ds);
+		//return false;
 
 	if( count > 0 ){
 		load_in();

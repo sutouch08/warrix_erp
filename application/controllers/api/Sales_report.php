@@ -201,7 +201,7 @@ class Sales_report extends CI_Controller
   {
     $this->load->model('api/sale_report_model');
 
-    $limit = 3; //--- limit rows
+    $limit = 100; //--- limit rows
     $role = 'S'; //--- only sale order
     $role_name = array(
       'S' => 'ขาย',

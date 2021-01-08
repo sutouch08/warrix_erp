@@ -7,6 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
+				<button type="button" class="btn btn-sm btn-primary" onclick="getSearch()"><i class="fa fa-search"></i> Search</button>
 				<button type="button" class="btn btn-sm btn-warning" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
 			</p>
 		</div>
@@ -46,6 +47,14 @@
   </div>
 
 	<div class="col-sm-1 col-1-harf padding-5">
+    <label>คลังสินค้า</label>
+		<select class="form-control input-sm" name="warehouse" onchange="getSearch()">
+      <option value="all">ทั้งหมด</option>
+      <?php echo select_sell_warehouse($warehouse); ?>
+    </select>
+  </div>
+
+	<div class="col-sm-1 padding-5">
     <label>การยืนยัน</label>
 		<select class="form-control input-sm" name="is_valid" onchange="getSearch()">
       <option value="all">ทั้งหมด</option>
@@ -54,7 +63,7 @@
     </select>
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-2 padding-5 last">
     <label>วันที่</label>
     <div class="input-daterange input-group">
       <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
@@ -62,10 +71,6 @@
     </div>
   </div>
 
-	<div class="col-sm-1 padding-5 last">
-		<label class="display-block not-show">search</label>
-		<button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
-	</div>
 </div>
 
 <hr class="margin-top-15">
@@ -137,7 +142,7 @@
 <?php endforeach; ?>
 <?php else : ?>
       <tr>
-        <td colspan="7" class="text-center"><h4>ไม่พบรายการ</h4></td>
+        <td colspan="8" class="text-center"><h4>ไม่พบรายการ</h4></td>
       </tr>
 <?php endif; ?>
       </tbody>

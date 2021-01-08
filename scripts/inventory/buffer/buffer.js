@@ -36,3 +36,40 @@ $("#toDate").datepicker({
 		$("#fromDate").datepicker("option", "maxDate", ds);
 	}
 });
+
+
+function deleteBuffer(id, order, product) {
+	swal({
+		title: "คุณแน่ใจ ?",
+		text: "ต้องการลบ " + order + "/"+product+" หรือไม่ ?",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: 'ใช่, ฉันต้องการลบ',
+		cancelButtonText: 'ยกเลิก',
+		closeOnConfirm: false
+		}, function(){
+			$.ajax({
+				url: BASE_URL + 'inventory/buffer/delete_buffer',
+				type:"POST",
+        cache:"false",
+				data:{
+					'id' : id
+				},
+				success: function(rs){
+					var rs = $.trim(rs);
+					if( rs == 'success' ){
+						swal({
+							title: 'Deleted',
+							type: 'success',
+							timer: 1000 });
+							
+						$('#row-'+id).remove();
+						reIndex();
+					}else{
+						swal("Error !", rs , "error");
+					}
+				}
+			});
+	});
+}

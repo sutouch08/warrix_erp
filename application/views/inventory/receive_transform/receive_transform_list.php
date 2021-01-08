@@ -81,6 +81,7 @@
 					<th class="width-15 middle">ใบเบิกแปรสภาพ</th>
 					<th class="width-10 middle text-center">จำนวน</th>
 					<th class="width-10 middle text-center">สถานะ</th>
+					<th class="width-10 middle">พนักงาน</th>
           <th></th>
 				</tr>
 			</thead>
@@ -103,6 +104,7 @@
                 <span class="red"><strong>CN</strong></span>
                 <?php endif; ?>
               </td>
+							<td class="middle"><?php echo $rs->user; ?></td>
               <td class="middle text-right">
                 <button type="button" class="btn btn-mini btn-info" onclick="viewDetail('<?php echo $rs->code; ?>')"><i class="fa fa-eye"></i></button>
                 <?php if(($this->pm->can_edit OR $this->pm->can_add) && $rs->status == 0) : ?>

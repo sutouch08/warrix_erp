@@ -147,6 +147,11 @@ hr{
 	margin-bottom: 5px;
 }
 
+hr.padding-5{
+  margin-left: -7px;
+  margin-right: -7px;
+}
+
 
 .title-block {
   margin-top:0px;

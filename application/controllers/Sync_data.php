@@ -7,7 +7,7 @@ class Sync_data extends CI_Controller
 	public $menu_code = '';
 	public $menu_group_code = '';
 	public $pm;
-  public $limit = 1000;
+  public $limit = 100;
   public $date;
 
   public function __construct()
@@ -15,6 +15,7 @@ class Sync_data extends CI_Controller
     parent::__construct();
     $this->ms = $this->load->database('ms', TRUE); //--- SAP database
     $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
+		$this->cn = $this->load->database('cn', TRUE);
     $this->load->model('sync_data_model');
     $this->date = date('Y-d-m H:i:s');
   }
@@ -580,6 +581,49 @@ class Sync_data extends CI_Controller
 
 
 
+
+  public function syncTransformGoodsIssueCode()
+  {
+    $this->load->model('inventory/adjust_transform_model');
+    $ds = $this->adjust_transform_model->get_non_issue_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->adjust_transform_model->get_sap_issue_doc($rs->code);
+
+        if(!empty($inv))
+        {
+          $this->adjust_transform_model->update_issue_code($rs->code, $inv->DocNum);
+          $update++;
+        }
+
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WG',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+
+
   public function syncAdjustGoodsIssueCode()
   {
     $this->load->model('inventory/adjust_model');
@@ -690,6 +734,85 @@ class Sync_data extends CI_Controller
 
     $logs = array(
       'sync_item' => 'SM',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+
+	public function syncConsignSoldInvCode()
+  {
+    $this->load->model('account/consign_order_model');
+    $ds = $this->consign_order_model->get_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->consign_order_model->get_sap_doc_num($rs->code);
+
+        if(!empty($inv))
+        {
+          $this->consign_order_model->update_inv($rs->code, $inv);
+          $update++;
+        }
+
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WM',
+      'get_item' => $count,
+      'update_item' => $update
+    );
+
+    //--- add logs
+    $this->sync_data_model->add_logs($logs);
+
+    echo $count.' | '.$update.' | '.$message;
+  }
+
+	public function syncConsignmentSoldInvCode()
+  {
+    $this->load->model('account/consignment_order_model');
+    $ds = $this->consignment_order_model->get_non_inv_code($this->limit);
+    $count = 0;
+    $update = 0;
+    $message = 'done';
+    if(!empty($ds))
+    {
+      foreach($ds as $rs)
+      {
+        $count++;
+        $inv = $this->consignment_order_model->get_sap_doc_num($rs->code);
+
+        if(!empty($inv))
+        {
+          $this->consignment_order_model->update_inv($rs->code, $inv);
+          $update++;
+        }
+
+      }
+    }
+    else
+    {
+      $message = 'not found';
+    }
+
+    $logs = array(
+      'sync_item' => 'WD',
       'get_item' => $count,
       'update_item' => $update
     );

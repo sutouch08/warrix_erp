@@ -412,7 +412,7 @@ class Consignment_order_model extends CI_Model
       ->group_end();
     }
 
-    $this->db->order_by('code', 'DESC');
+    $this->db->order_by('date_add', 'DESC');
 
     if(!empty($perpage))
     {
@@ -506,6 +506,47 @@ class Consignment_order_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+
+	public function get_non_inv_code($limit = 100)
+	{
+		$rs = $this->db
+    ->select('code')
+    ->where('status', 1)
+    ->where('inv_code IS NULL', NULL, FALSE)
+    ->limit($limit)
+    ->get('consignment_order');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+	}
+
+
+	public function get_sap_doc_num($code)
+  {
+    $rs = $this->cn
+    ->select('DocNum')
+    ->where('U_ECOMNO', $code)
+    ->where('CANCELED', 'N')
+    ->get('ODLN');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row()->DocNum;
+    }
+
+    return NULL;
+  }
+
+	public function update_inv($code, $doc_num)
+  {
+    return $this->db->set('inv_code', $doc_num)->where('code', $code)->update('consignment_order');
   }
 
 

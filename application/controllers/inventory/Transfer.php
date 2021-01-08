@@ -913,7 +913,7 @@ class Transfer extends PS_Controller
       $draft = $this->transfer_model->get_transfer_draft($code);
       if(!empty($draft))
       {
-        if(empty($draft->F_Receipt) OR $draft->F_Receipt == 'N')
+        if(empty($draft->F_Receipt) OR $draft->F_Receipt == 'N' OR $draft->F_Receipt == 'D')
         {
           //---- ยืนยันรับสินค้า
           if($this->transfer_model->confirm_draft_receipted($draft->DocEntry))

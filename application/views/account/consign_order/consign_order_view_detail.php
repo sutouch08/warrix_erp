@@ -9,7 +9,7 @@
     	<p class="pull-right top-p">
         <button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
 		<?php if($doc->status == 1) : ?>
-			<?php if($this->pm->can_delete) : ?>
+			<?php if($this->pm->can_delete && $in_sap === FALSE) : ?>
 				<button type="button" class="btn btn-sm btn-danger" onclick="unSaveConsign()"><i class="fa fa-refresh"></i> ยกเลิกการบันทึก</button>
 			<?php endif; ?>
 				<button type="button" class="btn btn-sm btn-primary" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
@@ -48,9 +48,13 @@
     <label>อ้างอิง</label>
     <input type="text" class="form-control input-sm text-center" name="ref_code" id="ref_code" value="<?php echo $doc->ref_code; ?>" disabled>
   </div>
-	<div class="col-sm-10 col-10-harf col-xs-12 padding-5 last">
+	<div class="col-sm-8 col-8-harf col-xs-12 padding-5">
     <label>หมายเหตุ</label>
     <input type="text" class="form-control input-sm" name="remark" id="remark" value="<?php echo $doc->remark; ?>" disabled>
+  </div>
+	<div class="col-sm-2 col-xs-4 padding-5 last">
+    <label>SAP No.</label>
+    <input type="text" class="form-control input-sm" id="inv_code" value="<?php echo $doc->inv_code; ?>" disabled>
   </div>
 
 </div>

@@ -25,6 +25,7 @@ class Delivery_order extends PS_Controller
     $this->load->model('masters/customers_model');
     $this->load->helper('channels');
     $this->load->helper('order');
+    $this->load->helper('warehouse');
     $filter = array(
       'code'          => get_filter('code', 'ic_code', ''),
       'customer'      => get_filter('customer', 'ic_customer', ''),
@@ -34,7 +35,8 @@ class Delivery_order extends PS_Controller
       'from_date'     => get_filter('from_date', 'ic_from_date', ''),
       'to_date'       => get_filter('to_date', 'ic_to_date', ''),
       'sort_by'       => get_filter('sort_by', 'ic_sort_by', ''),
-      'order_by'      => get_filter('order_by', 'ic_order_by', '')
+      'order_by'      => get_filter('order_by', 'ic_order_by', ''),
+      'warehouse' => get_filter('warehouse', 'ic_warehouse', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -547,7 +549,19 @@ class Delivery_order extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('ic_code','ic_customer','ic_user','ic_role','ic_channels','ic_from_date','ic_to_date', 'ic_sort_by', 'ic_order_by');
+    $filter = array(
+      'ic_code',
+      'ic_customer',
+      'ic_user',
+      'ic_role',
+      'ic_channels',
+      'ic_from_date',
+      'ic_to_date',
+      'ic_sort_by',
+      'ic_order_by',
+      'ic_warehouse'
+    );
+    
     clear_filter($filter);
   }
 

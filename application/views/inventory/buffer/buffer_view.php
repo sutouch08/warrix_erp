@@ -67,15 +67,22 @@
     <?php if( !empty($data)) : ?>
     <?php $no = $this->uri->segment(4) + 1; ?>
     <?php foreach($data as $rs) : ?>
-      <tr class="font-size-12">
-        <td class="text-center"><?php echo $no; ?></td>
+      <tr class="font-size-12" id="row-<?php echo $rs->id; ?>">
+        <td class="text-center no"><?php echo $no; ?></td>
         <td class="text-center"><?php echo thai_date($rs->date_upd, TRUE); ?></td>
         <td class="text-center"><?php echo $rs->order_code; ?></td>
         <td><?php echo $rs->product_code; ?></td>
         <td class="text-center"><?php echo number($rs->qty); ?></td>
     		<td class="text-center"><?php echo $rs->state_name; ?></td>
         <td class="text-center"> <?php echo $rs->zone_name; ?></td>
-    		<td class="text-right"></td>
+    		<td class="text-right">
+    			<?php if($this->pm->can_delete) : ?>
+						<button type="button" class="btn btn-xs btn-danger"
+						onclick="deleteBuffer(<?php echo $rs->id;?>, '<?php echo $rs->order_code; ?>', '<?php echo $rs->product_code; ?>')">
+							<i class="fa fa-trash"></i>
+						</button>
+					<?php endif; ?>
+    		</td>
       </tr>
     <?php  $no++; ?>
     <?php endforeach; ?>

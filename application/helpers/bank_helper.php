@@ -33,4 +33,27 @@ function select_bank_account($id = '')
   return $sc;
 }
 
+
+function select_bank($code = NULL)
+{
+  $sc = "";
+  $CI =& get_instance();
+  $CI->load->model('masters/bank_model');
+
+  $bank = $CI->bank_model->get_banks();
+
+  if(!empty($bank))
+  {
+    foreach($bank as $rs)
+    {
+      $selected = is_selected($rs->code, $code);
+
+      $sc .= "<option value='{$rs->code}' {$selected}>{$rs->name}</option>";
+    }
+
+  }
+
+  return $sc;
+}
+
  ?>

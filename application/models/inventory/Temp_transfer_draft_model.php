@@ -42,6 +42,10 @@ class Temp_transfer_draft_model extends CI_Model
       {
         $this->mc->where('F_Sap', 'N');
       }
+			else if($ds['status'] ===  'D')
+			{
+				$this->mc->where('F_Sap', 'D');
+			}
     }
 
 
@@ -70,7 +74,7 @@ class Temp_transfer_draft_model extends CI_Model
     ->select('F_E_Commerce, F_E_CommerceDate')
     ->select('F_Sap, F_SapDate')
     ->select('F_Receipt, F_ReceiptDate')
-    ->select('F_error AS Message');
+    ->select('Message AS Message');
 
     if(!empty($ds['code']))
     {
@@ -105,6 +109,10 @@ class Temp_transfer_draft_model extends CI_Model
       {
         $this->mc->where('F_Sap', 'N');
       }
+			else if($ds['status'] ===  'D')
+			{
+				$this->mc->where('F_Sap', 'D');
+			}
     }
 
 

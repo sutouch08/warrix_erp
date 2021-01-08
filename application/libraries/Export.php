@@ -2166,6 +2166,131 @@ public function export_consignment_order($code)
 
 //---- Good issue
 //---- OIGE IGE1
+//---- Transform
+public function export_transform_goods_issue($code)
+{
+  $sc = TRUE;
+  $this->ci->load->model('inventory/adjust_transform_model');
+  $doc = $this->ci->adjust_transform_model->get($code);
+  if(! empty($doc) && $doc->status == 1)
+  {
+    $sap = $this->ci->adjust_transform_model->get_sap_issue_doc($code);
+    if(empty($sap))
+    {
+      $middle = $this->ci->adjust_transform_model->get_middle_goods_issue($code);
+      if(!empty($middle))
+      {
+        foreach($middle as $rows)
+        {
+          if($this->ci->adjust_transform_model->drop_middle_issue_data($rows->DocEntry) === FALSE)
+          {
+            $sc = FALSE;
+            $this->error = "ลบรายการที่ค้างใน Temp ไม่สำเร็จ";
+          }
+        }
+      }
+
+      if($sc === TRUE)
+      {
+        $details = $this->ci->adjust_transform_model->get_details($code);
+        if(!empty($details))
+        {
+          $doc_total = 0;
+
+          foreach($details as $row)
+          {
+            $doc_total += $row->qty * $row->cost;
+          }
+
+
+          $arr = array(
+            'U_ECOMNO' => $code,
+            'DocType' => 'I',
+            'CANCELED' => 'N',
+            'DocDate' => sap_date($doc->date_add),
+            'DocDueDate' => sap_date($doc->date_add),
+            'DocTotal' => $doc_total,
+            'DocTotalFC' => $doc_total,
+            'Comments' => limitText($doc->remark, 250),
+            'F_E_Commerce' => 'A',
+            'F_E_CommerceDate' => sap_date(now(), TRUE)
+          );
+
+          $this->ci->mc->trans_begin();
+
+          $docEntry = $this->ci->adjust_transform_model->add_sap_goods_issue($arr);
+
+          //--- now add details
+          if($docEntry !== FALSE)
+          {
+            $line = 0;
+            foreach($details as $rs)
+            {
+              if($sc === FALSE)
+              {
+                break;
+              }
+
+              $arr = array(
+                'DocEntry' => $docEntry,
+                'U_ECOMNO' => $rs->adjust_code,
+                'LineNum' => $line,
+                'ItemCode' => $rs->product_code,
+                'Dscription' => limitText($rs->product_name, 95),
+                'Quantity' => $rs->qty,
+                'WhsCode' => $doc->from_warehouse,
+                'FisrtBin' => $doc->from_zone,
+                'DocDate' => sap_date($doc->date_add),
+                'F_E_Commerce' => 'A',
+                'F_E_CommerceDate' => sap_date(now(), TRUE)
+              );
+
+              if(!$this->ci->adjust_transform_model->add_sap_goods_issue_row($arr))
+              {
+                $sc = FALSE;
+                $this->error = "Insert Goods Issue Temp Error at line {$line}, ItemCode : {$rs->product_code} ";
+              }
+
+              $line++;
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "เพิ่มเอกสารไม่สำเร็จ";
+          }
+
+          if($sc === TRUE)
+          {
+            $this->ci->mc->trans_commit();
+          }
+          else
+          {
+            $this->ci->mc->trans_rollback();
+          }
+
+        }
+
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "เอกสาร Goods Issue ถูกนำเข้า SAP แล้วไม่อนุญาติให้แก้ไข";
+    }
+  }
+  else
+  {
+    $sc = FALSE;
+    $this->error = "ไม่พบเลขที่เอกสาร หรือ สถานะเอกสารไม่ถูกต้อง";
+  }
+
+  return $sc;
+}
+
+
+//---- Good issue
+//---- OIGE IGE1
 //---- Adjust
 public function export_adjust_goods_issue($code)
 {

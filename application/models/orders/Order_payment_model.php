@@ -199,5 +199,19 @@ class Order_payment_model extends CI_Model
     return FALSE;
   }
 
+
+	//---- for check transection
+	public function has_account_transection($id_account)
+	{
+		$rs = $this->db->where('id_account', $id_account)->count_all_results('order_payment');
+
+		if($rs > 0)
+		{
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
 } //--- end class
 ?>

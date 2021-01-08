@@ -1084,6 +1084,7 @@ class Orders_model extends CI_Model
     ->where('status', 1)
     ->where('is_cancled', 0)
     ->where('is_expired', 0)
+    ->where('is_valid', 1)
     ->where('inv_code IS NULL', NULL, FALSE)
     ->limit($limit)
     ->get('orders');
@@ -1179,7 +1180,7 @@ class Orders_model extends CI_Model
     ->select('code')
     ->where('date_add <', $date)
     ->where_in('role', $role)
-    ->where_in('state', array(1,2,3))
+    ->where_in('state', array(1,2))
     ->where('is_paid', 0)
     ->where('never_expire', 0)
     ->get('orders');

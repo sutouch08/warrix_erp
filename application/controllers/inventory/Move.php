@@ -325,28 +325,30 @@ class Move extends PS_Controller
 
       $from_zone = $this->input->post('from_zone');
       $to_zone = $this->input->post('to_zone');
-      $trans_products = $this->input->post('trans_products');
+      $trans_products = $this->input->post('items');
+
       if($from_zone != $to_zone)
       {
         if(!empty($trans_products))
         {
+          $items = json_decode($trans_products);
           $this->db->trans_start();
-          foreach($trans_products as $item => $qty)
+          foreach($items as $item)
           {
-            $id = $this->move_model->get_id($code, $item, $from_zone, $to_zone);
+            $id = $this->move_model->get_id($code, $item->code, $from_zone, $to_zone);
             if(!empty($id))
             {
-              $this->move_model->update_qty($id, $qty);
+              $this->move_model->update_qty($id, $item->qty);
             }
             else
             {
               $arr = array(
                 'move_code' => $code,
-                'product_code' => $item,
-                'product_name' => $this->products_model->get_name($item),
+                'product_code' => $item->code,
+                'product_name' => $this->products_model->get_name($item->code),
                 'from_zone' => $from_zone,
                 'to_zone' => $to_zone,
-                'qty' => $qty
+                'qty' => $item->qty
               );
 
               $this->move_model->add_detail($arr);
@@ -354,6 +356,7 @@ class Move extends PS_Controller
           }
 
           $this->db->trans_complete();
+
 
           if($this->db->trans_status() === FALSE)
           {

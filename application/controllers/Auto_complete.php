@@ -42,6 +42,7 @@ class Auto_complete extends CI_Controller
     $rs = $this->db
     ->select('code, name')
     ->where('CardType', 'C')
+		->where('active', 1)
     ->group_start()
     ->like('code', $txt)
     ->or_like('name', $txt)

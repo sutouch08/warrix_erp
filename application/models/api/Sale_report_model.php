@@ -9,7 +9,7 @@ class Sale_report_model extends CI_Model
 
   public function get_orders($role = 'S', $limit = 100)
   {
-    $begin_date = '2020-07-01 00:00:00';
+    $begin_date = '2020-10-22 00:00:00';
     $rs = $this->db
     ->select('code, status, state')
     ->where('role', $role)
@@ -33,7 +33,7 @@ class Sale_report_model extends CI_Model
 
   public function get_error_orders($role = 'S', $limit = 100)
   {
-    $begin_date = '2020-07-01 00:00:00';
+    $begin_date = '2020-10-22 00:00:00';
     $rs = $this->db
     ->select('code, status, state')
     ->where('role', $role)

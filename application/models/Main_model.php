@@ -76,7 +76,7 @@ class Main_model extends CI_Model
       $this->db->limit($limit);
     }
 
-    $rs = $this->db->get();
+		$rs = $this->db->get();
 
     if($rs->num_rows() > 0)
     {

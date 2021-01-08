@@ -28,6 +28,27 @@ class Invoice_model extends CI_Model
   }
 
 
+  //----- get sold qty from order sold
+  public function get_billed_detail_qty($code)
+  {
+    $rs = $this->db
+    ->select('product_code, product_name')
+    ->select_sum('qty')
+    ->where('is_count', 1)
+    ->where('reference', $code)
+    ->group_by('product_code')
+    ->order_by('product_code', 'ASC')
+    ->get('order_sold');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
   public function get_details($code)
   {
     $rs = $this->db->where('reference', $code)->get('order_sold');
@@ -72,6 +93,8 @@ class Invoice_model extends CI_Model
     else
     {
       $control_day = getConfig('OVER_DUE_DATE');
+			$control_day++;
+			
       $rs = $this->ms
       ->select('DocEntry', FALSE)
       ->where('CardCode', $customer_code)

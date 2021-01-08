@@ -130,7 +130,7 @@
 		  <td>{{ products }}</td>
 		  <td align="center" class="qty-label">{{ qty }}</td>
 		  <td align="center">
-		  	<input type="number" class="form-control input-sm text-center input-qty" max="{{qty}}" id="{{products}}" />
+		  	<input type="number" class="form-control input-sm text-center input-qty" name="items[{{products}}]" data-products="{{products}}" max="{{qty}}" id="item_{{no}}" />
 		  </td>
 		</tr>
 	{{/if}}
