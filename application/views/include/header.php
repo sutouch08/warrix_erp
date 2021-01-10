@@ -28,7 +28,22 @@
     <script src="<?php echo base_url(); ?>assets/js/handlebars-v3.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/chosen.jquery.js"></script>
 	  <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/css/sweet-alert.css">
-    <style> .ui-helper-hidden-accessible { display:none; } </style>
+    <style>
+			.ui-helper-hidden-accessible {
+				display:none;
+			}
+
+			.ui-autocomplete {
+		    max-height: 250px;
+		    overflow-y: auto;
+		    /* prevent horizontal scrollbar */
+		    overflow-x: hidden;
+			}
+
+			.ui-widget {
+				width:auto;
+			}
+	</style>
 	</head>
 	<body class="no-skin" onload="checkError()">
 		<div id="loader" style="position:absolute; padding: 15px 25px 15px 25px; background-color:#fff; opacity:0.0; box-shadow: 0px 0px 25px #CCC; top:-20px; display:none; z-index:10;">
@@ -74,7 +89,7 @@
 
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
-						
+
 						<li class="light-blue">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 

@@ -5,8 +5,7 @@
 	?>
 <form id="discount-form">
 <div class="row">
-	<div class="col-sm-12">
-		<div class="table-responsive">
+	<div class="col-sm-12 col-xs-12 table-responsive">
 			<table class="table table-striped border-1">
         <thead>
         	<tr class="font-size-12">
@@ -132,8 +131,6 @@
 
         	</tbody>
         </table>
-			</div>
-
     </div>
 </div>
 <!--  End Order Detail ----------------->

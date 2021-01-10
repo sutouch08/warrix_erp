@@ -3,10 +3,6 @@
     	<label>เลขที่เอกสาร</label>
       <input type="text" class="form-control input-sm text-center" value="<?php echo $order->code; ?>" disabled />
     </div>
-		<div class="col-sm-1 col-xs-6 padding-5">
-			<label>ใบเสนอราคา</label>
-		  <input type="text" class="form-control input-sm text-center" value="<?php echo $order->quotation_no; ?>" disabled />
-		</div>
     <div class="col-sm-1 col-xs-6 padding-5">
     	<label>วันที่</label>
 			<input type="text" class="form-control input-sm text-center edit" name="date" id="date" value="<?php echo thai_date($order->date_add); ?>" disabled readonly />
@@ -15,7 +11,7 @@
 			<label>รหัสลูกค้า</label>
 			<input type="text" class="form-control input-sm text-center edit" id="customer_code" name="customer_code" value="<?php echo $order->customer_code; ?>" disabled />
 		</div>
-    <div class="col-sm-4 col-xs-12 padding-5">
+    <div class="col-sm-5 col-xs-12 padding-5">
     	<label>ลูกค้า[ในระบบ]</label>
 			<input type="text" class="form-control input-sm edit" id="customer" name="customer" value="<?php echo $order->customer_name; ?>" required disabled />
     </div>
@@ -44,12 +40,11 @@
 			<label>อ้างอิง</label>
 		  <input type="text" class="form-control input-sm text-center edit" name="reference" id="reference" value="<?php echo $order->reference; ?>" disabled />
 		</div>
-
 		<div class="col-sm-2 col-2-harf col-xs-12 padding-5">
 			<label>คลัง</label>
 	    <select class="form-control input-sm edit" name="warehouse" id="warehouse" disabled>
 				<option value="">เลือกคลัง</option>
-				<?php echo select_sell_warehouse($order->warehouse_code); ?>
+				<?php echo select_warehouse($order->warehouse_code); ?>
 			</select>
 	  </div>
 

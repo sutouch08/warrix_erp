@@ -3,6 +3,73 @@ $('#date').datepicker({
 });
 
 
+$('#qt_no').autocomplete({
+	source:BASE_URL + 'auto_complete/get_active_quotation',
+	autoFocus:true,
+	open:function(event){
+		var $ul = $(this).autocomplete('widget');
+		$ul.css('width', 'auto');
+	},
+	close:function() {
+		var rs = $(this).val();
+		var arr = rs.split(' | ');
+		if(arr.length === 2) {
+			$(this).val(arr[0]);
+		}
+		else {
+			$(this).val('');
+		}
+	}
+})
+
+
+function get_quotation()
+{
+	var qt_no = $('#qt_no').val();
+	var code = $('#order_code').val();
+
+	swal({
+		title: "คุณแน่ใจ ?",
+		text: "การทั้งเก่าหมดจะถูกลบและโหลดใหม่  ยืนยันการดึงรายการหรือไม่ ?",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: 'ยืนยัน',
+		cancelButtonText: 'ยกเลิก',
+		closeOnConfirm: false
+		}, function(){
+			load_in();
+			$.ajax({
+				url: BASE_URL + 'orders/orders/load_quotation',
+				type:"GET",
+				cache:"false",
+				data:{
+					'order_code' : code,
+					'qt_no' : qt_no
+				},
+				success: function(rs){
+					load_out();
+					var rs = $.trim(rs);
+					if( rs == 'success' ){
+						swal({
+							title:'Success',
+							text:'ดึงรายการใหม่เรียบร้อยแล้ว',
+							type:'success',
+							timer:1000
+						});
+
+						window.location.reload();
+
+					}else{
+						swal("Error !", rs , "error");
+					}
+				}
+			});
+	});
+
+}
+
+
 
 
 //---- เปลี่ยนสถานะออเดอร์  เป็นบันทึกแล้ว

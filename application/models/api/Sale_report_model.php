@@ -1,15 +1,22 @@
 <?php
 class Sale_report_model extends CI_Model
 {
+	private $begin_date = '2020-10-22 00:00:00';
   public function __construct()
   {
       parent::__construct();
   }
 
+	private function get_begin_date()
+	{
+		return date('Y-m-d 00:00:00', strtotime(getConfig('POWER_BI_BEGIN_DATE')));
+	}
+
 
   public function get_orders($role = 'S', $limit = 100)
   {
-    $begin_date = '2020-10-22 00:00:00';
+    $begin_date = $this->get_begin_date();
+
     $rs = $this->db
     ->select('code, status, state')
     ->where('role', $role)
@@ -33,7 +40,7 @@ class Sale_report_model extends CI_Model
 
   public function get_error_orders($role = 'S', $limit = 100)
   {
-    $begin_date = '2020-10-22 00:00:00';
+    $begin_date = $this->get_begin_date();
     $rs = $this->db
     ->select('code, status, state')
     ->where('role', $role)

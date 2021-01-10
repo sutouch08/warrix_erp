@@ -21,17 +21,21 @@
 <hr class=""/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
 <div class="row">
-  <div class="col-sm-2 padding-5 first">
+  <div class="col-sm-1 col-1-harf padding-5 first">
     <label>เลขที่เอกสาร</label>
     <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
   </div>
 
-  <div class="col-sm-2 padding-5">
+	<div class="col-sm-1 col-1-harf padding-5">
+		<label>ใบเสนอราคา</label>
+    <input type="text" class="form-control input-sm search" name="qt_no"  value="<?php echo $qt_no; ?>" />
+	</div>
+  <div class="col-sm-1 col-1-harf padding-5">
     <label>ลูกค้า</label>
     <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-1 col-1-harf padding-5">
     <label>พนักงาน</label>
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>

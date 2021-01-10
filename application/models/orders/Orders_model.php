@@ -354,6 +354,11 @@ class Orders_model extends CI_Model
       $this->db->like('orders.code', $ds['code']);
     }
 
+    if(!empty($ds['qt_no']))
+    {
+      $this->db->like('orders.quotation_no', $ds['qt_no']);
+    }
+
     //--- รหัส/ชื่อ ลูกค้า
     if( ! empty($ds['customer']))
     {
@@ -516,6 +521,13 @@ class Orders_model extends CI_Model
       $this->db->like('orders.code', $ds['code']);
     }
 
+
+    if(!empty($ds['qt_no']))
+    {
+      $this->db->like('orders.quotation_no', $ds['qt_no']);
+    }
+
+    
     //--- รหัส/ชื่อ ลูกค้า
     if( ! empty($ds['customer']))
     {

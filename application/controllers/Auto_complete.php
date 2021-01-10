@@ -11,6 +11,43 @@ class Auto_complete extends CI_Controller
   }
 
 
+	public function get_active_quotation()
+	{
+		$txt = $this->ms->escape_str(trim($_REQUEST['term']));
+
+		$sc = array();
+		$qr  = "SELECT DocNum, CardCode, CardName ";
+		$qr .= "FROM OQUT WHERE DocStatus = 'O' ";
+
+		if($txt != '*')
+		{
+			$sub  = "DocNum LIKE N'%".$txt."%' ";
+			$sub .= "OR CardCode LIKE N'%".$txt."%' ";
+			$sub .= "OR CardName LIKE N'%".$txt."%'";
+
+			$qr .= "AND ({$sub})";
+		}
+
+		$qr .= "ORDER BY DocNum DESC ";
+		$qr .= "OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY";
+
+		$qs = $this->ms->query($qr);
+
+		if($qs->num_rows() > 0)
+		{
+			foreach($qs->result() as $rs)
+			{
+				$sc[] = $rs->DocNum.' | '.$rs->CardCode.' : '.$rs->CardName;
+			}
+		}
+		else
+		{
+			$sc[] = "not found";
+		}
+
+		echo json_encode($sc);
+	}
+
 
   public function get_sender()
   {

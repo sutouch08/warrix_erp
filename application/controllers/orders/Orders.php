@@ -44,6 +44,7 @@ class Orders extends PS_Controller
   {
     $filter = array(
       'code' => get_filter('code', 'order_code', ''),
+			'qt_no' => get_filter('qt_no', 'qt_no', ''),
       'customer' => get_filter('customer', 'order_customer', ''),
       'user' => get_filter('user', 'order_user', ''),
       'reference' => get_filter('reference', 'order_reference', ''),
@@ -669,6 +670,195 @@ class Orders extends PS_Controller
     echo $sc === TRUE ? 'success' : $message;
   }
 
+
+
+
+	public function load_quotation()
+	{
+		$sc = TRUE;
+
+		$code = $this->input->get('order_code');
+		$qt_no = $this->input->get('qt_no');
+
+		if(!empty($code))
+		{
+			//--- load model
+			$this->load->model('orders/quotation_model');
+			$order = $this->orders_model->get($code);
+			if(!empty($order))
+			{
+				//---- order state ต้องยังไม่ถูกดึงไปจัด
+				if($order->state <= 3)
+				{
+
+					//---- start transection
+					$this->db->trans_begin();
+					//--- มีอยู่แต่ต้องการเอาออก
+					if(empty($qt_no) && !empty($order->quotation_no))
+					{
+						//--- 2. ลบรายการที่มีในออเดอร์แก่า
+						if($this->orders_model->clear_order_detail($code))
+						{
+							//---- update qt no on order
+							$arr = array(
+								'quotation_no' => NULL,
+								'status' => 0
+							);
+
+							if(! $this->orders_model->update($code, $arr))
+							{
+								$sc = FALSE;
+								$this->error = "ลบเลขที่ใบเสนอราคาไม่สำเร็จ";
+							}
+
+						}
+						else
+						{
+							$sc = FALSE;
+							$this->error = "ลบรายการไม่สำเร็จ";
+						}
+					}
+					else
+					{
+						if(!empty($qt_no))
+						{
+							//--- ยังไม่มี หรือ มีแล้วต้องการเปลี่ยน
+							$docEntry = $this->quotation_model->get_id($qt_no);
+
+							if(! empty($docEntry))
+							{
+								//---- 1. ดึงรายการในใบเสนอราคามาเช็คก่อนว่ามีรายการหรือไม่
+								$is_exists = $this->quotation_model->is_exists_details($docEntry);
+
+								if($is_exists === TRUE)
+								{
+									//--- 2. ลบรายการที่มีในออเดอร์แก่า
+									if($this->orders_model->clear_order_detail($code))
+									{
+										//--- 3. เพิ่มรายการใหม่
+										$details = $this->quotation_model->get_details($docEntry);
+
+										if(!empty($details))
+										{
+											$auz = getConfig('ALLOW_UNDER_ZERO');
+
+											foreach($details as $rs)
+											{
+												if($sc === FALSE)
+												{
+													break;
+												}
+
+												$item = $this->products_model->get($rs->code);
+
+												if(!empty($item))
+												{
+													//---- ยอดสินค้าที่่สั่งได้
+													$stock = $this->get_sell_stock($item->code, $order->warehouse_code);
+													$qty = round($rs->qty, 2);
+													//--- ถ้ามีสต็อกมากว่าที่สั่ง หรือ เป็นสินค้าไม่นับสต็อก
+								          if( $stock >= $qty OR $item->count_stock == 0 OR $auz == 1)
+								          {
+														$price = add_vat($rs->price); //-- PriceBefDi
+														$disc_amount = ($price * ($rs->discount * 0.01)) * $qty;
+														$total_amount = ($qty * $price) - $disc_amount;
+
+														$arr = array(
+															'order_code' => $code,
+															'style_code' => $item->style_code,
+															'product_code' => $item->code,
+															'product_name' => $item->name,
+															'cost' => $item->cost,
+															'price' => $price,
+															'qty' => $qty,
+															'discount1' => $rs->discount.'%',
+															'discount_amount' => $disc_amount,
+															'total_amount' => $total_amount,
+															'is_count' => $item->count_stock
+														);
+
+														$this->orders_model->add_detail($arr);
+													}
+													else
+													{
+														$sc = FALSE;
+														$this->error = "สินค้าไม่พอ : {$item->code} ต้องการ {$qty} คงเหลือ {$stock}";
+													}
+												}
+												else
+												{
+													$sc = FALSE;
+													$this->error = "ไม่พบรหัสสินค้า '{$rs->code}' ในระบบ";
+												}
+
+											} //--- end foreach
+
+											$arr = array(
+												'quotation_no' => $qt_no,
+												'status' => 0
+											);
+
+											$this->orders_model->update($code, $arr);
+
+										}
+										else
+										{
+											$sc = FALSE;
+											$this->error = "Error : ไม่พบรายการในใบเสนอราคา";
+										}
+									}
+									else
+									{
+										$sc = FALSE;
+										$this->error = "ลบรายการเก่าไม่สำเร็จ";
+									}
+								}
+								else
+								{
+									$sc = FALSE;
+									$this->error = "ไม่พบรายการในใบเสนอราคา";
+								}
+							}
+							else
+							{
+								$sc = FALSE;
+								$this->error = "ใบเสนอราคาไม่ถูกต้อง";
+							} //--- end if empty qt
+						}
+
+					} //--- end if empty qt_no
+
+
+					if($sc === TRUE)
+					{
+						$this->db->trans_commit();
+					}
+					else
+					{
+						$this->db->trans_rollback();
+					}
+
+				}
+				else
+				{
+					$sc = FALSE;
+					$this->error = "ออเดอร์อยุ๋ในสถานะที่ไม่สามารถแก้ไขรายการได้";
+				}
+			}
+			else
+			{
+				$sc = FALSE;
+				$this->error = "ไม่พบข้อมูลออเดอร์";
+			}
+		}
+		else
+		{
+			$sc = FALSE;
+			$this->error = "ไม่พบเลขที่เอกสาร";
+		}
+
+		echo $sc === TRUE ? 'success' : $this->error;
+	}
 
 
 
@@ -2559,6 +2749,7 @@ class Orders extends PS_Controller
   {
     $filter = array(
       'order_code',
+			'qt_no',
       'order_customer',
       'order_user',
       'order_reference',

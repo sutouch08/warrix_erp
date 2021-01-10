@@ -12,18 +12,51 @@ $hide = $order->status == 1 ? 'hide' : '';
     <div class="col-sm-6">
     	<p class="pull-right top-p">
         	<button type="button" class="btn btn-sm btn-warning" onClick="editOrder('<?php echo $order->code; ?>')"><i class="fa fa-arrow-left"></i> กลับ</button>
+					<button type="button" class="btn btn-sm btn-info" onclick="recalDiscount()">
+			        <i class="fa fa-calculator"></i> คำนวณส่วนลดใหม่</button>
+			      </button>
       <?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
           <button type="button" class="btn btn-sm btn-success <?php echo $hide; ?>" id="btn-save-order" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
       <?php endif; ?>
+
         </p>
     </div>
 </div>
 <hr class="margin-bottom-15" />
-<?php $this->load->view('orders/order_edit_header'); ?>
+<?php $this->load->view('orders/order_edit_detail_header'); ?>
 
+<?php
+		$asq = getConfig('ALLOW_LOAD_QUOTATION');
+		$qt =  'disabled';
+		if($asq && $order->state < 4 && $order->is_expired == 0 && ($this->pm->can_add OR $this->pm->can_edit))
+		{
+			$qt = '';
+		}
+?>
 <!--  Search Product -->
 <div class="row">
-	<div class="col-sm-2 col-2-harf col-xs-12 padding-5 margin-bottom-10 first">
+	<div class="col-sm-1 col-1-harf col-xs-4 padding-5 first">
+		<input type="text"
+		class="form-control input-sm text-center"
+		id="qt_no"
+		name="qty_no"
+		placeholder="ใบเสนอราคา"
+		value="<?php echo $order->quotation_no; ?>"
+		<?php echo $qt; ?>>
+	</div>
+	<div class="col-sm-1 col-xs-4 padding-5">
+
+		<button type="button"
+		class="btn btn-xs btn-primary btn-block"
+		id="btn-qt-no"
+		<?php if($asq) : ?>
+		onclick="get_quotation()"
+	<?php endif; ?>
+		<?php echo $qt; ?>
+		>ดึงรายการ</button>
+
+	</div>
+	<div class="col-sm-2 col-2-harf col-xs-12 padding-5 margin-bottom-10">
     <input type="text" class="form-control input-sm text-center" id="pd-box" placeholder="ค้นรหัสสินค้า" />
   </div>
   <div class="col-sm-1 col-1-harf col-xs-12 padding-5 margin-bottom-10">
@@ -38,15 +71,12 @@ $hide = $order->status == 1 ? 'hide' : '';
   <div class="col-sm-1 col-xs-6 padding-5 margin-bottom-10">
     <input type="number" class="form-control input-sm text-center" id="input-qty">
   </div>
-  <div class="col-sm-1 col-xs-12 padding-5 margin-bottom-10">
+  <div class="col-sm-1 col-xs-12 padding-5 margin-bottom-10 last">
     <button type="button" class="btn btn-xs btn-primary btn-block" onclick="addItemToOrder()">เพิ่ม</button>
   </div>
 
-  <div class="col-sm-2 col-2-harf col-xs-6 padding-5 margin-bottom-10 last">
-    <button type="button" class="btn btn-xs btn-info btn-block" onclick="recalDiscount()">
-        <i class="fa fa-calculator"></i> คำนวณส่วนลดใหม่</button>
-      </button>
-  </div>
+
+
 </div>
 <hr class="margin-top-15 margin-bottom-0" />
 <!--- Category Menu ---------------------------------->
@@ -90,7 +120,7 @@ $hide = $order->status == 1 ? 'hide' : '';
 </form>
 <input type="hidden" id="auz" value="<?php echo getConfig('ALLOW_UNDER_ZERO'); ?>">
 <script src="<?php echo base_url(); ?>scripts/orders/orders.js"></script>
-<script src="<?php echo base_url(); ?>scripts/orders/order_add.js"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_add.js?v=<?php echo date('YmdH'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/product_tab_menu.js"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_grid.js"></script>
 
