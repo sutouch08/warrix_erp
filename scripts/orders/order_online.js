@@ -619,7 +619,18 @@ $('#district').autocomplete({
 
 
 $('#province').autocomplete({
-	source:BASE_URL + 'auto_complete/district',
+	source:BASE_URL + 'auto_complete/province',
+	autoFocus:true,
+	open:function(event){
+		var $ul = $(this).autocomplete('widget');
+		$ul.css('width', 'auto');
+	}
+})
+
+
+
+$('#postcode').autocomplete({
+	source:BASE_URL + 'auto_complete/postcode',
 	autoFocus:true,
 	open:function(event){
 		var $ul = $(this).autocomplete('widget');
@@ -628,13 +639,15 @@ $('#province').autocomplete({
 	close:function(){
 		var rs = $.trim($(this).val());
 		var adr = rs.split('>>');
-		if(adr.length == 2){
-			$('#province').val(adr[0]);
-			$('#postcode').val(adr[1]);
+		if(adr.length == 4){
+			$('#sub_district').val(adr[0]);
+			$('#district').val(adr[1]);
+			$('#province').val(adr[2]);
+			$('#postcode').val(adr[3]);
+			$('#postcode').focus();
 		}
 	}
 })
-
 
 
 function clearAddressField()

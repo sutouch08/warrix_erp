@@ -890,7 +890,7 @@ class Consignment_order extends PS_Controller
                     $discount = $disc['discount_amount'];
                     $amount = ($price - $discount) * $qty;
                     $input_type = 3;  //--- 1 = key in , 2 = load diff, 3 = excel
-                    $stock = $item->count_stock == 1 ? $this->stock_model->get_stock_zone($doc->zone_code, $item->code) : 10000000;
+                    $stock = $item->count_stock == 1 ? $this->stock_model->get_consign_stock_zone($doc->zone_code, $item->code) : 10000000;
                     $c_qty = $item->count_stock == 1 ? $this->consignment_order_model->get_unsave_qty($code, $item->code) : 0;
                     $detail = $this->consignment_order_model->get_exists_detail($code, $product_code, $price, $discLabel, $input_type);
                     $sum_qty = $qty + $c_qty;

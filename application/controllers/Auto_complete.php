@@ -219,6 +219,41 @@ public function get_prepare_item_code()
   }
 
 
+	public function province()
+  {
+    $sc = array();
+    $adr = $this->db->select("province")
+    ->like('province', $_REQUEST['term'])
+    ->group_by('province')
+    ->limit(20)->get('address_info');
+    if($adr->num_rows() > 0)
+    {
+      foreach($adr->result() as $rs)
+      {
+        $sc[] = $rs->province;
+      }
+    }
+
+    echo json_encode($sc);
+  }
+
+
+	public function postcode()
+  {
+    $sc = array();
+    $adr = $this->db->like('zipcode', $_REQUEST['term'])->limit(20)->get('address_info');
+    if($adr->num_rows() > 0)
+    {
+      foreach($adr->result() as $rs)
+      {
+        $sc[] = $rs->tumbon.'>>'.$rs->amphur.'>>'.$rs->province.'>>'.$rs->zipcode;
+      }
+    }
+
+    echo json_encode($sc);
+  }
+
+
 
 
   public function get_vendor_code_and_name()
@@ -562,11 +597,11 @@ public function get_prepare_item_code()
     $sc = array();
     $txt = convert($_REQUEST['term']);
     $qr = "SELECT BpCode, BpName FROM OOAT ";
-    $this->ms->select('BpCode, BpName');
+    $qr .= "WHERE StartDate <= '".now()."' AND EndDate >= '".now()."' ";
 
     if($txt != '*')
     {
-      $qr .= "WHERE BpCode LIKE N'%{$txt}%' OR BpName LIKE N'%{$txt}%' ";
+      $qr .= "AND (BpCode LIKE N'%{$txt}%' OR BpName LIKE N'%{$txt}%') ";
     }
 
     $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";
@@ -592,13 +627,14 @@ public function get_prepare_item_code()
   public function get_support()
   {
     $sc = array();
-    $txt = convert($_REQUEST['term']);
+    $txt = trim($_REQUEST['term']);
+
     $qr = "SELECT BpCode, BpName FROM OOAT ";
-    $this->ms->select('BpCode, BpName');
+		$qr .= "WHERE StartDate <= '".now()."' AND EndDate >= '".now()."' ";
 
     if($txt != '*')
     {
-      $qr .= "WHERE BpCode LIKE N'%{$txt}%' OR BpName LIKE N'%{$txt}%' ";
+      $qr .= "AND (BpCode LIKE N'%{$txt}%' OR BpName LIKE N'%{$txt}%') ";
     }
 
     $qr .= "ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY";

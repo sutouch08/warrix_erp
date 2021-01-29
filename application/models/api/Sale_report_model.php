@@ -1,7 +1,7 @@
 <?php
 class Sale_report_model extends CI_Model
 {
-	private $begin_date = '2020-10-22 00:00:00';
+	private $begin_date = '2020-12-15 00:00:00';
   public function __construct()
   {
       parent::__construct();

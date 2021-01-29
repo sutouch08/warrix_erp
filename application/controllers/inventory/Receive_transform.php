@@ -397,6 +397,19 @@ class Receive_transform extends PS_Controller
   }
 
 
+	private function get_avg_cost($code)
+	{
+		$this->load->model('masters/products_model');
+		$cost = $this->products_model->get_sap_item_avg_cost($code);
+
+		if(empty($cost))
+		{
+			$cost = $this->products_model->get_product_cost($code);
+		}
+
+		return $cost;
+	}
+
 
   public function get_transform_detail()
   {
@@ -418,8 +431,8 @@ class Receive_transform extends PS_Controller
           'barcode' => $rs->barcode,
           'pdCode' => $rs->product_code,
           'pdName' => $rs->name,
-          'qty' => number($rs->sold_qty),
-          'price' => number($rs->price,2),
+          'qty' => round($rs->sold_qty,2),
+          'price' => round($this->get_avg_cost($rs->product_code),2),
           'limit' => $diff,
           'backlog' => number($diff)
         );

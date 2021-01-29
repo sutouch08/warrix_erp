@@ -257,7 +257,7 @@ class Transform_model extends CI_Model
     ->where('tf.is_closed', 1)
     ->where('od.state', 8)
     ->where('od.is_cancled', 0)
-    ->where('od.is_expired', 0);
+    ->where('od.is_expired', 0)
     ->where('tf.reference IS NULL', NULL, FALSE);
 
     if($code !== '*')

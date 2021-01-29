@@ -1,11 +1,11 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
-	<div class="col-sm-6">
+	<div class="col-sm-6 col-xs-6 padding-5">
     <h3 class="title">
       <?php echo $this->title; ?>
     </h3>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6 col-xs-6 padding-5">
     	<p class="pull-right top-p">
       <?php if($this->pm->can_add) : ?>
         <button type="button" class="btn btn-sm btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
@@ -13,25 +13,25 @@
       </p>
     </div>
 </div><!-- End Row -->
-<hr class=""/>
+<hr class="padding-5"/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
 <div class="row">
-  <div class="col-sm-2 padding-5 first">
+  <div class="col-sm-2 col-xs-6 padding-5">
     <label>เลขที่เอกสาร</label>
     <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
   </div>
 
-  <div class="col-sm-2 padding-5">
+  <div class="col-sm-2 col-xs-6 padding-5">
     <label>ลูกค้า</label>
     <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-2 col-xs-6 padding-5">
     <label>พนักงาน</label>
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-2 col-xs-6 padding-5">
 		<label>การอนุมัติ</label>
 		<select class="form-control input-sm" name="isApprove" onchange="getSearch()">
 			<option value="all">ทั้งหมด</option>
@@ -40,55 +40,55 @@
 		</select>
 	</div>
 
-	<div class="col-sm-2 padding-5">
+	<div class="col-sm-2 col-xs-6 padding-5">
     <label>วันที่</label>
     <div class="input-daterange input-group">
-      <input type="text" class="form-control input-sm width-50 from-date" name="fromDate" id="fromDate" value="<?php echo $from_date; ?>" />
-      <input type="text" class="form-control input-sm width-50" name="toDate" id="toDate" value="<?php echo $to_date; ?>" />
+      <input type="text" class="form-control input-sm width-50 text-center from-date" name="fromDate" id="fromDate" value="<?php echo $from_date; ?>" />
+      <input type="text" class="form-control input-sm width-50 text-center" name="toDate" id="toDate" value="<?php echo $to_date; ?>" />
     </div>
   </div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-6 padding-5">
 		<label class="display-block not-show">search</label>
     <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
   </div>
-	<div class="col-sm-1 padding-5 last">
+	<div class="col-sm-1 col-xs-6 padding-5">
 		<label class="display-block not-show">Reset</label>
     <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
 
 </div>
 <div class="row margin-top-10">
-	<div class="col-sm-1 col-1-harf padding-5 first">
+	<div class="col-sm-1 col-1-harf col-xs-4 padding-5">
 		<button type="button" id="btn-state-1" class="btn btn-sm btn-block <?php echo $btn['state_1']; ?>" onclick="toggleState(1)">รอดำเนินการ</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-3" class="btn btn-sm btn-block <?php echo $btn['state_3']; ?>" onclick="toggleState(3)">รอจัด</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-4" class="btn btn-sm btn-block <?php echo $btn['state_4']; ?>" onclick="toggleState(4)">กำลังจัด</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-5" class="btn btn-sm btn-block <?php echo $btn['state_5']; ?>" onclick="toggleState(5)">รอตรวจ</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-6" class="btn btn-sm btn-block <?php echo $btn['state_6']; ?>" onclick="toggleState(6)">กำลังตรวจ</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-7" class="btn btn-sm btn-block <?php echo $btn['state_7']; ?>" onclick="toggleState(7)">รอเปิดบิล</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-8" class="btn btn-sm btn-block <?php echo $btn['state_8']; ?>" onclick="toggleState(8)">เปิดบิลแล้ว</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-state-9" class="btn btn-sm btn-block <?php echo $btn['state_9']; ?>" onclick="toggleState(9)">ยกเลิก</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-not-save" class="btn btn-sm btn-block <?php echo $btn['not_save']; ?>" onclick="toggleNotSave()">ไม่บันทึก</button>
 	</div>
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-4 padding-5">
 		<button type="button" id="btn-expire" class="btn btn-sm btn-block <?php echo $btn['is_expire']; ?>" onclick="toggleIsExpire()">หมดอายุ</button>
 	</div>
-	<div class="col-sm-1 col-1-harf padding-5 last">
+	<div class="col-sm-1 col-1-harf col-xs-4 padding-5">
 		<button type="button" id="btn-only-me" class="btn btn-sm btn-block <?php echo $btn['only_me']; ?>" onclick="toggleOnlyMe()">เฉพาะฉัน</button>
 	</div>
 </div>
@@ -108,7 +108,7 @@
 </form>
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-12 col-xs-12 padding-5 table-responsive">
 		<table class="table table-striped table-hover border-1">
 			<thead>
 				<tr>

@@ -1428,6 +1428,7 @@ public function export_receive_transform($code)
             'DocRate' => 1,
             'DocTotal' => remove_vat($total_amount),
             'Comments' => limitText($doc->remark, 250),
+						'U_PDNO' => $doc->order_code,
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => now()
           );
@@ -2211,6 +2212,7 @@ public function export_transform_goods_issue($code)
             'DocDueDate' => sap_date($doc->date_add),
             'DocTotal' => $doc_total,
             'DocTotalFC' => $doc_total,
+						'U_PDNO' => $doc->reference,
             'Comments' => limitText($doc->remark, 250),
             'F_E_Commerce' => 'A',
             'F_E_CommerceDate' => sap_date(now(), TRUE)
@@ -2234,6 +2236,7 @@ public function export_transform_goods_issue($code)
               $arr = array(
                 'DocEntry' => $docEntry,
                 'U_ECOMNO' => $rs->adjust_code,
+								'BaseRef' => $doc->reference,
                 'LineNum' => $line,
                 'ItemCode' => $rs->product_code,
                 'Dscription' => limitText($rs->product_name, 95),

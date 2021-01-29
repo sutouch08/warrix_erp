@@ -1,12 +1,12 @@
 <?php $this->load->view('include/header'); ?>
 <?php $isAdmin = (get_cookie('id_profile') == -987654321 ? TRUE : FALSE); ?>
 <div class="row">
-	<div class="col-sm-3">
+	<div class="col-sm-3 col-xs-12 padding-5">
     <h3 class="title">
       <?php echo $this->title; ?>
     </h3>
     </div>
-    <div class="col-sm-9">
+    <div class="col-sm-9 col-xs-12 padding-5">
     	<p class="pull-right" style="margin-bottom:1px;">
 				<?php if(empty($approve_view)) : ?>
 				<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
@@ -39,7 +39,7 @@
       </p>
     </div>
 </div><!-- End Row -->
-<hr/>
+<hr class="padding-5"/>
 
 <?php $this->load->view('sponsor/sponsor_edit_header'); ?>
 <?php if(empty($approve_view)) : ?>

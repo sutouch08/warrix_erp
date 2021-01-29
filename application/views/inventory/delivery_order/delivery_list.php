@@ -7,7 +7,7 @@
     </div>
 		<div class="col-sm-6">
 			<p class="pull-right top-p">
-				<button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-search"></i> Search</button>
+				<button type="submit" class="btn btn-sm btn-primary" onclick="getSearch()"><i class="fa fa-search"></i> Search</button>
 				<button type="button" class="btn btn-sm btn-warning" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
 			</p>
 		</div>

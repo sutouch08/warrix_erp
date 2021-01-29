@@ -8,6 +8,7 @@ class Temp_transfer extends PS_Controller
   public $menu_sub_group_code = 'TETRANSFER';
 	public $title = 'ตรวจสอบ WW-WQ-MV-WL';
   public $filter;
+
   public function __construct()
   {
     parent::__construct();
@@ -65,6 +66,40 @@ class Temp_transfer extends PS_Controller
     $this->load->view('inventory/temp_transfer/temp_detail', $ds);
   }
 
+
+
+	public function delete()
+	{
+		$sc = TRUE;
+		$code = $this->input->post('code');
+
+		$doc = $this->temp_transfer_model->get($code);
+
+		if(!empty($doc))
+		{
+			if($doc->F_Sap != 'Y')
+			{
+				if(! $this->temp_transfer_model->delete($doc->DocEntry))
+				{
+					$sc = FALSE;
+					$this->error = "Delete failed";
+				}
+
+			}
+			else
+			{
+				$sc = FALSE;
+				$this->error = "Document already in SAP";
+			}
+		}
+		else
+		{
+			$sc = FALSE;
+			$this->error = "Document not exists";
+		}
+
+		echo $sc === TRUE ? 'success' : $this->error;
+	}
 
 
 

@@ -145,6 +145,8 @@ hr{
 	border-color:#CCC;
 	margin-top: 5px;
 	margin-bottom: 5px;
+	margin-left: -7px;
+  margin-right: -7px;
 }
 
 hr.padding-5{

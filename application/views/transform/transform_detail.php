@@ -1,7 +1,7 @@
 
 <div class="row">
-	<div class="col-sm-12">
-		<p class="pull-right red">** เชื่อมโยงสินค้าได้เฉพาะสถานะ "รอดำเนินการ" เท่านั้น</p>
+	<p class="pull-right red">** เชื่อมโยงสินค้าได้เฉพาะสถานะ "รอดำเนินการ" เท่านั้น</p>
+	<div class="col-sm-12 col-xs-12 padding-5 table-responsive">
     	<table class="table table-striped border-1">
         <thead>
         	<tr class="font-size-12">

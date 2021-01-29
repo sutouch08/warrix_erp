@@ -31,6 +31,8 @@ class Support_model extends CI_Model
     ->from('OOAT')
     ->join('OAT1', 'OOAT.AbsID = OAT1.AgrNo', 'inner')
     ->where('BpCode', $code)
+		->where('OOAT.StartDate <=', now())
+		->where('OOAT.EndDate >=', now())
     ->get();
 
     if($rs->num_rows() === 1)

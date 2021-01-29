@@ -6,6 +6,36 @@ class Temp_transfer_model extends CI_Model
     parent::__construct();
   }
 
+	public function get($code)
+	{
+		$rs = $this->mc
+		->select('DocEntry, F_Sap')
+		->where('U_ECOMNO', $code)
+		->group_start()
+		->where('F_Sap =', 'N')
+		->or_where('F_Sap IS NULL', NULL, FALSE)
+		->group_end()
+		->get('OWTR');
+
+		if($rs->num_rows() > 0)
+		{
+			return $rs->row();
+		}
+
+		return NULL;
+	}
+
+
+	public function delete($docEntry)
+	{
+		$this->mc->trans_start();
+		$this->mc->where('DocEntry', $docEntry)->delete('WTR1');
+		$this->mc->where('DocEntry', $docEntry)->delete('OWTR');
+		$this->mc->trans_complete();
+
+		return $this->mc->trans_status();
+	}
+
 
   public function count_rows(array $ds = array())
   {

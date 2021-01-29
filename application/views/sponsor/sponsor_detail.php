@@ -5,7 +5,7 @@
 	?>
 <form id="discount-form">
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-12 col-xs-12 padding-5 table-responsive">
     	<table class="table table-striped border-1">
         <thead>
         	<tr class="font-size-12">

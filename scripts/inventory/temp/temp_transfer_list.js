@@ -48,3 +48,42 @@ function get_detail(code)
 	var target 	= HOME + 'get_detail/'+code+'?nomenu';
 	window.open(target, "_blank", prop );
 }
+
+function get_delete(code) {
+	swal({
+		title: "คุณแน่ใจ ?",
+		text: "ต้องการลบ '"+code+"' หรือไม่ ?",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: 'ใช่, ฉันต้องการ',
+		cancelButtonText: 'ไม่ใช่',
+		closeOnConfirm: false
+		}, function(){
+			$.ajax({
+				url: HOME + 'delete',
+				type:"POST",
+				cache:"false",
+				data:{
+					"code" : code
+				},
+				success: function(rs){
+					var rs = $.trim(rs);
+					if( rs == 'success' ){
+						swal({
+							title: 'Deleted',
+							type: 'success',
+							timer: 1000
+						});
+
+						setTimeout(function(){
+							window.location.reload();
+						}, 1200);
+
+					}else{
+						swal("Error !", rs, "error");
+					}
+				}
+			});
+	});
+}

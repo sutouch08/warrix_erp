@@ -123,6 +123,12 @@
 					<td class="text-right">
 						<button type="button" class="btn btn-minier btn-info" onclick="get_detail('<?php echo $rs->U_ECOMNO; ?>')">
 							<i class="fa fa-eye"></i>
+						</button>
+						<?php if($rs->F_Sap != 'Y') : ?>
+							<button type="button" class="btn btn-minier btn-danger" onclick="get_delete('<?php echo $rs->U_ECOMNO; ?>')">
+								<i class="fa fa-trash"></i>
+							</button>
+						<?php endif; ?>
 					</td>
         </tr>
 <?php  $no++; ?>

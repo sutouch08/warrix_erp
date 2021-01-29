@@ -6,6 +6,31 @@ class Products_model extends CI_Model
     parent::__construct();
   }
 
+	public function get_sap_item_avg_cost($code)
+	{
+		$rs = $this->ms->select('LstEvlPric AS cost')->where('ItemCode', $code)->get('OITM');
+		if($rs->num_rows() === 1)
+		{
+			return $rs->row()->cost;
+		}
+
+		return NULL;
+	}
+
+
+	public function get_product_cost($code)
+	{
+		$rs = $this->db->select('cost')->where('code', $code)->get('products');
+
+		if($rs->num_rows() === 1)
+		{
+			return $rs->row()->cost;
+		}
+
+		return 0;
+	}
+
+
   public function count_sap_update_list($date_add, $date_upd)
   {
     $rs = $this->ms->select('ItemCode')

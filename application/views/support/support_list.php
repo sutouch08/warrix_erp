@@ -1,11 +1,11 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
-	<div class="col-sm-6">
+	<div class="col-sm-6 col-xs-8 padding-5">
     <h3 class="title">
     <?php echo $this->title; ?>
     </h3>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6 col-xs-4 padding-5">
     	<p class="pull-right top-p">
       <?php if($this->pm->can_add) : ?>
         <button type="button" class="btn btn-sm btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
@@ -13,10 +13,10 @@
       </p>
     </div>
 </div><!-- End Row -->
-<hr class=""/>
+<hr class="padding-5"/>
 <form id="searchForm" method="post" action="<?php echo current_url(); ?>">
 <div class="row">
-  <div class="col-sm-1 col-1-harf col-xs-6 padding-5 first">
+  <div class="col-sm-1 col-1-harf col-xs-6 padding-5">
     <label>เลขที่เอกสาร</label>
     <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
   </div>
@@ -36,7 +36,7 @@
     <input type="text" class="form-control input-sm search" name="user" value="<?php echo $user; ?>" />
   </div>
 
-	<div class="col-sm-1 padding-5">
+	<div class="col-sm-1 col-xs-6 padding-5">
 		<label>การอนุมัติ</label>
 		<select class="form-control input-sm" name="isApprove" onchange="getSearch()">
 			<option value="all">ทั้งหมด</option>
@@ -46,7 +46,7 @@
 	</div>
 
 
-	<div class="col-sm-2 col-xs-12 padding-5">
+	<div class="col-sm-2 col-xs-6 padding-5">
     <label>วันที่</label>
     <div class="input-daterange input-group width-100">
       <input type="text" class="form-control input-sm width-50 from-date" name="fromDate" id="fromDate" value="<?php echo $from_date; ?>" />
@@ -55,20 +55,20 @@
 
   </div>
 
-  <div class="col-sm-1 padding-5">
+  <div class="col-sm-1 col-xs-6 padding-5">
     <label class="display-block not-show">buton</label>
     <button type="submit" class="btn btn-xs btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
   </div>
-	<div class="col-sm-1 padding-5 last">
+	<div class="col-sm-1 col-xs-6 padding-5">
     <label class="display-block not-show">buton</label>
     <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()"><i class="fa fa-retweet"></i> Reset</button>
   </div>
 </div>
-<hr class="margin-top-15">
+<hr class="margin-top-15 padding-5">
 </form>
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
-	<div class="col-sm-12">
+	<div class="col-sm-12 col-xs-12 padding-5 table-responsive">
 		<table class="table table-striped table-hover border-1">
 			<thead>
 				<tr>

@@ -336,7 +336,7 @@ class Transfer extends PS_Controller
 
 
 
-    echo $sc === TRUE ? 'success' : $message;
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
