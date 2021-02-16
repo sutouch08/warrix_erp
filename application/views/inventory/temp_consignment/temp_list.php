@@ -114,6 +114,8 @@
               <span class="blue">NC</span>
             <?php elseif($rs->F_Sap === 'N') : ?>
               <span class="red">ERROR</span>
+						<?php elseif($rs->F_Sap == 'Y') : ?>
+							<span class="green">สำเร็จ</span>
             <?php endif; ?>
           </td>
           <td class="">

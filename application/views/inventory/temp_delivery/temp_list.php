@@ -68,12 +68,12 @@
       <thead>
         <tr>
           <th class="width-5 text-center">ลำดับ</th>
-          <th class="width-10 text-center">วันที่</th>
-          <th class="width-15">เลขที่เอกสาร </th>
+          <th class="width-8 text-center">วันที่</th>
+          <th class="width-10">เลขที่เอกสาร </th>
           <th class="width-10">รหัสลูกค้า</th>
           <th class="width-20">ชื่อลูกค้า</th>
-          <th class="width-10">เข้าถังกลาง</th>
-          <th class="width-10">เข้า SAP</th>
+          <th class="width-15">เข้าถังกลาง</th>
+          <th class="width-15">เข้า SAP</th>
           <th class="width-5 text-center">สถานะ</th>
 					<th class="">หมายเหตุ</th>
 					<th class="width-5"></th>
@@ -120,6 +120,8 @@
               <span class="blue">NC</span>
             <?php elseif($rs->F_Sap === 'N') : ?>
               <span class="red">ERROR</span>
+						<?php elseif($rs->F_Sap === 'Y') : ?>
+							<span class="green">สำเร็จ</span>
             <?php endif; ?>
           </td>
           <td class="middle">

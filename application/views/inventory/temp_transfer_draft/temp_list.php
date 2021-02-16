@@ -127,6 +127,8 @@
               <span class="red">ERROR</span>
 						<?php elseif($rs->F_Sap === 'D') : ?>
 							<span class="blue">Draft</span>
+						<?php elseif($rs->F_Sap == 'Y') : ?>
+							<span class="green">สำเร็จ</span>
             <?php endif; ?>
           </td>
 					<td class="middle text-center">
