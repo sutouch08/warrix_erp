@@ -246,6 +246,10 @@ class Import_order extends CI_Controller
                     //---- กำหนดรหัสลูกค้าตามค่าที่ config สำหรับเว็บไซต์ที่ชำระแบบ COD
                     $customer_code = $web_customer_cod;
                   }
+									else
+									{
+										$customer_code = $channels->customer_code;
+									}
                 }
                 else
                 {

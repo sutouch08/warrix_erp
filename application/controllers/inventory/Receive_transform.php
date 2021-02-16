@@ -163,14 +163,16 @@ class Receive_transform extends PS_Controller
             if($qty != 0 && $sc === TRUE)
             {
               $pd = $this->products_model->get($item);
+							$price = $this->get_avg_cost($item);
+							$cost = $price == 0 ? $pd->cost : $price;
               $ds = array(
                 'receive_code' => $code,
                 'style_code' => $pd->style_code,
                 'product_code' => $item,
                 'product_name' => $pd->name,
-                'price' => $prices[$item],
+                'price' => $cost,
                 'qty' => $qty,
-                'amount' => $qty * $prices[$item]
+                'amount' => $qty * $cost
               );
 
               if($this->receive_transform_model->add_detail($ds) === FALSE)
@@ -426,13 +428,15 @@ class Receive_transform extends PS_Controller
       foreach($details as $rs)
       {
         $diff = $rs->sold_qty - $rs->receive_qty;
+				$cost = $this->get_avg_cost($rs->product_code);
+				$cost = $cost == 0 ? $rs->price : $cost;
         $arr = array(
           'no' => $no,
           'barcode' => $rs->barcode,
           'pdCode' => $rs->product_code,
           'pdName' => $rs->name,
           'qty' => round($rs->sold_qty,2),
-          'price' => round($this->get_avg_cost($rs->product_code),2),
+          'price' => round($cost,2),
           'limit' => $diff,
           'backlog' => number($diff)
         );
@@ -469,26 +473,32 @@ class Receive_transform extends PS_Controller
 
 
   public function update_header(){
+		$sc = TRUE;
     $code = $this->input->post('code');
     $date = db_date($this->input->post('date_add'));
     $remark = get_null($this->input->post('remark'));
+
     if(!empty($code))
     {
+			$arr = array(
+	      'date_add' => $date,
+	      'remark' => $remark
+	    );
+
+	    if(!$this->receive_transform_model->update($code, $arr))
+	    {
+	      $sc = FALSE;
+				$this->error = "ปรับปรุงข้อมูลไม่สำเร็จ";
+	    }
 
     }
-    $arr = array(
-      'date_add' => $date,
-      'remark' => $remark
-    );
+		else
+		{
+			$sc = FALSE;
+			$this->error = "Missing required parameter : code";
+		}
 
-    if($this->receive_transform_model->update($code, $arr))
-    {
-      echo 'success';
-    }
-    else
-    {
-      echo 'ปรับปรุงข้อมูลไม่สำเร็จ';
-    }
+		$this->response($sc);
   }
 
 

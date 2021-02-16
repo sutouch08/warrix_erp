@@ -273,6 +273,11 @@ function is_true($value)
 }
 
 
+function get_zero($value)
+{
+	return $value === NULL ? 0 : $value;
+}
+
 
 function pagination_config( $base_url, $total_rows = 0, $perpage = 20, $segment = 3)
 {

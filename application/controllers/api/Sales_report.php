@@ -4,8 +4,8 @@ class Sales_report extends CI_Controller
   private $host = "https://api-report.warrix.co.th";
   private $endpoint = "/api/v1/sales-report";
   private $url = "";
-  public $app_id = "MkgwaFZtZjBJSTRDclNncWlXd0poQ1ZEZnA1SVJvZjY=";
-  public $app_secret = "Q213dGdRSUdmNFVWQWdyWg==";
+  private $app_id = "MkgwaFZtZjBJSTRDclNncWlXd0poQ1ZEZnA1SVJvZjY=";
+  private $app_secret = "Q213dGdRSUdmNFVWQWdyWg==";
   public $home;
 
   public function __construct()
@@ -20,8 +20,16 @@ class Sales_report extends CI_Controller
     $this->load->view('auto/sales_report_api');
   }
 
+
+	public function resend()
+	{
+		$this->load->view('auto/resend_error');
+	}
+
+
   public function get_query()
   {
+		$code = 'WO-xxxxxx';
     $this->db
     ->select('so.*')
     ->select('cn.name AS channels')
@@ -165,6 +173,8 @@ class Sales_report extends CI_Controller
       //echo $data_string;
 
       $ch = curl_init();
+
+
       curl_setopt($ch, CURLOPT_URL, $apiUrl);
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
@@ -270,8 +280,8 @@ class Sales_report extends CI_Controller
                 'sale_code' => $order->sale_code,
                 'sale_name' => $order->sale_name,
                 'employee_nam' => $order->employee_name,
-                'date_add' => date('d-m-Y H:i:s', strtotime($order->date_add)),
-                'date_upd' => date('d-m-Y H:i:s'),
+								'date_add' => date('d/m/Y H:i:s', strtotime($order->date_add)),
+                'date_upd' => date('d/m/Y H:i:s'),
                 'id_zone' => $order->zone_code,
                 'id_warehouse' => $order->warehouse_code
               );
