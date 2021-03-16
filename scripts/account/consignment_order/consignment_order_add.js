@@ -591,6 +591,15 @@ function uploadfile(){
 			{
 				swal("Error!", rs, "error");
 			}
+		},
+		error:function(xhr, status, error){
+			load_out();
+			var errorMessage = xhr.status + ': '+xhr.statusText;
+			swal({
+				title:'Error!',
+				text:'Error-'+errorMessage,
+				type:'error'
+			});
 		}
 	});
 }

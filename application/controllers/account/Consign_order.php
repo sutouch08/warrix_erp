@@ -935,7 +935,7 @@ class Consign_order extends PS_Controller
             {
               //--- skip hrader row
               $product_code = $rs['A'];
-              $price = $rs['B'];
+              $price = floatval(preg_replace('/[^\d.]/', '', $rs['B']));
               $qty = $rs['C'];
               $discLabel = empty($rs['D']) ? 0 : $rs['D'];
 

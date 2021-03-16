@@ -3,6 +3,8 @@ class Import_order extends CI_Controller
 {
   public $ms;
   public $mc;
+	public $sync_web_stock = FALSE;
+
   public function __construct()
   {
     parent::__construct();
@@ -21,6 +23,10 @@ class Import_order extends CI_Controller
 
     $this->load->library('excel');
     $this->load->library('api');
+
+		$this->sync_web_stock = getConfig('SYNC_WEB_STOCK') == 1 ? TRUE : FALSE;
+
+
   }
 
 
@@ -151,7 +157,8 @@ class Import_order extends CI_Controller
                 'Q' => 'shipping fee',
                 'R' => 'service fee',
                 'S' => 'force update',
-                'T' => 'Is DHL'
+                'T' => 'Is DHL',
+								'U' => 'Hold'
               );
 
               foreach($headCol as $col => $field)
@@ -225,7 +232,7 @@ class Import_order extends CI_Controller
               }
 
               //-- state ของออเดอร์ จะมีการเปลี่ยนแปลงอีกที
-              $state = 3;
+              $state = empty($rs['U']) ? 3 : 1;
 
               //---- ถ้ายังไม่มีออเดอร์ ให้เพิ่มใหม่ หรือ มีออเดอร์แล้ว แต่ต้องการ update
               //---- โดยการใส่ force update มาเป็น 1
@@ -314,7 +321,7 @@ class Import_order extends CI_Controller
                   {
                     $arr = array(
                       'order_code' => $order_code,
-                      'state' => 3,
+                      'state' => $state,
                       'update_user' => get_cookie('uname')
                     );
                     //--- add state event
@@ -442,7 +449,11 @@ class Import_order extends CI_Controller
                 }
                 else
                 {
-                  $this->update_api_stock($item->code, $item->old_code);
+									if($this->sync_web_stock)
+									{
+										$this->update_api_stock($item->code, $item->old_code);
+									}
+
                 }
               }
               else
@@ -477,7 +488,10 @@ class Import_order extends CI_Controller
                   }
                   else
                   {
-                    $this->update_api_stock($item->code, $item->old_code);
+                    if($this->sync_web_stock)
+										{
+											$this->update_api_stock($item->code, $item->old_code);
+										}
                   }
                 } //--- enf force update
               } //--- end if exists detail
@@ -568,7 +582,7 @@ class Import_order extends CI_Controller
 
   public function update_api_stock($code, $old_code)
   {
-    if(getConfig('SYNC_WEB_STOCK') == 1)
+    if($this->sync_web_stock)
     {
       $sell_stock = $this->stock_model->get_sell_stock($code);
       $reserv_stock = $this->orders_model->get_reserv_stock($code);
