@@ -158,7 +158,8 @@ class Import_order extends CI_Controller
                 'R' => 'service fee',
                 'S' => 'force update',
                 'T' => 'Is DHL',
-								'U' => 'Hold'
+								'U' => 'Hold',
+								'V' => 'Remark'
               );
 
               foreach($headCol as $col => $field)
@@ -215,6 +216,9 @@ class Import_order extends CI_Controller
 
               //--- คลังสินค้า
               $warehouse_code = getConfig('WEB_SITE_WAREHOUSE_CODE');
+
+							//-- remark
+							$remark = $rs['V'];
 
               $is_exists = FALSE;
 
@@ -313,7 +317,8 @@ class Import_order extends CI_Controller
                     'date_add' => $date_add,
                     'warehouse_code' => $warehouse_code,
                     'user' => get_cookie('uname'),
-                    'is_import' => 1
+                    'is_import' => 1,
+										'remark' => $remark
                   );
 
                   //--- เพิ่มเอกสาร
