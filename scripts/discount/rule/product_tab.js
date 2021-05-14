@@ -379,7 +379,7 @@ $('#txt-style-id-box').autocomplete({
   autoFocus:true,
   close:function(){
     arr = $(this).val().split(' | ');
-    if(arr.length == 1){
+    if(arr.length == 2){
       code = arr[0];
       $('#id_style').val(code);
       $(this).val(code);

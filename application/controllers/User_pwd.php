@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class User_pwd extends CI_Controller
+class User_pwd extends PS_Controller
 {
   public $title = 'เปลี่ยนรหัสผ่าน';
 	public $menu_code = 'change password';

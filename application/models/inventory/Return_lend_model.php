@@ -205,7 +205,7 @@ class Return_lend_model extends CI_Model
     if(!empty($ds['empName']))
     {
       $emp_in = employee_in($ds['empName']); //--- employee_helper;
-      $this->db->where_in($emp_in);
+      $this->db->where_in('empID', $emp_in);
     }
 
     if(!empty($ds['status']) && $ds['status'] != 'all')
@@ -247,7 +247,7 @@ class Return_lend_model extends CI_Model
     if(!empty($ds['empName']))
     {
       $emp_in = employee_in($ds['empName']); //--- employee_helper;
-      $this->db->where_in($emp_in);
+      $this->db->where_in('empID', $emp_in);
     }
 
     if($ds['status'] != 'all')

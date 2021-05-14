@@ -934,10 +934,10 @@ class Consign_order extends PS_Controller
             if($i > 1)
             {
               //--- skip hrader row
-              $product_code = $rs['A'];
+              $product_code = trim($rs['A']);
               $price = floatval(preg_replace('/[^\d.]/', '', $rs['B']));
-              $qty = $rs['C'];
-              $discLabel = empty($rs['D']) ? 0 : $rs['D'];
+              $qty = trim($rs['C']);
+              $discLabel = empty(trim($rs['D'])) ? 0 : trim($rs['D']);
 
               if(!empty($product_code))
               {
